@@ -35,6 +35,9 @@ public class AsymmetricAlgorithmShimTests {
       catch (CryptographicException) {
         // ignore
       }
+      catch (PlatformNotSupportedException) {
+        // ignore
+      }
 
       if (algorithm is not null)
         yield return new object[] { algorithm, label };
