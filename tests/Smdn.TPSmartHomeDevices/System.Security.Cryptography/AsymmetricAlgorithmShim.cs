@@ -17,18 +17,32 @@ public class AsymmetricAlgorithmShimTests {
 
   private static System.Collections.IEnumerable YeildTestCase_ExportSubjectPublicKeyInfoPem()
   {
-    yield return new object[] { RSA.Create(keySizeInBits: 512) };
-    yield return new object[] { RSA.Create(keySizeInBits: 1024) };
-    yield return new object[] { RSA.Create(keySizeInBits: 2048) };
+    foreach (var (algorithmGenerator, label) in new (Func<AsymmetricAlgorithm>, string) [] {
+      (static () => RSA.Create(keySizeInBits: 512), "RSA 512 bits" ),
+      (static () => RSA.Create(keySizeInBits: 1024), "RSA 1024 bits" ),
+      (static () => RSA.Create(keySizeInBits: 2048), "RSA 2048 bits" ),
 
-    yield return new object[] { DSA.Create(keySizeInBits: 1024) };
-    yield return new object[] { DSA.Create(keySizeInBits: 2048) };
+      (static () => DSA.Create(keySizeInBits: 1024), "DSA 1024 bits" ),
+      (static () => DSA.Create(keySizeInBits: 2048), "DSA 2048 bits" ),
 
-    yield return new object[] { ECDsa.Create() };
+      (static () => ECDsa.Create(), "ECDsa" ),
+    }) {
+      AsymmetricAlgorithm? algorithm = null;
+
+      try {
+        algorithm = algorithmGenerator();
+      }
+      catch (CryptographicException) {
+        // ignore
+      }
+
+      if (algorithm is not null)
+        yield return new object[] { algorithm, label };
+    }
   }
 
   [TestCaseSource(nameof(YeildTestCase_ExportSubjectPublicKeyInfoPem))]
-  public void ExportSubjectPublicKeyInfoPem(AsymmetricAlgorithm algorithm)
+  public void ExportSubjectPublicKeyInfoPem(AsymmetricAlgorithm algorithm, string label)
   {
     var expected = string.Concat(
       "-----BEGIN PUBLIC KEY-----\n",
@@ -39,7 +53,8 @@ public class AsymmetricAlgorithmShimTests {
 #if !SYSTEM_SECURITY_CRYPTOGRAPHY_ASYMMETRICALGORITHM_EXPORTSUBJECTPUBLICKEYINFOPEM
     Assert.AreEqual(
       expected,
-      AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm)
+      AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm),
+      $"{nameof(AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem)} ({label})"
     );
 #endif
 
@@ -47,7 +62,7 @@ public class AsymmetricAlgorithmShimTests {
     Assert.AreEqual(
       RemoveLF(expected),
       RemoveLF(algorithm.ExportSubjectPublicKeyInfoPem()),
-      "compare with runtime library implementation's output"
+      $"compare with runtime library implementation's output ({label})"
     );
 
     static string RemoveLF(string input)
