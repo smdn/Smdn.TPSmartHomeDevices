@@ -1,0 +1,25 @@
+<!--
+SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet)' == 'true' and $([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))">net7.0;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetCoreApp)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetFx)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SmdnTestTargetProjectDirectory)System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Smdn.Fundamental.Stream" Version="3.*" />
+    <PackageReference Include="Smdn.Test.NUnit.Constraints" Version="1.*" />
+  </ItemGroup>
+</Project>
