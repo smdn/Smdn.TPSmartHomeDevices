@@ -4,6 +4,10 @@
 name: Generate release target
 run-name: Generate release target for ${{ inputs.release_target_tag_name || github.ref_name }}
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   push:
     tags:

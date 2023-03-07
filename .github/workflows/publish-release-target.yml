@@ -4,6 +4,11 @@
 name: Publish release target
 run-name: Publish release target ${{ github.head_ref }}
 
+permissions:
+  contents: write
+  packages: write
+  pull-requests: read
+
 on:
   pull_request:
     types: [closed]
