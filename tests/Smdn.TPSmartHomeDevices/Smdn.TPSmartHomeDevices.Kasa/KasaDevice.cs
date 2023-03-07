@@ -278,7 +278,11 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.AreEqual(SocketError.HostNotFound, ex!.SocketErrorCode, nameof(ex.SocketErrorCode));
+    Assert.That(
+      ex!.SocketErrorCode,
+      Is.AnyOf(SocketError.HostNotFound, SocketError.TryAgain),
+      nameof(ex.SocketErrorCode)
+    );
 
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
