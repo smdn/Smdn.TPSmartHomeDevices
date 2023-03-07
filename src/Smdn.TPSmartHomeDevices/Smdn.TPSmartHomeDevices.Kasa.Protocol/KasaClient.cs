@@ -1,0 +1,267 @@
+// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+// SPDX-License-Identifier: MIT
+using System;
+using System.Buffers;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
+
+/// <remarks>
+/// This implementation is based on and ported from the following implementation: <see href="https://github.com/plasticrake/tplink-smarthome-api">plasticrake/tplink-smarthome-api</see>.
+/// </remarks>
+public sealed partial class KasaClient : IDisposable {
+  public const int DefaultPort = 9999;
+  private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
+#if LANG_VERSION_11_OR_GREATER
+    "err_code"u8
+#else
+    "err_code"
+#endif
+  );
+
+  private bool IsDisposed => endPoint is null;
+
+  private EndPoint? endPoint; // if null, it indicates a 'disposed' state.
+  private Socket? socket;
+  private readonly ILogger? logger;
+  private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: 1024); // TODO: best initial capacity
+
+  public bool IsConnected {
+    get {
+      ThrowIfDisposed();
+      return socket is not null && socket.Connected;
+    }
+  }
+
+  public EndPoint EndPoint {
+    get {
+      ThrowIfDisposed();
+      return endPoint;
+    }
+  }
+
+  public KasaClient(
+    EndPoint endPoint,
+    IServiceProvider? serviceProvider = null
+  )
+  {
+    this.endPoint = endPoint switch {
+      null => throw new ArgumentNullException(nameof(endPoint)),
+      DnsEndPoint dnsEndPoint => dnsEndPoint.Port == 0
+        ? new DnsEndPoint(
+          host: dnsEndPoint.Host,
+          port: DefaultPort
+        )
+        : dnsEndPoint,
+      IPEndPoint ipEndPoint => ipEndPoint.Port == 0
+        ? new IPEndPoint(
+          address: ipEndPoint.Address,
+          port: DefaultPort
+        )
+        : ipEndPoint,
+      EndPoint ep => ep, // TODO: should throw exception?
+    };
+
+    logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})"); // TODO: logger category name
+
+    logger?.LogTrace("Device end point: {DeviceEndPoint}", endPoint);
+  }
+
+  private void Dispose(bool disposing)
+  {
+    if (!disposing)
+      return;
+
+    endPoint = null;
+
+    socket?.Dispose();
+    socket = null;
+  }
+
+  public void Dispose()
+  {
+    Dispose(true);
+    GC.SuppressFinalize(this);
+  }
+
+  internal void DisposeWithLog(LogLevel logLevel, string? reasonForDispose)
+  {
+    if (IsDisposed)
+      return;
+
+    logger?.Log(logLevel: logLevel, message: reasonForDispose);
+
+    Dispose();
+  }
+
+  private void ThrowIfDisposed()
+  {
+    if (IsDisposed)
+      throw new ObjectDisposedException(GetType().FullName);
+  }
+
+  private async Task<Socket> ConnectAsync(
+    CancellationToken cancellationToken
+  )
+  {
+    var s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+    try {
+      logger?.LogDebug("Connecting");
+
+      await s.ConnectAsync(
+        remoteEP: endPoint
+        // TODO: cancellationToken
+      ).ConfigureAwait(false);
+
+      logger?.LogDebug("Connected");
+
+      return s;
+    }
+    catch (Exception ex) {
+      s.Dispose();
+
+      if (ex is SocketException exSocket)
+        logger?.LogError(ex, "Connection failed (NativeErrorCode = {NativeErrorCode})", exSocket.NativeErrorCode);
+      else
+        logger?.LogCritical(ex, "Connection failed with unexpected exception");
+      throw;
+    }
+  }
+
+  public Task<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter parameter,
+    Func<JsonElement, TMethodResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (parameter is null)
+      throw new ArgumentNullException(nameof(parameter));
+    if (composeResult is null)
+      throw new ArgumentNullException(nameof(composeResult));
+
+    ThrowIfDisposed();
+
+    return SendAsyncCore(
+      module: module,
+      method: method,
+      parameter: parameter,
+      composeResult: composeResult,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  private async Task<TMethodResult> SendAsyncCore<TMethodParameter, TMethodResult>(
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter parameter,
+    Func<JsonElement, TMethodResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+  {
+    // ensure socket created and connected
+    socket ??= await ConnectAsync(cancellationToken);
+
+    /*
+     * send
+     */
+    try {
+      const SocketFlags sendSocketFlags = default;
+
+      KasaJsonSerializer.Serialize(buffer, module, method, parameter, logger);
+
+      logger?.LogTrace("Sending request {RequestSize} bytes", buffer.WrittenCount);
+
+      await socket.SendAsync(
+        buffer.WrittenMemory,
+        sendSocketFlags,
+        cancellationToken: cancellationToken
+      ).ConfigureAwait(false);
+    }
+    finally {
+      buffer.Clear(); // clear buffer state for next use
+    }
+
+    /*
+    * receive
+    */
+    try {
+      const SocketFlags receiveSocketFlags = default;
+      const int receiveBlockSize = 0x100;
+
+      for (; ;) {
+        var buf = buffer.GetMemory(receiveBlockSize);
+
+        var len = await socket.ReceiveAsync(
+          buf,
+          receiveSocketFlags,
+          cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+
+        if (len <= 0)
+          break;
+
+        buffer.Advance(len);
+
+        if (len < buf.Length)
+          break;
+      }
+
+      logger?.LogTrace("Received response {ResponseSize} bytes", buffer.WrittenCount);
+
+      JsonElement result = default;
+
+      try {
+        result = KasaJsonSerializer.Deserialize(buffer, module, method, logger);
+
+        if (
+          result.TryGetProperty(PropertyNameForErrorCode.EncodedUtf8Bytes, out var propErrorCode) &&
+          propErrorCode.TryGetInt32(out var errorCode) &&
+          errorCode != 0
+        ) {
+          throw new KasaErrorResponseException(
+            deviceEndPoint: endPoint,
+            requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
+            requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
+            errorCode: (ErrorCode)errorCode
+          );
+        }
+      }
+      catch (InvalidDataException ex) {
+        throw new KasaUnexpectedResponseException(
+          message: "Received unexpected or invalid response",
+          deviceEndPoint: endPoint,
+          requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
+          requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
+          ex
+        );
+      }
+
+      try {
+        return composeResult(result);
+      }
+      catch (Exception ex) {
+        throw new KasaUnexpectedResponseException(
+          message: "Unexpected method result: " + JsonSerializer.Serialize(result),
+          deviceEndPoint: endPoint,
+          requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
+          requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
+          ex
+        );
+      }
+    }
+    finally {
+      buffer.Clear(); // clear buffer state for next use
+    }
+  }
+}
