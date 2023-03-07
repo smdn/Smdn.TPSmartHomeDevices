@@ -1,0 +1,32 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup>
+    <!-- enable target framework net* (.NET >= 5.0) by default -->
+    <EnableTargetFrameworkDotNet>true</EnableTargetFrameworkDotNet>
+    <!-- enable target framework netcoreapp* by default -->
+    <EnableTargetFrameworkNetCoreApp>true</EnableTargetFrameworkNetCoreApp>
+    <!-- enable target framework net* (.NET Framework/Mono) by default -->
+    <EnableTargetFrameworkNetFx>true</EnableTargetFrameworkNetFx>
+  </PropertyGroup>
+
+  <!-- On Ubuntu 22.04 -->
+  <PropertyGroup
+    Condition=" $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.22.04')) "
+  >
+    <!-- disable .NET Core (cannot run .NET Core on Ubuntu 22.04) -->
+    <EnableTargetFrameworkNetCoreApp>false</EnableTargetFrameworkNetCoreApp>
+    <!-- disable Mono (test runner not working on local environment?) -->
+    <EnableTargetFrameworkNetFx>false</EnableTargetFrameworkNetFx>
+  </PropertyGroup>
+
+  <!-- On Ubuntu 20.04 -->
+  <PropertyGroup
+    Condition=" $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.20.04')) "
+  >
+    <!-- enable Mono on GitHub Actions -->
+    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">true</EnableTargetFrameworkNetFx>
+  </PropertyGroup>
+</Project>

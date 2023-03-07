@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: "2022 smdn <smdn@smdn.jp>"
+
+name: Publish release target
+run-name: Publish release target ${{ github.head_ref }}
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  run-publish-release-target:
+    uses: smdn/Smdn.Fundamentals/.github/workflows/publish-release-target.yml@workflows/release-target-v1.5.8
+    if: |
+      (github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/')) &&
+      (contains(github.event.pull_request.labels.*.name, 'release-target'))
+    with:
+      pr_number_request_for_release: ${{ github.event.pull_request.number }}
+      pr_label_request_for_release:  'release-target'
+    secrets:
+      token_repo:                 ${{ secrets.PUBLISH_NEW_RELEASE }}
+      token_push_nuget_org:       ${{ secrets.PUBLISH_PACKAGE_NUGETORG }}
+      token_push_github_packages: ${{ secrets.PUBLISH_NEW_RELEASE }}

@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: "2022 smdn <smdn@smdn.jp>"
+
+name: Run tests with released packages
+
+on:
+  release:
+    types: [published]
+
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "The project name to run the test."
+        required: false
+        type: string
+      os:
+        description: "The OS label which run the test on. (ex: ubuntu-latest, windows-latest, macos-latest)"
+        required: false
+        type: string
+      verbose:
+        description: "If true, enables verbose output."
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  prerequisites:
+    runs-on: ubuntu-latest
+    outputs:
+      verbose: ${{ steps.input-prerequisites.outputs.verbose }}
+    steps:
+    - name: Delay until the package is published
+      run: |
+        # If the workflow is triggered by 'release' event,
+        # wait for a while until the package is published on NuGet
+        if [ '${{ github.event_name }}' = 'release' ]; then
+          sleep 5.0m
+        fi
+
+    - name: Determine prerequisites
+      id: input-prerequisites
+      run: |
+        if [ '${{ github.event.inputs.verbose }}' = 'true' ]; then
+          echo 'verbose=true' >> $GITHUB_OUTPUT
+        else
+          echo 'verbose=false' >> $GITHUB_OUTPUT
+        fi
+
+  run-test:
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.1.5
+    needs: prerequisites
+    with:
+      project:              ${{ github.event.inputs.project }}
+      os:                   ${{ github.event.inputs.os }}
+      extra_options_common: '/p:TestReleasedPackage=true'
+      verbose:              ${{ fromJSON(needs.prerequisites.outputs.verbose) }}
+      dotnet_sdk_version:   '6.0.200'
+      timeout_minutes_test_job:   10
+      timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
+      timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
+    secrets:
+      token_repo: ${{ secrets.GITHUB_TOKEN }}

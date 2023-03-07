@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: "2022 smdn <smdn@smdn.jp>"
+
+name: Run tests
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+    - 'src/**/*.cs'
+    - 'src/**/*.csproj'
+    - 'tests/**/*.cs'
+    - 'tests/**/*.csproj'
+
+  pull_request:
+    branches: [ main ]
+    paths:
+    - 'src/**/*.cs'
+    - 'src/**/*.csproj'
+    - 'tests/**/*.cs'
+    - 'tests/**/*.csproj'
+
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "The project name to run the test."
+        required: false
+        type: string
+      os:
+        description: "The OS label which run the test on. (ex: ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest)"
+        required: false
+        type: string
+      verbose:
+        description: "If true, enables verbose output."
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  prerequisites:
+    runs-on: ubuntu-latest
+    outputs:
+      os: ${{ steps.input-prerequisites.outputs.os }}
+      verbose: ${{ steps.input-prerequisites.outputs.verbose }}
+    env:
+      RUNS_ON_OS_LIST_DEFAULT: 'ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest'
+    steps:
+    - name: Determine prerequisites
+      id: input-prerequisites
+      run: |
+        if [ -z '${{ github.event.inputs.os }}' ]; then
+          echo "os=${RUNS_ON_OS_LIST_DEFAULT}" >> $GITHUB_OUTPUT
+        else
+          echo 'os=${{ github.event.inputs.os }}' >> $GITHUB_OUTPUT
+        fi
+
+        if [ '${{ github.event.inputs.verbose }}' = 'true' ]; then
+          echo 'verbose=true' >> $GITHUB_OUTPUT
+        else
+          echo 'verbose=false' >> $GITHUB_OUTPUT
+        fi
+
+  run-test:
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.1.5
+    needs: prerequisites
+    with:
+      project:            ${{ github.event.inputs.project }}
+      os:                 ${{ needs.prerequisites.outputs.os }}
+      verbose:            ${{ fromJSON(needs.prerequisites.outputs.verbose) }}
+      dotnet_sdk_version: '6.0.200'
+      timeout_minutes_test_job:   10
+      timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
+      timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
+    secrets:
+      token_repo: ${{ secrets.GITHUB_TOKEN }}

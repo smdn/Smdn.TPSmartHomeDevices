@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<!--
+  This project file performs downloading packages defined by PackageDownload.
+  Run `dotnet restore` to download the packages.
+-->
+<Project Sdk="Microsoft.Build.NoTargets/1.0.80">
+  <Import Project="$(MSBuildThisFileDirectory)..\src\Directory.Build.props" />
+
+  <!-- ref: https://learn.microsoft.com/en-us/nuget/consume-packages/packagedownload-functionality -->
+  <PropertyGroup>
+    <NoBuild>true</NoBuild>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)..\src\Directory.Build.targets" />
+</Project>

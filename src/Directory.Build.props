@@ -1,0 +1,37 @@
+<!--
+SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup>
+    <SmdnBuildAssetRootDirectory>$(MSBuildThisFileDirectory)..\</SmdnBuildAssetRootDirectory>
+  </PropertyGroup>
+
+  <ImportGroup Label="project assets">
+    <Import Project="$(MSBuildThisFileDirectory)ProjectAssets.props" />
+  </ImportGroup>
+
+  <PropertyGroup Label="API list generator configurations">
+    <APIListOutputBaseDirectory>$(MSBuildThisFileDirectory)..\doc\api-list\</APIListOutputBaseDirectory>
+    <APIListPackageVersion>1.2.1</APIListPackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="package properties">
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/smdn/Smdn.Template.Library</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Label="repository properties" Condition="'$(GITHUB_ACTIONS)' != 'true'">
+    <RepositoryUrl>https://github.com/smdn/Smdn.Template.Library</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'Smdn.MSBuild.DefineConstants.NETSdkApi is required' == 'true'">
+    <PackageReference
+      Include="Smdn.MSBuild.DefineConstants.NETSdkApi"
+      Version="[1.*,2.0)"
+      PrivateAssets="all"
+      IncludeAssets="build"
+    />
+  </ItemGroup>
+</Project>

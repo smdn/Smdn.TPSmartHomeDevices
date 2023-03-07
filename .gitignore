@@ -1,0 +1,12 @@
+bin/
+obj/
+*.userprefs
+.vs/
+TestResult.xml
+TestResults/
+mono_crash.mem.*.blob
+mono_crash.*.json
+
+# automatically generated files from Smdn.MSBuild.ProjectAssets.*
+.editorconfig
+src/.editorconfig

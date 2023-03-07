@@ -1,0 +1,10 @@
+<!--
+SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <ImportGroup Label="project assets">
+    <Import Project="$(SmdnProjectAssets_TargetsImports)" />
+    <Import Project="$(MSBuildThisFileDirectory)PackageProvidedAPI.targets" />
+  </ImportGroup>
+</Project>
