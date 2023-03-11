@@ -172,7 +172,7 @@ public partial class TapoDevice : IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
-      client.DisposeWithLog(LogLevel.Information, $"endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.DisposeWithLog(LogLevel.Information, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
       client = null;
     }
 
@@ -247,16 +247,16 @@ public partial class TapoDevice : IDisposable {
         }
       ) {
         // The end point may have changed.
-        // Dispose the current session, re-establish the session and then retry.
-        client.DisposeWithLog(LogLevel.Information, $"endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
+        // Dispose the current HTTP client in order to recreate the client and try again.
+        client.DisposeWithLog(LogLevel.Information, $"Endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         client = null;
 
-        // continue
+        continue;
       }
       catch (HttpRequestException ex) when (ex.InnerException is SocketException exSocket) {
-        // The session may be invalid due to an exception at the transport layer.
-        // Dispose the current session in order to re-establish the session.
-        client.DisposeWithLog(LogLevel.Error, $"unexpected socket exception ({(int)exSocket.SocketErrorCode})");
+        // The HTTP client may have been invalid due to an exception at the transport layer.
+        // Dispose the current HTTP client and rethrow exception.
+        client.DisposeWithLog(LogLevel.Error, $"Unexpected socket exception ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         client = null;
 
         throw;
@@ -268,7 +268,11 @@ public partial class TapoDevice : IDisposable {
 
         continue;
       }
-      catch {
+      catch (Exception ex) {
+        // Dispose the current client and rethrow exception.
+        client.DisposeWithLog(LogLevel.Error, $"Unexpected exception ({ex.GetType().FullName})");
+        client = null;
+
         throw;
       }
     }

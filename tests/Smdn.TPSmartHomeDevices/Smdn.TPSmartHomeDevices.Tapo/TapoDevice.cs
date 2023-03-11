@@ -234,6 +234,15 @@ public class TapoDeviceTests {
 
     public new ValueTask EnsureSessionEstablishedAsync(CancellationToken cancellationToken = default)
       => base.EnsureSessionEstablishedAsync(cancellationToken: cancellationToken);
+
+    public new Task<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
+      TRequest request,
+      Func<TResponse, TResult> composeResult,
+      CancellationToken cancellationToken = default
+    )
+      where TRequest : ITapoPassThroughRequest
+      where TResponse : ITapoPassThroughResponse
+      => base.SendRequestAsync(request, composeResult, cancellationToken);
   }
 
   [Test]
@@ -463,6 +472,40 @@ public class TapoDeviceTests {
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
     Assert.IsNotNull(device.Session, nameof(device.Session));
     Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
+  }
+
+  [Test]
+  public async Task SendRequestAsync_UnexpectedException()
+  {
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = (_, _, _) => (
+        ErrorCode.Success,
+        new GetDeviceInfoResponse() {
+          ErrorCode = ErrorCode.Success,
+          Result = new(),
+        }
+      ),
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new ConcreteTapoDevice(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.IsNull(device.Session, nameof(device.Session));
+
+    Assert.ThrowsAsync<NotSupportedException>(
+      async () => await device.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse, int>(
+        request: new GetDeviceInfoRequest(),
+        composeResult: static resp => throw new NotSupportedException("unexpected exception"),
+        cancellationToken: default
+      )
+    );
+
+    Assert.IsNull(device.Session, nameof(device.Session));
   }
 
   [Test]
