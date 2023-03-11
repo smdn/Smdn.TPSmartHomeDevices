@@ -261,6 +261,13 @@ public partial class TapoDevice : IDisposable {
 
         throw;
       }
+      catch (TapoErrorResponseException ex) when (attempt == 0) {
+        // The session may have been invalid.
+        // Dispose the current session in order to re-establish the session and try again.
+        client.CloseSessionWithLog(LogLevel.Debug, $"Unexpected error response ({nameof(ex.ErrorCode)}: {(int)ex.ErrorCode})");
+
+        continue;
+      }
       catch {
         throw;
       }
