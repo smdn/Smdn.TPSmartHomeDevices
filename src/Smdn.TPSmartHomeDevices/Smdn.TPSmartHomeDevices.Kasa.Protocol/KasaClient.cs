@@ -19,6 +19,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 /// </remarks>
 public sealed partial class KasaClient : IDisposable {
   public const int DefaultPort = 9999;
+  internal const int DefaultBufferCapacity = 1024; // TODO: best initial capacity
   private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "err_code"u8
@@ -32,7 +33,7 @@ public sealed partial class KasaClient : IDisposable {
   private EndPoint? endPoint; // if null, it indicates a 'disposed' state.
   private Socket? socket;
   private readonly ILogger? logger;
-  private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: 1024); // TODO: best initial capacity
+  private readonly ArrayBufferWriter<byte> buffer;
 
   public bool IsConnected {
     get {
@@ -52,6 +53,19 @@ public sealed partial class KasaClient : IDisposable {
     EndPoint endPoint,
     IServiceProvider? serviceProvider = null
   )
+    : this(
+      endPoint: endPoint ?? throw new ArgumentNullException(nameof(endPoint)),
+      buffer: new(initialCapacity: DefaultBufferCapacity),
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  internal KasaClient(
+    EndPoint endPoint,
+    ArrayBufferWriter<byte> buffer,
+    IServiceProvider? serviceProvider = null
+  )
   {
     this.endPoint = endPoint switch {
       null => throw new ArgumentNullException(nameof(endPoint)),
@@ -69,6 +83,8 @@ public sealed partial class KasaClient : IDisposable {
         : ipEndPoint,
       EndPoint ep => ep, // TODO: should throw exception?
     };
+
+    this.buffer = buffer;
 
     logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})"); // TODO: logger category name
 
@@ -169,8 +185,13 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken = default
   )
   {
-    // ensure socket created and connected
-    socket ??= await ConnectAsync(cancellationToken);
+    if (socket is null) {
+      // ensure socket created and connected
+      socket = await ConnectAsync(cancellationToken);
+
+      // clear buffer for the initial use
+      buffer.Clear();
+    }
 
     /*
      * send
@@ -268,6 +289,8 @@ public sealed partial class KasaClient : IDisposable {
           ex
         );
       }
+
+      logger?.LogTrace("Buffer capacity: {Capacity} bytes", buffer.Capacity);
 
       try {
         return composeResult(result);

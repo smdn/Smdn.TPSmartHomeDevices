@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Buffers;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
@@ -35,6 +36,7 @@ public partial class KasaDevice : IDisposable {
   private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
   protected bool IsDisposed => deviceEndPointProvider is null;
 
+  private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: KasaClient.DefaultBufferCapacity);
   private readonly IServiceProvider? serviceProvider;
 
   private KasaClient? client;
@@ -218,6 +220,7 @@ public partial class KasaDevice : IDisposable {
 
       client ??= new KasaClient(
         endPoint: endPoint,
+        buffer: buffer,
         serviceProvider: serviceProvider
       );
 
