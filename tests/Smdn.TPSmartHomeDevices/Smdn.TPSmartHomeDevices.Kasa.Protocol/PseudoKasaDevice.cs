@@ -13,6 +13,13 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
+  public class AbortProcessException : Exception {
+    public AbortProcessException(string message)
+      : base(message)
+    {
+    }
+  }
+
   public IPEndPoint? EndPoint { get; private set; }
   private Socket? listener;
   private Task? taskProcessListener;
@@ -147,7 +154,12 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
           break;
         }
 
-        await ProcessClientAsync(socket, cancellationToken);
+        try {
+          await ProcessClientAsync(socket, cancellationToken);
+        }
+        catch (AbortProcessException) {
+          // expected
+        }
       }
       finally {
 #if false

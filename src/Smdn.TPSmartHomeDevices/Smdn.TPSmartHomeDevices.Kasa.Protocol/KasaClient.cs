@@ -182,11 +182,20 @@ public sealed partial class KasaClient : IDisposable {
 
       logger?.LogTrace("Sending request {RequestSize} bytes", buffer.WrittenCount);
 
-      await socket.SendAsync(
-        buffer.WrittenMemory,
-        sendSocketFlags,
-        cancellationToken: cancellationToken
-      ).ConfigureAwait(false);
+      try {
+        await socket.SendAsync(
+          buffer.WrittenMemory,
+          sendSocketFlags,
+          cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+      }
+      catch (SocketException ex) when (
+        ex.SocketErrorCode is
+          SocketError.Shutdown or // EPIPE
+          SocketError.ConnectionReset // ECONNRESET
+      ) {
+        throw new KasaDisconnectedException(ex.Message, endPoint, ex);
+      }
     }
     finally {
       buffer.Clear(); // clear buffer state for next use
@@ -202,11 +211,21 @@ public sealed partial class KasaClient : IDisposable {
       for (; ;) {
         var buf = buffer.GetMemory(receiveBlockSize);
 
-        var len = await socket.ReceiveAsync(
-          buf,
-          receiveSocketFlags,
-          cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
+        int len = default;
+
+        try {
+          len = await socket.ReceiveAsync(
+            buf,
+            receiveSocketFlags,
+            cancellationToken: cancellationToken
+          ).ConfigureAwait(false);
+        }
+        catch (SocketException ex) when (
+          ex.SocketErrorCode is
+            SocketError.ConnectionReset // ECONNRESET
+        ) {
+          throw new KasaDisconnectedException(ex.Message, endPoint, ex);
+        }
 
         if (len <= 0)
           break;
@@ -216,6 +235,9 @@ public sealed partial class KasaClient : IDisposable {
         if (len < buf.Length)
           break;
       }
+
+      if (buffer.WrittenCount == 0)
+        throw new KasaDisconnectedException("The peer may have dropped connection", endPoint, innerException: null);
 
       logger?.LogTrace("Received response {ResponseSize} bytes", buffer.WrittenCount);
 

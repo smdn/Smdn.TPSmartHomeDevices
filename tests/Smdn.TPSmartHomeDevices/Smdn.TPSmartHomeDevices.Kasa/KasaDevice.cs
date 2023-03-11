@@ -364,9 +364,6 @@ public class KasaDeviceTests {
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
   }
 
-
-
-
   [Test]
   public async Task SendRequestAsync_EndPointUnreachable_StaticEndPoint()
   {
@@ -406,7 +403,7 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.AreEqual(SocketError.Shutdown, ex!.SocketErrorCode, nameof(ex.SocketErrorCode));
+    Assert.AreEqual(SocketError.ConnectionRefused, ex!.SocketErrorCode, nameof(ex.SocketErrorCode));
 
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }

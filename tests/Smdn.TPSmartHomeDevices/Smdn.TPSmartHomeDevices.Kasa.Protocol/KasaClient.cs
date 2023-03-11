@@ -224,4 +224,102 @@ public class KasaClientTests {
     Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
     Assert.IsInstanceOf<NotImplementedException>(ex!.InnerException);
   }
+
+  [Test]
+  public async Task SendAsync_DisconnectedException_DeviceNotRespond()
+  {
+    await using var device = new PseudoKasaDevice() {
+      FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => JsonDocument.Parse(
+json: @"{
+  ""smartlife.iot.smartbulb.lightingservice"": {
+    ""get_light_state"": {
+      ""on_off"": 1,
+      ""brightness"": 50
+    }
+  }
+}")!,
+    };
+
+    using var client = new KasaClient(
+      endPoint: device.Start()
+    );
+
+    // set connected state
+    await client.SendAsync(
+      module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+      method: JsonEncodedText.Encode("get_light_state"),
+      parameter: new { },
+      composeResult: static json => JsonDocument.Parse(json.ToString())
+    );
+
+    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+
+    // disconnect from device
+    await device.DisposeAsync();
+
+    var ex = Assert.ThrowsAsync<KasaDisconnectedException>(
+      async () => await client.SendAsync(
+        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+        method: JsonEncodedText.Encode("get_light_state"),
+        parameter: new { },
+        composeResult: static json => JsonDocument.Parse(json.ToString())
+      )
+    );
+
+    Assert.AreEqual(ex.DeviceEndPoint, device.EndPoint, nameof(ex.DeviceEndPoint));
+  }
+
+  [Test]
+  public async Task SendAsync_DisconnectedException_ConnectionClosed()
+  {
+    int request = 0;
+
+    await using var device = new PseudoKasaDevice() {
+      FuncGenerateResponse = (EndPoint _, JsonDocument requestJsonDocument) => {
+        if (request == 0) {
+          request++;
+
+          return JsonDocument.Parse(json: @"{
+  ""smartlife.iot.smartbulb.lightingservice"": {
+    ""get_light_state"": {
+      ""on_off"": 1,
+      ""brightness"": 50
+    }
+  }
+}")!;
+        }
+        else {
+          throw new PseudoKasaDevice.AbortProcessException("close connection");
+        }
+      },
+    };
+
+    using var client = new KasaClient(
+      endPoint: device.Start()
+    );
+
+    // set connected state
+    await client.SendAsync(
+      module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+      method: JsonEncodedText.Encode("get_light_state"),
+      parameter: new { },
+      composeResult: static json => JsonDocument.Parse(json.ToString())
+    );
+
+    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+
+    // device will close connection
+    var ex = Assert.ThrowsAsync<KasaDisconnectedException>(
+      async () => await client.SendAsync(
+        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+        method: JsonEncodedText.Encode("get_light_state"),
+        parameter: new { },
+        composeResult: static json => JsonDocument.Parse(json.ToString())
+      )
+    );
+
+    Assert.AreEqual(ex.DeviceEndPoint, device.EndPoint, nameof(ex.DeviceEndPoint));
+  }
 }
