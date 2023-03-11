@@ -37,8 +37,7 @@ partial class TapoClient {
   {
     cancellationToken.ThrowIfCancellationRequested();
 
-    logger?.LogInformation("Request method: {method}", request.Method);
-    logger?.LogTrace("Request: {Request}", JsonSerializer.Serialize(request, defaultJsonSerializerOptions));
+    logger?.LogDebug("Request: {Request}", JsonSerializer.Serialize(request, defaultJsonSerializerOptions));
 
     var (securePassThroughResponse, requestUri) = await PostPlainTextRequestAsync<
       SecurePassThroughRequest<TRequest>,
@@ -52,7 +51,7 @@ partial class TapoClient {
 
     var response = securePassThroughResponse.Result.PassThroughResponse;
 
-    logger?.LogInformation("Respose error code: {ErrorCode}", (int)response.ErrorCode);
+    logger?.LogDebug("Respose error code: {ErrorCode}", (int)response.ErrorCode);
 
     TapoErrorResponseException.ThrowIfError(
       requestUri,
@@ -76,6 +75,8 @@ partial class TapoClient {
     where TResponse : ITapoResponse
   {
     cancellationToken.ThrowIfCancellationRequested();
+
+    logger?.LogDebug("HTTP Transaction: Session={SessionId}, Token={Token}", session?.SessionId, session?.Token);
 
     var jsonSerializerOptions = session is null
       ? defaultJsonSerializerOptions
