@@ -154,6 +154,7 @@ public partial class TapoClientTests {
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
     Assert.Throws<ObjectDisposedException>(() => client.AuthenticateAsync());
+    Assert.Throws<ObjectDisposedException>(() => client.CloseSession(), nameof(client.CloseSession));
   }
 
   [Test]
@@ -179,5 +180,49 @@ public partial class TapoClientTests {
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
     Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>());
     Assert.Throws<ObjectDisposedException>(() => client.AuthenticateAsync());
+  }
+
+  [Test]
+  public async Task CloseSession_AuthenticatedState()
+  {
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint,
+      serviceProvider: services?.BuildServiceProvider()
+    );
+
+    await client.AuthenticateAsync();
+
+    Assert.IsNotNull(client.Session, nameof(client.Session));
+
+    Assert.DoesNotThrow(() => client.CloseSession(), $"{nameof(client.CloseSession)} #1");
+    Assert.DoesNotThrow(() => client.CloseSession(), $"{nameof(client.CloseSession)} #2");
+
+    Assert.IsNull(client.Session, nameof(client.Session));
+  }
+
+  [Test]
+  public async Task CloseSession_NonAuthenticatedState()
+  {
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint,
+      serviceProvider: services?.BuildServiceProvider()
+    );
+
+    Assert.IsNull(client.Session, nameof(client.Session));
+
+    Assert.DoesNotThrow(() => client.CloseSession(), $"{nameof(client.CloseSession)} #1");
+    Assert.DoesNotThrow(() => client.CloseSession(), $"{nameof(client.CloseSession)} #2");
+
+    Assert.IsNull(client.Session, nameof(client.Session));
   }
 }

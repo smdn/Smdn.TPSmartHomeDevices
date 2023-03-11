@@ -145,6 +145,25 @@ public sealed partial class TapoClient : IDisposable {
     return AuthenticateAsyncCore(cancellationToken);
   }
 
+  internal void CloseSessionWithLog(LogLevel logLevel, string? reasonForClosingSession)
+  {
+    if (IsDisposed)
+      return;
+
+    logger?.Log(logLevel: logLevel, message: reasonForClosingSession);
+
+    CloseSession();
+  }
+
+  public void CloseSession()
+  {
+    ThrowIfDisposed();
+
+    // dispose the established session and set to null
+    session?.Dispose();
+    session = null;
+  }
+
   public Task<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )
