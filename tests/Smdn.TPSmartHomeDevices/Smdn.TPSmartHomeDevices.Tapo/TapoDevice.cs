@@ -579,6 +579,77 @@ public class TapoDeviceTests {
   }
 
   [Test]
+  public async Task SendRequestAsync_ResponseWithErrorCodeMinus1301_RetrySuccess()
+  {
+    const ErrorCode errorCodeMinus1301 = (ErrorCode)(-1301);
+    var request = 0;
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = _ => $"token-request{request}",
+      FuncGeneratePassThroughResponse = (_, _, _) => (
+        ErrorCode.Success,
+        new GetDeviceInfoResponse() {
+          ErrorCode = request++ == 0 ? errorCodeMinus1301 : ErrorCode.Success,
+          Result = new(),
+        }
+      ),
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.IsNull(device.Session, nameof(device.Session));
+
+    Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
+
+    Assert.AreEqual(2, request, nameof(request));
+    Assert.IsNotNull(device.Session, nameof(device.Session));
+    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session));
+  }
+
+  [Test]
+  public async Task SendRequestAsync_ResponseWithErrorCodeMinus1301_RetryFailedWithErrorResponse()
+  {
+    const ErrorCode errorCodeMinus1301 = (ErrorCode)(-1301);
+    var request = 0;
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = _ => $"token-request{request}",
+      FuncGeneratePassThroughResponse = (_, _, _) => {
+        request++;
+
+        return (
+          ErrorCode.Success,
+          new GetDeviceInfoResponse() {
+            ErrorCode = errorCodeMinus1301,
+            Result = new(),
+          }
+        );
+      },
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.IsNull(device.Session, nameof(device.Session));
+
+    var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
+
+    Assert.AreEqual(2, request, nameof(request));
+    Assert.AreEqual(errorCodeMinus1301, ex.ErrorCode, nameof(ex.ErrorCode));
+    StringAssert.Contains("token=token-request1", ex.EndPoint.Query, nameof(ex.EndPoint.Query));
+    Assert.IsNull(device.Session, nameof(device.Session));
+  }
+
+  [Test]
   public async Task GetDeviceInfoAsync()
   {
     var requestSequenceNumber = 0;

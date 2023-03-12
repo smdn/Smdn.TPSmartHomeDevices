@@ -261,6 +261,18 @@ public partial class TapoDevice : IDisposable {
 
         throw;
       }
+      catch (TapoErrorResponseException ex) when (
+        // request failed with error code -1301
+        attempt == 0 &&
+        ex.ErrorCode == (ErrorCode)(-1301)
+      ) {
+        // The session might have been in invalid state(?)
+        // Dispose the current HTTP client in order to recreate the client and try again from establishing session.
+        client.DisposeWithLog(LogLevel.Warning, "Error code -1301");
+        client = null;
+
+        continue;
+      }
       catch (TapoErrorResponseException ex) when (attempt == 0) {
         // The session may have been invalid.
         // Dispose the current session in order to re-establish the session and try again.
