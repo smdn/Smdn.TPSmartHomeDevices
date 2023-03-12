@@ -38,13 +38,12 @@ public sealed class TapoSession : IDisposable {
 
     aes = Aes.Create();
     aes.Padding = PaddingMode.PKCS7;
-
-    var keyByteArray = key.ToArray();
-    var initialVectorByteArray = iv.ToArray();
+    aes.Key = key.ToArray();
+    aes.IV = iv.ToArray();
 
     securePassThroughJsonConverterFactory = new(
-      encryptorForPassThroughRequest: aes.CreateEncryptor(keyByteArray, initialVectorByteArray),
-      decryptorForPassThroughResponse: aes.CreateDecryptor(keyByteArray, initialVectorByteArray),
+      encryptorForPassThroughRequest: aes.CreateEncryptor(),
+      decryptorForPassThroughResponse: aes.CreateDecryptor(),
       plainTextJsonSerializerOptions: plainTextJsonSerializerOptions,
       logger: logger
     );
