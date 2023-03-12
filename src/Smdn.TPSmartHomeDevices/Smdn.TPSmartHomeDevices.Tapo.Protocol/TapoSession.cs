@@ -37,6 +37,7 @@ public sealed class TapoSession : IDisposable {
     ExpiresOn = expiresOn;
 
     aes = Aes.Create();
+    aes.Padding = PaddingMode.PKCS7;
 
     var keyByteArray = key.ToArray();
     var initialVectorByteArray = iv.ToArray();

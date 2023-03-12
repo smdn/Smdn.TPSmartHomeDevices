@@ -47,12 +47,16 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     {
       var aes = Aes.Create();
 
+      aes.Padding = PaddingMode.PKCS7;
+      aes.Key = key;
+      aes.IV = initialVector;
+
       return new UnauthorizedSession(
         remoteEndPoint,
         sessionId,
         expiresOn,
-        aes.CreateEncryptor(key, initialVector),
-        aes.CreateDecryptor(key, initialVector)
+        aes.CreateEncryptor(),
+        aes.CreateDecryptor()
       );
     }
 

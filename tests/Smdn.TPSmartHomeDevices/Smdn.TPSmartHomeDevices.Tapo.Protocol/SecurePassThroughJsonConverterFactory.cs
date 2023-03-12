@@ -234,6 +234,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
   )
   {
     var aes = Aes.Create();
+
+    aes.Padding = PaddingMode.PKCS7;
+
     var rng = RandomNumberGenerator.Create();
     var key = new byte[16];
     var iv = new byte[16];
@@ -401,6 +404,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
   )
   {
     var aes = Aes.Create();
+
+    aes.Padding = PaddingMode.PKCS7;
+
     var rng = RandomNumberGenerator.Create();
     var key = new byte[16];
     var iv = new byte[16];
