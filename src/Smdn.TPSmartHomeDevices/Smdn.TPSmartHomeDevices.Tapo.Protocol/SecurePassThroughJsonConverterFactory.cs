@@ -142,11 +142,24 @@ public sealed class SecurePassThroughJsonConverterFactory :
       using var stream = new MemoryStream(base64, writable: false);
       using var decryptingStream = CreateDecryptingStream(stream);
 
-      return (TValue?)JsonSerializer.Deserialize(
-        utf8Json: decryptingStream,
-        returnType: typeToConvert,
-        options: plainTextJsonSerializerOptions
-      );
+      try {
+        return (TValue?)JsonSerializer.Deserialize(
+          utf8Json: decryptingStream,
+          returnType: typeToConvert,
+          options: plainTextJsonSerializerOptions
+        );
+      }
+      catch (CryptographicException ex) when (IsInvalidPaddingException(ex)) {
+        throw new SecurePassThroughInvalidPaddingException("Invalid padding detected in encrypted JSON", ex);
+      }
+
+      static bool IsInvalidPaddingException(CryptographicException ex)
+      {
+        // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Security.Cryptography/src/Resources/Strings.resx
+        const string SR_Cryptography_InvalidPadding = "Padding is invalid and cannot be removed.";
+
+        return SR_Cryptography_InvalidPadding.AsSpan().SequenceEqual(ex.Message); // TODO: consider localized message strings
+      }
     }
     finally {
       if (logger is not null) {

@@ -459,6 +459,68 @@ public class SecurePassThroughJsonConverterFactoryTests {
     assert((ITapoPassThroughResponse)deserialized!);
   }
 
+  [TestCase(@"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse))]
+  public void ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding(
+    string rawJsonExpression,
+    Type returnType
+  )
+  {
+    var rng = RandomNumberGenerator.Create();
+    var key = new byte[16];
+    var iv = new byte[16];
+
+    rng.GetBytes(key);
+    rng.GetBytes(iv);
+
+    var aesDecrypting = Aes.Create();
+    var aesEncrypting = Aes.Create();
+
+    // reproduce a case when the padding is invalid
+    aesDecrypting.Padding = PaddingMode.PKCS7;
+    aesEncrypting.Padding = PaddingMode.ISO10126;
+
+    var options = new JsonSerializerOptions();
+
+    options.Converters.Add(
+      CreateFactory(
+        encryptorForPassThroughRequest: new ThrowExceptionTransform(), // encryption must not be performed,
+        decryptorForPassThroughResponse: aesDecrypting.CreateDecryptor(key, iv)
+      )
+    );
+
+    using var inputStream = new MemoryStream();
+
+    inputStream.WriteByte((byte)'"');
+
+    var toBase64Stream = new CryptoStream(
+      inputStream,
+      new ToBase64Transform(),
+      CryptoStreamMode.Write,
+      leaveOpen: true
+    );
+    var encryptingStream = new CryptoStream(
+      toBase64Stream,
+      aesEncrypting.CreateEncryptor(key, iv),
+      CryptoStreamMode.Write,
+      leaveOpen: true
+    );
+
+    encryptingStream.Write(Encoding.UTF8.GetBytes(rawJsonExpression));
+    encryptingStream.Close();
+    toBase64Stream.Close();
+
+    inputStream.WriteByte((byte)'"');
+    inputStream.Position = 0L;
+
+    Assert.Throws<SecurePassThroughInvalidPaddingException>(
+      () => JsonSerializer.Deserialize(
+        inputStream,
+        returnType,
+        options
+      )
+    );
+  }
+
   [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughResponse))]
   public void ConverterForITapoPassThroughResponse_OptionsSuppliedByFactoryMustBeUsed(
     Type returnType,
