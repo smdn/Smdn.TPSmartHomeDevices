@@ -211,7 +211,7 @@ public partial class KasaDevice : IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
-      client.DisposeWithLog(LogLevel.Information, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
       client = null;
     }
 
@@ -245,7 +245,7 @@ public partial class KasaDevice : IDisposable {
       ) {
         // The end point may have changed.
         // Dispose the current client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Information, $"Endpoint may have changed ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
+        client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
         client = null;
 
         continue;
@@ -253,7 +253,7 @@ public partial class KasaDevice : IDisposable {
       catch (SocketException ex) {
         // The client may have been invalid due to an exception at the transport layer.
         // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, $"Unexpected socket exception ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected socket exception ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
         client = null;
 
         throw;
@@ -262,9 +262,9 @@ public partial class KasaDevice : IDisposable {
         // The peer device disconnected the connection, or may have dropped the connection.
         // Dispose the current client in order to recreate the client and try again.
         if (ex.InnerException is SocketException exSocket)
-          client.DisposeWithLog(LogLevel.Debug, $"Disconnected ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
+          client.DisposeWithLog(LogLevel.Debug, exception: null, $"Disconnected ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         else
-          client.DisposeWithLog(LogLevel.Debug, $"Disconnected ({ex.Message})");
+          client.DisposeWithLog(LogLevel.Debug, exception: null, $"Disconnected ({ex.Message})");
 
         client = null;
 
@@ -272,7 +272,7 @@ public partial class KasaDevice : IDisposable {
       }
       catch (Exception ex) {
         // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, $"Unexpected exception ({ex.GetType().FullName})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected exception ({ex.GetType().FullName})");
         client = null;
 
         throw;

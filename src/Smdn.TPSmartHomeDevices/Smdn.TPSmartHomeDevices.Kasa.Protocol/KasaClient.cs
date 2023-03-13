@@ -108,12 +108,20 @@ public sealed partial class KasaClient : IDisposable {
     GC.SuppressFinalize(this);
   }
 
-  internal void DisposeWithLog(LogLevel logLevel, string? reasonForDispose)
+  internal void DisposeWithLog(
+    LogLevel logLevel,
+    Exception? exception,
+    string? reasonForDispose
+  )
   {
     if (IsDisposed)
       return;
 
-    logger?.Log(logLevel: logLevel, message: reasonForDispose);
+    logger?.Log(
+      logLevel: logLevel,
+      exception: exception,
+      message: reasonForDispose
+    );
 
     Dispose();
   }

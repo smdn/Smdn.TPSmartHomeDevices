@@ -172,7 +172,7 @@ public partial class TapoDevice : IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
-      client.DisposeWithLog(LogLevel.Information, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
       client = null;
     }
 
@@ -248,7 +248,7 @@ public partial class TapoDevice : IDisposable {
       ) {
         // The end point may have changed.
         // Dispose the current HTTP client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Information, $"Endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
+        client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         client = null;
 
         continue;
@@ -256,7 +256,7 @@ public partial class TapoDevice : IDisposable {
       catch (HttpRequestException ex) when (ex.InnerException is SocketException exSocket) {
         // The HTTP client may have been invalid due to an exception at the transport layer.
         // Dispose the current HTTP client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, $"Unexpected socket exception ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected socket exception ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         client = null;
 
         throw;
@@ -268,7 +268,7 @@ public partial class TapoDevice : IDisposable {
       ) {
         // The session might have been in invalid state(?)
         // Dispose the current HTTP client in order to recreate the client and try again from establishing session.
-        client.DisposeWithLog(LogLevel.Warning, "Error code -1301");
+        client.DisposeWithLog(LogLevel.Warning, ex, "Error code -1301");
         client = null;
 
         continue;
@@ -276,13 +276,13 @@ public partial class TapoDevice : IDisposable {
       catch (TapoErrorResponseException ex) when (attempt == 0) {
         // The session may have been invalid.
         // Dispose the current session in order to re-establish the session and try again.
-        client.CloseSessionWithLog(LogLevel.Debug, $"Unexpected error response ({nameof(ex.ErrorCode)}: {(int)ex.ErrorCode})");
+        client.CloseSessionWithLog(LogLevel.Warning, ex, $"Unexpected error response ({nameof(ex.ErrorCode)}: {(int)ex.ErrorCode})");
 
         continue;
       }
       catch (Exception ex) {
         // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, $"Unexpected exception ({ex.GetType().FullName})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected exception ({ex.GetType().FullName})");
         client = null;
 
         throw;
