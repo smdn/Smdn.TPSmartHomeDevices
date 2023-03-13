@@ -269,7 +269,7 @@ public class KasaDeviceTests {
   {
     using var device = new ConcreteKasaDevice(
       deviceEndPointProvider: new StaticDeviceEndPointProvider(
-        new DnsEndPoint("device.invalid", KasaClient.DefaultPort)
+        new DnsEndPoint("device.invalid", KasaClient.DefaultPort, AddressFamily.InterNetwork)
       )
     );
 

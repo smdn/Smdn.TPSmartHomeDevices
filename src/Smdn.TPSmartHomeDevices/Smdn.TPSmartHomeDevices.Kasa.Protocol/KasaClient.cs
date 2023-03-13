@@ -87,7 +87,7 @@ public sealed partial class KasaClient : IDisposable {
 
     logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})"); // TODO: logger category name
 
-    logger?.LogTrace("Device end point: {DeviceEndPoint}", endPoint);
+    logger?.LogTrace("Device end point: {DeviceEndPoint} ({DeviceEndPointAddressFamily})", endPoint, endPoint.AddressFamily);
   }
 
   private void Dispose(bool disposing)
@@ -135,7 +135,7 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken
   )
   {
-    var s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    var s = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
     try {
       logger?.LogDebug("Connecting");
