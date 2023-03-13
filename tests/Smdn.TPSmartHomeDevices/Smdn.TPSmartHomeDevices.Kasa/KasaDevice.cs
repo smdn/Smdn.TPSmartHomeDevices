@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Buffers;
+using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -465,5 +467,100 @@ public class KasaDeviceTests {
       "request #2"
     );
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+  }
+
+  private static byte[] EncryptedResponseDocument(JsonDocument document)
+  {
+    var buffer = new ArrayBufferWriter<byte>(256);
+
+    using (var writer = new Utf8JsonWriter(buffer)) {
+      document.WriteTo(writer);
+    }
+
+    var length = buffer.WrittenCount;
+    var encryptedResponse = new byte[4 + length];
+
+    BinaryPrimitives.WriteInt32BigEndian(encryptedResponse.AsSpan(0, 4), length);
+
+    var body = encryptedResponse.AsMemory(4, length);
+
+    buffer.WrittenMemory.CopyTo(body);
+
+    KasaJsonSerializer.EncryptInPlace(body.Span);
+
+    return encryptedResponse;
+  }
+
+  [Test]
+  public async Task SendRequestAsync_ReceivedIncompleteResponse_RetrySuccess()
+  {
+    int request = 0;
+
+    await using var pseudoDevice = new PseudoKasaDevice() {
+      FuncGenerateResponse = static (_, _) => JsonDocument.Parse(@"{""module"":{""method"":{""err_code"":0}}}"),
+      FuncEncryptResponse = responseDocument => {
+        var resp = EncryptedResponseDocument(responseDocument);
+
+        if (request++ == 0) {
+          return resp.AsSpan(0, resp.Length - 1).ToArray(); // truncate response message body
+        }
+        else {
+          return resp;
+        }
+      }
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new ConcreteKasaDevice(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+    );
+
+    Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
+
+    Assert.DoesNotThrowAsync(
+      async () => await device.SendRequestAsync(
+        module: JsonEncodedText.Encode("module"),
+        method: JsonEncodedText.Encode("method")
+      )
+    );
+
+    Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+    Assert.AreEqual(2, request, nameof(request));
+  }
+
+  [Test]
+  public async Task SendRequestAsync_ReceivedIncompleteResponse_RetryFailure()
+  {
+    int request = 0;
+
+    await using var pseudoDevice = new PseudoKasaDevice() {
+      FuncGenerateResponse = static (_, _) => JsonDocument.Parse(@"{""module"":{""method"":{""err_code"":0}}}"),
+      FuncEncryptResponse = responseDocument => {
+        request++;
+
+        var resp = EncryptedResponseDocument(responseDocument);
+
+        return resp.AsSpan(0, resp.Length - 1).ToArray(); // truncate response message body
+      }
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new ConcreteKasaDevice(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+    );
+
+    Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
+
+    Assert.ThrowsAsync<KasaIncompleteResponseException>(
+      async () => await device.SendRequestAsync(
+        module: JsonEncodedText.Encode("module"),
+        method: JsonEncodedText.Encode("method")
+      )
+    );
+
+    Assert.AreEqual(2, request, nameof(request));
+    Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
 }
