@@ -261,6 +261,14 @@ public partial class TapoDevice : IDisposable {
 
         throw;
       }
+      catch (SecurePassThroughInvalidPaddingException ex) {
+        // The session might have been in invalid state(?)
+        // Dispose the current HTTP client in order to recreate the client and try again from establishing session.
+        client.DisposeWithLog(LogLevel.Warning, ex, "Invalid padding in secure pass through");
+        client = null;
+
+        continue;
+      }
       catch (TapoErrorResponseException ex) when (
         // request failed with error code -1301
         attempt == 0 &&
