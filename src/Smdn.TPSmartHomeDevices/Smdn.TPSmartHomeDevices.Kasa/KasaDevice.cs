@@ -215,7 +215,10 @@ public partial class KasaDevice : IDisposable {
       client = null;
     }
 
-    for (var attempt = 0; attempt <= 1; attempt++) {
+    const int maxAttempts = 2;
+    const int firstAttempt = 1;
+
+    for (var attempt = firstAttempt; attempt <= maxAttempts; attempt++) {
       cancellationToken.ThrowIfCancellationRequested();
 
       client ??= new KasaClient(
@@ -234,7 +237,7 @@ public partial class KasaDevice : IDisposable {
         ).ConfigureAwait(false);
       }
       catch (SocketException ex) when (
-        attempt == 0 &&
+        attempt == firstAttempt &&
         !deviceEndPointProvider.IsStaticEndPoint &&
         ex.SocketErrorCode switch {
           SocketError.ConnectionRefused => true, // ECONNREFUSED
@@ -258,7 +261,7 @@ public partial class KasaDevice : IDisposable {
 
         throw;
       }
-      catch (KasaDisconnectedException ex) when (attempt == 0) {
+      catch (KasaDisconnectedException ex) when (attempt == firstAttempt) {
         // The peer device disconnected the connection, or may have dropped the connection.
         // Dispose the current client in order to recreate the client and try again.
         if (ex.InnerException is SocketException exSocket)
@@ -270,7 +273,7 @@ public partial class KasaDevice : IDisposable {
 
         continue;
       }
-      catch (KasaIncompleteResponseException ex) when (attempt == 0) {
+      catch (KasaIncompleteResponseException ex) when (attempt == firstAttempt) {
         // The peer has been in invalid state(?) and returnd incomplete response.
         // Dispose the current client in order to recreate the client and try again.
         client.DisposeWithLog(LogLevel.Warning, exception: null, $"Received incomplete response ({ex.Message})");

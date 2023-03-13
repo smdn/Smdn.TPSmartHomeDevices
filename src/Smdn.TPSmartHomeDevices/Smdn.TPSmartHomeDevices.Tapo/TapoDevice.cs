@@ -222,7 +222,10 @@ public partial class TapoDevice : IDisposable {
     where TRequest : ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
-    for (var attempt = 0; attempt <= 1; attempt++) {
+    const int maxAttempts = 2;
+    const int firstAttempt = 1;
+
+    for (var attempt = firstAttempt; attempt <= maxAttempts; attempt++) {
       await EnsureSessionEstablishedAsync(cancellationToken).ConfigureAwait(false);
 
       cancellationToken.ThrowIfCancellationRequested();
@@ -236,7 +239,7 @@ public partial class TapoDevice : IDisposable {
         return composeResult(response);
       }
       catch (HttpRequestException ex) when (
-        attempt == 0 &&
+        attempt == firstAttempt &&
         !deviceEndPointProvider.IsStaticEndPoint &&
         ex.InnerException is SocketException exSocket &&
         exSocket.SocketErrorCode switch {
@@ -271,7 +274,7 @@ public partial class TapoDevice : IDisposable {
       }
       catch (TapoErrorResponseException ex) when (
         // request failed with error code -1301
-        attempt == 0 &&
+        attempt == firstAttempt &&
         ex.ErrorCode == (ErrorCode)(-1301)
       ) {
         // The session might have been in invalid state(?)
@@ -281,7 +284,7 @@ public partial class TapoDevice : IDisposable {
 
         continue;
       }
-      catch (TapoErrorResponseException ex) when (attempt == 0) {
+      catch (TapoErrorResponseException ex) when (attempt == firstAttempt) {
         // The session may have been invalid.
         // Dispose the current session in order to re-establish the session and try again.
         client.CloseSessionWithLog(LogLevel.Warning, ex, $"Unexpected error response ({nameof(ex.ErrorCode)}: {(int)ex.ErrorCode})");
