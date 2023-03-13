@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using NUnit.Framework;
 
@@ -17,16 +18,21 @@ public class AsymmetricAlgorithmShimTests {
 
   private static System.Collections.IEnumerable YeildTestCase_ExportSubjectPublicKeyInfoPem()
   {
-    foreach (var (algorithmGenerator, label) in new (Func<AsymmetricAlgorithm>, string) [] {
-      (static () => RSA.Create(keySizeInBits: 512), "RSA 512 bits" ),
-      (static () => RSA.Create(keySizeInBits: 1024), "RSA 1024 bits" ),
-      (static () => RSA.Create(keySizeInBits: 2048), "RSA 2048 bits" ),
+    static IEnumerable<(Func<AsymmetricAlgorithm>, string)> YieldTestCases()
+    {
+      yield return (static () => RSA.Create(keySizeInBits: 512), "RSA 512 bits" );
+      yield return (static () => RSA.Create(keySizeInBits: 1024), "RSA 1024 bits" );
+      yield return (static () => RSA.Create(keySizeInBits: 2048), "RSA 2048 bits" );
 
-      (static () => DSA.Create(keySizeInBits: 1024), "DSA 1024 bits" ),
-      (static () => DSA.Create(keySizeInBits: 2048), "DSA 2048 bits" ),
+      if (!OperatingSystem.IsMacOS()) {
+        yield return (static () => DSA.Create(keySizeInBits: 1024), "DSA 1024 bits" );
+        yield return (static () => DSA.Create(keySizeInBits: 2048), "DSA 2048 bits" );
+      }
 
-      (static () => ECDsa.Create(), "ECDsa" ),
-    }) {
+      yield return (static () => ECDsa.Create(), "ECDsa" );
+    }
+
+    foreach (var (algorithmGenerator, label) in YieldTestCases()) {
       AsymmetricAlgorithm? algorithm = null;
 
       try {
