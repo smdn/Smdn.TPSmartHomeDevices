@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Buffers;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -269,36 +268,44 @@ public sealed partial class KasaClient : IDisposable {
         throw new KasaDisconnectedException("The peer may have dropped connection", endPoint, innerException: null);
 
       logger?.LogTrace("Received response {ResponseSize} bytes", buffer.WrittenCount);
+      logger?.LogTrace("Buffer capacity: {Capacity} bytes", buffer.Capacity);
 
       JsonElement result = default;
 
       try {
         result = KasaJsonSerializer.Deserialize(buffer, module, method, logger);
-
-        if (
-          result.TryGetProperty(PropertyNameForErrorCode.EncodedUtf8Bytes, out var propErrorCode) &&
-          propErrorCode.TryGetInt32(out var errorCode) &&
-          errorCode != 0
-        ) {
-          throw new KasaErrorResponseException(
-            deviceEndPoint: endPoint,
-            requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
-            requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
-            errorCode: (ErrorCode)errorCode
-          );
-        }
       }
-      catch (InvalidDataException ex) {
+      catch (KasaMessageBodyTooShortException ex) {
+        throw new KasaIncompleteResponseException(
+          message: "Received incomplete response: " + ex.Message,
+          deviceEndPoint: endPoint,
+          requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
+          requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
+          innerException: ex
+        );
+      }
+      catch (KasaMessageException ex) {
         throw new KasaUnexpectedResponseException(
           message: "Received unexpected or invalid response",
           deviceEndPoint: endPoint,
           requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
           requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
-          ex
+          innerException: ex
         );
       }
 
-      logger?.LogTrace("Buffer capacity: {Capacity} bytes", buffer.Capacity);
+      if (
+        result.TryGetProperty(PropertyNameForErrorCode.EncodedUtf8Bytes, out var propErrorCode) &&
+        propErrorCode.TryGetInt32(out var errorCode) &&
+        errorCode != 0
+      ) {
+        throw new KasaErrorResponseException(
+          deviceEndPoint: endPoint,
+          requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
+          requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
+          errorCode: (ErrorCode)errorCode
+        );
+      }
 
       try {
         return composeResult(result);

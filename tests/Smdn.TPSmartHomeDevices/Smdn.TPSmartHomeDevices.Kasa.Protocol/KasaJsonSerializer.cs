@@ -3,7 +3,6 @@
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
-using System.IO;
 using System.Text;
 using System.Text.Json;
 using NUnit.Framework;
@@ -186,7 +185,7 @@ public class KasaJsonSerializerTests {
     );
 
   [Test]
-  public void Deserialize_InvalidData_LengthHeaderTooShort(
+  public void Deserialize_MessageHeaderTooShort(
     [Values(0, 1, 2, 3)] int length
   )
   {
@@ -197,7 +196,7 @@ public class KasaJsonSerializerTests {
       buffer.Advance(length);
     }
 
-    Assert.Throws<InvalidDataException>(
+    Assert.Throws<KasaMessageHeaderTooShortException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         JsonEncodedText.Encode("module"),
@@ -206,13 +205,18 @@ public class KasaJsonSerializerTests {
     );
   }
 
-  private static System.Collections.IEnumerable YieldTestCases_Deserialize_InvalidData_InputTooShort()
+  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageBodyTooShort()
   {
     foreach (var input in new[] {
       new byte[] { 0x00, 0x00, 0x00, 0x01 }, // length = 1 byte, data = 0 bytes
       new byte[] { 0x00, 0x00, 0x00, 0x02, 0x00 }, // length = 2 byte, data = 1 bytes
     }) {
-      yield return new object[] { CreateWrittenArrayBufferWritter(input) };
+      var bodyLengthIndicatedInHeader = BinaryPrimitives.ReadInt32BigEndian(input.AsSpan(0, 4));
+
+      yield return new object[] {
+        CreateWrittenArrayBufferWritter(input),
+        bodyLengthIndicatedInHeader
+      };
     }
 
     static ArrayBufferWriter<byte> CreateWrittenArrayBufferWritter(byte[] input)
@@ -229,9 +233,10 @@ public class KasaJsonSerializerTests {
     }
   }
 
-  [TestCaseSource(nameof(YieldTestCases_Deserialize_InvalidData_InputTooShort))]
-  public void Deserialize_InvalidData_InputTooShort(ArrayBufferWriter<byte> buffer)
-    => Assert.Throws<InvalidDataException>(
+  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageBodyTooShort))]
+  public void Deserialize_MessageBodyTooShort(ArrayBufferWriter<byte> buffer, int bodyLengthIndicatedInHeader)
+  {
+    var ex = Assert.Throws<KasaMessageBodyTooShortException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         JsonEncodedText.Encode("module"),
@@ -239,7 +244,11 @@ public class KasaJsonSerializerTests {
       )
     );
 
-  private static System.Collections.IEnumerable YieldTestCases_Deserialize_InvalidData_ModuleUnmatch()
+    Assert.AreEqual(bodyLengthIndicatedInHeader, ex.IndicatedLength, nameof(ex.IndicatedLength));
+    Assert.AreEqual(buffer.WrittenCount - 4, ex.ActualLength, nameof(ex.ActualLength));
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageModuleUnmatch()
   {
     foreach (var testCase in new[] {
       new { SerializingModuleName = "module", DeserializingModuleName = "Module" },
@@ -259,9 +268,9 @@ public class KasaJsonSerializerTests {
     }
   }
 
-  [TestCaseSource(nameof(YieldTestCases_Deserialize_InvalidData_ModuleUnmatch))]
-  public void Deserialize_InvalidData_ModuleUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
-    => Assert.Throws<InvalidDataException>(
+  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageModuleUnmatch))]
+  public void Deserialize_MessageModuleUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
+    => Assert.Throws<KasaMessageException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         module,
@@ -269,7 +278,7 @@ public class KasaJsonSerializerTests {
       )
     );
 
-  private static System.Collections.IEnumerable YieldTestCases_Deserialize_InvalidData_MethodUnmatch()
+  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageMethodUnmatch()
   {
     foreach (var testCase in new[] {
       new { SerializingMethodName = "method", DeserializingMethodName = "Method" },
@@ -289,9 +298,9 @@ public class KasaJsonSerializerTests {
     }
   }
 
-  [TestCaseSource(nameof(YieldTestCases_Deserialize_InvalidData_MethodUnmatch))]
-  public void Deserialize_InvalidData_MethodUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
-    => Assert.Throws<InvalidDataException>(
+  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageMethodUnmatch))]
+  public void Deserialize_MessageMethodUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
+    => Assert.Throws<KasaMessageException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         module,

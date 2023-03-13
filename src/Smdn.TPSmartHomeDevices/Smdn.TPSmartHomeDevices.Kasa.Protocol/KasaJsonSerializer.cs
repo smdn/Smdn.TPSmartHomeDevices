@@ -95,13 +95,13 @@ public static class KasaJsonSerializer {
     var buf = buffer.WrittenMemory;
 
     if (buf.Length < 4)
-      throw new InvalidDataException("input too short (expects at least 4 bytes of header)");
+      throw new KasaMessageHeaderTooShortException($"input too short (expects at least 4 bytes of header but was {buf.Length})");
 
     var length = BinaryPrimitives.ReadInt32BigEndian(buf.Slice(0, 4).Span);
     var body = buf.Slice(4);
 
     if (body.Length < length)
-      throw new InvalidDataException($"input too short (expects at least {length} bytes of data body, but is {body.Length} bytes)");
+      throw new KasaMessageBodyTooShortException(indicatedLength: length, actualLength: body.Length);
 
     body = body.Slice(0, length);
 
@@ -118,10 +118,10 @@ public static class KasaJsonSerializer {
     var doc = JsonDocument.Parse(bodyArraySegment.AsMemory());
 
     if (!doc.RootElement.TryGetProperty(module.EncodedUtf8Bytes, out var propModule))
-      throw new InvalidDataException($"The response JSON does not contain the expected property for the module '{module}'.");
+      throw new KasaMessageException($"The response JSON does not contain the expected property for the module '{module}'.");
 
     if (!propModule.TryGetProperty(method.EncodedUtf8Bytes, out var propMethod))
-      throw new InvalidDataException($"The response JSON does not contain the expected property for the method '{method}'.");
+      throw new KasaMessageException($"The response JSON does not contain the expected property for the method '{method}'.");
 
     return propMethod;
   }

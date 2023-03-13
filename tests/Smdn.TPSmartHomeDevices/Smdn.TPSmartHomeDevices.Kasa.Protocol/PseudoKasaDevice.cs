@@ -26,6 +26,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
   private CancellationTokenSource? listenerCancellationTokenSource = new();
 
   public Func<EndPoint, JsonDocument, JsonDocument>? FuncGenerateResponse { get; set; }
+  public Func<JsonDocument, byte[]>? FuncEncryptResponse { get; set; }
 
   private void ThrowIfDisposed()
   {
@@ -226,34 +227,49 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
         return;
 
       byte[]? responseBuffer = null;
+      int responseLength = 0;
+      bool shouldReturnBuffer = true;
 
       try {
         const SocketFlags sendSocketFlags = default;
 
-        using (var writer = new Utf8JsonWriter(buffer)) {
-          response.WriteTo(writer);
+        if (FuncEncryptResponse is null) {
+          // perform default encryption
+          shouldReturnBuffer = true;
+
+          using (var writer = new Utf8JsonWriter(buffer)) {
+            response.WriteTo(writer);
+          }
+
+          var length = buffer.WrittenCount;
+
+          responseBuffer = ArrayPool<byte>.Shared.Rent(4 + length);
+
+          BinaryPrimitives.WriteInt32BigEndian(responseBuffer.AsSpan(0, 4), length);
+
+          var body = responseBuffer.AsMemory(4, length);
+
+          buffer.WrittenMemory.CopyTo(body);
+
+          KasaJsonSerializer.EncryptInPlace(body.Span);
+
+          responseLength = 4 + length;
+        }
+        else {
+          // perform encryption with customized function
+          responseBuffer = FuncEncryptResponse(response);
+          responseLength = responseBuffer.Length;
+          shouldReturnBuffer = false;
         }
 
-        var length = buffer.WrittenCount;
-
-        responseBuffer = ArrayPool<byte>.Shared.Rent(4 + length);
-
-        BinaryPrimitives.WriteInt32BigEndian(responseBuffer.AsSpan(0, 4), length);
-
-        var body = responseBuffer.AsMemory(4, length);
-
-        buffer.WrittenMemory.CopyTo(body);
-
-        KasaJsonSerializer.EncryptInPlace(body.Span);
-
         await socket.SendAsync(
-          responseBuffer.AsMemory(0, 4 + length),
+          responseBuffer.AsMemory(0, responseLength),
           sendSocketFlags,
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }
       finally {
-        if (responseBuffer is not null)
+        if (shouldReturnBuffer && responseBuffer is not null)
           ArrayPool<byte>.Shared.Return(responseBuffer);
 
         buffer.Clear(); // clear buffer state for next use

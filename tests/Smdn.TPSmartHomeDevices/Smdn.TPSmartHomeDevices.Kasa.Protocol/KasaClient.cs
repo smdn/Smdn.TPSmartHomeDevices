@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Buffers.Binary;
 using System.Net;
 using System.Threading.Tasks;
 using System.Text.Json;
@@ -321,5 +322,50 @@ json: @"{
     );
 
     Assert.AreEqual(ex.DeviceEndPoint, device.EndPoint, nameof(ex.DeviceEndPoint));
+  }
+
+  [TestCase(1, 0)]
+  [TestCase(1033, 1024)]
+  public async Task SendAsync_ReceivedIncompleteResponse(
+    int bodyLengthIndicatedInHeader,
+    int actualBodyLength
+  )
+  {
+    await using var device = new PseudoKasaDevice() {
+      FuncGenerateResponse = static (_, _) => JsonDocument.Parse(json: "{}")!,
+      FuncEncryptResponse = _ => {
+        const int headerLength = 4;
+        var response = new byte[headerLength + actualBodyLength];
+
+        BinaryPrimitives.WriteInt32BigEndian(response.AsSpan(0, 4), bodyLengthIndicatedInHeader);
+
+        return response;
+      }
+    };
+
+    using var client = new KasaClient(
+      endPoint: device.Start()
+    );
+
+    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
+    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+
+    var ex = Assert.ThrowsAsync<KasaIncompleteResponseException>(
+      async () => await client.SendAsync(
+        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+        method: JsonEncodedText.Encode("get_light_state"),
+        parameter: new { },
+        composeResult: static _ => 0
+      )
+    );
+
+    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.IsInstanceOf<KasaMessageBodyTooShortException>(ex!.InnerException);
+
+    var exBodyTooShortException = (ex.InnerException as KasaMessageBodyTooShortException)!;
+
+    Assert.AreEqual(actualBodyLength, exBodyTooShortException.ActualLength, nameof(exBodyTooShortException.ActualLength));
+    Assert.AreEqual(bodyLengthIndicatedInHeader, exBodyTooShortException.IndicatedLength, nameof(exBodyTooShortException.IndicatedLength));
   }
 }
