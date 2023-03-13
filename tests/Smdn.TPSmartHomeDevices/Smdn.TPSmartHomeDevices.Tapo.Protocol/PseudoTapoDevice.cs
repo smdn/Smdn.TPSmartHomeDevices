@@ -102,6 +102,8 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   private HttpListener? listener;
   private Task? taskProcessListener;
 
+  private bool IsDisposed => listener is null;
+
   private readonly ConcurrentDictionary<string, UnauthorizedSession> unauthorizedSessions = new();
   private readonly ConcurrentDictionary<string, AuthorizedSession> authorizedSessions = new();
 
@@ -216,6 +218,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
         if (context is not null)
           await ProcessRequestAsync(context).ConfigureAwait(false);
+      }
+      catch (HttpListenerException) when (IsDisposed) {
+        return; // expected exception (listener disposed)
       }
       catch (ObjectDisposedException) {
         return; // expected exception (listener stopped)
