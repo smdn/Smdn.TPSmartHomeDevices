@@ -1,18 +1,18 @@
-// Smdn.TPSmartHomeDevices.dll (Smdn.TPSmartHomeDevices-1.0.0-preview1)
+// Smdn.TPSmartHomeDevices.dll (Smdn.TPSmartHomeDevices-1.0.0-preview2)
 //   Name: Smdn.TPSmartHomeDevices
 //   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0-preview1+e06e7ca85c2de4ff93d0da638a7853e7f837e6ce
+//   InformationalVersion: 1.0.0-preview2+81e3802b1dec05701f67b90fc3e31867a1d3af11
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
-//     Microsoft.Extensions.DependencyInjection.Abstractions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
-//     Microsoft.Extensions.Http, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
-//     Microsoft.Extensions.Logging.Abstractions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
+//     Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
+//     Microsoft.Extensions.Http, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
+//     Microsoft.Extensions.Logging.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Smdn.Fundamental.PrintableEncoding.Hexadecimal, Version=3.0.1.0, Culture=neutral
 //     Smdn.Net.AddressResolution, Version=1.0.0.0, Culture=neutral
-//     System.Net.Http.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     System.Text.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Net.Http.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 #nullable enable annotations
 
@@ -127,10 +127,18 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     public static IDeviceEndPointProvider Create(string hostName) {}
   }
 
+  public class KasaDisconnectedException : KasaProtocolException {
+    public KasaDisconnectedException(string message, EndPoint deviceEndPoint, Exception? innerException) {}
+  }
+
   public class KasaErrorResponseException : KasaUnexpectedResponseException {
     public KasaErrorResponseException(EndPoint deviceEndPoint, string requestModule, string requestMethod, ErrorCode errorCode) {}
 
     public ErrorCode ErrorCode { get; }
+  }
+
+  public class KasaIncompleteResponseException : KasaUnexpectedResponseException {
+    public KasaIncompleteResponseException(string message, EndPoint deviceEndPoint, string requestModule, string requestMethod, Exception? innerException) {}
   }
 
   public abstract class KasaProtocolException : InvalidOperationException {
@@ -187,6 +195,21 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
     public static JsonElement Deserialize(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method, ILogger? logger = null) {}
     public static void EncryptInPlace(Span<byte> body) {}
     public static void Serialize<TMethodParameter>(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, ILogger? logger = null) {}
+  }
+
+  public class KasaMessageBodyTooShortException : KasaMessageException {
+    public KasaMessageBodyTooShortException(int indicatedLength, int actualLength) {}
+
+    public int ActualLength { get; }
+    public int IndicatedLength { get; }
+  }
+
+  public class KasaMessageException : SystemException {
+    public KasaMessageException(string message) {}
+  }
+
+  public class KasaMessageHeaderTooShortException : KasaMessageException {
+    public KasaMessageHeaderTooShortException(string message) {}
   }
 }
 
@@ -371,6 +394,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     Success = 0,
   }
 
+  public class SecurePassThroughInvalidPaddingException : SystemException {
+    public SecurePassThroughInvalidPaddingException(string message, Exception? innerException) {}
+  }
+
   public sealed class SecurePassThroughJsonConverterFactory :
     JsonConverterFactory,
     IDisposable
@@ -391,6 +418,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public TapoSession? Session { get; }
 
     public Task AuthenticateAsync(CancellationToken cancellationToken = default) {}
+    public void CloseSession() {}
     public void Dispose() {}
     public Task<TResponse> SendRequestAsync<TRequest, TResponse>(CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest, new() where TResponse : ITapoPassThroughResponse {}
     public Task<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
