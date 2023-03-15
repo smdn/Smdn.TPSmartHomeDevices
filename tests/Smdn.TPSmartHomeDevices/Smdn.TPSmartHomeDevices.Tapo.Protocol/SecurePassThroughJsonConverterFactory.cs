@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Smdn.IO.Streams;
 
@@ -92,12 +93,14 @@ public class SecurePassThroughJsonConverterFactoryTests {
   private static SecurePassThroughJsonConverterFactory CreateFactory(
     ICryptoTransform? encryptorForPassThroughRequest = null,
     ICryptoTransform? decryptorForPassThroughResponse = null,
-    JsonSerializerOptions? baseJsonSerializerOptions = null
+    JsonSerializerOptions? baseJsonSerializerOptions = null,
+    ILogger? logger = null
   )
     => new(
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
       decryptorForPassThroughResponse: decryptorForPassThroughResponse ?? new NullTransform(),
-      plainTextJsonSerializerOptions: baseJsonSerializerOptions
+      plainTextJsonSerializerOptions: baseJsonSerializerOptions,
+      logger: logger
     );
 
   [TestCase(typeof(HandshakeRequest), false)]
@@ -459,10 +462,23 @@ public class SecurePassThroughJsonConverterFactoryTests {
     assert((ITapoPassThroughResponse)deserialized!);
   }
 
-  [TestCase(@"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse))]
+  private class NullLogger : ILogger {
+    public IDisposable? BeginScope<TState>(TState state) => null; // do nothing
+    public bool IsEnabled(LogLevel logLevel) => true; // enable all log level
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { } // do nothing
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding()
+  {
+    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), new NullLogger() };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding))]
   public void ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding(
     string rawJsonExpression,
-    Type returnType
+    Type returnType,
+    ILogger? logger
   )
   {
     var rng = RandomNumberGenerator.Create();
@@ -484,7 +500,8 @@ public class SecurePassThroughJsonConverterFactoryTests {
     options.Converters.Add(
       CreateFactory(
         encryptorForPassThroughRequest: new ThrowExceptionTransform(), // encryption must not be performed,
-        decryptorForPassThroughResponse: aesDecrypting.CreateDecryptor(key, iv)
+        decryptorForPassThroughResponse: aesDecrypting.CreateDecryptor(key, iv),
+        logger: logger
       )
     );
 

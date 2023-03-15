@@ -138,6 +138,8 @@ public sealed class SecurePassThroughJsonConverterFactory :
     if (!reader.TryGetBytesFromBase64(out var base64))
       throw new JsonException("could not read base64 string");
 
+    var cryptographicExceptionThrown = false;
+
     try {
       using var stream = new MemoryStream(base64, writable: false);
       using var decryptingStream = CreateDecryptingStream(stream);
@@ -150,7 +152,12 @@ public sealed class SecurePassThroughJsonConverterFactory :
         );
       }
       catch (CryptographicException ex) when (IsInvalidPaddingException(ex)) {
+        cryptographicExceptionThrown = true;
         throw new SecurePassThroughInvalidPaddingException("Invalid padding detected in encrypted JSON", ex);
+      }
+      catch (CryptographicException ex) {
+        cryptographicExceptionThrown = true;
+        throw;
       }
 
       static bool IsInvalidPaddingException(CryptographicException ex)
@@ -162,7 +169,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
       }
     }
     finally {
-      if (logger is not null) {
+      if (!cryptographicExceptionThrown && logger is not null) {
         using var stream = new MemoryStream(base64, writable: false);
         using var decryptingStream = CreateDecryptingStream(stream);
 
