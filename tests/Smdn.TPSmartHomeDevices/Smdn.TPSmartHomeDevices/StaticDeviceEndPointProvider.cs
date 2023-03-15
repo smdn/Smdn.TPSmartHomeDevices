@@ -9,8 +9,6 @@ namespace Smdn.TPSmartHomeDevices;
 internal sealed class StaticDeviceEndPointProvider : IDeviceEndPointProvider {
   private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
 
-  public bool IsStaticEndPoint => true;
-
   public StaticDeviceEndPointProvider(EndPoint endPoint)
   {
     staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);

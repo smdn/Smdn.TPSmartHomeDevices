@@ -32,6 +32,8 @@ public class MacAddressDeviceEndPointFactoryTests {
 
       public ValueTask<IPAddress?> ResolveAsync(PhysicalAddress address, CancellationToken cancellationToken)
         => new(ipAddress);
+
+      public void Invalidate(IPAddress address) { }
     }
 
     public StaticMacAddressDeviceEndPointFactory(IPAddress ipAddress)
@@ -70,7 +72,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     var endPoint = factory.Create(PhysicalAddress.None);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsFalse(endPoint.IsStaticEndPoint, nameof(endPoint.IsStaticEndPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
     Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.GetEndPointAsync());
   }
@@ -85,7 +87,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     var endPoint = factory.Create(PhysicalAddress.None, port);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsFalse(endPoint.IsStaticEndPoint, nameof(endPoint.IsStaticEndPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
     Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.GetEndPointAsync());
   }

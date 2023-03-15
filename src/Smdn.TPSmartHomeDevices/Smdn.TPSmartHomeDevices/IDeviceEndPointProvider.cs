@@ -7,7 +7,5 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 public interface IDeviceEndPointProvider {
-  bool IsStaticEndPoint { get; }
-
   ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken = default);
 }

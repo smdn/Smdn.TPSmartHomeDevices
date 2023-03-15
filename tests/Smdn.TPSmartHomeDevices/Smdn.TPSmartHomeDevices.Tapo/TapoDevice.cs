@@ -400,7 +400,8 @@ public class TapoDeviceTests {
 
     var endPoint = pseudoDevice.GetEndPointProvider();
 
-    Assert.IsTrue(endPoint.IsStaticEndPoint, nameof(endPoint.IsStaticEndPoint));
+    Assert.That(endPoint, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(endPoint));
+    Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(endPoint));
 
     using var device = new ConcreteTapoDevice(
       deviceEndPointProvider: endPoint,

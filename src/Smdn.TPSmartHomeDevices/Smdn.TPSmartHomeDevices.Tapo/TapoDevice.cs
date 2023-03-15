@@ -239,8 +239,8 @@ public partial class TapoDevice : IDisposable {
         return composeResult(response);
       }
       catch (HttpRequestException ex) when (
-        attempt == firstAttempt &&
-        !deviceEndPointProvider.IsStaticEndPoint &&
+        attempt == firstAttempt && // retry just once
+        deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint &&
         ex.InnerException is SocketException exSocket &&
         exSocket.SocketErrorCode switch {
           SocketError.ConnectionRefused => true, // ECONNREFUSED
@@ -253,6 +253,9 @@ public partial class TapoDevice : IDisposable {
         // Dispose the current HTTP client in order to recreate the client and try again.
         client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
         client = null;
+
+        // mark end point as invalid to have the end point refreshed or rescanned
+        dynamicEndPoint.InvalidateEndPoint();
 
         continue;
       }

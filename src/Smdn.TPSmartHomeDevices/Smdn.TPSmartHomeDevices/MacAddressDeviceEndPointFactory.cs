@@ -10,12 +10,11 @@ using Smdn.Net.AddressResolution;
 namespace Smdn.TPSmartHomeDevices;
 
 public class MacAddressDeviceEndPointFactory : IDisposable {
-  protected class MacAddressDeviceEndPointProvider : IDeviceEndPointProvider {
+  protected class MacAddressDeviceEndPointProvider : IDynamicDeviceEndPointProvider {
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;
     private readonly int port;
-
-    public bool IsStaticEndPoint => false;
+    private IPAddress? latestResolvedAddress;
 
     public MacAddressDeviceEndPointProvider(
       IAddressResolver<PhysicalAddress, IPAddress> resolver,
@@ -29,13 +28,23 @@ public class MacAddressDeviceEndPointFactory : IDisposable {
     }
 
     public async ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
-      => new IPEndPoint(
-        address: await resolver.ResolveAsync(
-          address: address,
-          cancellationToken: cancellationToken
-        ).ConfigureAwait(false),
+    {
+      latestResolvedAddress = await resolver.ResolveAsync(
+        address: address,
+        cancellationToken: cancellationToken
+      ).ConfigureAwait(false);
+
+      return new IPEndPoint(
+        address: latestResolvedAddress,
         port: port
       );
+    }
+
+    public void InvalidateEndPoint()
+    {
+      if (latestResolvedAddress is not null)
+        resolver.Invalidate(latestResolvedAddress);
+    }
   }
 
   /*

@@ -237,8 +237,8 @@ public partial class KasaDevice : IDisposable {
         ).ConfigureAwait(false);
       }
       catch (SocketException ex) when (
-        attempt == firstAttempt &&
-        !deviceEndPointProvider.IsStaticEndPoint &&
+        attempt == firstAttempt && // retry just once
+        deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint &&
         ex.SocketErrorCode switch {
           SocketError.ConnectionRefused => true, // ECONNREFUSED
           SocketError.HostUnreachable => true, // EHOSTUNREACH
@@ -250,6 +250,9 @@ public partial class KasaDevice : IDisposable {
         // Dispose the current client in order to recreate the client and try again.
         client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
         client = null;
+
+        // mark end point as invalid to have the end point refreshed or rescanned
+        dynamicEndPoint.InvalidateEndPoint();
 
         continue;
       }

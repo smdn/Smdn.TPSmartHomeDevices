@@ -20,7 +20,8 @@ public class TapoDeviceEndPointProviderTests {
     var provider = TapoDeviceEndPointProvider.Create(hostName: "localhost");
 
     Assert.IsNotNull(provider);
-    Assert.IsTrue(provider.IsStaticEndPoint, nameof(provider.IsStaticEndPoint));
+    Assert.That(provider, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(provider));
+    Assert.That(provider, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(provider));
     Assert.AreEqual(
       new DnsEndPoint("localhost", 80),
       await provider.GetEndPointAsync(default)
@@ -37,7 +38,8 @@ public class TapoDeviceEndPointProviderTests {
     var provider = TapoDeviceEndPointProvider.Create(ipAddress: IPAddress.Loopback);
 
     Assert.IsNotNull(provider);
-    Assert.IsTrue(provider.IsStaticEndPoint, nameof(provider.IsStaticEndPoint));
+    Assert.That(provider, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(provider));
+    Assert.That(provider, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(provider));
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("127.0.0.1"), 80),
       await provider.GetEndPointAsync(default)
@@ -50,7 +52,8 @@ public class TapoDeviceEndPointProviderTests {
     var provider = TapoDeviceEndPointProvider.Create(ipAddress: IPAddress.IPv6Loopback);
 
     Assert.IsNotNull(provider);
-    Assert.IsTrue(provider.IsStaticEndPoint, nameof(provider.IsStaticEndPoint));
+    Assert.That(provider, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(provider));
+    Assert.That(provider, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(provider));
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("::1"), 80),
       await provider.GetEndPointAsync(default)

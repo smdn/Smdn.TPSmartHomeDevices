@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class DynamicDeviceEndPointProvider : IDeviceEndPointProvider {
+internal sealed class DynamicDeviceEndPointProvider : IDynamicDeviceEndPointProvider {
   public EndPoint EndPoint { get; set; }
-  public bool IsStaticEndPoint => false;
+  public bool HasInvalidated { get; set; }
 
   public DynamicDeviceEndPointProvider(EndPoint endPoint)
   {
@@ -17,4 +17,7 @@ internal sealed class DynamicDeviceEndPointProvider : IDeviceEndPointProvider {
 
   public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
     => ValueTask.FromResult(EndPoint);
+
+  public void InvalidateEndPoint()
+    => HasInvalidated = true;
 }

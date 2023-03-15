@@ -10,8 +10,6 @@ internal sealed class RequestCancellationAfterReturnDeviceEndPointProvider : IDe
   private readonly CancellationTokenSource cancellationTokenSource;
   private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
 
-  public bool IsStaticEndPoint => true;
-
   public RequestCancellationAfterReturnDeviceEndPointProvider(
     CancellationTokenSource cancellationTokenSource,
     EndPoint endPoint
