@@ -119,7 +119,8 @@ partial class TapoClient {
         logger?.LogCritical("Could not exchange the key during handshaking.");
         throw new TapoAuthenticationException(
           message: $"Handshaking to the peer device at '{httpClient.BaseAddress}' failed with error code {(int)ex.ErrorCode}.",
-          endPoint: httpClient.BaseAddress
+          endPoint: httpClient.BaseAddress,
+          innerException: ex
         );
       }
 
