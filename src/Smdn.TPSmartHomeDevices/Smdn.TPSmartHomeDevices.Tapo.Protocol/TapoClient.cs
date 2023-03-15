@@ -90,13 +90,11 @@ public sealed partial class TapoClient : IDisposable {
 
     logger?.LogTrace("Device end point: {DeviceEndPointUri}", endPointUri);
 
-    var httpClientFactory = serviceProvider?.GetService<IHttpClientFactory>();
+    var httpClientFactory = serviceProvider?.GetService<IHttpClientFactory>() ?? TapoHttpClientFactory.Instance;
 
     logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", httpClientFactory?.GetType().FullName);
 
-    httpClient = httpClientFactory is null
-      ? httpClient = new()
-      : httpClientFactory.CreateClient(nameof(TapoClient)); // TODO: name
+    httpClient = httpClientFactory.CreateClient(nameof(TapoClient)); // TODO: name
 
     httpClient.BaseAddress = endPointUri;
   }
