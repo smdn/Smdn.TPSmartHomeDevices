@@ -16,6 +16,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
 public class KasaDeviceTests {
+  private const int RertyMaxAttemptsForIncompleteResponse = 3;
   private ServiceCollection? services;
 
   [OneTimeSetUp]
@@ -502,7 +503,7 @@ public class KasaDeviceTests {
       FuncEncryptResponse = responseDocument => {
         var resp = EncryptedResponseDocument(responseDocument);
 
-        if (request++ == 0) {
+        if (++request < RertyMaxAttemptsForIncompleteResponse) {
           return resp.AsSpan(0, resp.Length - 1).ToArray(); // truncate response message body
         }
         else {
@@ -527,7 +528,7 @@ public class KasaDeviceTests {
     );
 
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
-    Assert.AreEqual(2, request, nameof(request));
+    Assert.AreEqual(RertyMaxAttemptsForIncompleteResponse, request, nameof(request));
   }
 
   [Test]
@@ -561,7 +562,7 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.AreEqual(2, request, nameof(request));
+    Assert.AreEqual(RertyMaxAttemptsForIncompleteResponse, request, nameof(request));
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
 }

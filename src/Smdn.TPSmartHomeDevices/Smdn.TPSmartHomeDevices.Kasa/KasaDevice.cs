@@ -215,7 +215,7 @@ public partial class KasaDevice : IDisposable {
       client = null;
     }
 
-    const int maxAttempts = 2;
+    const int maxAttempts = 3;
     const int firstAttempt = 1;
 
     for (var attempt = firstAttempt; attempt <= maxAttempts; attempt++) {
@@ -264,7 +264,9 @@ public partial class KasaDevice : IDisposable {
 
         throw;
       }
-      catch (KasaDisconnectedException ex) when (attempt == firstAttempt) {
+      catch (KasaDisconnectedException ex) when (
+        attempt == firstAttempt // retry just once
+      ) {
         // The peer device disconnected the connection, or may have dropped the connection.
         // Dispose the current client in order to recreate the client and try again.
         if (ex.InnerException is SocketException exSocket)
@@ -276,7 +278,9 @@ public partial class KasaDevice : IDisposable {
 
         continue;
       }
-      catch (KasaIncompleteResponseException ex) when (attempt == firstAttempt) {
+      catch (KasaIncompleteResponseException ex) when (
+        attempt < maxAttempts // retry up to max attempts
+      ) {
         // The peer has been in invalid state(?) and returnd incomplete response.
         // Dispose the current client in order to recreate the client and try again.
         client.DisposeWithLog(LogLevel.Warning, exception: null, ex.Message);
