@@ -183,7 +183,7 @@ partial class TapoClient {
       key: keyBytes.AsSpan(0, 16),
       iv: keyBytes.AsSpan(16, 16),
       plainTextJsonSerializerOptions: defaultJsonSerializerOptions,
-      serviceProvider: serviceProvider
+      logger: logger
     );
 
     // TODO: logger

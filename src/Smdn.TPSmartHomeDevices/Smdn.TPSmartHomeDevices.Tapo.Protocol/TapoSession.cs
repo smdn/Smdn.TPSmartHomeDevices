@@ -28,11 +28,9 @@ public sealed class TapoSession : IDisposable {
     ReadOnlySpan<byte> key,
     ReadOnlySpan<byte> iv,
     JsonSerializerOptions plainTextJsonSerializerOptions,
-    IServiceProvider? serviceProvider
+    ILogger? logger
   )
   {
-    var logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(TapoSession)}({sessionId})");
-
     SessionId = sessionId;
     ExpiresOn = expiresOn;
 
