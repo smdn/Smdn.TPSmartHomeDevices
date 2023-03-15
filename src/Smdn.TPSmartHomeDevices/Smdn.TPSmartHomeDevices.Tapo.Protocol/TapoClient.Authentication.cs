@@ -52,7 +52,7 @@ partial class TapoClient {
       }
       catch (TapoErrorResponseException ex) {
         throw new TapoAuthenticationException(
-          message: $"Denied to initiate authorized session with the device at '{httpClient.BaseAddress}'.",
+          message: $"Denied to initiate authorized session with the device at '{httpClient.BaseAddress}'. (error code: {(int)ex.ErrorCode})",
           endPoint: httpClient.BaseAddress,
           innerException: ex
         );
@@ -118,7 +118,7 @@ partial class TapoClient {
       if (response.Result.Key is null) {
         logger?.LogCritical("Could not exchange the key during handshaking.");
         throw new TapoAuthenticationException(
-          message: $"Could not exchange the key during handshaking with the device at '{httpClient.BaseAddress}'.",
+          message: $"Handshaking to the peer device at '{httpClient.BaseAddress}' failed with error code {(int)ex.ErrorCode}.",
           endPoint: httpClient.BaseAddress
         );
       }
