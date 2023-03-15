@@ -107,9 +107,9 @@ public sealed class SecurePassThroughJsonConverterFactory :
   )
   {
     logger?.LogTrace(
-      "{TypeFullName}: {RawJson}",
-      typeof(TValue).FullName,
-      JsonSerializer.Serialize(value: value, options: plainTextJsonSerializerOptions)
+      "PassThroughRequest: {RawJson} ({TypeFullName})",
+      JsonSerializer.Serialize(value: value, options: plainTextJsonSerializerOptions),
+      typeof(TValue).FullName
     );
 
     var stream = new MemoryStream(capacity: 256); // TODO: IMemoryAllocator
@@ -167,9 +167,9 @@ public sealed class SecurePassThroughJsonConverterFactory :
         using var decryptingStream = CreateDecryptingStream(stream);
 
         logger.LogTrace(
-          "{TypeFullName}: {RawJson}",
-          typeToConvert.FullName,
-          new StreamReader(decryptingStream, Encoding.UTF8).ReadToEnd()
+          "PassThroughResponse: {RawJson} ({TypeFullName})",
+          new StreamReader(decryptingStream, Encoding.UTF8).ReadToEnd(),
+          typeof(TValue).FullName
         );
       }
     }

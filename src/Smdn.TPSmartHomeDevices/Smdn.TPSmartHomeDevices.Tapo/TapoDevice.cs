@@ -293,7 +293,7 @@ public partial class TapoDevice : IDisposable {
       }
       catch (Exception ex) {
         // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected exception ({ex.GetType().FullName})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unhandled exception ({ex.GetType().FullName})");
         client = null;
 
         throw;

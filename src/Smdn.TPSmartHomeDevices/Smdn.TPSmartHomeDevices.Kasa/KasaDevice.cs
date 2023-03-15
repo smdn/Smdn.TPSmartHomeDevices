@@ -276,14 +276,14 @@ public partial class KasaDevice : IDisposable {
       catch (KasaIncompleteResponseException ex) when (attempt == firstAttempt) {
         // The peer has been in invalid state(?) and returnd incomplete response.
         // Dispose the current client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Warning, exception: null, $"Received incomplete response ({ex.Message})");
+        client.DisposeWithLog(LogLevel.Warning, exception: null, ex.Message);
         client = null;
 
         continue;
       }
       catch (Exception ex) {
         // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected exception ({ex.GetType().FullName})");
+        client.DisposeWithLog(LogLevel.Error, ex, $"Unhandled exception ({ex.GetType().FullName})");
         client = null;
 
         throw;
