@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 #endif
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,7 +101,9 @@ public partial class TapoDevice : IDisposable {
   )
   {
     this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
-    this.credentialProvider = credentialProvider;
+    this.credentialProvider = credentialProvider
+      ?? serviceProvider?.GetRequiredService<ITapoCredentialProvider>()
+      ?? throw new ArgumentNullException(nameof(credentialProvider));
     this.exceptionHandler = exceptionHandler
       ?? serviceProvider?.GetService<TapoClientExceptionHandler>()
       ?? TapoClientExceptionHandler.Default;
@@ -187,7 +190,8 @@ public partial class TapoDevice : IDisposable {
     client ??= new TapoClient(
       endPoint: endPoint,
       credentialProvider: credentialProvider,
-      serviceProvider: serviceProvider
+      httpClientFactory: serviceProvider?.GetService<IHttpClientFactory>(),
+      logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(TapoClient)}({endPoint})") // TODO: logger category name
     );
 
     if (client.Session is not null)

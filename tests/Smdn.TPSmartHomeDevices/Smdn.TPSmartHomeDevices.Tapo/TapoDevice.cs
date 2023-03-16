@@ -72,6 +72,60 @@ public class TapoDeviceTests {
   }
 
   [Test]
+  public void Create_WithCredentialProvider_ByICredentialProvider()
+  {
+    Assert.DoesNotThrow(
+      () => {
+        using var device = TapoDevice.Create(
+          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          credentialProvider: services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>()
+        );
+      }
+    );
+  }
+
+  [Test]
+  public void Create_WithCredentialProvider_ViaIServiceProvider()
+  {
+    Assert.DoesNotThrow(
+      () => {
+        using var device = TapoDevice.Create(
+          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          serviceProvider: services?.BuildServiceProvider()
+        );
+      }
+    );
+  }
+
+  [Test]
+  public void Create_WithCredentialProvider_CredentialProviderNull()
+  {
+    Assert.Throws<ArgumentNullException>(
+      () => {
+        using var device = TapoDevice.Create(
+          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          credentialProvider: null,
+          serviceProvider: null
+        );
+      }
+    );
+  }
+
+  [Test]
+  public void Create_WithCredentialProvider_NoCredentialViaIServiceProvider()
+  {
+    Assert.Throws<InvalidOperationException>(
+      () => {
+        using var device = TapoDevice.Create(
+          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          credentialProvider: null,
+          serviceProvider: new ServiceCollection().BuildServiceProvider()
+        );
+      }
+    );
+  }
+
+  [Test]
   public async Task Create_WithDeviceAddress()
   {
     using var device = TapoDevice.Create(
@@ -105,7 +159,8 @@ public class TapoDeviceTests {
   public async Task Create_WithEndPointProvider()
   {
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(new DnsEndPoint("localhost", 0))
+      deviceEndPointProvider: new StaticDeviceEndPointProvider(new DnsEndPoint("localhost", 0)),
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.AreEqual(
@@ -122,7 +177,8 @@ public class TapoDeviceTests {
   {
     using var device = TapoDevice.Create(
       deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
-      terminalUuid: new Guid(uuid)
+      terminalUuid: new Guid(uuid),
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNotEmpty(device.TerminalUuidString, nameof(device.TerminalUuidString));
@@ -182,7 +238,8 @@ public class TapoDeviceTests {
   public async Task ResolveEndPointAsync_ResolveToDefaultPort(EndPoint endPoint, EndPoint expectedEndPoint)
   {
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(endPoint)
+      deviceEndPointProvider: new StaticDeviceEndPointProvider(endPoint),
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.AreEqual(
@@ -197,7 +254,8 @@ public class TapoDeviceTests {
     var provider = new UnresolvedDeviceEndPointProvider();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: provider
+      deviceEndPointProvider: provider,
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.ResolveEndPointAsync());
@@ -211,7 +269,8 @@ public class TapoDeviceTests {
   {
     using var cts = new CancellationTokenSource();
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider()
+      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     cts.Cancel();
@@ -250,7 +309,8 @@ public class TapoDeviceTests {
   public void EnsureSessionEstablishedAsync_Disposed()
   {
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider()
+      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     device.Dispose();
@@ -266,7 +326,8 @@ public class TapoDeviceTests {
     var provider = new UnresolvedDeviceEndPointProvider();
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: provider
+      deviceEndPointProvider: provider,
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.EnsureSessionEstablishedAsync());

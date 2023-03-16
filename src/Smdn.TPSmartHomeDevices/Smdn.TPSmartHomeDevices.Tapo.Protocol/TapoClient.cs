@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -42,10 +41,9 @@ public sealed partial class TapoClient : IDisposable {
 
   private bool IsDisposed => httpClient is null;
 
-  private ITapoCredentialProvider? credentialProvider;
+  private readonly ITapoCredentialProvider credentialProvider;
   private HttpClient? httpClient; // if null, it indicates a 'disposed' state.
   private readonly EndPoint endPoint;
-  private readonly IServiceProvider? serviceProvider;
   private readonly ILogger? logger;
   private TapoSession? session;
 
@@ -79,30 +77,24 @@ public sealed partial class TapoClient : IDisposable {
 
   public TapoClient(
     EndPoint endPoint,
-    ITapoCredentialProvider? credentialProvider = null,
-    IServiceProvider? serviceProvider = null
+    ITapoCredentialProvider credentialProvider,
+    IHttpClientFactory? httpClientFactory = null,
+    ILogger? logger = null
   )
   {
     this.endPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
-    this.credentialProvider =
-      credentialProvider
-      ?? serviceProvider?.GetService<ITapoCredentialProvider>()
-      ?? throw new ArgumentException("No credential provider supplied.", nameof(credentialProvider));
-
-    this.serviceProvider = serviceProvider;
-
-    logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(TapoClient)}({endPoint})"); // TODO: logger category name
+    this.credentialProvider = credentialProvider ?? throw new ArgumentNullException(nameof(credentialProvider));
+    this.logger = logger;
 
     var endPointUri = GetEndPointUri(endPoint);
 
     logger?.LogTrace("Device end point: {DeviceEndPointUri}", endPointUri);
 
-    var httpClientFactory = serviceProvider?.GetService<IHttpClientFactory>() ?? TapoHttpClientFactory.Instance;
+    httpClientFactory ??= TapoHttpClientFactory.Instance;
 
-    logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", httpClientFactory?.GetType().FullName);
+    logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", httpClientFactory!.GetType().FullName);
 
-    httpClient = httpClientFactory.CreateClient(nameof(TapoClient)); // TODO: name
-
+    httpClient = httpClientFactory.CreateClient($"{nameof(TapoClient)} ({endPointUri})");
     httpClient.BaseAddress = endPointUri;
   }
 
@@ -113,8 +105,6 @@ public sealed partial class TapoClient : IDisposable {
 
     session?.Dispose();
     session = null;
-
-    credentialProvider = null;
 
     httpClient = null;
   }

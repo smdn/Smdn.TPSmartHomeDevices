@@ -26,7 +26,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());
@@ -50,7 +50,7 @@ partial class TapoClientTests {
   {
     using var client = new TapoClient(
       endPoint: new DnsEndPoint("localhost", 0),
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.ThrowsAsync<InvalidOperationException>(
@@ -80,7 +80,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());
@@ -113,7 +113,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());

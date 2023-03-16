@@ -21,7 +21,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(
@@ -51,7 +51,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -77,7 +77,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -109,7 +109,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -135,7 +135,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -164,7 +164,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(
@@ -197,7 +197,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrowAsync(
@@ -226,7 +226,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -255,7 +255,7 @@ partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(

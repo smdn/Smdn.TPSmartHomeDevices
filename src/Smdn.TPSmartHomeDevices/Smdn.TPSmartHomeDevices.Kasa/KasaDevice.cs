@@ -230,7 +230,7 @@ public partial class KasaDevice : IDisposable {
       client ??= new KasaClient(
         endPoint: endPoint,
         buffer: buffer,
-        serviceProvider: serviceProvider
+        logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})") // TODO: logger category name
       );
 
       try {

@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
@@ -57,12 +56,12 @@ public sealed partial class KasaClient : IDisposable {
 
   public KasaClient(
     EndPoint endPoint,
-    IServiceProvider? serviceProvider = null
+    ILogger? logger = null
   )
     : this(
       endPoint: endPoint ?? throw new ArgumentNullException(nameof(endPoint)),
       buffer: new(initialCapacity: DefaultBufferCapacity),
-      serviceProvider: serviceProvider
+      logger: logger
     )
   {
   }
@@ -70,7 +69,7 @@ public sealed partial class KasaClient : IDisposable {
   internal KasaClient(
     EndPoint endPoint,
     ArrayBufferWriter<byte> buffer,
-    IServiceProvider? serviceProvider = null
+    ILogger? logger
   )
   {
     this.endPoint = endPoint switch {
@@ -91,10 +90,8 @@ public sealed partial class KasaClient : IDisposable {
     };
 
     this.buffer = buffer;
-
-    logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})"); // TODO: logger category name
-
-    logger?.LogTrace("Device end point: {DeviceEndPoint} ({DeviceEndPointAddressFamily})", endPoint, endPoint.AddressFamily);
+    this.logger = logger;
+    this.logger?.LogTrace("Device end point: {DeviceEndPoint} ({DeviceEndPointAddressFamily})", endPoint, endPoint.AddressFamily);
   }
 
   private void Dispose(bool disposing)

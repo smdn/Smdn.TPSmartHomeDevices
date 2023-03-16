@@ -29,6 +29,7 @@ public partial class TapoClientTests {
   }
 
   private ServiceCollection? services;
+  private ITapoCredentialProvider? defaultCredentialProvider;
 
   [OneTimeSetUp]
   public void SetUp()
@@ -39,6 +40,8 @@ public partial class TapoClientTests {
       base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
+
+    defaultCredentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
   }
 
   [Test]
@@ -47,53 +50,18 @@ public partial class TapoClientTests {
     Assert.Throws<ArgumentNullException>(() => {
       using var client = new TapoClient(
         endPoint: null!,
-        serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
       );
     });
   }
 
   [Test]
-  public void Ctor_ArgumentException_NoCredential()
+  public void Ctor_ArgumentNullException_CredentialProvider()
   {
-    Assert.Throws<ArgumentException>(() => {
+    Assert.Throws<ArgumentNullException>(() => {
       using var client = new TapoClient(
         endPoint: new IPEndPoint(IPAddress.Loopback, 80),
-        credentialProvider: null,
-        serviceProvider: null
-      );
-    });
-  }
-
-  [Test]
-  public void Ctor_ArgumentException_NoCredentialViaIServiceProvider()
-  {
-    Assert.Throws<ArgumentException>(() => {
-      using var client = new TapoClient(
-        endPoint: new IPEndPoint(IPAddress.Loopback, 80),
-        credentialProvider: null,
-        serviceProvider: new ServiceCollection().BuildServiceProvider()
-      );
-    });
-  }
-
-  [Test]
-  public void Ctor_CredentialProvider_ViaIServiceProvider()
-  {
-    Assert.DoesNotThrow(() => {
-      using var client = new TapoClient(
-        endPoint: new IPEndPoint(IPAddress.Loopback, 80),
-        serviceProvider: services?.BuildServiceProvider()
-      );
-    });
-  }
-
-  [Test]
-  public void Ctor_CredentialProvider_FromITapoCredentialProvider()
-  {
-    Assert.DoesNotThrow(() => {
-      using var client = new TapoClient(
-        endPoint: new IPEndPoint(IPAddress.Loopback, 80),
-        credentialProvider: new CredentialProvider("user", "pass")
+        credentialProvider: null
       );
     });
   }
@@ -121,7 +89,7 @@ public partial class TapoClientTests {
   {
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.AreEqual(expectedEndPointUri, client.EndPointUri);
@@ -132,7 +100,7 @@ public partial class TapoClientTests {
   {
     using var client = new TapoClient(
       endPoint: new DnsEndPoint("localhost", 8080),
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.AreEqual(
@@ -146,7 +114,7 @@ public partial class TapoClientTests {
   {
     using var client = new TapoClient(
       endPoint: new IPEndPoint(IPAddress.Loopback, 80),
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
@@ -167,7 +135,7 @@ public partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     await client.AuthenticateAsync();
@@ -192,7 +160,7 @@ public partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     await client.AuthenticateAsync();
@@ -215,7 +183,7 @@ public partial class TapoClientTests {
 
     using var client = new TapoClient(
       endPoint: endPoint,
-      serviceProvider: services?.BuildServiceProvider()
+      credentialProvider: defaultCredentialProvider
     );
 
     Assert.IsNull(client.Session, nameof(client.Session));
