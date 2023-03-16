@@ -48,6 +48,13 @@ public sealed partial class KasaClient : IDisposable {
     }
   }
 
+  internal ILogger? Logger {
+    get {
+      ThrowIfDisposed();
+      return logger;
+    }
+  }
+
   public KasaClient(
     EndPoint endPoint,
     IServiceProvider? serviceProvider = null
@@ -105,24 +112,6 @@ public sealed partial class KasaClient : IDisposable {
   {
     Dispose(true);
     GC.SuppressFinalize(this);
-  }
-
-  internal void DisposeWithLog(
-    LogLevel logLevel,
-    Exception? exception,
-    string? reasonForDispose
-  )
-  {
-    if (IsDisposed)
-      return;
-
-    logger?.Log(
-      logLevel: logLevel,
-      exception: exception,
-      message: reasonForDispose
-    );
-
-    Dispose();
   }
 
   private void ThrowIfDisposed()

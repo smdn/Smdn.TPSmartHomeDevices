@@ -4,10 +4,10 @@ using System;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-public abstract class TapoProtocolException : InvalidOperationException {
+public class TapoProtocolException : InvalidOperationException {
   public Uri EndPoint { get; }
 
-  protected TapoProtocolException(
+  protected internal TapoProtocolException(
     string message,
     Uri endPoint,
     Exception? innerException

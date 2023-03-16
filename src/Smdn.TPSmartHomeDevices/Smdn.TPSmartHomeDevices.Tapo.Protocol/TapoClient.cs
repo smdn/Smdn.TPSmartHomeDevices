@@ -70,6 +70,13 @@ public sealed partial class TapoClient : IDisposable {
     }
   }
 
+  internal ILogger? Logger {
+    get {
+      ThrowIfDisposed();
+      return logger;
+    }
+  }
+
   public TapoClient(
     EndPoint endPoint,
     ITapoCredentialProvider? credentialProvider = null,
@@ -118,24 +125,6 @@ public sealed partial class TapoClient : IDisposable {
     GC.SuppressFinalize(this);
   }
 
-  internal void DisposeWithLog(
-    LogLevel logLevel,
-    Exception? exception,
-    string? reasonForDispose
-  )
-  {
-    if (IsDisposed)
-      return;
-
-    logger?.Log(
-      logLevel: logLevel,
-      exception: exception,
-      message: reasonForDispose
-    );
-
-    Dispose();
-  }
-
   private void ThrowIfDisposed()
   {
     if (IsDisposed)
@@ -149,23 +138,6 @@ public sealed partial class TapoClient : IDisposable {
     ThrowIfDisposed();
 
     return AuthenticateAsyncCore(cancellationToken);
-  }
-
-  internal void CloseSessionWithLog(
-    LogLevel logLevel,
-    Exception? exception,
-    string? reasonForClosingSession)
-  {
-    if (IsDisposed)
-      return;
-
-    logger?.Log(
-      logLevel: logLevel,
-      exception: exception,
-      message: reasonForClosingSession
-    );
-
-    CloseSession();
   }
 
   public void CloseSession()

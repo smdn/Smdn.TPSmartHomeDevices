@@ -6,10 +6,10 @@ using System.Buffers;
 using System.Diagnostics;
 #endif
 using System.Net;
-using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
@@ -36,6 +36,7 @@ public partial class KasaDevice : IDisposable {
   private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
   protected bool IsDisposed => deviceEndPointProvider is null;
 
+  private readonly KasaClientExceptionHandler exceptionHandler;
   private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: KasaClient.DefaultBufferCapacity);
   private readonly IServiceProvider? serviceProvider;
 
@@ -81,6 +82,8 @@ public partial class KasaDevice : IDisposable {
   {
     this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
     this.serviceProvider = serviceProvider;
+
+    exceptionHandler = serviceProvider?.GetService<KasaClientExceptionHandler>() ?? KasaClientExceptionHandler.Default;
   }
 
   public void Dispose()
@@ -207,18 +210,21 @@ public partial class KasaDevice : IDisposable {
     CancellationToken cancellationToken
   )
   {
-    var endPoint = await ResolveEndPointAsync(cancellationToken).ConfigureAwait(false);
+    const int maxAttempts = 5;
+    EndPoint? endPoint = null;
 
-    if (client is not null && !client.EndPoint.Equals(endPoint)) {
-      // endpoint has changed, recreate client with new endpoint
-      client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
-      client = null;
-    }
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (endPoint is null) {
+        endPoint = await ResolveEndPointAsync(cancellationToken).ConfigureAwait(false);
 
-    const int maxAttempts = 3;
-    const int firstAttempt = 1;
+        if (client is not null && !client.EndPoint.Equals(endPoint)) {
+          // endpoint has changed, recreate client with new endpoint
+          client.Logger?.LogInformation($"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+          client.Dispose();
+          client = null;
+        }
+      }
 
-    for (var attempt = firstAttempt; attempt <= maxAttempts; attempt++) {
       cancellationToken.ThrowIfCancellationRequested();
 
       client ??= new KasaClient(
@@ -236,66 +242,37 @@ public partial class KasaDevice : IDisposable {
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }
-      catch (SocketException ex) when (
-        attempt == firstAttempt && // retry just once
-        deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint &&
-        ex.SocketErrorCode switch {
-          SocketError.ConnectionRefused => true, // ECONNREFUSED
-          SocketError.HostUnreachable => true, // EHOSTUNREACH
-          SocketError.NetworkUnreachable => true, // ENETUNREACH
-          _ => false,
-        }
-      ) {
-        // The end point may have changed.
-        // Dispose the current client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
-        client = null;
-
-        // mark end point as invalid to have the end point refreshed or rescanned
-        dynamicEndPoint.InvalidateEndPoint();
-
-        continue;
-      }
-      catch (SocketException ex) {
-        // The client may have been invalid due to an exception at the transport layer.
-        // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected socket exception ({nameof(ex.SocketErrorCode)}: {(int)ex.SocketErrorCode})");
-        client = null;
-
-        throw;
-      }
-      catch (KasaDisconnectedException ex) when (
-        attempt == firstAttempt // retry just once
-      ) {
-        // The peer device disconnected the connection, or may have dropped the connection.
-        // Dispose the current client in order to recreate the client and try again.
-        if (ex.InnerException is SocketException exSocket)
-          client.DisposeWithLog(LogLevel.Debug, exception: null, $"Disconnected ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
-        else
-          client.DisposeWithLog(LogLevel.Debug, exception: null, $"Disconnected ({ex.Message})");
-
-        client = null;
-
-        continue;
-      }
-      catch (KasaIncompleteResponseException ex) when (
-        attempt < maxAttempts // retry up to max attempts
-      ) {
-        // The peer has been in invalid state(?) and returnd incomplete response.
-        // Dispose the current client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Warning, exception: null, ex.Message);
-        client = null;
-
-        continue;
-      }
       catch (Exception ex) {
-        // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unhandled exception ({ex.GetType().FullName})");
-        client = null;
+        var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
-        throw;
-      }
-    }
+        switch (handling) {
+          case KasaClientExceptionHandling.Throw:
+          default:
+            client.Dispose();
+            client = null;
+            throw;
+
+          case KasaClientExceptionHandling.Retry:
+            continue;
+
+          case KasaClientExceptionHandling.RetryAfterReconnect:
+            client.Dispose();
+            client = null;
+            continue;
+
+          case KasaClientExceptionHandling.RetryAfterResolveEndPoint:
+            if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
+              goto case KasaClientExceptionHandling.Throw;
+
+            // mark end point as invalid to have the end point refreshed or rescanned
+            dynamicEndPoint.InvalidateEndPoint();
+
+            endPoint = null; // should resolve end point
+
+            continue;
+        } // switch (handling)
+      } // try
+    } // for
 
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
     throw new UnreachableException();

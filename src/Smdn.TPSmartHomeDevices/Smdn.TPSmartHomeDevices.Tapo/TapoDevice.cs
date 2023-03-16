@@ -5,10 +5,9 @@ using System;
 using System.Diagnostics;
 #endif
 using System.Net;
-using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
@@ -19,6 +18,7 @@ public partial class TapoDevice : IDisposable {
   protected bool IsDisposed => deviceEndPointProvider is null;
 
   private readonly ITapoCredentialProvider? credentialProvider;
+  private readonly TapoClientExceptionHandler exceptionHandler;
   private readonly IServiceProvider? serviceProvider;
   public string TerminalUuidString { get; } // must be in the format of 00000000-0000-0000-0000-000000000000
 
@@ -46,6 +46,7 @@ public partial class TapoDevice : IDisposable {
         userName: email ?? throw new ArgumentNullException(nameof(email)),
         password: password ?? throw new ArgumentNullException(nameof(password))
       ),
+      exceptionHandler: null,
       serviceProvider: serviceProvider
     )
   {
@@ -67,6 +68,7 @@ public partial class TapoDevice : IDisposable {
         userName: email ?? throw new ArgumentNullException(nameof(email)),
         password: password ?? throw new ArgumentNullException(nameof(password))
       ),
+      exceptionHandler: null,
       serviceProvider: serviceProvider
     )
   {
@@ -83,6 +85,7 @@ public partial class TapoDevice : IDisposable {
       ),
       terminalUuid: terminalUuid,
       credentialProvider: null,
+      exceptionHandler: null,
       serviceProvider: serviceProvider
     )
   {
@@ -92,11 +95,15 @@ public partial class TapoDevice : IDisposable {
     IDeviceEndPointProvider deviceEndPointProvider,
     Guid? terminalUuid = null,
     ITapoCredentialProvider? credentialProvider = null,
+    TapoClientExceptionHandler? exceptionHandler = null,
     IServiceProvider? serviceProvider = null
   )
   {
     this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
     this.credentialProvider = credentialProvider;
+    this.exceptionHandler = exceptionHandler
+      ?? serviceProvider?.GetService<TapoClientExceptionHandler>()
+      ?? TapoClientExceptionHandler.Default;
     this.serviceProvider = serviceProvider;
 
     TerminalUuidString = GetOrGenerateTerminalUuidString(terminalUuid);
@@ -172,7 +179,8 @@ public partial class TapoDevice : IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
-      client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.Logger?.LogInformation($"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.Dispose();
       client = null;
     }
 
@@ -222,10 +230,9 @@ public partial class TapoDevice : IDisposable {
     where TRequest : ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
-    const int maxAttempts = 2;
-    const int firstAttempt = 1;
+    const int maxAttempts = 5;
 
-    for (var attempt = firstAttempt; attempt <= maxAttempts; attempt++) {
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
       await EnsureSessionEstablishedAsync(cancellationToken).ConfigureAwait(false);
 
       cancellationToken.ThrowIfCancellationRequested();
@@ -238,70 +245,49 @@ public partial class TapoDevice : IDisposable {
 
         return composeResult(response);
       }
-      catch (HttpRequestException ex) when (
-        attempt == firstAttempt && // retry just once
-        deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint &&
-        ex.InnerException is SocketException exSocket &&
-        exSocket.SocketErrorCode switch {
-          SocketError.ConnectionRefused => true, // ECONNREFUSED
-          SocketError.HostUnreachable => true, // EHOSTUNREACH
-          SocketError.NetworkUnreachable => true, // ENETUNREACH
-          _ => false,
-        }
-      ) {
-        // The end point may have changed.
-        // Dispose the current HTTP client in order to recreate the client and try again.
-        client.DisposeWithLog(LogLevel.Information, exception: null, $"Endpoint may have changed: ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
-        client = null;
-
-        // mark end point as invalid to have the end point refreshed or rescanned
-        dynamicEndPoint.InvalidateEndPoint();
-
-        continue;
-      }
-      catch (HttpRequestException ex) when (ex.InnerException is SocketException exSocket) {
-        // The HTTP client may have been invalid due to an exception at the transport layer.
-        // Dispose the current HTTP client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unexpected socket exception ({nameof(exSocket.SocketErrorCode)}: {(int)exSocket.SocketErrorCode})");
-        client = null;
-
-        throw;
-      }
-      catch (SecurePassThroughInvalidPaddingException ex) {
-        // The session might have been in invalid state(?)
-        // Dispose the current HTTP client in order to recreate the client and try again from establishing session.
-        client.DisposeWithLog(LogLevel.Warning, ex, "Invalid padding in secure pass through");
-        client = null;
-
-        continue;
-      }
-      catch (TapoErrorResponseException ex) when (
-        // request failed with error code -1301
-        attempt == firstAttempt &&
-        ex.ErrorCode == (ErrorCode)(-1301)
-      ) {
-        // The session might have been in invalid state(?)
-        // Dispose the current HTTP client in order to recreate the client and try again from establishing session.
-        client.DisposeWithLog(LogLevel.Warning, ex, "Error code -1301");
-        client = null;
-
-        continue;
-      }
-      catch (TapoErrorResponseException ex) when (attempt == firstAttempt) {
-        // The session may have been invalid.
-        // Dispose the current session in order to re-establish the session and try again.
-        client.CloseSessionWithLog(LogLevel.Warning, ex, $"Unexpected error response ({nameof(ex.ErrorCode)}: {(int)ex.ErrorCode})");
-
-        continue;
-      }
       catch (Exception ex) {
-        // Dispose the current client and rethrow exception.
-        client.DisposeWithLog(LogLevel.Error, ex, $"Unhandled exception ({ex.GetType().FullName})");
-        client = null;
+        var endPointUri = client.EndPointUri;
+        var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
-        throw;
-      }
-    }
+        switch (handling) {
+          case TapoClientExceptionHandling.Throw:
+          default:
+            client.Dispose();
+            client = null;
+            throw;
+
+          case TapoClientExceptionHandling.ThrowWrapTapoProtocolException:
+            client.Dispose();
+            client = null;
+            throw new TapoProtocolException(
+              message: "Unhandled exception",
+              endPoint: endPointUri,
+              innerException: ex
+            );
+
+          case TapoClientExceptionHandling.Retry:
+            continue;
+
+          case TapoClientExceptionHandling.RetryAfterReconnect:
+            client.Dispose();
+            client = null;
+            continue;
+
+          case TapoClientExceptionHandling.RetryAfterReestablishSession:
+            client.CloseSession();
+            continue;
+
+          case TapoClientExceptionHandling.RetryAfterResolveEndPoint:
+            if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
+              goto case TapoClientExceptionHandling.Throw;
+
+            // mark end point as invalid to have the end point refreshed or rescanned
+            dynamicEndPoint.InvalidateEndPoint();
+
+            continue;
+        } // switch (handling)
+      } // try
+    } // for
 
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
     throw new UnreachableException();
