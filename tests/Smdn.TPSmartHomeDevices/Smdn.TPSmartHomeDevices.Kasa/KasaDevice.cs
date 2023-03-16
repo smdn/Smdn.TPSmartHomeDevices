@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
@@ -17,13 +18,6 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 [TestFixture]
 public class KasaDeviceTests {
   private const int RertyMaxAttemptsForIncompleteResponse = 3;
-  private ServiceCollection? services;
-
-  [OneTimeSetUp]
-  public void SetUp()
-  {
-    services = new ServiceCollection();
-  }
 
   private static System.Collections.IEnumerable YiledTestCases_Create_ArgumentNull()
   {
@@ -156,8 +150,14 @@ public class KasaDeviceTests {
   }
 
   private class ConcreteKasaDevice : KasaDevice {
-    public ConcreteKasaDevice(IDeviceEndPointProvider deviceEndPointProvider)
-      : base(deviceEndPointProvider: deviceEndPointProvider)
+    public ConcreteKasaDevice(
+      IDeviceEndPointProvider deviceEndPointProvider,
+      IServiceProvider serviceProvider = null
+    )
+      : base(
+        deviceEndPointProvider: deviceEndPointProvider,
+        serviceProvider: serviceProvider
+      )
     {
     }
 
@@ -365,6 +365,19 @@ public class KasaDeviceTests {
 
     Assert.AreEqual(resultFromEndPoint2, returnValueFromEndPoint2, nameof(resultFromEndPoint2));
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+
+    // end point should not be marked as invalidated in this scenario
+    Assert.IsFalse(provider.HasInvalidated, nameof(provider.HasInvalidated));
+  }
+
+  private class HandleAsEndPointUnreachableExceptionHandler : KasaClientExceptionHandler {
+    public override KasaClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
+      =>
+        attempt == 0
+          ? exception is SocketException or KasaProtocolException
+            ? KasaClientExceptionHandling.RetryAfterResolveEndPoint
+            : default
+          : default;
   }
 
   [Test]
@@ -383,8 +396,15 @@ public class KasaDeviceTests {
     Assert.That(endPoint, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(endPoint));
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(endPoint));
 
+    var services = new ServiceCollection();
+
+    services.AddSingleton<KasaClientExceptionHandler>(
+      new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
+    );
+
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: endPoint
+      deviceEndPointProvider: endPoint,
+      serviceProvider: services.BuildServiceProvider()
     );
 
     Assert.DoesNotThrowAsync(
@@ -396,18 +416,19 @@ public class KasaDeviceTests {
     );
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
-    // set to unreachable state
-    await pseudoDevice.StopAsync();
+    // dispose endpoint
+    // this causes an exception to be raised in the request to the pseudo device,
+    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+    await pseudoDevice.DisposeAsync();
 
-    var ex = Assert.ThrowsAsync<SocketException>(
+    var ex = Assert.ThrowsAsync(
+      Is.InstanceOf<SocketException>().Or.InstanceOf<KasaDisconnectedException>(),
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
         composeResult: static _ => 0
       )
     );
-
-    Assert.AreEqual(SocketError.ConnectionRefused, ex!.SocketErrorCode, nameof(ex.SocketErrorCode));
 
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
@@ -436,10 +457,16 @@ public class KasaDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var provider = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var services = new ServiceCollection();
+
+    services.AddSingleton<KasaClientExceptionHandler>(
+      new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
+    );
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: provider
+      deviceEndPointProvider: endPoint,
+      serviceProvider: services.BuildServiceProvider()
     );
 
     Assert.DoesNotThrowAsync(
@@ -455,9 +482,12 @@ public class KasaDeviceTests {
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    provider.EndPoint = pseudoDeviceEndPoint2.EndPoint;
+    endPoint.Invalidated +=
+      (_, _) => endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
 
     // dispose endpoint #1
+    // this causes an exception to be raised in the request to the pseudo device #1,
+    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
     await pseudoDeviceEndPoint1.DisposeAsync();
 
     Assert.DoesNotThrowAsync(
@@ -469,6 +499,7 @@ public class KasaDeviceTests {
       "request #2"
     );
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+    Assert.IsTrue(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
   private static byte[] EncryptedResponseDocument(JsonDocument document)

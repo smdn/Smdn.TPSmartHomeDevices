@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
@@ -344,6 +345,9 @@ public class TapoDeviceTests {
       device.Session.Token,
       nameof(device.Session.Token)
     );
+
+    // end point should not be marked as invalidated in this scenario
+    Assert.IsFalse(provider.HasInvalidated, nameof(provider.HasInvalidated));
   }
 
   [Test]
@@ -382,6 +386,16 @@ public class TapoDeviceTests {
     Assert.IsNull(device.Session, nameof(device.Session), "session must be disposed");
   }
 
+  private class HandleAsEndPointUnreachableExceptionHandler : TapoClientExceptionHandler {
+    public override TapoClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
+      =>
+        attempt == 0
+          ? exception is HttpRequestException httpRequestException && httpRequestException.InnerException is SocketException
+            ? TapoClientExceptionHandling.RetryAfterResolveEndPoint
+            : default
+          : default;
+  }
+
   [Test]
   public async Task SendRequestAsync_EndPointUnreachable_StaticEndPoint()
   {
@@ -403,16 +417,28 @@ public class TapoDeviceTests {
     Assert.That(endPoint, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(endPoint));
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(endPoint));
 
+    var serviceCollection = new ServiceCollection();
+
+    serviceCollection.AddTapoBase64EncodedCredential(
+      base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
+      base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
+    );
+    serviceCollection.AddSingleton<TapoClientExceptionHandler>(
+      new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
+    );
+
     using var device = new ConcreteTapoDevice(
       deviceEndPointProvider: endPoint,
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: serviceCollection.BuildServiceProvider()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
     Assert.IsNotNull(device.Session, nameof(device.Session));
 
-    // set to unreachable state
-    await pseudoDevice.StopAsync();
+    // dispose endpoint
+    // this causes an exception to be raised in the request to the pseudo device,
+    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+    await pseudoDevice.DisposeAsync();
 
     var ex = Assert.ThrowsAsync<HttpRequestException>(async () => await device.GetDeviceInfoAsync());
 
@@ -450,11 +476,20 @@ public class TapoDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var provider = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var serviceCollection = new ServiceCollection();
+
+    serviceCollection.AddTapoBase64EncodedCredential(
+      base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
+      base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
+    );
+    serviceCollection.AddSingleton<TapoClientExceptionHandler>(
+      new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
+    );
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: provider,
-      serviceProvider: services.BuildServiceProvider()
+      deviceEndPointProvider: endPoint,
+      serviceProvider: serviceCollection.BuildServiceProvider()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #1");
@@ -465,14 +500,18 @@ public class TapoDeviceTests {
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    provider.EndPoint = pseudoDeviceEndPoint2.EndPoint;
+    endPoint.Invalidated +=
+      (_, _) => endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
 
     // dispose endpoint #1
+    // this causes an exception to be raised in the request to the pseudo device #1,
+    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
     await pseudoDeviceEndPoint1.DisposeAsync();
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
     Assert.IsNotNull(device.Session, nameof(device.Session));
     Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
+    Assert.IsTrue(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
   [Test]

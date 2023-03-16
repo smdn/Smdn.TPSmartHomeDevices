@@ -197,13 +197,6 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     return EndPoint!;
   }
 
-  public async Task StopAsync()
-  {
-    ThrowIfDisposed();
-
-    await DisposeAsync();
-  }
-
   public IDeviceEndPointProvider GetEndPointProvider()
     => new StaticDeviceEndPointProvider(EndPoint);
 

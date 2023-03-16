@@ -130,13 +130,6 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     }
   }
 
-  public async Task StopAsync()
-  {
-    ThrowIfDisposed();
-
-    await DisposeAsync();
-  }
-
   private async Task ProcessListenerAsync(
     CancellationToken cancellationToken
   )
