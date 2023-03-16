@@ -117,7 +117,7 @@ partial class TapoClient {
       await requestContent.ReadAsStringAsync().ConfigureAwait(false)
     );
 
-    var httpResponse = await httpClient.PostAsync(
+    using var httpResponse = await httpClient.PostAsync(
       requestUri: requestUri,
       content: requestContent,
       cancellationToken: cancellationToken
