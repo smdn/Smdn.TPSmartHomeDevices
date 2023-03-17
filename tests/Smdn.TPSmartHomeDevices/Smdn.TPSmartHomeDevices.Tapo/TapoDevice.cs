@@ -3,6 +3,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -60,6 +61,45 @@ public class TapoDeviceTests {
     yield return new object[] {
       new TestDelegate(() => TapoDevice.Create(hostName: "localhost", email: "user@mail.test", password: null!)),
       "password"
+    };
+
+    var services = new ServiceCollection();
+    var endPointFactory = new NullMacAddressDeviceEndPointFactory();
+
+    services.AddDeviceEndPointFactory(endPointFactory);
+
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: null!, email: "user@mail.test", password: "pass", serviceProvider: services.BuildServiceProvider())),
+      "macAddress"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: null!, password: "pass", serviceProvider: services.BuildServiceProvider())),
+      "email"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: null!, serviceProvider: services.BuildServiceProvider())),
+      "password"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: "pass", serviceProvider: null!)),
+      "serviceProvider"
+    };
+
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: null!, email: "user@mail.test", password: "pass", endPointFactory: endPointFactory)),
+      "macAddress"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: null!, password: "pass", endPointFactory: endPointFactory)),
+      "email"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: null!, endPointFactory: endPointFactory)),
+      "password"
+    };
+    yield return new object[] {
+      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: "pass", endPointFactory: null!)),
+      "endPointFactory"
     };
   }
 
@@ -135,7 +175,7 @@ public class TapoDeviceTests {
     );
 
     Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, 80),
+      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
       await device.ResolveEndPointAsync()
     );
   }
@@ -150,8 +190,61 @@ public class TapoDeviceTests {
     );
 
     Assert.AreEqual(
-      new DnsEndPoint("localhost", 80),
+      new DnsEndPoint("localhost", TapoClient.DefaultPort),
       await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public async Task Create_WithMacAddress_IDeviceEndPointFactory()
+  {
+    using var device = TapoDevice.Create(
+      macAddress: PhysicalAddress.None,
+      "user@mail.test",
+      "password",
+      endPointFactory: new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
+    );
+
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
+      await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public async Task Create_WithMacAddress_IServiceProvider()
+  {
+    var services = new ServiceCollection();
+
+    services.AddDeviceEndPointFactory(
+      new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
+    );
+
+    using var device = TapoDevice.Create(
+      macAddress: PhysicalAddress.None,
+      "user@mail.test",
+      "password",
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
+      await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public void Create_WithMacAddress_IServiceProvider_IDeviceEndPointFactoryNotRegistered()
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<InvalidOperationException>(
+      () => TapoDevice.Create(
+        macAddress: PhysicalAddress.None,
+      "user@mail.test",
+      "password",
+        serviceProvider: services.BuildServiceProvider()
+      )
     );
   }
 

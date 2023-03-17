@@ -9,7 +9,7 @@ using Smdn.Net.AddressResolution;
 
 namespace Smdn.TPSmartHomeDevices;
 
-public class MacAddressDeviceEndPointFactory : IDisposable {
+public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAddress>, IDisposable {
   protected class MacAddressDeviceEndPointProvider : IDynamicDeviceEndPointProvider {
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;

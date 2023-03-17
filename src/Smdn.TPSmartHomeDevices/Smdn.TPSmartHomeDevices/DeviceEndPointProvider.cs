@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Smdn.TPSmartHomeDevices;
 
@@ -47,6 +49,29 @@ internal static class DeviceEndPointProvider {
     => new StaticDeviceEndPointProvider(
       endPoint ?? throw new ArgumentNullException(nameof(endPoint))
     );
+
+  public static IDeviceEndPointProvider Create(
+    PhysicalAddress macAddress,
+    int port,
+    IServiceProvider serviceProvider
+  )
+    => Create(
+      macAddress: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
+      port: port,
+      endPointFactory: (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider)))
+        .GetRequiredService<IDeviceEndPointFactory<PhysicalAddress>>()
+    );
+
+  public static IDeviceEndPointProvider Create(
+    PhysicalAddress macAddress,
+    int port,
+    IDeviceEndPointFactory<PhysicalAddress> endPointFactory
+  )
+    => (endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory)))
+      .Create(
+        address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
+        port: port
+      );
 
   internal static async ValueTask<EndPoint> ResolveOrThrowAsync(
     this IDeviceEndPointProvider provider,

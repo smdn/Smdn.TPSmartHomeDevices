@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Diagnostics;
 #endif
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,6 +67,40 @@ public partial class KasaDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: KasaDeviceEndPointProvider.Create(ipAddress),
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  protected KasaDevice(
+    PhysicalAddress macAddress,
+    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
+    IServiceProvider? serviceProvider = null
+  )
+    : this(
+      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(macAddress, endPointFactory),
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class with a MAC address.
+  /// </summary>
+  /// <param name="macAddress">
+  /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must be registered to create an end point from the <paramref name="macAddress"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> has been registered for <see cref="serviceProvider"/>.</exception>
+  protected KasaDevice(
+    PhysicalAddress macAddress,
+    IServiceProvider serviceProvider
+  )
+    : this(
+      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(macAddress, serviceProvider),
       serviceProvider: serviceProvider
     )
   {

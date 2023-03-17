@@ -6,6 +6,7 @@ using System.Diagnostics;
 #endif
 using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,6 +59,56 @@ public partial class TapoDevice : IDisposable {
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
       terminalUuid: terminalUuid,
+      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      exceptionHandler: null,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  protected TapoDevice(
+    PhysicalAddress macAddress,
+    string email,
+    string password,
+    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
+    IServiceProvider? serviceProvider = null
+  )
+    : this(
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, endPointFactory),
+      terminalUuid: null,
+      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      exceptionHandler: null,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with a MAC address.
+  /// </summary>
+  /// <param name="macAddress">
+  /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
+  /// </param>
+  /// <param name="email">
+  /// A <see cref="string"/> that holds the e-mail address of the Tapo account used for authentication.
+  /// </param>
+  /// <param name="password">
+  /// A <see cref="string"/> that holds the password of the Tapo account used for authentication.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must be registered to create an end point from the <paramref name="macAddress"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> has been registered for <see cref="serviceProvider"/>.</exception>
+  protected TapoDevice(
+    PhysicalAddress macAddress,
+    string email,
+    string password,
+    IServiceProvider serviceProvider
+  )
+    : this(
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
+      terminalUuid: null,
       credentialProvider: PlainTextCredentialProvider.Create(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider

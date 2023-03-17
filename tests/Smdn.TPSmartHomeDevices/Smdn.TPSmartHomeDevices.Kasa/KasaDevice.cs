@@ -4,6 +4,7 @@ using System;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
@@ -34,6 +35,29 @@ public class KasaDeviceTests {
       new TestDelegate(() => KasaDevice.Create(hostName: null!)),
       "hostName"
     };
+
+    var services = new ServiceCollection();
+    var endPointFactory = new NullMacAddressDeviceEndPointFactory();
+
+    services.AddDeviceEndPointFactory(endPointFactory);
+
+    yield return new object[] {
+      new TestDelegate(() => KasaDevice.Create(macAddress: null!, serviceProvider: services.BuildServiceProvider())),
+      "macAddress"
+    };
+    yield return new object[] {
+      new TestDelegate(() => KasaDevice.Create(macAddress: PhysicalAddress.None, serviceProvider: null!)),
+      "serviceProvider"
+    };
+
+    yield return new object[] {
+      new TestDelegate(() => KasaDevice.Create(macAddress: null!, endPointFactory: endPointFactory)),
+      "macAddress"
+    };
+    yield return new object[] {
+      new TestDelegate(() => KasaDevice.Create(macAddress: PhysicalAddress.None, endPointFactory: null!)),
+      "endPointFactory"
+    };
   }
 
   [TestCaseSource(nameof(YiledTestCases_Create_ArgumentNull))]
@@ -52,7 +76,7 @@ public class KasaDeviceTests {
     );
 
     Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, 9999),
+      new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort),
       await device.ResolveEndPointAsync()
     );
   }
@@ -65,8 +89,55 @@ public class KasaDeviceTests {
     );
 
     Assert.AreEqual(
-      new DnsEndPoint("localhost", 9999),
+      new DnsEndPoint("localhost", KasaClient.DefaultPort),
       await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public async Task Create_WithMacAddress_IDeviceEndPointFactory()
+  {
+    using var device = KasaDevice.Create(
+      macAddress: PhysicalAddress.None,
+      endPointFactory: new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
+    );
+
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort),
+      await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public async Task Create_WithMacAddress_IServiceProvider()
+  {
+    var services = new ServiceCollection();
+
+    services.AddDeviceEndPointFactory(
+      new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
+    );
+
+    using var device = KasaDevice.Create(
+      macAddress: PhysicalAddress.None,
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort),
+      await device.ResolveEndPointAsync()
+    );
+  }
+
+  [Test]
+  public void Create_WithMacAddress_IServiceProvider_IDeviceEndPointFactoryNotRegistered()
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<InvalidOperationException>(
+      () => KasaDevice.Create(
+        macAddress: PhysicalAddress.None,
+        serviceProvider: services.BuildServiceProvider()
+      )
     );
   }
 
