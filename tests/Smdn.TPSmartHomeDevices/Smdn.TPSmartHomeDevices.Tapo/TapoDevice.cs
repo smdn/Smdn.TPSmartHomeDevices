@@ -264,6 +264,7 @@ public class TapoDeviceTests {
 
   private const string ExpectedTerminalUuidRegexPattern = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
 
+#if false
   [TestCase("5b5ab773-e14a-4d2b-bb00-1464a64da330")]
   [TestCase("00000000-0000-0000-0000-000000000000")] // NIL
   public void Create_TerminalUuid_UserSupplied(string uuid)
@@ -277,6 +278,7 @@ public class TapoDeviceTests {
     Assert.IsNotEmpty(device.TerminalUuidString, nameof(device.TerminalUuidString));
     StringAssert.IsMatch(ExpectedTerminalUuidRegexPattern, device.TerminalUuidString, nameof(device.TerminalUuidString));
   }
+#endif
 
   [Test]
   public void Create_TerminalUuid_AutoGenerate()

@@ -82,13 +82,11 @@ partial class TapoDevice {
 
   public static TapoDevice Create(
     IDeviceEndPointProvider deviceEndPointProvider,
-    Guid? terminalUuid = null,
     ITapoCredentialProvider? credentialProvider = null,
     IServiceProvider? serviceProvider = null
   )
     => new(
       deviceEndPointProvider: deviceEndPointProvider,
-      terminalUuid: terminalUuid,
       credentialProvider: credentialProvider,
       serviceProvider: serviceProvider
     );

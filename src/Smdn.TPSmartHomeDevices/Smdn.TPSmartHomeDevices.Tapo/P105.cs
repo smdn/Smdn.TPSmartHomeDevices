@@ -86,13 +86,11 @@ public class P105 : TapoDevice {
 
   public P105(
     IDeviceEndPointProvider deviceEndPointProvider,
-    Guid? terminalUuid = null,
     ITapoCredentialProvider? credentialProvider = null,
     IServiceProvider? serviceProvider = null
   )
     : base(
       deviceEndPointProvider: deviceEndPointProvider,
-      terminalUuid: terminalUuid,
       credentialProvider: credentialProvider,
       serviceProvider: serviceProvider
     )

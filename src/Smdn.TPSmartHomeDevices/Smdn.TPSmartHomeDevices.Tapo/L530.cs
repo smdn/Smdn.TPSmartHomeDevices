@@ -89,13 +89,11 @@ public class L530 : TapoDevice {
 
   public L530(
     IDeviceEndPointProvider deviceEndPointProvider,
-    Guid? terminalUuid = null,
     ITapoCredentialProvider? credentialProvider = null,
     IServiceProvider? serviceProvider = null
   )
     : base(
       deviceEndPointProvider: deviceEndPointProvider,
-      terminalUuid: terminalUuid,
       credentialProvider: credentialProvider,
       serviceProvider: serviceProvider
     )

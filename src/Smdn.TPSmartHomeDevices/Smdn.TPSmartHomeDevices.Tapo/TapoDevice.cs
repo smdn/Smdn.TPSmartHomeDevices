@@ -36,12 +36,10 @@ public partial class TapoDevice : IDisposable {
     string hostName,
     string email,
     string password,
-    Guid? terminalUuid = null,
     IServiceProvider? serviceProvider = null
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
-      terminalUuid: terminalUuid,
       credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -53,12 +51,10 @@ public partial class TapoDevice : IDisposable {
     IPAddress ipAddress,
     string email,
     string password,
-    Guid? terminalUuid = null,
     IServiceProvider? serviceProvider = null
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
-      terminalUuid: terminalUuid,
       credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -75,7 +71,6 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, endPointFactory),
-      terminalUuid: null,
       credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -108,7 +103,6 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
-      terminalUuid: null,
       credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -118,12 +112,10 @@ public partial class TapoDevice : IDisposable {
 
   protected TapoDevice(
     string hostName,
-    Guid? terminalUuid = null,
     IServiceProvider? serviceProvider = null
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
-      terminalUuid: terminalUuid,
       credentialProvider: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -133,7 +125,6 @@ public partial class TapoDevice : IDisposable {
 
   protected TapoDevice(
     IDeviceEndPointProvider deviceEndPointProvider,
-    Guid? terminalUuid = null,
     ITapoCredentialProvider? credentialProvider = null,
     TapoClientExceptionHandler? exceptionHandler = null,
     IServiceProvider? serviceProvider = null
@@ -148,14 +139,7 @@ public partial class TapoDevice : IDisposable {
       ?? TapoClientExceptionHandler.Default;
     this.serviceProvider = serviceProvider;
 
-    TerminalUuidString = GetOrGenerateTerminalUuidString(terminalUuid);
-
-    static string GetOrGenerateTerminalUuidString(Guid? terminalUuid)
-    {
-      var uuid = terminalUuid ?? Guid.NewGuid();
-
-      return uuid.ToString("D", provider: null);
-    }
+    TerminalUuidString = Guid.NewGuid().ToString("D", provider: null); // TODO: support DI
   }
 
   public void Dispose()
