@@ -30,7 +30,7 @@ internal static class DeviceEndPointProvider {
   public static IDeviceEndPointProvider Create(string hostName, int port)
     => Create(
       new DnsEndPoint(
-        host: hostName,
+        host: hostName ?? throw new ArgumentNullException(nameof(hostName)),
         port: port
       )
     );
@@ -38,7 +38,7 @@ internal static class DeviceEndPointProvider {
   public static IDeviceEndPointProvider Create(IPAddress ipAddress, int port)
     => Create(
       new IPEndPoint(
-        address: ipAddress,
+        address: ipAddress ?? throw new ArgumentNullException(nameof(ipAddress)),
         port: port
       )
     );

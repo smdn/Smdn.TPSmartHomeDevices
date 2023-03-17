@@ -27,8 +27,8 @@ public class KasaDeviceTests {
     };
 
     yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(deviceAddress: null!)),
-      "deviceAddress"
+      new TestDelegate(() => KasaDevice.Create(ipAddress: null!)),
+      "ipAddress"
     };
     yield return new object[] {
       new TestDelegate(() => KasaDevice.Create(hostName: null!)),
@@ -45,10 +45,10 @@ public class KasaDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithDeviceAddress()
+  public async Task Create_WithIPAddress()
   {
     using var device = KasaDevice.Create(
-      deviceAddress: IPAddress.Loopback
+      ipAddress: IPAddress.Loopback
     );
 
     Assert.AreEqual(
@@ -58,7 +58,7 @@ public class KasaDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithDeviceHostName()
+  public async Task Create_WithHostName()
   {
     using var device = KasaDevice.Create(
       hostName: "localhost"
@@ -87,7 +87,7 @@ public class KasaDeviceTests {
   public void Dispose()
   {
     using var device = KasaDevice.Create(
-      deviceAddress: IPAddress.Loopback
+      ipAddress: IPAddress.Loopback
     );
 
     Assert.DoesNotThrow(device.Dispose, "dispose");

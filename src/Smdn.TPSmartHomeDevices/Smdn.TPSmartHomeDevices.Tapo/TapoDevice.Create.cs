@@ -9,19 +9,15 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 partial class TapoDevice {
 #pragma warning restore IDE0040
   public static TapoDevice Create(
-    IPAddress deviceAddress,
+    IPAddress ipAddress,
     string email,
     string password,
     IServiceProvider? serviceProvider = null
   )
-    => Create(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(
-        ipAddress: deviceAddress ?? throw new ArgumentNullException(nameof(deviceAddress))
-      ),
-      credentialProvider: new PlainTextCredentialProvider(
-        userName: email ?? throw new ArgumentNullException(nameof(email)),
-        password: password ?? throw new ArgumentNullException(nameof(password))
-      ),
+    => new(
+      ipAddress: ipAddress,
+      email: email,
+      password: password,
       serviceProvider: serviceProvider
     );
 

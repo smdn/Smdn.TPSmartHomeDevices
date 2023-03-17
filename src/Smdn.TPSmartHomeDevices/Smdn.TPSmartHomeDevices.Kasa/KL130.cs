@@ -42,7 +42,7 @@ public class KL130 : KasaDevice {
     IServiceProvider? serviceProvider = null
   )
     : base(
-      ipAddress: ipAddress ?? throw new ArgumentNullException(nameof(ipAddress)),
+      ipAddress: ipAddress,
       serviceProvider: serviceProvider
     )
   {
@@ -53,7 +53,7 @@ public class KL130 : KasaDevice {
     IServiceProvider? serviceProvider = null
   )
     : base(
-      deviceEndPointProvider: deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider)),
+      deviceEndPointProvider: deviceEndPointProvider,
       serviceProvider: serviceProvider
     )
   {

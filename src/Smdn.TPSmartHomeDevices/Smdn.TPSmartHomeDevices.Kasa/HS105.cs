@@ -24,7 +24,7 @@ public class HS105 : KasaDevice {
     IServiceProvider? serviceProvider = null
   )
     : base(
-      hostName: hostName ?? throw new ArgumentNullException(nameof(hostName)),
+      hostName: hostName,
       serviceProvider: serviceProvider
     )
   {
@@ -35,7 +35,7 @@ public class HS105 : KasaDevice {
     IServiceProvider? serviceProvider = null
   )
     : base(
-      ipAddress: ipAddress ?? throw new ArgumentNullException(nameof(ipAddress)),
+      ipAddress: ipAddress,
       serviceProvider: serviceProvider
     )
   {
@@ -46,7 +46,7 @@ public class HS105 : KasaDevice {
     IServiceProvider? serviceProvider = null
   )
     : base(
-      deviceEndPointProvider: deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider)),
+      deviceEndPointProvider: deviceEndPointProvider,
       serviceProvider: serviceProvider
     )
   {

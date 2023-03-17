@@ -9,11 +9,11 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 partial class KasaDevice {
 #pragma warning restore IDE0040
   public static KasaDevice Create(
-    IPAddress deviceAddress,
+    IPAddress ipAddress,
     IServiceProvider? serviceProvider = null
   )
     => new(
-      ipAddress: deviceAddress ?? throw new ArgumentNullException(nameof(deviceAddress)),
+      ipAddress: ipAddress,
       serviceProvider: serviceProvider
     );
 

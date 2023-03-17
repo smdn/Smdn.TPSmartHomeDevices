@@ -39,14 +39,9 @@ public partial class TapoDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(
-        hostName ?? throw new ArgumentNullException(nameof(hostName))
-      ),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
       terminalUuid: terminalUuid,
-      credentialProvider: new PlainTextCredentialProvider(
-        userName: email ?? throw new ArgumentNullException(nameof(email)),
-        password: password ?? throw new ArgumentNullException(nameof(password))
-      ),
+      credentialProvider: PlainTextCredentialProvider.Create(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -61,14 +56,9 @@ public partial class TapoDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(
-        ipAddress ?? throw new ArgumentNullException(nameof(ipAddress))
-      ),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
       terminalUuid: terminalUuid,
-      credentialProvider: new PlainTextCredentialProvider(
-        userName: email ?? throw new ArgumentNullException(nameof(email)),
-        password: password ?? throw new ArgumentNullException(nameof(password))
-      ),
+      credentialProvider: PlainTextCredentialProvider.Create(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -81,9 +71,7 @@ public partial class TapoDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(
-        hostName ?? throw new ArgumentNullException(nameof(hostName))
-      ),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
       terminalUuid: terminalUuid,
       credentialProvider: null,
       exceptionHandler: null,

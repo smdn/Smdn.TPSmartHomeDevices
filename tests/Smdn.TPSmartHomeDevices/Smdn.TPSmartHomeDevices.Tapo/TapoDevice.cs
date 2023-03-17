@@ -37,15 +37,15 @@ public class TapoDeviceTests {
     };
 
     yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(deviceAddress: null!, email: "user@mail.test", password: "pass")),
-      "deviceAddress"
+      new TestDelegate(() => TapoDevice.Create(ipAddress: null!, email: "user@mail.test", password: "pass")),
+      "ipAddress"
     };
     yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(deviceAddress: IPAddress.Loopback, email: null!, password: "pass")),
+      new TestDelegate(() => TapoDevice.Create(ipAddress: IPAddress.Loopback, email: null!, password: "pass")),
       "email"
     };
     yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(deviceAddress: IPAddress.Loopback, email: "user@mail.test", password: null!)),
+      new TestDelegate(() => TapoDevice.Create(ipAddress: IPAddress.Loopback, email: "user@mail.test", password: null!)),
       "password"
     };
 
@@ -126,10 +126,10 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithDeviceAddress()
+  public async Task Create_WithIPAddress()
   {
     using var device = TapoDevice.Create(
-      deviceAddress: IPAddress.Loopback,
+      ipAddress: IPAddress.Loopback,
       "user@mail.test",
       "password"
     );
@@ -141,7 +141,7 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithDeviceHostName()
+  public async Task Create_WithHostName()
   {
     using var device = TapoDevice.Create(
       hostName: "localhost",
@@ -189,7 +189,7 @@ public class TapoDeviceTests {
   public void Create_TerminalUuid_AutoGenerate()
   {
     using var device = TapoDevice.Create(
-      deviceAddress: IPAddress.Loopback,
+      ipAddress: IPAddress.Loopback,
       "user@mail.test",
       "password"
     );
@@ -204,7 +204,7 @@ public class TapoDeviceTests {
   public void Dispose()
   {
     using var device = TapoDevice.Create(
-      deviceAddress: IPAddress.Loopback,
+      ipAddress: IPAddress.Loopback,
       "user@mail.test",
       "password"
     );

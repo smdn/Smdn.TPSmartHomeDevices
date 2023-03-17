@@ -8,19 +8,14 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 public static class TapoCredentailProviderServiceCollectionExtensions {
   public static IServiceCollection AddTapoCredential(
     this IServiceCollection services,
-    string userName,
+    string email,
     string password
   )
   {
     if (services is null)
       throw new ArgumentNullException(nameof(services));
 
-    services.AddSingleton<ITapoCredentialProvider>(
-      new PlainTextCredentialProvider(
-        userName ?? throw new ArgumentNullException(nameof(userName)),
-        password ?? throw new ArgumentNullException(nameof(password))
-      )
-    );
+    services.AddSingleton(PlainTextCredentialProvider.Create(email, password));
 
     return services;
   }

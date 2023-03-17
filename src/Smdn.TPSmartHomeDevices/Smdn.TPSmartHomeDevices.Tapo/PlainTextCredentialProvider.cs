@@ -1,14 +1,21 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+using System;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-internal class PlainTextCredentialProvider : ITapoCredentialProvider {
+internal sealed class PlainTextCredentialProvider : ITapoCredentialProvider {
+  public static ITapoCredentialProvider Create(string email, string password)
+    => new PlainTextCredentialProvider(
+      userName: email ?? throw new ArgumentNullException(nameof(email)),
+      password: password ?? throw new ArgumentNullException(nameof(password))
+    );
+
   private readonly string userName;
   private readonly string password;
 
-  public PlainTextCredentialProvider(
+  private PlainTextCredentialProvider(
     string userName,
     string password
   )

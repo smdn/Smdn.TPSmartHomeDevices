@@ -54,9 +54,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(
-        hostName ?? throw new ArgumentNullException(nameof(hostName))
-      ),
+      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(hostName),
       serviceProvider: serviceProvider
     )
   {
@@ -67,9 +65,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(
-        ipAddress ?? throw new ArgumentNullException(nameof(ipAddress))
-      ),
+      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(ipAddress),
       serviceProvider: serviceProvider
     )
   {
