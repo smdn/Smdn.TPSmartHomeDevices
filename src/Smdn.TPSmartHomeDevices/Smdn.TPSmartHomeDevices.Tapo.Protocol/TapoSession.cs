@@ -34,6 +34,7 @@ public sealed class TapoSession : IDisposable {
     ExpiresOn = expiresOn;
 
     aes = Aes.Create();
+    aes.Mode = CipherMode.CBC;
     aes.Padding = PaddingMode.PKCS7;
     aes.Key = key.ToArray();
     aes.IV = iv.ToArray();
