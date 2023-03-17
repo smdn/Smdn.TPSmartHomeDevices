@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,42 @@ public class L900 : TapoDevice {
   )
     : base(
       ipAddress: ipAddress,
+      email: email,
+      password: password,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  public L900(
+    PhysicalAddress macAddress,
+    string email,
+    string password,
+    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
+    IServiceProvider? serviceProvider = null
+  )
+    : base(
+      macAddress: macAddress,
+      email: email,
+      password: password,
+      endPointFactory: endPointFactory,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L900"/> class with a MAC address.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice" />
+  public L900(
+    PhysicalAddress macAddress,
+    string email,
+    string password,
+    IServiceProvider serviceProvider
+  )
+    : base(
+      macAddress: macAddress,
       email: email,
       password: password,
       serviceProvider: serviceProvider

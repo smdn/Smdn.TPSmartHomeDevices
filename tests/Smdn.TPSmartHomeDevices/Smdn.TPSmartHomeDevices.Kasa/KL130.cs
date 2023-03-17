@@ -10,29 +10,9 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
 public class KL130Tests {
-  private static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentNull()
-  {
-    yield return new object[] {
-      new TestDelegate(() => new KL130(hostName: null!)),
-      "hostName"
-    };
-    yield return new object[] {
-      new TestDelegate(() => new KL130(ipAddress: null!)),
-      "ipAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => new KL130(deviceEndPointProvider: null!)),
-      "deviceEndPointProvider"
-    };
-  }
-
-  [TestCaseSource(nameof(YiledTestCases_Ctor_ArgumentNull))]
-  public void Ctor_ArgumentNull(TestDelegate testAction, string expectedParamName)
-  {
-    var ex = Assert.Throws<ArgumentNullException>(testAction)!;
-
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-  }
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  public void Ctor_ArgumentException(Type[] ctorArgumentTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
+    => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<KL130>(ctorArgumentTypes, ctorParameters, expectedExceptionType, expectedParamName);
 
   private static System.Collections.IEnumerable YieldTestCases_TransitionPeriod()
   {

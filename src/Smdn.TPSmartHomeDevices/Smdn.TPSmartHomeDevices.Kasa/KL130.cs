@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -43,6 +44,34 @@ public class KL130 : KasaDevice {
   )
     : base(
       ipAddress: ipAddress,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  public KL130(
+    PhysicalAddress macAddress,
+    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
+    IServiceProvider? serviceProvider = null
+  )
+    : base(
+      macAddress: macAddress,
+      endPointFactory: endPointFactory,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KL130"/> class with a MAC address.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice" />
+  public KL130(
+    PhysicalAddress macAddress,
+    IServiceProvider serviceProvider
+  )
+    : base(
+      macAddress: macAddress,
       serviceProvider: serviceProvider
     )
   {

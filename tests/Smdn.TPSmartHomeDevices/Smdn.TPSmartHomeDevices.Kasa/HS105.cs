@@ -10,29 +10,9 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
 public class HS105Tests {
-  private static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentNull()
-  {
-    yield return new object[] {
-      new TestDelegate(() => new HS105(hostName: null!)),
-      "hostName"
-    };
-    yield return new object[] {
-      new TestDelegate(() => new HS105(ipAddress: null!)),
-      "ipAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => new HS105(deviceEndPointProvider: null!)),
-      "deviceEndPointProvider"
-    };
-  }
-
-  [TestCaseSource(nameof(YiledTestCases_Ctor_ArgumentNull))]
-  public void Ctor_ArgumentNull(TestDelegate testAction, string expectedParamName)
-  {
-    var ex = Assert.Throws<ArgumentNullException>(testAction)!;
-
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-  }
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  public void Ctor_ArgumentException(Type[] ctorArgumentTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
+    => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<HS105>(ctorArgumentTypes, ctorParameters, expectedExceptionType, expectedParamName);
 
   [Test]
   public async Task TurnOnAsync()
