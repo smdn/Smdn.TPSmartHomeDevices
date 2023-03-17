@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
@@ -15,7 +16,12 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     if (services is null)
       throw new ArgumentNullException(nameof(services));
 
-    services.AddSingleton(PlainTextCredentialProvider.Create(email, password));
+    services.TryAdd(
+      ServiceDescriptor.Singleton(
+        typeof(ITapoCredentialProvider),
+        TapoCredentialProviderFactory.CreateFromPlainText(email, password)
+      )
+    );
 
     return services;
   }
@@ -29,10 +35,10 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     if (services is null)
       throw new ArgumentNullException(nameof(services));
 
-    services.AddSingleton<ITapoCredentialProvider>(
-      new Base64EncodedCredentialProvider(
-        base64UserNameSHA1Digest ?? throw new ArgumentNullException(nameof(base64UserNameSHA1Digest)),
-        base64Password ?? throw new ArgumentNullException(nameof(base64Password))
+    services.TryAdd(
+      ServiceDescriptor.Singleton(
+        typeof(ITapoCredentialProvider),
+        TapoCredentialProviderFactory.CreateFromBase64EncodedText(base64UserNameSHA1Digest, base64Password)
       )
     );
 

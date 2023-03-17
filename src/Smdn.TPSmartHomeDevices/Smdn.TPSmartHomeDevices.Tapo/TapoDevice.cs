@@ -42,7 +42,7 @@ public partial class TapoDevice : IDisposable {
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
       terminalUuid: terminalUuid,
-      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -59,7 +59,7 @@ public partial class TapoDevice : IDisposable {
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
       terminalUuid: terminalUuid,
-      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -76,7 +76,7 @@ public partial class TapoDevice : IDisposable {
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, endPointFactory),
       terminalUuid: null,
-      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -109,7 +109,7 @@ public partial class TapoDevice : IDisposable {
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
       terminalUuid: null,
-      credentialProvider: PlainTextCredentialProvider.Create(email, password),
+      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
