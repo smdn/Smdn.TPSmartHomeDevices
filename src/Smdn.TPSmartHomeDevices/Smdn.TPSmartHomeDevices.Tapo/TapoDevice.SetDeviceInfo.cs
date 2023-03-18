@@ -34,7 +34,7 @@ partial class TapoDevice {
     );
 
   /// <summary>
-  /// Sets the on/off state of the device according to the parameter <see cref="newOnOffState" />.
+  /// Sets the on/off state of the device according to the parameter <paramref name="newOnOffState" />.
   /// </summary>
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
