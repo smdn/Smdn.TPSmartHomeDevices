@@ -91,7 +91,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
       if (!EndPointUtils.TryFindUnusedPort(exceptPort, out var port))
         throw new InvalidOperationException("could not find unused port");
 
-      listener = CreateListeningSocket(new IPEndPoint(IPAddress.Any, port));
+      listener = CreateListeningSocket(new IPEndPoint(IPAddress.Loopback, port));
     }
     else {
       foreach (var port in EndPointUtils.EnumerateIANASuggestedDynamicPorts(exceptPort)) {
@@ -110,9 +110,9 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
 
     taskProcessListener = Task.Run(() => ProcessListenerAsync(listenerCancellationTokenSource.Token));
 
-    EndPoint = listener?.LocalEndPoint as IPEndPoint;
+    EndPoint = (listener?.LocalEndPoint as IPEndPoint) ?? throw new InvalidOperationException("could not get listener end point");
 
-    return EndPoint ?? throw new InvalidOperationException("could not get listener end point");
+    return EndPoint;
 
     static Socket CreateListeningSocket(IPEndPoint endPoint)
     {

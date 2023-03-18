@@ -493,7 +493,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         ? unauthorizedSessions.TryGetValue(sessionId, out var unauthorizedSession)
           ? unauthorizedSession
           : null
-        : unauthorizedSessions.FirstOrDefault(pair => pair.Value.RemoteEndPoint == context.Request.RemoteEndPoint).Value // find session by requested remote end point
+        : unauthorizedSessions.FirstOrDefault(pair => pair.Value.RemoteEndPoint.Equals(context.Request.RemoteEndPoint)).Value // find session by requested remote end point
       : authorizedSessions.TryGetValue(token, out var authorizedSession)
         ? authorizedSession
         : null;
