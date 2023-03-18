@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -97,8 +98,13 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   private static readonly Encoding utf8nobom = new UTF8Encoding(false);
 
+  private static string CreateEndPointHttpUrl(IPEndPoint endPoint)
+    => endPoint.AddressFamily == AddressFamily.InterNetworkV6
+      ? $"http://[{endPoint.Address}]:{endPoint.Port}/"
+      : $"http://{endPoint.Address}:{endPoint.Port}/";
+
   public IPEndPoint? EndPoint { get; private set; }
-  public Uri? EndPointUri => EndPoint is null ? null : new Uri($"http://{EndPoint.Address}:{EndPoint.Port}");
+  public Uri? EndPointUri => EndPoint is null ? null : new Uri(CreateEndPointHttpUrl(EndPoint));
   private HttpListener? listener;
   private Task? taskProcessListener;
 
@@ -163,11 +169,15 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       if (!EndPointUtils.TryFindUnusedPort(exceptPort, out var port))
         throw new InvalidOperationException("could not find unused port");
 
-      EndPoint = new IPEndPoint(IPAddress.Loopback, port);
+      EndPoint = new IPEndPoint(
+        Socket.OSSupportsIPv6
+          ? IPAddress.IPv6Loopback
+          : IPAddress.Loopback,
+        port
+      );
 
       listener = new HttpListener();
-      listener.Prefixes.Add($"http://{EndPoint.Address}:{EndPoint.Port}/");
-
+      listener.Prefixes.Add(CreateEndPointHttpUrl(EndPoint));
       listener.Start();
     }
     else {
@@ -175,9 +185,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         var l = new HttpListener();
 
         try {
-          var endPoint = new IPEndPoint(IPAddress.Loopback, port);
+          var endPoint = new IPEndPoint(
+            Socket.OSSupportsIPv6
+              ? IPAddress.IPv6Loopback
+              : IPAddress.Loopback,
+            port
+          );
 
-          l.Prefixes.Add($"http://{endPoint.Address}:{endPoint.Port}/");
+          l.Prefixes.Add(CreateEndPointHttpUrl(endPoint));
           l.Start();
 
           EndPoint = endPoint;

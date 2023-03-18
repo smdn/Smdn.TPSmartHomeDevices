@@ -91,12 +91,26 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
       if (!EndPointUtils.TryFindUnusedPort(exceptPort, out var port))
         throw new InvalidOperationException("could not find unused port");
 
-      listener = CreateListeningSocket(new IPEndPoint(IPAddress.Loopback, port));
+      listener = CreateListeningSocket(
+        new IPEndPoint(
+          Socket.OSSupportsIPv6
+            ? IPAddress.IPv6Loopback
+            : IPAddress.Loopback,
+          port
+        )
+      );
     }
     else {
       foreach (var port in EndPointUtils.EnumerateIANASuggestedDynamicPorts(exceptPort)) {
         try {
-          listener = CreateListeningSocket(new IPEndPoint(IPAddress.Any, port));
+          listener = CreateListeningSocket(
+            new IPEndPoint(
+              Socket.OSSupportsIPv6
+                ? IPAddress.IPv6Any
+                : IPAddress.Any,
+              port
+            )
+          );
           break;
         }
         catch (SocketException) {
@@ -120,6 +134,9 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
 
       try {
         s = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+        if (Socket.OSSupportsIPv6)
+          s.DualMode = true;
 
         s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
         s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
