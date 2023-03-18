@@ -75,6 +75,9 @@ public partial class TapoClientTests {
     yield return new object[] { new IPEndPoint(IPAddress.Loopback, 0), new Uri("http://127.0.0.1/") };
     yield return new object[] { new IPEndPoint(IPAddress.Loopback, 8080), new Uri("http://127.0.0.1:8080/") };
 
+    yield return new object[] { new IPEndPoint(IPAddress.IPv6Loopback, 0), new Uri("http://[::1]/") };
+    yield return new object[] { new IPEndPoint(IPAddress.IPv6Loopback, 8080), new Uri("http://[::1]:8080/") };
+
     yield return new object[] { new DnsEndPoint("localhost", 0), new Uri("http://localhost/") };
     yield return new object[] { new DnsEndPoint("device.test", 8080), new Uri("http://device.test:8080/") };
 
