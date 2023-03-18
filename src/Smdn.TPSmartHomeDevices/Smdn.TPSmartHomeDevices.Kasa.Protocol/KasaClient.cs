@@ -206,7 +206,8 @@ public sealed partial class KasaClient : IDisposable {
       catch (SocketException ex) when (
         ex.SocketErrorCode is
           SocketError.Shutdown or // EPIPE
-          SocketError.ConnectionReset // ECONNRESET
+          SocketError.ConnectionReset or // ECONNRESET
+          SocketError.ConnectionAborted // WSAECONNABORTED
       ) {
         throw new KasaDisconnectedException(ex.Message, endPoint, ex);
       }
