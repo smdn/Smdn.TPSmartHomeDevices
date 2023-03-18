@@ -13,6 +13,7 @@ SPDX-License-Identifier: MIT
     <DefineConstants
       Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
     >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals in C# 11 -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
@@ -36,6 +37,7 @@ SPDX-License-Identifier: MIT
   </ItemGroup>
 
   <PropertyGroup>
+    <NoWarn>CS1573;CS1591;$(NoWarn)</NoWarn> <!-- XML docs-->
     <NoWarn>CS8618;SA1027;SA1507;SA1005;$(NoWarn)</NoWarn>
   </PropertyGroup>
 
