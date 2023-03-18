@@ -25,8 +25,8 @@ public class L530Tests {
   }
 
   [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
-  public void Ctor_ArgumentException(Type[] ctorArgumentTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
-    => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<L530>(ctorArgumentTypes, ctorParameters, expectedExceptionType, expectedParamName);
+  public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
+    => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<L530>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 
   [TestCase(0, "brightness")]
   [TestCase(101, "brightness")]

@@ -50,6 +50,15 @@ public partial class KasaDevice : IDisposable {
     }
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <param name="hostName">
+  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
   protected KasaDevice(
     string hostName,
     IServiceProvider? serviceProvider = null
@@ -61,6 +70,15 @@ public partial class KasaDevice : IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <param name="ipAddress">
+  /// A <see cref="IPAddress"/> that holds the IP address representing the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
   protected KasaDevice(
     IPAddress ipAddress,
     IServiceProvider? serviceProvider = null
@@ -72,29 +90,17 @@ public partial class KasaDevice : IDisposable {
   {
   }
 
-  protected KasaDevice(
-    PhysicalAddress macAddress,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
-  )
-    : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(macAddress, endPointFactory),
-      serviceProvider: serviceProvider
-    )
-  {
-  }
-
   /// <summary>
-  /// Initializes a new instance of the <see cref="KasaDevice"/> class with a MAC address.
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class with specifying the device endpoint by MAC address.
   /// </summary>
   /// <param name="macAddress">
   /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
   /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
-  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must be registered to create an end point from the <paramref name="macAddress"/>.
+  /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must be registered to create an end point from the <paramref name="macAddress"/>.
   /// </param>
-  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> has been registered for <see cref="serviceProvider"/>.</exception>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   protected KasaDevice(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
@@ -106,6 +112,19 @@ public partial class KasaDevice : IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class.
+  /// </summary>
+  /// <param name="deviceEndPointProvider">
+  /// A <see cref="IDeviceEndPointProvider"/> that provides the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
+  /// <exception cref="ArgumentNullException">
+  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>.
+  /// </exception>
   protected KasaDevice(
     IDeviceEndPointProvider deviceEndPointProvider,
     IServiceProvider? serviceProvider = null

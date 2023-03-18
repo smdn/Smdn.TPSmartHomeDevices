@@ -38,28 +38,6 @@ internal class ConcreteKasaDeviceCommonTests {
     services.AddDeviceEndPointFactory(endPointFactory);
 
     /*
-     * (PhysicalAddress macAddress, IDeviceEndPointFactory<PhysicalAddress> endPointFactory, IServiceProvider? serviceProvider)
-     */
-    yield return new object[] {
-      new Type[] { typeof(PhysicalAddress), typeof(IDeviceEndPointFactory<PhysicalAddress>), typeof(IServiceProvider) },
-      new object?[] { null, endPointFactory, null },
-      typeof(ArgumentNullException),
-      "macAddress"
-    };
-    yield return new object[] {
-      new Type[] { typeof(PhysicalAddress), typeof(IDeviceEndPointFactory<PhysicalAddress>), typeof(IServiceProvider) },
-      new object?[] { PhysicalAddress.None, null, null },
-      typeof(ArgumentNullException),
-      "endPointFactory"
-    };
-    yield return new object[] {
-      new Type[] { typeof(PhysicalAddress), typeof(IDeviceEndPointFactory<PhysicalAddress>), typeof(IServiceProvider) },
-      new object?[] { PhysicalAddress.None, endPointFactory, null },
-      null,
-      null
-    };
-
-    /*
      * (PhysicalAddress macAddress, IServiceProvider serviceProvider)
      */
     yield return new object[] {
@@ -83,7 +61,7 @@ internal class ConcreteKasaDeviceCommonTests {
   }
 
   internal static void TestCtor_ArgumentException<TKasaDevice>(
-    Type[] ctorArgumentTypes,
+    Type[] ctorParameterTypes,
     object?[] ctorParameters,
     Type? expectedExceptionType,
     string expectedParamName
@@ -92,17 +70,72 @@ internal class ConcreteKasaDeviceCommonTests {
   {
     var ctor = typeof(TKasaDevice).GetConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      types: ctorArgumentTypes
+      types: ctorParameterTypes
     );
 
     if (ctor is null)
       Assert.Fail("Constructor for test case was not found.");
 
+    TestCreate_ArgumentException(
+      ctor,
+      ctorParameters,
+      expectedExceptionType,
+      expectedParamName
+    );
+  }
+
+  internal static void TestCreate_ArgumentException(
+    Type type,
+    string methodName,
+    Type[] methodParameterTypes,
+    object?[] methodParameters,
+    Type? expectedExceptionType,
+    string expectedParamName
+  )
+  {
+    var method = type.GetMethod(
+      name: methodName,
+      bindingAttr: BindingFlags.Public | BindingFlags.Static,
+      types: methodParameterTypes
+    );
+
+    if (method is null)
+      Assert.Fail("Method for test case was not found.");
+
+    TestCreate_ArgumentException(
+      method,
+      methodParameters,
+      expectedExceptionType,
+      expectedParamName
+    );
+  }
+
+  private static void TestCreate_ArgumentException(
+    MethodBase method,
+    object?[] methodParameters,
+    Type? expectedExceptionType,
+    string expectedParamName
+  )
+  {
     if (expectedExceptionType is null) {
-      Assert.DoesNotThrow(() => ctor.Invoke(ctorParameters));
+      Assert.DoesNotThrow(
+        () => {
+          if (method is ConstructorInfo ctor)
+            ctor.Invoke(methodParameters);
+          else
+            method.Invoke(null, methodParameters);
+        }
+      );
     }
     else {
-      var ex = Assert.Throws<TargetInvocationException>(() => ctor.Invoke(ctorParameters));
+      var ex = Assert.Throws<TargetInvocationException>(
+        () => {
+          if (method is ConstructorInfo ctor)
+            ctor.Invoke(methodParameters);
+          else
+            method.Invoke(null, methodParameters);
+        }
+      );
       var actualException = ex.InnerException;
 
       Assert.IsInstanceOf(expectedExceptionType, actualException);

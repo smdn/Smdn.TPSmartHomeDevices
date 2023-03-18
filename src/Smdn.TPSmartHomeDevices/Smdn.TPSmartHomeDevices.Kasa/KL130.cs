@@ -27,17 +27,25 @@ public class KL130 : KasaDevice {
 #endif
   );
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public KL130(
     string hostName,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      hostName: hostName ?? throw new ArgumentNullException(nameof(hostName)),
+      hostName: hostName,
       serviceProvider: serviceProvider
     )
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(IPAddress, IServiceProvider?)" />
   public KL130(
     IPAddress ipAddress,
     IServiceProvider? serviceProvider = null
@@ -49,23 +57,10 @@ public class KL130 : KasaDevice {
   {
   }
 
-  public KL130(
-    PhysicalAddress macAddress,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
-  )
-    : base(
-      macAddress: macAddress,
-      endPointFactory: endPointFactory,
-      serviceProvider: serviceProvider
-    )
-  {
-  }
-
   /// <summary>
-  /// Initializes a new instance of the <see cref="KL130"/> class with a MAC address.
+  /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by MAC address.
   /// </summary>
-  /// <inheritdoc cref="KasaDevice" />
+  /// <inheritdoc cref="KasaDevice(PhysicalAddress, IServiceProvider)" />
   public KL130(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
@@ -77,6 +72,10 @@ public class KL130 : KasaDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KL130"/> class.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(IDeviceEndPointProvider, IServiceProvider?)" />
   public KL130(
     IDeviceEndPointProvider deviceEndPointProvider,
     IServiceProvider? serviceProvider = null

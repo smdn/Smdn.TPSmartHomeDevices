@@ -32,6 +32,21 @@ public partial class TapoDevice : IDisposable {
   /// </summary>
   public TapoSession? Session => client?.Session;
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <param name="hostName">
+  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// </param>
+  /// <param name="email">
+  /// A <see cref="string"/> that holds the e-mail address of the Tapo account used for authentication.
+  /// </param>
+  /// <param name="password">
+  /// A <see cref="string"/> that holds the password of the Tapo account used for authentication.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
   protected TapoDevice(
     string hostName,
     string email,
@@ -47,6 +62,34 @@ public partial class TapoDevice : IDisposable {
   {
   }
 
+  /// <param name="hostName">
+  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="ITapoCredentialProvider"/> must be registered in order to retrieve the credentials required for authentication.
+  /// </param>
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/summary"/>
+  protected TapoDevice(
+    string hostName,
+    IServiceProvider serviceProvider
+  )
+    : this(
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
+      credentialProvider: null,
+      exceptionHandler: null,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <param name="ipAddress">
+  /// A <see cref="IPAddress"/> that holds the IP address representing the device end point.
+  /// </param>
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/param[@name='email' or @name='password' or @name='serviceProvider']"/>
   protected TapoDevice(
     IPAddress ipAddress,
     string email,
@@ -62,16 +105,18 @@ public partial class TapoDevice : IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(IPAddress, string, string, IServiceProvider?)" path="/summary | /param[@name='ipAddress']"/>
+  /// <inheritdoc cref="TapoDevice(string, IServiceProvider)" path="/param[@name='serviceProvider']"/>
   protected TapoDevice(
-    PhysicalAddress macAddress,
-    string email,
-    string password,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
+    IPAddress ipAddress,
+    IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, endPointFactory),
-      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
+      credentialProvider: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -79,22 +124,17 @@ public partial class TapoDevice : IDisposable {
   }
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="TapoDevice"/> class with a MAC address.
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by MAC address.
   /// </summary>
   /// <param name="macAddress">
   /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
   /// </param>
-  /// <param name="email">
-  /// A <see cref="string"/> that holds the e-mail address of the Tapo account used for authentication.
-  /// </param>
-  /// <param name="password">
-  /// A <see cref="string"/> that holds the password of the Tapo account used for authentication.
-  /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
-  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must be registered to create an end point from the <paramref name="macAddress"/>.
+  /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must be registered to create an end point from the <paramref name="macAddress"/>.
   /// </param>
-  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> has been registered for <see cref="serviceProvider"/>.</exception>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/param[@name='email' or @name='password']"/>
   protected TapoDevice(
     PhysicalAddress macAddress,
     string email,
@@ -110,12 +150,19 @@ public partial class TapoDevice : IDisposable {
   {
   }
 
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="ITapoCredentialProvider"/> must be registered in order to retrieve the credentials required for authentication.
+  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must also be registered to create an <see cref="IDeviceEndPointProvider" />, corresponding to the <paramref name="macAddress"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
+  /// <inheritdoc cref="TapoDevice(PhysicalAddress, string, string, IServiceProvider?)" path="/summary | /param[@name='macAddress']"/>
   protected TapoDevice(
-    string hostName,
-    IServiceProvider? serviceProvider = null
+    PhysicalAddress macAddress,
+    IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
       credentialProvider: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -123,6 +170,25 @@ public partial class TapoDevice : IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class.
+  /// </summary>
+  /// <param name="deviceEndPointProvider">
+  /// A <see cref="IDeviceEndPointProvider"/> that provides the device end point.
+  /// </param>
+  /// <param name="credentialProvider">
+  /// A <see cref="ITapoCredentialProvider"/> that provides the credentials required for authentication.
+  /// </param>
+  /// <param name="exceptionHandler">
+  /// A <see cref="TapoClientExceptionHandler"/> that determines the handling of the exception thrown by the <see cref="TapoClient"/>.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
+  /// <exception cref="ArgumentNullException">
+  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>, or both <paramref name="credentialProvider"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
+  /// </exception>
   protected TapoDevice(
     IDeviceEndPointProvider deviceEndPointProvider,
     ITapoCredentialProvider? credentialProvider = null,
@@ -132,8 +198,7 @@ public partial class TapoDevice : IDisposable {
   {
     this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
     this.credentialProvider = credentialProvider
-      ?? serviceProvider?.GetRequiredService<ITapoCredentialProvider>()
-      ?? throw new ArgumentNullException(nameof(credentialProvider));
+      ?? (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider))).GetRequiredService<ITapoCredentialProvider>();
     this.exceptionHandler = exceptionHandler
       ?? serviceProvider?.GetService<TapoClientExceptionHandler>()
       ?? TapoClientExceptionHandler.Default;

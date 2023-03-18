@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public class L530 : TapoDevice {
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" />
   public L530(
     string hostName,
     string email,
@@ -25,9 +29,13 @@ public class L530 : TapoDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(string, IServiceProvider)" />
   public L530(
     string hostName,
-    IServiceProvider? serviceProvider = null
+    IServiceProvider serviceProvider
   )
     : base(
       hostName: hostName,
@@ -36,6 +44,10 @@ public class L530 : TapoDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" />
   public L530(
     IPAddress ipAddress,
     string email,
@@ -51,27 +63,25 @@ public class L530 : TapoDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(IPAddress, IServiceProvider)" />
   public L530(
-    PhysicalAddress macAddress,
-    string email,
-    string password,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
+    IPAddress ipAddress,
+    IServiceProvider serviceProvider
   )
     : base(
-      macAddress: macAddress,
-      email: email,
-      password: password,
-      endPointFactory: endPointFactory,
+      ipAddress: ipAddress,
       serviceProvider: serviceProvider
     )
   {
   }
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="L530"/> class with a MAC address.
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by MAC address.
   /// </summary>
-  /// <inheritdoc cref="TapoDevice" />
+  /// <inheritdoc cref="TapoDevice(PhysicalAddress, string, string, IServiceProvider?)" />
   public L530(
     PhysicalAddress macAddress,
     string email,
@@ -87,6 +97,28 @@ public class L530 : TapoDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by MAC address.
+  /// </summary>
+  /// <inheritdoc cref="TapoDevice(PhysicalAddress, IServiceProvider)" />
+  public L530(
+    PhysicalAddress macAddress,
+    IServiceProvider serviceProvider
+  )
+    : base(
+      macAddress: macAddress,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="L530"/> class.
+  /// </summary>
+  /// <inheritdoc
+  ///   cref="TapoDevice(IDeviceEndPointProvider, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   path="/exception | /param[@name='deviceEndPointProvider' or @name='credentialProvider' or @name='serviceProvider']"
+  /// />
   public L530(
     IDeviceEndPointProvider deviceEndPointProvider,
     ITapoCredentialProvider? credentialProvider = null,

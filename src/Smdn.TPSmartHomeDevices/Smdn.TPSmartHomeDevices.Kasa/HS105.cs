@@ -20,6 +20,10 @@ public class HS105 : KasaDevice {
 #endif
   );
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by hostname.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public HS105(
     string hostName,
     IServiceProvider? serviceProvider = null
@@ -31,6 +35,10 @@ public class HS105 : KasaDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by IP address.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(IPAddress, IServiceProvider?)" />
   public HS105(
     IPAddress ipAddress,
     IServiceProvider? serviceProvider = null
@@ -42,23 +50,10 @@ public class HS105 : KasaDevice {
   {
   }
 
-  public HS105(
-    PhysicalAddress macAddress,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
-  )
-    : base(
-      macAddress: macAddress,
-      endPointFactory: endPointFactory,
-      serviceProvider: serviceProvider
-    )
-  {
-  }
-
   /// <summary>
-  /// Initializes a new instance of the <see cref="HS105"/> class with a MAC address.
+  /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by MAC address.
   /// </summary>
-  /// <inheritdoc cref="KasaDevice" />
+  /// <inheritdoc cref="KasaDevice(PhysicalAddress, IServiceProvider)" />
   public HS105(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
@@ -70,6 +65,10 @@ public class HS105 : KasaDevice {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="HS105"/> class.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice(IDeviceEndPointProvider, IServiceProvider?)" />
   public HS105(
     IDeviceEndPointProvider deviceEndPointProvider,
     IServiceProvider? serviceProvider = null

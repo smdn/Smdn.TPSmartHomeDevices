@@ -11,8 +11,8 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 [TestFixture]
 public class HS105Tests {
   [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
-  public void Ctor_ArgumentException(Type[] ctorArgumentTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
-    => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<HS105>(ctorArgumentTypes, ctorParameters, expectedExceptionType, expectedParamName);
+  public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
+    => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<HS105>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 
   [Test]
   public async Task TurnOnAsync()

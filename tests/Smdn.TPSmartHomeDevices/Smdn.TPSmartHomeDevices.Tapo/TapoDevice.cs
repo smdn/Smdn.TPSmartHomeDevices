@@ -30,86 +30,21 @@ public class TapoDeviceTests {
     );
   }
 
-  private static System.Collections.IEnumerable YiledTestCases_Create_ArgumentNull()
-  {
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(deviceEndPointProvider: null!)),
-      "deviceEndPointProvider"
-    };
-
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(ipAddress: null!, email: "user@mail.test", password: "pass")),
-      "ipAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(ipAddress: IPAddress.Loopback, email: null!, password: "pass")),
-      "email"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(ipAddress: IPAddress.Loopback, email: "user@mail.test", password: null!)),
-      "password"
-    };
-
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(hostName: null!, email: "user@mail.test", password: "pass")),
-      "hostName"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(hostName: "localhost", email: null!, password: "pass")),
-      "email"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(hostName: "localhost", email: "user@mail.test", password: null!)),
-      "password"
-    };
-
-    var services = new ServiceCollection();
-    var endPointFactory = new NullMacAddressDeviceEndPointFactory();
-
-    services.AddDeviceEndPointFactory(endPointFactory);
-
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: null!, email: "user@mail.test", password: "pass", serviceProvider: services.BuildServiceProvider())),
-      "macAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: null!, password: "pass", serviceProvider: services.BuildServiceProvider())),
-      "email"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: null!, serviceProvider: services.BuildServiceProvider())),
-      "password"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: "pass", serviceProvider: null!)),
-      "serviceProvider"
-    };
-
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: null!, email: "user@mail.test", password: "pass", endPointFactory: endPointFactory)),
-      "macAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: null!, password: "pass", endPointFactory: endPointFactory)),
-      "email"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: null!, endPointFactory: endPointFactory)),
-      "password"
-    };
-    yield return new object[] {
-      new TestDelegate(() => TapoDevice.Create(macAddress: PhysicalAddress.None, email: "user@mail.test", password: "pass", endPointFactory: null!)),
-      "endPointFactory"
-    };
-  }
-
-  [TestCaseSource(nameof(YiledTestCases_Create_ArgumentNull))]
-  public void Create_ArgumentNull(TestDelegate testAction, string expectedParamName)
-  {
-    var ex = Assert.Throws<ArgumentNullException>(testAction)!;
-
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-  }
+  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  public void Create_ArgumentException(
+    Type[] methodParameterTypes,
+    object?[] methodParameters,
+    Type? expectedExceptionType,
+    string expectedParamName
+  )
+    => ConcreteTapoDeviceCommonTests.TestCreate_ArgumentException(
+      typeof(TapoDevice),
+      nameof(TapoDevice.Create),
+      methodParameterTypes,
+      methodParameters,
+      expectedExceptionType,
+      expectedParamName
+    );
 
   [Test]
   public void Create_WithCredentialProvider_ByICredentialProvider()
@@ -191,22 +126,6 @@ public class TapoDeviceTests {
 
     Assert.AreEqual(
       new DnsEndPoint("localhost", TapoClient.DefaultPort),
-      await device.ResolveEndPointAsync()
-    );
-  }
-
-  [Test]
-  public async Task Create_WithMacAddress_IDeviceEndPointFactory()
-  {
-    using var device = TapoDevice.Create(
-      macAddress: PhysicalAddress.None,
-      "user@mail.test",
-      "password",
-      endPointFactory: new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
-    );
-
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
       await device.ResolveEndPointAsync()
     );
   }

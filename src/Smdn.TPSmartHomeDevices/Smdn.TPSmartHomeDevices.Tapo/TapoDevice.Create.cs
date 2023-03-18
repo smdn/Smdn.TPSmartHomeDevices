@@ -9,19 +9,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 #pragma warning disable IDE0040
 partial class TapoDevice {
 #pragma warning restore IDE0040
-  public static TapoDevice Create(
-    IPAddress ipAddress,
-    string email,
-    string password,
-    IServiceProvider? serviceProvider = null
-  )
-    => new(
-      ipAddress: ipAddress,
-      email: email,
-      password: password,
-      serviceProvider: serviceProvider
-    );
-
+  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)"/>
   public static TapoDevice Create(
     string hostName,
     string email,
@@ -35,38 +23,41 @@ partial class TapoDevice {
       serviceProvider: serviceProvider
     );
 
+  /// <inheritdoc cref="TapoDevice(string, IServiceProvider)"/>
   public static TapoDevice Create(
-    PhysicalAddress macAddress,
-    string email,
-    string password,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory,
-    IServiceProvider? serviceProvider = null
+    string hostName,
+    IServiceProvider serviceProvider
   )
     => new(
-      macAddress: macAddress,
-      email: email,
-      password: password,
-      endPointFactory: endPointFactory,
+      hostName: hostName,
       serviceProvider: serviceProvider
     );
 
-  /// <summary>
-  /// Creates a new instance of the <see cref="TapoDevice"/> class with a MAC address.
-  /// </summary>
-  /// <param name="macAddress">
-  /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
-  /// </param>
-  /// <param name="email">
-  /// A <see cref="string"/> that holds the e-mail address of the Tapo account used for authentication.
-  /// </param>
-  /// <param name="password">
-  /// A <see cref="string"/> that holds the password of the Tapo account used for authentication.
-  /// </param>
-  /// <param name="serviceProvider">
-  /// A <see cref="IServiceProvider"/>.
-  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must be registered to create an end point from the <paramref name="macAddress"/>.
-  /// </param>
-  /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> has been registered for <see cref="serviceProvider"/>.</exception>
+  /// <inheritdoc cref="TapoDevice(IPAddress, string, string, IServiceProvider?)"/>
+  public static TapoDevice Create(
+    IPAddress ipAddress,
+    string email,
+    string password,
+    IServiceProvider? serviceProvider = null
+  )
+    => new(
+      ipAddress: ipAddress,
+      email: email,
+      password: password,
+      serviceProvider: serviceProvider
+    );
+
+  /// <inheritdoc cref="TapoDevice(IPAddress, IServiceProvider)"/>
+  public static TapoDevice Create(
+    IPAddress ipAddress,
+    IServiceProvider serviceProvider
+  )
+    => new(
+      ipAddress: ipAddress,
+      serviceProvider: serviceProvider
+    );
+
+  /// <inheritdoc cref="TapoDevice(PhysicalAddress, string, string, IServiceProvider)"/>
   public static TapoDevice Create(
     PhysicalAddress macAddress,
     string email,
@@ -80,6 +71,20 @@ partial class TapoDevice {
       serviceProvider: serviceProvider
     );
 
+  /// <inheritdoc cref="TapoDevice(PhysicalAddress, IServiceProvider)"/>
+  public static TapoDevice Create(
+    PhysicalAddress macAddress,
+    IServiceProvider serviceProvider
+  )
+    => new(
+      macAddress: macAddress,
+      serviceProvider: serviceProvider
+    );
+
+  /// <inheritdoc
+  ///   cref="TapoDevice(IDeviceEndPointProvider, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   path="/summary | /exception | /param[@name='deviceEndPointProvider' or @name='credentialProvider' or @name='serviceProvider']"
+  /// />
   public static TapoDevice Create(
     IDeviceEndPointProvider deviceEndPointProvider,
     ITapoCredentialProvider? credentialProvider = null,

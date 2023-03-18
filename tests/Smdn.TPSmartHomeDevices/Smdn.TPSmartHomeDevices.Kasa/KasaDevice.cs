@@ -20,53 +20,21 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 public class KasaDeviceTests {
   private const int RertyMaxAttemptsForIncompleteResponse = 3;
 
-  private static System.Collections.IEnumerable YiledTestCases_Create_ArgumentNull()
-  {
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(deviceEndPointProvider: null!)),
-      "deviceEndPointProvider"
-    };
-
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(ipAddress: null!)),
-      "ipAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(hostName: null!)),
-      "hostName"
-    };
-
-    var services = new ServiceCollection();
-    var endPointFactory = new NullMacAddressDeviceEndPointFactory();
-
-    services.AddDeviceEndPointFactory(endPointFactory);
-
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(macAddress: null!, serviceProvider: services.BuildServiceProvider())),
-      "macAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(macAddress: PhysicalAddress.None, serviceProvider: null!)),
-      "serviceProvider"
-    };
-
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(macAddress: null!, endPointFactory: endPointFactory)),
-      "macAddress"
-    };
-    yield return new object[] {
-      new TestDelegate(() => KasaDevice.Create(macAddress: PhysicalAddress.None, endPointFactory: null!)),
-      "endPointFactory"
-    };
-  }
-
-  [TestCaseSource(nameof(YiledTestCases_Create_ArgumentNull))]
-  public void Create_ArgumentNull(TestDelegate testAction, string expectedParamName)
-  {
-    var ex = Assert.Throws<ArgumentNullException>(testAction)!;
-
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-  }
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  public void Create_ArgumentException(
+    Type[] methodParameterTypes,
+    object?[] methodParameters,
+    Type? expectedExceptionType,
+    string expectedParamName
+  )
+    => ConcreteKasaDeviceCommonTests.TestCreate_ArgumentException(
+      typeof(KasaDevice),
+      nameof(KasaDevice.Create),
+      methodParameterTypes,
+      methodParameters,
+      expectedExceptionType,
+      expectedParamName
+    );
 
   [Test]
   public async Task Create_WithIPAddress()
@@ -90,20 +58,6 @@ public class KasaDeviceTests {
 
     Assert.AreEqual(
       new DnsEndPoint("localhost", KasaClient.DefaultPort),
-      await device.ResolveEndPointAsync()
-    );
-  }
-
-  [Test]
-  public async Task Create_WithMacAddress_IDeviceEndPointFactory()
-  {
-    using var device = KasaDevice.Create(
-      macAddress: PhysicalAddress.None,
-      endPointFactory: new StaticMacAddressDeviceEndPointFactory(IPAddress.Loopback)
-    );
-
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort),
       await device.ResolveEndPointAsync()
     );
   }
