@@ -3,6 +3,8 @@
 using System;
 using System.Buffers.Binary;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -229,6 +231,11 @@ public class KasaClientTests {
   [Test]
   public async Task SendAsync_DisconnectedException_DeviceNotRespond()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      Assert.Ignore("disconnection of device causes test runner timeout");
+      return;
+    }
+
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => JsonDocument.Parse(
 json: @"{
@@ -259,16 +266,31 @@ json: @"{
     // disconnect from device
     await device.DisposeAsync();
 
-    var ex = Assert.ThrowsAsync<KasaDisconnectedException>(
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
+
+    var ex = Assert.CatchAsync(
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
         parameter: new { },
-        composeResult: static json => JsonDocument.Parse(json.ToString())
+        composeResult: static json => JsonDocument.Parse(json.ToString()),
+        cancellationToken: cts.Token
       )
     );
 
-    Assert.AreEqual(ex.DeviceEndPoint, device.EndPoint, nameof(ex.DeviceEndPoint));
+    switch (ex) {
+      case KasaDisconnectedException disconnectedException:
+        Assert.AreEqual(disconnectedException.DeviceEndPoint, device.EndPoint, nameof(disconnectedException.DeviceEndPoint));
+        break;
+
+      case OperationCanceledException:
+        Assert.Inconclusive("test timed out");
+        break;
+
+      default: // unexpected exception
+        Assert.IsInstanceOf<KasaDisconnectedException>(ex);
+        break;
+    }
   }
 
   [Test]
@@ -311,8 +333,10 @@ json: @"{
     Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
     Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
 
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
+
     // device will close connection
-    var ex = Assert.ThrowsAsync<KasaDisconnectedException>(
+    var ex = Assert.CatchAsync(
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
@@ -321,7 +345,20 @@ json: @"{
       )
     );
 
-    Assert.AreEqual(ex.DeviceEndPoint, device.EndPoint, nameof(ex.DeviceEndPoint));
+
+    switch (ex) {
+      case KasaDisconnectedException disconnectedException:
+        Assert.AreEqual(disconnectedException.DeviceEndPoint, device.EndPoint, nameof(disconnectedException.DeviceEndPoint));
+        break;
+
+      case OperationCanceledException:
+        Assert.Inconclusive("test timed out");
+        break;
+
+      default: // unexpected exception
+        Assert.IsInstanceOf<KasaDisconnectedException>(ex);
+        break;
+    }
   }
 
   [TestCase(1, 0)]

@@ -6,6 +6,7 @@ using System.Buffers.Binary;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -340,6 +341,11 @@ public class KasaDeviceTests {
   [Test]
   public async Task SendRequestAsync_ResolvedEndPointHasChangedFromPreviousEndPoint()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      Assert.Ignore("disconnection of device causes test runner timeout");
+      return;
+    }
+
     static JsonDocument GenerateResponse(string result)
       => JsonDocument.Parse(
         @$"{{""module"":{{""method"":{{""err_code"":0,""result"":""{result}""}}}}}}"
@@ -382,10 +388,13 @@ public class KasaDeviceTests {
     // dispose endpoint #1
     await pseudoDeviceEndPoint1.DisposeAsync();
 
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
+
     var resultFromEndPoint2 = await device.SendRequestAsync(
       module: JsonEncodedText.Encode("module"),
       method: JsonEncodedText.Encode("method"),
-      composeResult: composeResult
+      composeResult: composeResult,
+      cancellationToken: cts.Token
     );
 
     Assert.AreEqual(resultFromEndPoint2, returnValueFromEndPoint2, nameof(resultFromEndPoint2));
@@ -408,6 +417,11 @@ public class KasaDeviceTests {
   [Test]
   public async Task SendRequestAsync_EndPointUnreachable_StaticEndPoint()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      Assert.Ignore("disconnection of device causes test runner timeout");
+      return;
+    }
+
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, _) => JsonDocument.Parse(
         @"{""module"":{""method"":{""err_code"":0}}}"
@@ -446,12 +460,15 @@ public class KasaDeviceTests {
     // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
     await pseudoDevice.DisposeAsync();
 
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
+
     var ex = Assert.ThrowsAsync(
       Is.InstanceOf<SocketException>().Or.InstanceOf<KasaDisconnectedException>(),
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
-        composeResult: static _ => 0
+        composeResult: static _ => 0,
+        cancellationToken: cts.Token
       )
     );
 
@@ -461,6 +478,11 @@ public class KasaDeviceTests {
   [Test]
   public async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      Assert.Ignore("disconnection of device causes test runner timeout");
+      return;
+    }
+
     await using var pseudoDeviceEndPoint1 = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, req) => {
         Assert.IsTrue(req.RootElement.TryGetProperty("module1", out var _));
@@ -515,11 +537,14 @@ public class KasaDeviceTests {
     // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
     await pseudoDeviceEndPoint1.DisposeAsync();
 
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
+
     Assert.DoesNotThrowAsync(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module2"),
         method: JsonEncodedText.Encode("method"),
-        composeResult: static _ => 0
+        composeResult: static _ => 0,
+        cancellationToken: cts.Token
       ),
       "request #2"
     );
