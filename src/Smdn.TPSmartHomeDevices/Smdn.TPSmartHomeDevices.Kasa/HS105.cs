@@ -21,15 +21,15 @@ public class HS105 : KasaDevice {
   );
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by host name.
   /// </summary>
   /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public HS105(
-    string hostName,
+    string host,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      hostName: hostName,
+      host: host,
       serviceProvider: serviceProvider
     )
   {

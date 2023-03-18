@@ -12,14 +12,14 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 internal class ConcreteTapoDeviceCommonTests {
   internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
   {
-    const string hostName = "localhost";
+    const string host = "localhost";
     const string email = "user@mail.test";
     const string password = "password";
 
     var services = new ServiceCollection();
 
     /*
-     * (string hostName, string email, string password, IServiceProvider? serviceProvider)
+     * (string host, string email, string password, IServiceProvider? serviceProvider)
      */
     var parameterTypes = new[] { typeof(string), typeof(string), typeof(string), typeof(IServiceProvider) };
 
@@ -27,23 +27,23 @@ internal class ConcreteTapoDeviceCommonTests {
       parameterTypes,
       new object?[] { null, email, password, null },
       typeof(ArgumentNullException),
-      "hostName"
+      "host"
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { hostName, null, password, null },
+      new object?[] { host, null, password, null },
       typeof(ArgumentNullException),
       "email"
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { hostName, email, null, null },
+      new object?[] { host, email, null, null },
       typeof(ArgumentNullException),
       "password"
     };
 
     /*
-     * (string hostName, IServiceProvider serviceProvider)
+     * (string host, IServiceProvider serviceProvider)
      */
     parameterTypes = new[] { typeof(string), typeof(IServiceProvider) };
 
@@ -51,17 +51,17 @@ internal class ConcreteTapoDeviceCommonTests {
       parameterTypes,
       new object?[] { null, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
-      "hostName"
+      "host"
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { hostName, null },
+      new object?[] { host, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { hostName, new ServiceCollection().BuildServiceProvider() },
+      new object?[] { host, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
       null
     };

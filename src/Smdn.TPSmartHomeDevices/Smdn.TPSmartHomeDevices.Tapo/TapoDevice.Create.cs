@@ -11,13 +11,13 @@ partial class TapoDevice {
 #pragma warning restore IDE0040
   /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)"/>
   public static TapoDevice Create(
-    string hostName,
+    string host,
     string email,
     string password,
     IServiceProvider? serviceProvider = null
   )
     => new(
-      hostName: hostName,
+      host: host,
       email: email,
       password: password,
       serviceProvider: serviceProvider
@@ -25,11 +25,11 @@ partial class TapoDevice {
 
   /// <inheritdoc cref="TapoDevice(string, IServiceProvider)"/>
   public static TapoDevice Create(
-    string hostName,
+    string host,
     IServiceProvider serviceProvider
   )
     => new(
-      hostName: hostName,
+      host: host,
       serviceProvider: serviceProvider
     );
 

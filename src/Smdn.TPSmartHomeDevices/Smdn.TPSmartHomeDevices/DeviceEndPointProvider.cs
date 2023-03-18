@@ -29,10 +29,10 @@ internal static class DeviceEndPointProvider {
         : staticEndPointValueTaskResult;
   }
 
-  public static IDeviceEndPointProvider Create(string hostName, int port)
+  public static IDeviceEndPointProvider Create(string host, int port)
     => Create(
       new DnsEndPoint(
-        host: hostName ?? throw new ArgumentNullException(nameof(hostName)),
+        host: host ?? throw new ArgumentNullException(nameof(host)),
         port: port
       )
     );

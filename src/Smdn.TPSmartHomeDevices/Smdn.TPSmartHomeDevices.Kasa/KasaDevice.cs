@@ -51,20 +51,20 @@ public partial class KasaDevice : IDisposable {
   }
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="KasaDevice"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class with specifying the device endpoint by host name.
   /// </summary>
-  /// <param name="hostName">
-  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// <param name="host">
+  /// A <see cref="string"/> that holds the host name or IP address string, representing the device endpoint.
   /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// </param>
   protected KasaDevice(
-    string hostName,
+    string host,
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(hostName),
+      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(host),
       serviceProvider: serviceProvider
     )
   {

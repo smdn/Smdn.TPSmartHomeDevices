@@ -53,7 +53,7 @@ public class KasaDeviceTests {
   public async Task Create_WithHostName()
   {
     using var device = KasaDevice.Create(
-      hostName: "localhost"
+      host: "localhost"
     );
 
     Assert.AreEqual(

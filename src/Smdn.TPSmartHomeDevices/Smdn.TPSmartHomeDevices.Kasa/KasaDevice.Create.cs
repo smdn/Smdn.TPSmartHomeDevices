@@ -11,11 +11,11 @@ partial class KasaDevice {
 #pragma warning restore IDE0040
   /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public static KasaDevice Create(
-    string hostName,
+    string host,
     IServiceProvider? serviceProvider = null
   )
     => new(
-      hostName: hostName,
+      host: host,
       serviceProvider: serviceProvider
     );
 

@@ -12,12 +12,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 public class TapoDeviceEndPointProviderTests {
   [Test]
   public void Create_FromHostName_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => TapoDeviceEndPointProvider.Create(hostName: null!));
+    => Assert.Throws<ArgumentNullException>(() => TapoDeviceEndPointProvider.Create(host: null!));
 
   [Test]
   public async Task Create_FromHostName()
   {
-    var provider = TapoDeviceEndPointProvider.Create(hostName: "localhost");
+    var provider = TapoDeviceEndPointProvider.Create(host: "localhost");
 
     Assert.IsNotNull(provider);
     Assert.That(provider, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(provider));
@@ -62,7 +62,7 @@ public class TapoDeviceEndPointProviderTests {
 
   private static System.Collections.IEnumerable YieldTestCases_IDeviceEndPointProvider_GetEndPointAsync_WithCancelledToken()
   {
-    yield return new object[] { TapoDeviceEndPointProvider.Create(hostName: "localhost") };
+    yield return new object[] { TapoDeviceEndPointProvider.Create(host: "localhost") };
     yield return new object[] { TapoDeviceEndPointProvider.Create(ipAddress: IPAddress.Loopback) };
     yield return new object[] { TapoDeviceEndPointProvider.Create(ipAddress: IPAddress.IPv6Loopback) };
   }

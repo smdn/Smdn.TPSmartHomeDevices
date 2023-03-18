@@ -12,12 +12,12 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 public class KasaDeviceEndPointProviderTests {
   [Test]
   public void Create_FromHostName_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => KasaDeviceEndPointProvider.Create(hostName: null!));
+    => Assert.Throws<ArgumentNullException>(() => KasaDeviceEndPointProvider.Create(host: null!));
 
   [Test]
   public async Task Create_FromHostName()
   {
-    var provider = KasaDeviceEndPointProvider.Create(hostName: "localhost");
+    var provider = KasaDeviceEndPointProvider.Create(host: "localhost");
 
     Assert.IsNotNull(provider);
     Assert.That(provider, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(provider));
@@ -62,7 +62,7 @@ public class KasaDeviceEndPointProviderTests {
 
   private static System.Collections.IEnumerable YieldTestCases_IDeviceEndPointProvider_GetEndPointAsync_WithCancelledToken()
   {
-    yield return new object[] { KasaDeviceEndPointProvider.Create(hostName: "localhost") };
+    yield return new object[] { KasaDeviceEndPointProvider.Create(host: "localhost") };
     yield return new object[] { KasaDeviceEndPointProvider.Create(ipAddress: IPAddress.Loopback) };
     yield return new object[] { KasaDeviceEndPointProvider.Create(ipAddress: IPAddress.IPv6Loopback) };
   }

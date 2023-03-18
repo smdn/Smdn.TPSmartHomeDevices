@@ -8,17 +8,17 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public class P105 : TapoDevice {
   /// <summary>
-  /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by host name.
   /// </summary>
   /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" />
   public P105(
-    string hostName,
+    string host,
     string email,
     string password,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      hostName: hostName,
+      host: host,
       email: email,
       password: password,
       serviceProvider: serviceProvider
@@ -27,15 +27,15 @@ public class P105 : TapoDevice {
   }
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by host name.
   /// </summary>
   /// <inheritdoc cref="TapoDevice(string, IServiceProvider)" />
   public P105(
-    string hostName,
+    string host,
     IServiceProvider serviceProvider
   )
     : base(
-      hostName: hostName,
+      host: host,
       serviceProvider: serviceProvider
     )
   {

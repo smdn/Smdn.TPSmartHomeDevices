@@ -33,10 +33,10 @@ public partial class TapoDevice : IDisposable {
   public TapoSession? Session => client?.Session;
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by host name.
   /// </summary>
-  /// <param name="hostName">
-  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// <param name="host">
+  /// A <see cref="string"/> that holds the host name or IP address string, representing the device endpoint.
   /// </param>
   /// <param name="email">
   /// A <see cref="string"/> that holds the e-mail address of the Tapo account used for authentication.
@@ -48,13 +48,13 @@ public partial class TapoDevice : IDisposable {
   /// A <see cref="IServiceProvider"/>.
   /// </param>
   protected TapoDevice(
-    string hostName,
+    string host,
     string email,
     string password,
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
       credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -62,8 +62,8 @@ public partial class TapoDevice : IDisposable {
   {
   }
 
-  /// <param name="hostName">
-  /// A <see cref="string"/> that holds the hostname representing the device end point.
+  /// <param name="host">
+  /// A <see cref="string"/> that holds the host name or IP address string, representing the device endpoint.
   /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
@@ -71,11 +71,11 @@ public partial class TapoDevice : IDisposable {
   /// </param>
   /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/summary"/>
   protected TapoDevice(
-    string hostName,
+    string host,
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(hostName),
+      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
       credentialProvider: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider

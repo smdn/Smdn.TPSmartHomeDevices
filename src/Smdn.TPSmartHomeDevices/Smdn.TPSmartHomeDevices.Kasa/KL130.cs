@@ -28,15 +28,15 @@ public class KL130 : KasaDevice {
   );
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by hostname.
+  /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by host name.
   /// </summary>
   /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public KL130(
-    string hostName,
+    string host,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      hostName: hostName,
+      host: host,
       serviceProvider: serviceProvider
     )
   {

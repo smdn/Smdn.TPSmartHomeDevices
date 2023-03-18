@@ -119,7 +119,7 @@ public class TapoDeviceTests {
   public async Task Create_WithHostName()
   {
     using var device = TapoDevice.Create(
-      hostName: "localhost",
+      host: "localhost",
       "user@mail.test",
       "password"
     );

@@ -13,13 +13,13 @@ internal class ConcreteKasaDeviceCommonTests {
   internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
   {
     /*
-     * (string hostName, IServiceProvider? serviceProvider)
+     * (string host, IServiceProvider? serviceProvider)
      */
     yield return new object[] {
       new Type[] { typeof(string), typeof(IServiceProvider) },
       new object?[] { null, null },
       typeof(ArgumentNullException),
-      "hostName"
+      "host"
     };
 
     /*

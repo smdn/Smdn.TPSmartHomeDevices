@@ -8,8 +8,8 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public static class TapoDeviceEndPointProvider {
-  public static IDeviceEndPointProvider Create(string hostName)
-    => DeviceEndPointProvider.Create(hostName, TapoClient.DefaultPort);
+  public static IDeviceEndPointProvider Create(string host)
+    => DeviceEndPointProvider.Create(host, TapoClient.DefaultPort);
 
   public static IDeviceEndPointProvider Create(IPAddress ipAddress)
     => DeviceEndPointProvider.Create(ipAddress, TapoClient.DefaultPort);
