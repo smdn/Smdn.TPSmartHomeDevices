@@ -130,11 +130,16 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       listener?.Stop();
       listener = null;
 
-      if (taskProcessListener is not null) {
-        await taskProcessListener.ConfigureAwait(false);
-        taskProcessListener.Dispose();
-        taskProcessListener = null;
+      try {
+        if (taskProcessListener is not null)
+          await taskProcessListener.ConfigureAwait(false);
       }
+      catch (OperationCanceledException) {
+        // expected
+      }
+
+      taskProcessListener?.Dispose();
+      taskProcessListener = null;
     }
     finally {
       Dispose();
@@ -212,7 +217,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         if (context is not null)
           await ProcessRequestAsync(context).ConfigureAwait(false);
       }
-      catch (HttpListenerException) when (IsDisposed) {
+      catch (HttpListenerException) {
         return; // expected exception (listener disposed)
       }
       catch (ObjectDisposedException) {

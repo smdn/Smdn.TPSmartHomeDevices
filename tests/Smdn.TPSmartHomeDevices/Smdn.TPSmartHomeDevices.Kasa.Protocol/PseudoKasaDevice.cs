@@ -41,20 +41,19 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
       listenerCancellationTokenSource?.Dispose();
       listenerCancellationTokenSource = null;
 
+      try {
+        if (taskProcessListener is not null)
+          await taskProcessListener.ConfigureAwait(false);
+      }
+      catch (OperationCanceledException) {
+        // expected
+      }
+      taskProcessListener?.Dispose();
+      taskProcessListener = null;
+
       listener?.Close();
       listener?.Dispose();
       listener = null;
-
-      if (taskProcessListener is not null) {
-        try {
-          await taskProcessListener.ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) {
-          // expected
-        }
-        taskProcessListener.Dispose();
-        taskProcessListener = null;
-      }
     }
     finally {
       Dispose();
@@ -67,11 +66,18 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     listenerCancellationTokenSource?.Dispose();
     listenerCancellationTokenSource = null;
 
-    listener?.Dispose();
-    listener = null;
-
+    try {
+      if (taskProcessListener is not null)
+        taskProcessListener.Wait();
+    }
+    catch (OperationCanceledException) {
+      // expected
+    }
     taskProcessListener?.Dispose();
     taskProcessListener = null;
+
+    listener?.Dispose();
+    listener = null;
   }
 
   public IDeviceEndPointProvider GetEndPointProvider()
