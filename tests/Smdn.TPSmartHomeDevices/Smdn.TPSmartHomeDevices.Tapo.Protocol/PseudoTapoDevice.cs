@@ -186,13 +186,22 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
         try {
           var endPoint = new IPEndPoint(
+#if false // IPv6
             Socket.OSSupportsIPv6
               ? IPAddress.IPv6Loopback
               : IPAddress.Loopback,
+#else
+            IPAddress.Loopback,
+#endif
             port
           );
 
+#if false // IPv6
+          // HttpListener on non-Windows platform does not support Socket.DualMode(?)
+          l.Prefixes.Add($"http://+:{port}/");
+#else
           l.Prefixes.Add(CreateEndPointHttpUrl(endPoint));
+#endif
           l.Start();
 
           EndPoint = endPoint;
