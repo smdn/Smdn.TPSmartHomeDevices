@@ -57,6 +57,14 @@ partial class TapoClient {
           innerException: ex
         );
       }
+      catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
+        logger?.LogCritical("Failed to initiate authorized session due to timeout. ({ExceptionMessage})", ex.Message);
+        throw new TapoAuthenticationException(
+          message: $"Failed to initiate authorized session with the device at '{httpClient.BaseAddress}' due to timeout. ({ex.Message})",
+          endPoint: httpClient.BaseAddress,
+          innerException: exTimeout
+        );
+      }
 
       if (string.IsNullOrEmpty(token)) {
         logger?.LogError("Access token has not been issued.");
@@ -131,6 +139,14 @@ partial class TapoClient {
         message: $"Failed to handshake with the device at '{httpClient.BaseAddress}' with error code {(int)ex.ErrorCode}.",
         endPoint: httpClient.BaseAddress,
         innerException: ex
+      );
+    }
+    catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
+      logger?.LogCritical("Failed to handshake due to timeout. ({ExceptionMessage})", ex.Message);
+      throw new TapoAuthenticationException(
+        message: $"Failed to handshake with the device at '{httpClient.BaseAddress}' due to timeout. ({ex.Message})",
+        endPoint: httpClient.BaseAddress,
+        innerException: exTimeout
       );
     }
 

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -212,6 +213,49 @@ partial class TapoClientTests {
   }
 
   [Test]
+  public async Task AuthenticateAsync_Handshake_Timeout()
+  {
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => token,
+      FuncGenerateHandshakeResponse = static (_, _) => {
+        System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500)); // perform latency
+
+        return new HandshakeResponse() {
+          ErrorCode = (ErrorCode)9999,
+          Result = new HandshakeResponse.ResponseResult(
+            Key: null
+          )
+        };
+      },
+    };
+
+    var services = new ServiceCollection();
+
+    services.AddTapoHttpClient(
+      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(1)
+    );
+
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint,
+      credentialProvider: defaultCredentialProvider,
+      httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+    );
+
+    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+      async () => await client.AuthenticateAsync()
+    );
+
+    Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+
+    Assert.IsNull(client.Session);
+    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  [Test]
   public async Task AuthenticateAsync_LoginDevice_ErrorResponse()
   {
     const ErrorCode loginDeviceErrorCode = (ErrorCode)(-9999);
@@ -261,6 +305,49 @@ partial class TapoClientTests {
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
       async () => await client.AuthenticateAsync()
     );
+
+    Assert.IsNull(client.Session);
+    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  [Test]
+  public async Task AuthenticateAsync_LoginDevice_Timeout()
+  {
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => token,
+      FuncGenerateLoginDeviceResponse = static _ => {
+        System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500)); // perform latency
+
+        return new LoginDeviceResponse() {
+          ErrorCode = ErrorCode.Success,
+          Result = new LoginDeviceResponse.ResponseResult() {
+            Token = token,
+          }
+        };
+      },
+    };
+
+    var services = new ServiceCollection();
+
+    services.AddTapoHttpClient(
+      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(1)
+    );
+
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint,
+      credentialProvider: defaultCredentialProvider,
+      httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+    );
+
+    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+      async () => await client.AuthenticateAsync()
+    );
+
+    Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
