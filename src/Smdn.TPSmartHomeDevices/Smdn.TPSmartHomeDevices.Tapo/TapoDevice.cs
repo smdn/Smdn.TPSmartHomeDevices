@@ -287,9 +287,17 @@ public partial class TapoDevice : IDisposable {
 
     cancellationToken.ThrowIfCancellationRequested();
 
-    await client.AuthenticateAsync(
-      cancellationToken: cancellationToken
-    ).ConfigureAwait(false);
+    try {
+      await client.AuthenticateAsync(
+        cancellationToken: cancellationToken
+      ).ConfigureAwait(false);
+    }
+    catch {
+      client.Dispose();
+      client = null;
+
+      throw;
+    }
   }
 
   protected ValueTask SendRequestAsync<TRequest, TResponse>(
