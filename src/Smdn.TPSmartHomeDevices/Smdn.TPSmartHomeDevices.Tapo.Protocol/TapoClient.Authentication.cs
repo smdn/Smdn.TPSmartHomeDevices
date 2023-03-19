@@ -14,7 +14,7 @@ partial class TapoClient {
 #pragma warning restore IDE0040
   private const int KeyExchangeAlgorithmKeySizeInBytes = 128;
 
-  private async Task AuthenticateAsyncCore(
+  private async ValueTask AuthenticateAsyncCore(
     CancellationToken cancellationToken
   )
   {
@@ -82,7 +82,7 @@ partial class TapoClient {
     }
   }
 
-  private async Task<TapoSession> HandshakeAsync(
+  private async ValueTask<TapoSession> HandshakeAsync(
     CancellationToken cancellationToken
   )
   {

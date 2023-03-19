@@ -309,7 +309,7 @@ public class TapoDeviceTests {
     public new ValueTask EnsureSessionEstablishedAsync(CancellationToken cancellationToken = default)
       => base.EnsureSessionEstablishedAsync(cancellationToken: cancellationToken);
 
-    public new Task<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
+    public new ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
       TRequest request,
       Func<TResponse, TResult> composeResult,
       CancellationToken cancellationToken = default

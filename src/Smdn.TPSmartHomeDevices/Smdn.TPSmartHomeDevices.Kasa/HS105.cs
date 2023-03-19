@@ -94,7 +94,7 @@ public class HS105 : KasaDevice {
     }
   }
 
-  public Task TurnOnAsync(CancellationToken cancellationToken = default)
+  public ValueTask TurnOnAsync(CancellationToken cancellationToken = default)
     => SendRequestAsync(
       module: ModuleTextSystem,
       method: MethodTextSetRelayState,
@@ -102,7 +102,7 @@ public class HS105 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
-  public Task TurnOffAsync(CancellationToken cancellationToken = default)
+  public ValueTask TurnOffAsync(CancellationToken cancellationToken = default)
     => SendRequestAsync(
       module: ModuleTextSystem,
       method: MethodTextSetRelayState,
@@ -116,7 +116,7 @@ public class HS105 : KasaDevice {
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
   /// </param>
-  public Task SetOnOffStateAsync(
+  public ValueTask SetOnOffStateAsync(
     bool newOnOffState,
     CancellationToken cancellationToken = default
   )
@@ -133,7 +133,7 @@ public class HS105 : KasaDevice {
     public bool RelayState { get; init; }
   }
 
-  public Task<bool> GetOnOffStateAsync(
+  public ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(

@@ -161,7 +161,7 @@ public class L530 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%].
   /// </param>
-  public Task SetBrightnessAsync(
+  public ValueTask SetBrightnessAsync(
     int brightness,
     CancellationToken cancellationToken = default
   )
@@ -178,7 +178,7 @@ public class L530 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorTemperatureAsync(
+  public ValueTask SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness = null,
     CancellationToken cancellationToken = default
@@ -200,7 +200,7 @@ public class L530 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorAsync(
+  public ValueTask SetColorAsync(
     int hue,
     int saturation,
     int? brightness = null,
@@ -221,7 +221,7 @@ public class L530 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorHueAsync(
+  public ValueTask SetColorHueAsync(
     int hue,
     int? brightness = null,
     CancellationToken cancellationToken = default
@@ -241,7 +241,7 @@ public class L530 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorSaturationAsync(
+  public ValueTask SetColorSaturationAsync(
     int saturation,
     int? brightness = null,
     CancellationToken cancellationToken = default

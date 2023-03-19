@@ -117,7 +117,7 @@ public sealed partial class KasaClient : IDisposable {
       throw new ObjectDisposedException(GetType().FullName);
   }
 
-  private async Task<Socket> ConnectAsync(
+  private async ValueTask<Socket> ConnectAsync(
     CancellationToken cancellationToken
   )
   {
@@ -146,7 +146,7 @@ public sealed partial class KasaClient : IDisposable {
     }
   }
 
-  public Task<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
+  public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameter,
@@ -170,7 +170,7 @@ public sealed partial class KasaClient : IDisposable {
     );
   }
 
-  private async Task<TMethodResult> SendAsyncCore<TMethodParameter, TMethodResult>(
+  private async ValueTask<TMethodResult> SendAsyncCore<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameter,

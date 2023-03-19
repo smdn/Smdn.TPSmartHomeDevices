@@ -292,7 +292,29 @@ public partial class TapoDevice : IDisposable {
     ).ConfigureAwait(false);
   }
 
-  protected Task<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
+  protected ValueTask SendRequestAsync<TRequest, TResponse>(
+    TRequest request,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+  {
+    if (request is null)
+      throw new ArgumentNullException(nameof(request));
+
+    ThrowIfDisposed();
+
+    return SendRequestAsyncCore(request, cancellationToken);
+
+    async ValueTask SendRequestAsyncCore(TRequest req, CancellationToken ct)
+      => await SendRequestAsync<TRequest, TResponse, None /* as an alternative to System.Void */>(
+        request: req,
+        composeResult: static _ => default,
+        cancellationToken: ct
+      ).ConfigureAwait(false);
+  }
+
+  protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
     TRequest request,
     Func<TResponse, TResult> composeResult,
     CancellationToken cancellationToken = default
@@ -314,7 +336,7 @@ public partial class TapoDevice : IDisposable {
     );
   }
 
-  private async Task<TResult> SendRequestAsyncCore<TRequest, TResponse, TResult>(
+  private async ValueTask<TResult> SendRequestAsyncCore<TRequest, TResponse, TResult>(
     TRequest request,
     Func<TResponse, TResult> composeResult,
     CancellationToken cancellationToken = default
@@ -388,7 +410,7 @@ public partial class TapoDevice : IDisposable {
 #endif
   }
 
-  public Task<TapoDeviceInfo> GetDeviceInfoAsync(
+  public ValueTask<TapoDeviceInfo> GetDeviceInfoAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse, TapoDeviceInfo>(
@@ -397,16 +419,15 @@ public partial class TapoDevice : IDisposable {
       cancellationToken: cancellationToken
     );
 
-  public Task SetDeviceInfoAsync<TParameters>(
+  public ValueTask SetDeviceInfoAsync<TParameters>(
     TParameters parameters,
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<SetDeviceInfoRequest<TParameters>, SetDeviceInfoResponse, None>(
+    => SendRequestAsync<SetDeviceInfoRequest<TParameters>, SetDeviceInfoResponse>(
       request: new(
         terminalUuid: TerminalUuidString,
         parameters: parameters
       ),
-      composeResult: static resp => default,
       cancellationToken: cancellationToken
     );
 }

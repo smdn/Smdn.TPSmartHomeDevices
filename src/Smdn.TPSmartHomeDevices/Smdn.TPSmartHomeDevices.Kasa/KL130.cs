@@ -109,7 +109,7 @@ public class KL130 : KasaDevice {
     public int IgnoreDefault => 0; // turn on/off with the default configuration
   }
 
-  public Task TurnOnAsync(
+  public ValueTask TurnOnAsync(
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
   )
@@ -123,7 +123,7 @@ public class KL130 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
-  public Task TurnOffAsync(
+  public ValueTask TurnOffAsync(
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
   )
@@ -143,7 +143,7 @@ public class KL130 : KasaDevice {
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
   /// </param>
-  public Task SetOnOffStateAsync(
+  public ValueTask SetOnOffStateAsync(
     bool newOnOffState,
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
@@ -163,7 +163,7 @@ public class KL130 : KasaDevice {
     public KL130LightState LightState { get; init; }
   }
 
-  public Task<KL130LightState> GetLightStateAsync(
+  public ValueTask<KL130LightState> GetLightStateAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -173,7 +173,7 @@ public class KL130 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
-  public Task<bool> GetOnOffStateAsync(
+  public ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -205,7 +205,7 @@ public class KL130 : KasaDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorTemperatureAsync(
+  public ValueTask SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness = null,
     TimeSpan? transitionPeriod = null,
@@ -252,7 +252,7 @@ public class KL130 : KasaDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
-  public Task SetColorAsync(
+  public ValueTask SetColorAsync(
     int hue,
     int saturation,
     int? brightness = null,

@@ -187,7 +187,7 @@ public class KasaDeviceTests {
     {
     }
 
-    public Task SendRequestAsync(
+    public ValueTask SendRequestAsync(
       JsonEncodedText module,
       JsonEncodedText method,
       CancellationToken cancellationToken = default
@@ -199,7 +199,7 @@ public class KasaDeviceTests {
         cancellationToken: cancellationToken
       );
 
-    public new Task<TMethodResult> SendRequestAsync<TMethodResult>(
+    public new ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(
       JsonEncodedText module,
       JsonEncodedText method,
       Func<JsonElement, TMethodResult> composeResult,

@@ -178,7 +178,7 @@ public partial class KasaDevice : IDisposable {
       );
   }
 
-  protected Task SendRequestAsync<TMethodParameter>(
+  protected ValueTask SendRequestAsync<TMethodParameter>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameters,
@@ -191,19 +191,21 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ? Task.FromCanceled(cancellationToken)
+      ?
+#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
+        ValueTask.FromCanceled(cancellationToken)
+#else
+        ValueTaskShim.FromCanceled(cancellationToken)
+#endif
       : SendRequestAsyncCore(
         module: module,
         method: method,
         parameters: parameters,
-        composeResult: NoneConverter,
         cancellationToken: cancellationToken
       );
-
-    static None NoneConverter(JsonElement result) => default;
   }
 
-  protected Task<TMethodResult> SendRequestAsync<TMethodResult>(
+  protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     Func<JsonElement, TMethodResult> composeResult,
@@ -216,7 +218,12 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ? Task.FromCanceled<TMethodResult>(cancellationToken)
+      ?
+#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
+        ValueTask.FromCanceled<TMethodResult>(cancellationToken)
+#else
+        ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
+#endif
       : SendRequestAsyncCore<NullParameter, TMethodResult>(
         module: module,
         method: method,
@@ -226,7 +233,7 @@ public partial class KasaDevice : IDisposable {
       );
   }
 
-  protected Task<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(
+  protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameters,
@@ -242,7 +249,12 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ? Task.FromCanceled<TMethodResult>(cancellationToken)
+      ?
+#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
+        ValueTask.FromCanceled<TMethodResult>(cancellationToken)
+#else
+        ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
+#endif
       : SendRequestAsyncCore(
         module: module,
         method: method,
@@ -252,7 +264,21 @@ public partial class KasaDevice : IDisposable {
       );
   }
 
-  private async Task<TMethodResult> SendRequestAsyncCore<TMethodParameter, TMethodResult>(
+  private async ValueTask SendRequestAsyncCore<TMethodParameter>(
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter parameters,
+    CancellationToken cancellationToken
+  )
+    => await SendRequestAsyncCore<TMethodParameter, None /* as an alternative to System.Void */>(
+      module: module,
+      method: method,
+      parameters: parameters,
+      composeResult: static _ => default,
+      cancellationToken: cancellationToken
+    ).ConfigureAwait(false);
+
+  private async ValueTask<TMethodResult> SendRequestAsyncCore<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameters,

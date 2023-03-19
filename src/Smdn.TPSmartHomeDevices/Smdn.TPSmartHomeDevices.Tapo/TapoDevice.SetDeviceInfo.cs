@@ -21,13 +21,13 @@ partial class TapoDevice {
   }
 #pragma warning restore CA1822
 
-  public Task TurnOnAsync(CancellationToken cancellationToken = default)
+  public ValueTask TurnOnAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
       default(TurnOnParameter),
       cancellationToken
     );
 
-  public Task TurnOffAsync(CancellationToken cancellationToken = default)
+  public ValueTask TurnOffAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
       default(TurnOffParameter),
       cancellationToken
@@ -39,7 +39,7 @@ partial class TapoDevice {
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
   /// </param>
-  public Task SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default)
+  public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default)
     => newOnOffState
       ? TurnOnAsync(cancellationToken)
       : TurnOffAsync(cancellationToken);

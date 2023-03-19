@@ -28,7 +28,7 @@ partial class TapoClient {
 
   private static readonly MediaTypeHeaderValue mediaTypeJson = new(mediaType: "application/json");
 
-  private async Task<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
+  private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken
   )
@@ -62,7 +62,7 @@ partial class TapoClient {
     return response;
   }
 
-  private async Task<(
+  private async ValueTask<(
     TResponse? Response,
     THttpResult? HttpResult
   )>

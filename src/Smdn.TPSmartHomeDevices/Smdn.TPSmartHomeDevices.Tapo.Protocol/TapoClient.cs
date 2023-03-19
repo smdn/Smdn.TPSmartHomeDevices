@@ -121,7 +121,7 @@ public sealed partial class TapoClient : IDisposable {
       throw new ObjectDisposedException(GetType().FullName);
   }
 
-  public Task AuthenticateAsync(
+  public ValueTask AuthenticateAsync(
     CancellationToken cancellationToken = default
   )
   {
@@ -139,7 +139,7 @@ public sealed partial class TapoClient : IDisposable {
     session = null;
   }
 
-  public Task<TResponse> SendRequestAsync<TRequest, TResponse>(
+  public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )
     where TRequest : ITapoPassThroughRequest, new()
@@ -149,7 +149,7 @@ public sealed partial class TapoClient : IDisposable {
       cancellationToken: cancellationToken
     );
 
-  public Task<TResponse> SendRequestAsync<TRequest, TResponse>(
+  public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken = default
   )
