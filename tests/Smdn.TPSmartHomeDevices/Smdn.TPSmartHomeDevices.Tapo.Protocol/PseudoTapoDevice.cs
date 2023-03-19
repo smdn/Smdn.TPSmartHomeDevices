@@ -238,8 +238,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
         var context = await listener!.GetContextAsync().ConfigureAwait(false);
 
-        if (context is not null)
-          await ProcessRequestAsync(context).ConfigureAwait(false);
+        if (context is not null) {
+          try {
+            await ProcessRequestAsync(context).ConfigureAwait(false);
+          }
+          catch (ClientDisconnectedException) {
+            // swallow
+          }
+        }
       }
       catch (HttpListenerException) {
         return; // expected exception (listener disposed)
@@ -247,6 +253,13 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       catch (ObjectDisposedException) {
         return; // expected exception (listener stopped)
       }
+    }
+  }
+
+  private class ClientDisconnectedException : InvalidOperationException {
+    public ClientDisconnectedException()
+      : base("The client may have disconnected unexpectedly.")
+    {
     }
   }
 
@@ -268,9 +281,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     const string contentType = "text/plain";
 
-    response.StatusCode = (int)statusCode;
-    response.ContentEncoding = utf8nobom;
-    response.ContentType = contentType;
+    try {
+      response.StatusCode = (int)statusCode;
+      response.ContentEncoding = utf8nobom;
+      response.ContentType = contentType;
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
 
     using var buffer = new MemoryStream();
     using var writer = new StreamWriter(buffer, response.ContentEncoding, 1024, leaveOpen: true);
@@ -324,7 +342,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       await ProcessPostJsonRequestAsync(context).ConfigureAwait(false);
     }
     finally {
-      context?.Response?.OutputStream?.Close();
+      try {
+        context?.Response?.OutputStream?.Close();
+      }
+      catch (ObjectDisposedException) {
+        // swallow
+      }
     }
   }
 
@@ -422,6 +445,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       await WriteBadRequestPlainTextContentAsync(context.Response, $"method not supported or unknown: '{method}'").ConfigureAwait(false);
       return;
     }
+    catch (ClientDisconnectedException) {
+      throw;
+    }
     catch (Exception ex) {
       Console.Error.WriteLine(ex);
     }
@@ -435,9 +461,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     const string contentType = "application/json";
 
-    response.StatusCode = (int)statusCode;
-    response.ContentEncoding = utf8nobom;
-    response.ContentType = contentType;
+    try {
+      response.StatusCode = (int)statusCode;
+      response.ContentEncoding = utf8nobom;
+      response.ContentType = contentType;
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
 
     using var buffer = new MemoryStream();
     using var writer = new StreamWriter(buffer, response.ContentEncoding, 1024, leaveOpen: true);
@@ -556,9 +587,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     const string contentType = "application/json";
 
-    response.StatusCode = (int)HttpStatusCode.OK;
-    response.ContentEncoding = utf8nobom;
-    response.ContentType = contentType;
+    try {
+      response.StatusCode = (int)HttpStatusCode.OK;
+      response.ContentEncoding = utf8nobom;
+      response.ContentType = contentType;
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
 
     using var buffer = new MemoryStream();
     var options = new JsonSerializerOptions();
