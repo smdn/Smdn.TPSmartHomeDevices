@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+using System;
 using System.Net;
 using System.Net.Http;
 
@@ -22,11 +23,31 @@ internal class TapoHttpClientFactory : IHttpClientFactory {
 
   private static HttpMessageHandler DefaultHandler { get; } = CreateHandler();
 
-  public static IHttpClientFactory Instance { get; } = new TapoHttpClientFactory();
+  public static IHttpClientFactory Default { get; } = new TapoHttpClientFactory(
+    configureClient: null
+  );
+
+  /*
+   * instance members
+   */
+  private readonly Action<HttpClient>? configureClient;
+
+  internal TapoHttpClientFactory(
+    Action<HttpClient>? configureClient
+  )
+  {
+    this.configureClient = configureClient;
+  }
 
   public HttpClient CreateClient(string name)
-    => new(
+  {
+    var client = new HttpClient(
       handler: DefaultHandler,
       disposeHandler: false
     );
+
+    configureClient?.Invoke(client);
+
+    return client;
+  }
 }

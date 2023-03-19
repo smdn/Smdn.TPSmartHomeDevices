@@ -90,7 +90,7 @@ public sealed partial class TapoClient : IDisposable {
 
     logger?.LogTrace("Device end point: {DeviceEndPointUri}", endPointUri);
 
-    httpClientFactory ??= TapoHttpClientFactory.Instance;
+    httpClientFactory ??= TapoHttpClientFactory.Default;
 
     logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", httpClientFactory!.GetType().FullName);
 
