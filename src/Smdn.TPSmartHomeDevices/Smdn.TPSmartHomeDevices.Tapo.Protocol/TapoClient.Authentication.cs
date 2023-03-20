@@ -24,13 +24,13 @@ partial class TapoClient {
     var prevSession = session;
 
     try {
-      logger?.LogDebug("Handshake starting: {BaseAddress}", httpClient.BaseAddress);
+      logger?.LogDebug("Handshake starting: {EndPointUri}", endPointUri);
 
       session = await HandshakeAsync(cancellationToken).ConfigureAwait(false);
 
       logger?.LogInformation(
-        "Session initiated: {BaseAddress} {SessionIDPrefix}{SessionID}, expires on {ExpiresOn}",
-        httpClient.BaseAddress,
+        "Session initiated: {EndPointUri} {SessionIDPrefix}{SessionID}, expires on {ExpiresOn}",
+        endPointUri,
         TapoSessionCookieUtils.HttpCookiePrefixForSessionId,
         session.SessionId,
         session.ExpiresOn.ToString("o", provider: null)
@@ -43,8 +43,8 @@ partial class TapoClient {
       try {
         var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
           request: new(
-            password: credential.GetBase64EncodedPassword(httpClient.BaseAddress.Host),
-            userName: credential.GetBase64EncodedUserNameSHA1Digest(httpClient.BaseAddress.Host)
+            password: credential.GetBase64EncodedPassword(endPointUri.Host),
+            userName: credential.GetBase64EncodedUserNameSHA1Digest(endPointUri.Host)
           ),
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
@@ -53,16 +53,16 @@ partial class TapoClient {
       }
       catch (TapoErrorResponseException ex) {
         throw new TapoAuthenticationException(
-          message: $"Denied to initiate authorized session with the device at '{httpClient.BaseAddress}'. (error code: {(int)ex.ErrorCode})",
-          endPoint: httpClient.BaseAddress,
+          message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {(int)ex.ErrorCode})",
+          endPoint: endPointUri,
           innerException: ex
         );
       }
       catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
         logger?.LogCritical("Failed to initiate authorized session due to timeout. ({ExceptionMessage})", ex.Message);
         throw new TapoAuthenticationException(
-          message: $"Failed to initiate authorized session with the device at '{httpClient.BaseAddress}' due to timeout. ({ex.Message})",
-          endPoint: httpClient.BaseAddress,
+          message: $"Failed to initiate authorized session with the device at '{endPointUri}' due to timeout. ({ex.Message})",
+          endPoint: endPointUri,
           innerException: exTimeout
         );
       }
@@ -70,8 +70,8 @@ partial class TapoClient {
       if (string.IsNullOrEmpty(token)) {
         logger?.LogError("Access token has not been issued.");
         throw new TapoAuthenticationException(
-          message: $"An access token was not issued from the device at '{httpClient.BaseAddress}'.",
-          endPoint: httpClient.BaseAddress
+          message: $"An access token was not issued from the device at '{endPointUri}'.",
+          endPoint: endPointUri
         );
       }
 
@@ -127,8 +127,8 @@ partial class TapoClient {
       if (response.Result.Key is null) {
         logger?.LogCritical("Could not exchange the key during handshaking.");
         throw new TapoAuthenticationException(
-          message: $"Could not exchange the key during handshaking with the device at '{httpClient.BaseAddress}'.",
-          endPoint: httpClient.BaseAddress
+          message: $"Could not exchange the key during handshaking with the device at '{endPointUri}'.",
+          endPoint: endPointUri
         );
       }
 
@@ -137,16 +137,16 @@ partial class TapoClient {
     catch (TapoErrorResponseException ex) {
       logger?.LogCritical("Failed to handshake with error code {ErrorCode}.", (int)ex.ErrorCode);
       throw new TapoAuthenticationException(
-        message: $"Failed to handshake with the device at '{httpClient.BaseAddress}' with error code {(int)ex.ErrorCode}.",
-        endPoint: httpClient.BaseAddress,
+        message: $"Failed to handshake with the device at '{endPointUri}' with error code {(int)ex.ErrorCode}.",
+        endPoint: endPointUri,
         innerException: ex
       );
     }
     catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
       logger?.LogCritical("Failed to handshake due to timeout. ({ExceptionMessage})", ex.Message);
       throw new TapoAuthenticationException(
-        message: $"Failed to handshake with the device at '{httpClient.BaseAddress}' due to timeout. ({ex.Message})",
-        endPoint: httpClient.BaseAddress,
+        message: $"Failed to handshake with the device at '{endPointUri}' due to timeout. ({ex.Message})",
+        endPoint: endPointUri,
         innerException: exTimeout
       );
     }
@@ -160,8 +160,8 @@ partial class TapoClient {
     if (encryptedKey.Length != KeyExchangeAlgorithmKeySizeInBytes) {
       logger?.LogCritical("Exchanged unexpecting length of key");
       throw new TapoAuthenticationException(
-        message: $"Exchanged unexpecting length of key from the device at '{httpClient.BaseAddress}'.",
-        endPoint: httpClient.BaseAddress
+        message: $"Exchanged unexpecting length of key from the device at '{endPointUri}'.",
+        endPoint: endPointUri
       );
     }
 

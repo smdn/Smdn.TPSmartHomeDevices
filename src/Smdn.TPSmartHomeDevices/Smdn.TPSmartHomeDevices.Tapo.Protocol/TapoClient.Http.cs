@@ -117,6 +117,12 @@ partial class TapoClient {
       await requestContent.ReadAsStringAsync().ConfigureAwait(false)
     );
 
+    using var httpClient = httpClientFactory.CreateClient(
+      name: string.Concat(nameof(TapoClient), " (", endPointUri, ")")
+    );
+
+    httpClient.BaseAddress = endPointUri;
+
     using var httpResponse = await httpClient.PostAsync(
       requestUri: requestUri,
       content: requestContent,

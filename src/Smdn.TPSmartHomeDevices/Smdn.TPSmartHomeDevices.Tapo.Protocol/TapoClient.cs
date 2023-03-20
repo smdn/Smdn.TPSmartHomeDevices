@@ -39,9 +39,10 @@ public sealed partial class TapoClient : IDisposable {
     return uriBuilder.Uri;
   }
 
-  private bool IsDisposed => httpClient is null;
+  private bool IsDisposed => httpClientFactory is null;
 
-  private HttpClient? httpClient; // if null, it indicates a 'disposed' state.
+  private IHttpClientFactory? httpClientFactory; // if null, it indicates a 'disposed' state.
+  private readonly Uri endPointUri;
   private readonly EndPoint endPoint;
   private readonly ILogger? logger;
   private TapoSession? session;
@@ -56,7 +57,7 @@ public sealed partial class TapoClient : IDisposable {
   public Uri EndPointUri {
     get {
       ThrowIfDisposed();
-      return httpClient.BaseAddress;
+      return endPointUri;
     }
   }
 
@@ -83,16 +84,13 @@ public sealed partial class TapoClient : IDisposable {
     this.endPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
     this.logger = logger;
 
-    var endPointUri = GetEndPointUri(endPoint);
+    endPointUri = GetEndPointUri(endPoint);
 
     logger?.LogTrace("Device end point: {DeviceEndPointUri}", endPointUri);
 
-    httpClientFactory ??= TapoHttpClientFactory.Default;
+    this.httpClientFactory = httpClientFactory ?? TapoHttpClientFactory.Default;
 
-    logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", httpClientFactory!.GetType().FullName);
-
-    httpClient = httpClientFactory.CreateClient($"{nameof(TapoClient)} ({endPointUri})");
-    httpClient.BaseAddress = endPointUri;
+    logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", this.httpClientFactory.GetType().FullName);
   }
 
   private void Dispose(bool disposing)
@@ -103,7 +101,7 @@ public sealed partial class TapoClient : IDisposable {
     session?.Dispose();
     session = null;
 
-    httpClient = null;
+    httpClientFactory = null;
   }
 
   public void Dispose()
