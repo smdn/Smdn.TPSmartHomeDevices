@@ -19,7 +19,7 @@ public partial class TapoDevice : IDisposable {
   private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
   protected bool IsDisposed => deviceEndPointProvider is null;
 
-  private readonly ITapoCredentialProvider? credentialProvider;
+  private readonly ITapoCredentialProvider? credential;
   private readonly TapoClientExceptionHandler exceptionHandler;
   private readonly IServiceProvider? serviceProvider;
   public string TerminalUuidString { get; } // must be in the format of 00000000-0000-0000-0000-000000000000
@@ -55,7 +55,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
-      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -76,7 +76,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
-      credentialProvider: null,
+      credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -98,7 +98,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
-      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -116,7 +116,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
-      credentialProvider: null,
+      credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -143,7 +143,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
-      credentialProvider: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -163,7 +163,7 @@ public partial class TapoDevice : IDisposable {
   )
     : this(
       deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
-      credentialProvider: null,
+      credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -176,7 +176,7 @@ public partial class TapoDevice : IDisposable {
   /// <param name="deviceEndPointProvider">
   /// A <see cref="IDeviceEndPointProvider"/> that provides the device end point.
   /// </param>
-  /// <param name="credentialProvider">
+  /// <param name="credential">
   /// A <see cref="ITapoCredentialProvider"/> that provides the credentials required for authentication.
   /// </param>
   /// <param name="exceptionHandler">
@@ -187,17 +187,17 @@ public partial class TapoDevice : IDisposable {
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   /// <exception cref="ArgumentNullException">
-  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>, or both <paramref name="credentialProvider"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
+  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>, or both <paramref name="credential"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
   /// </exception>
   protected TapoDevice(
     IDeviceEndPointProvider deviceEndPointProvider,
-    ITapoCredentialProvider? credentialProvider = null,
+    ITapoCredentialProvider? credential = null,
     TapoClientExceptionHandler? exceptionHandler = null,
     IServiceProvider? serviceProvider = null
   )
   {
     this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
-    this.credentialProvider = credentialProvider
+    this.credential = credential
       ?? (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider))).GetRequiredService<ITapoCredentialProvider>();
     this.exceptionHandler = exceptionHandler
       ?? serviceProvider?.GetService<TapoClientExceptionHandler>()
@@ -288,7 +288,7 @@ public partial class TapoDevice : IDisposable {
 
     try {
       await client.AuthenticateAsync(
-        credential: credentialProvider,
+        credential: credential,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
     }

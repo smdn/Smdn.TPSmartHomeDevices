@@ -114,16 +114,16 @@ public class P105 : TapoDevice {
   /// </summary>
   /// <inheritdoc
   ///   cref="TapoDevice(IDeviceEndPointProvider, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
-  ///   path="/exception | /param[@name='deviceEndPointProvider' or @name='credentialProvider' or @name='serviceProvider']"
+  ///   path="/exception | /param[@name='deviceEndPointProvider' or @name='credential' or @name='serviceProvider']"
   /// />
   public P105(
     IDeviceEndPointProvider deviceEndPointProvider,
-    ITapoCredentialProvider? credentialProvider = null,
+    ITapoCredentialProvider? credential = null,
     IServiceProvider? serviceProvider = null
   )
     : base(
       deviceEndPointProvider: deviceEndPointProvider,
-      credentialProvider: credentialProvider,
+      credential: credential,
       serviceProvider: serviceProvider
     )
   {

@@ -180,7 +180,7 @@ internal class ConcreteTapoDeviceCommonTests {
     };
 
     /*
-     * IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null
+     * IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null
      */
     parameterTypes = new[] { typeof(IDeviceEndPointProvider), typeof(ITapoCredentialProvider), typeof(IServiceProvider) };
 

@@ -83,16 +83,16 @@ partial class TapoDevice {
 
   /// <inheritdoc
   ///   cref="TapoDevice(IDeviceEndPointProvider, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
-  ///   path="/summary | /exception | /param[@name='deviceEndPointProvider' or @name='credentialProvider' or @name='serviceProvider']"
+  ///   path="/summary | /exception | /param[@name='deviceEndPointProvider' or @name='credential' or @name='serviceProvider']"
   /// />
   public static TapoDevice Create(
     IDeviceEndPointProvider deviceEndPointProvider,
-    ITapoCredentialProvider? credentialProvider = null,
+    ITapoCredentialProvider? credential = null,
     IServiceProvider? serviceProvider = null
   )
     => new(
       deviceEndPointProvider: deviceEndPointProvider,
-      credentialProvider: credentialProvider,
+      credential: credential,
       serviceProvider: serviceProvider
     );
 }

@@ -55,7 +55,7 @@ public class TapoDeviceTests {
       () => {
         using var device = TapoDevice.Create(
           deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
-          credentialProvider: services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>()
+          credential: services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>()
         );
       }
     );
@@ -81,7 +81,7 @@ public class TapoDeviceTests {
       () => {
         using var device = TapoDevice.Create(
           deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
-          credentialProvider: null,
+          credential: null,
           serviceProvider: null
         );
       }
@@ -95,7 +95,7 @@ public class TapoDeviceTests {
       () => {
         using var device = TapoDevice.Create(
           deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
-          credentialProvider: null,
+          credential: null,
           serviceProvider: new ServiceCollection().BuildServiceProvider()
         );
       }
