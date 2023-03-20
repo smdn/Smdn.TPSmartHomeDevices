@@ -370,6 +370,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       try {
         context?.Response?.OutputStream?.Close();
       }
+      catch (InvalidOperationException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+        // swallow
+      }
       catch (ObjectDisposedException) {
         // swallow
       }
