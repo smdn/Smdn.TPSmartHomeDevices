@@ -458,7 +458,7 @@ public class TapoDeviceTests {
 
     Assert.IsInstanceOf<SocketException>(ex!.InnerException);
 
-    Assert.IsNull(device.Session, nameof(device.Session), "session must be disposed");
+    Assert.IsNull(device.Session, nameof(device.Session)); // session must be disposed
   }
 
   private class HandleAsEndPointUnreachableExceptionHandler : TapoClientExceptionHandler {
@@ -653,7 +653,7 @@ public class TapoDeviceTests {
 
     Assert.AreEqual(2, request, nameof(request));
     Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session));
+    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session.Token));
   }
 
   [Test]
@@ -723,7 +723,7 @@ public class TapoDeviceTests {
 
     Assert.AreEqual(2, request, nameof(request));
     Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session));
+    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session.Token));
   }
 
   [Test]
