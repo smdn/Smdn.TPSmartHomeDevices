@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -54,6 +55,20 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
               logger?.LogWarning(errorResponseException, $"Unexpected error ({nameof(errorResponseException.ErrorCode)}: {(int)errorResponseException.ErrorCode})");
               return TapoClientExceptionHandling.RetryAfterReestablishSession;
           }
+        }
+
+        return TapoClientExceptionHandling.Throw;
+
+      case TaskCanceledException taskCanceledException:
+        if (taskCanceledException.InnerException is TimeoutException) {
+          if (attempt < 2 /* retry up to 3 times */) {
+            logger?.LogWarning("Request timed out; {ExceptionMessage}", taskCanceledException.Message);
+            return TapoClientExceptionHandling.Retry;
+          }
+
+          logger?.LogError(taskCanceledException, "Request timed out");
+
+          return TapoClientExceptionHandling.ThrowWrapTapoProtocolException;
         }
 
         return TapoClientExceptionHandling.Throw;

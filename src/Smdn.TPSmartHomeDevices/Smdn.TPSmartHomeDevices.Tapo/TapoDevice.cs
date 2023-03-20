@@ -381,11 +381,24 @@ public partial class TapoDevice : IDisposable {
           case TapoClientExceptionHandling.ThrowWrapTapoProtocolException:
             client.Dispose();
             client = null;
-            throw new TapoProtocolException(
-              message: "Unhandled exception",
-              endPoint: endPointUri,
-              innerException: ex
-            );
+
+            if (
+              ex is TaskCanceledException exTaskCanceled &&
+              exTaskCanceled.InnerException is TimeoutException exInnerTimeout
+            ) {
+              throw new TapoProtocolException(
+                message: $"Request timed out; {ex.Message}",
+                endPoint: endPointUri,
+                innerException: exInnerTimeout
+              );
+            }
+            else {
+              throw new TapoProtocolException(
+                message: "Unhandled exception",
+                endPoint: endPointUri,
+                innerException: ex
+              );
+            }
 
           case TapoClientExceptionHandling.Retry:
             continue;

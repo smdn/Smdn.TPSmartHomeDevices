@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -762,6 +764,129 @@ public class TapoDeviceTests {
     Assert.AreEqual(errorCodeMinus1301, ex.ErrorCode, nameof(ex.ErrorCode));
     StringAssert.Contains("token=token-request1", ex.EndPoint.Query, nameof(ex.EndPoint.Query));
     Assert.IsNull(device.Session, nameof(device.Session));
+  }
+
+  [Test]
+  public async Task SendRequestAsync_Timeout_RetrySuccess()
+  {
+    const int maxRetry = 3;
+
+    var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
+
+    for (var attempt = 0; attempt < maxRetry; attempt++) {
+      var state = Tuple.Create(
+        attempt < maxRetry - 1
+          ? TimeSpan.FromMilliseconds(1000)
+          : TimeSpan.FromMilliseconds(0),
+        $"token-request{attempt}"
+      );
+
+      pseudoDevices.Add(
+        new(state: state) {
+          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
+          FuncGeneratePassThroughResponse = (session, _, _) => {
+            // perform latency
+            System.Threading.Thread.Sleep((session.State as Tuple<TimeSpan, string>).Item1);
+
+            return (
+              ErrorCode.Success,
+              new GetDeviceInfoResponse() {
+                ErrorCode = ErrorCode.Success,
+                Result = new(),
+              }
+            );
+          },
+        }
+      );
+
+      pseudoDevices[attempt].Start();
+    }
+
+    services.AddTapoHttpClient(
+      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(200)
+    );
+
+    using var device = TapoDevice.Create(
+      deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
+        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
+      ),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    try {
+      Assert.IsNull(device.Session, nameof(device.Session));
+
+      Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
+
+      Assert.IsNotNull(device.Session, nameof(device.Session));
+      Assert.AreEqual("token-request2", device.Session.Token, nameof(device.Session.Token));
+    }
+    finally {
+      foreach (var pseudoDevice in pseudoDevices) {
+        await pseudoDevice.DisposeAsync();
+      }
+    }
+  }
+
+  [Test]
+  public async Task SendRequestAsync_Timeout_RetryFailedWithTimeout()
+  {
+    const int maxRetry = 3;
+
+    var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
+
+    for (var attempt = 0; attempt < maxRetry; attempt++) {
+      var state = Tuple.Create(
+        TimeSpan.FromMilliseconds(1000),
+        $"token-request{attempt}"
+      );
+
+      pseudoDevices.Add(
+        new(state: state) {
+          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
+          FuncGeneratePassThroughResponse = (session, _, _) => {
+            // perform latency
+            System.Threading.Thread.Sleep((session.State as Tuple<TimeSpan, string>).Item1);
+
+            return (
+              ErrorCode.Success,
+              new GetDeviceInfoResponse() {
+                ErrorCode = ErrorCode.Success,
+                Result = new(),
+              }
+            );
+          },
+        }
+      );
+
+      pseudoDevices[attempt].Start();
+    }
+
+    services.AddTapoHttpClient(
+      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(200)
+    );
+
+    using var device = TapoDevice.Create(
+      deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
+        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
+      ),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    try {
+      Assert.IsNull(device.Session, nameof(device.Session));
+
+      var ex = Assert.ThrowsAsync<TapoProtocolException>(async () => await device.GetDeviceInfoAsync());
+
+      Assert.IsInstanceOf<TimeoutException>(ex.InnerException, nameof(ex.InnerException));
+
+      Assert.IsNull(device.Session, nameof(device.Session));
+    }
+    finally {
+      foreach (var pseudoDevice in pseudoDevices) {
+        await pseudoDevice.DisposeAsync();
+      }
+    }
   }
 
   [Test]
