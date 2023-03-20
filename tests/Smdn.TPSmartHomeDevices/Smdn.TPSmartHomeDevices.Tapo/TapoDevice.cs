@@ -776,7 +776,7 @@ public class TapoDeviceTests {
     for (var attempt = 0; attempt < maxRetry; attempt++) {
       var state = Tuple.Create(
         attempt < maxRetry - 1
-          ? TimeSpan.FromMilliseconds(1000)
+          ? TimeSpan.FromSeconds(5)
           : TimeSpan.FromMilliseconds(0),
         $"token-request{attempt}"
       );
@@ -837,7 +837,7 @@ public class TapoDeviceTests {
 
     for (var attempt = 0; attempt < maxRetry; attempt++) {
       var state = Tuple.Create(
-        TimeSpan.FromMilliseconds(1000),
+        TimeSpan.FromSeconds(5),
         $"token-request{attempt}"
       );
 

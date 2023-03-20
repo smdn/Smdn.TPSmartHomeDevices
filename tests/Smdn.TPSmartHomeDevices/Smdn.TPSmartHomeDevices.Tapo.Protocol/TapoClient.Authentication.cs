@@ -220,7 +220,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => token,
       FuncGenerateHandshakeResponse = static (_, _) => {
-        System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500)); // perform latency
+        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5)); // perform latency
 
         return new HandshakeResponse() {
           ErrorCode = (ErrorCode)9999,
@@ -318,7 +318,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => token,
       FuncGenerateLoginDeviceResponse = static _ => {
-        System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500)); // perform latency
+        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5)); // perform latency
 
         return new LoginDeviceResponse() {
           ErrorCode = ErrorCode.Success,
