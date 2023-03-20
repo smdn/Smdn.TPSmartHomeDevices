@@ -41,7 +41,6 @@ public sealed partial class TapoClient : IDisposable {
 
   private bool IsDisposed => httpClient is null;
 
-  private readonly ITapoCredentialProvider credentialProvider;
   private HttpClient? httpClient; // if null, it indicates a 'disposed' state.
   private readonly EndPoint endPoint;
   private readonly ILogger? logger;
@@ -77,13 +76,11 @@ public sealed partial class TapoClient : IDisposable {
 
   public TapoClient(
     EndPoint endPoint,
-    ITapoCredentialProvider credentialProvider,
     IHttpClientFactory? httpClientFactory = null,
     ILogger? logger = null
   )
   {
     this.endPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
-    this.credentialProvider = credentialProvider ?? throw new ArgumentNullException(nameof(credentialProvider));
     this.logger = logger;
 
     var endPointUri = GetEndPointUri(endPoint);
@@ -122,12 +119,19 @@ public sealed partial class TapoClient : IDisposable {
   }
 
   public ValueTask AuthenticateAsync(
+    ITapoCredentialProvider credential,
     CancellationToken cancellationToken = default
   )
   {
+    if (credential is null)
+      throw new ArgumentNullException(nameof(credential));
+
     ThrowIfDisposed();
 
-    return AuthenticateAsyncCore(cancellationToken);
+    return AuthenticateAsyncCore(
+      credential,
+      cancellationToken
+    );
   }
 
   public void CloseSession()

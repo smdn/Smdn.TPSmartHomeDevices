@@ -277,7 +277,6 @@ public partial class TapoDevice : IDisposable {
 
     client ??= new TapoClient(
       endPoint: endPoint,
-      credentialProvider: credentialProvider,
       httpClientFactory: serviceProvider?.GetService<IHttpClientFactory>(),
       logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(TapoClient)}({endPoint})") // TODO: logger category name
     );
@@ -289,6 +288,7 @@ public partial class TapoDevice : IDisposable {
 
     try {
       await client.AuthenticateAsync(
+        credential: credentialProvider,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
     }

@@ -15,6 +15,7 @@ partial class TapoClient {
   private const int KeyExchangeAlgorithmKeySizeInBytes = 128;
 
   private async ValueTask AuthenticateAsyncCore(
+    ITapoCredentialProvider credential,
     CancellationToken cancellationToken
   )
   {
@@ -42,8 +43,8 @@ partial class TapoClient {
       try {
         var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
           request: new(
-            password: credentialProvider.GetBase64EncodedPassword(httpClient.BaseAddress.Host),
-            userName: credentialProvider.GetBase64EncodedUserNameSHA1Digest(httpClient.BaseAddress.Host)
+            password: credential.GetBase64EncodedPassword(httpClient.BaseAddress.Host),
+            userName: credential.GetBase64EncodedUserNameSHA1Digest(httpClient.BaseAddress.Host)
           ),
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);

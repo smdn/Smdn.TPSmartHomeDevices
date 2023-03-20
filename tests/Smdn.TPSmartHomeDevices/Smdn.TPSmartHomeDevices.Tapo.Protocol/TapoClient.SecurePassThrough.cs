@@ -25,11 +25,10 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint,
-      credentialProvider: defaultCredentialProvider
+      endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());
+    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
 
     GetDeviceInfoResponse? nullableResponse = null;
 
@@ -49,8 +48,7 @@ partial class TapoClientTests {
   public void SendRequestAsync_SessionNotEstablished()
   {
     using var client = new TapoClient(
-      endPoint: new DnsEndPoint("localhost", 0),
-      credentialProvider: defaultCredentialProvider
+      endPoint: new DnsEndPoint("localhost", 0)
     );
 
     Assert.ThrowsAsync<InvalidOperationException>(
@@ -79,11 +77,10 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint,
-      credentialProvider: defaultCredentialProvider
+      endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());
+    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()
@@ -112,11 +109,10 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint,
-      credentialProvider: defaultCredentialProvider
+      endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync());
+    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()
