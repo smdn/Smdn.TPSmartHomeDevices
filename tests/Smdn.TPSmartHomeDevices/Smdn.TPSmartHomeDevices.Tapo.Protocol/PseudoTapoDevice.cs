@@ -18,18 +18,21 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public abstract class SessionBase {
+    public object? State { get; }
     public string SessionId { get; }
     public DateTime ExpiresOn { get; }
     internal ICryptoTransform Encryptor { get; }
     internal ICryptoTransform Decryptor { get; }
 
     protected SessionBase(
+      object? state,
       string sessionId,
       DateTime expiresOn,
       ICryptoTransform encryptor,
       ICryptoTransform decryptor
     )
     {
+      State = state;
       SessionId = sessionId;
       ExpiresOn = expiresOn;
       Encryptor = encryptor;
@@ -39,6 +42,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   private class UnauthorizedSession : SessionBase {
     public static UnauthorizedSession Create(
+      object? state,
       IPEndPoint remoteEndPoint,
       string sessionId,
       DateTime expiresOn,
@@ -53,6 +57,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       aes.IV = initialVector;
 
       return new UnauthorizedSession(
+        state,
         remoteEndPoint,
         sessionId,
         expiresOn,
@@ -64,6 +69,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     public IPEndPoint RemoteEndPoint { get; }
 
     private UnauthorizedSession(
+      object? state,
       IPEndPoint remoteEndPoint,
       string sessionId,
       DateTime expiresOn,
@@ -71,6 +77,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       ICryptoTransform decryptor
     )
       : base(
+        state,
         sessionId,
         expiresOn,
         encryptor,
@@ -86,6 +93,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     public AuthorizedSession(string token, UnauthorizedSession session)
       : base(
+        session.State,
         session.SessionId,
         session.ExpiresOn,
         session.Encryptor,
@@ -103,6 +111,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       ? $"http://[{endPoint.Address}]:{endPoint.Port}/"
       : $"http://{endPoint.Address}:{endPoint.Port}/";
 
+  public object State { get; }
   public IPEndPoint? EndPoint { get; private set; }
   public Uri? EndPointUri => EndPoint is null ? null : new Uri(CreateEndPointHttpUrl(EndPoint));
   private HttpListener? listener;
@@ -120,7 +129,13 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public Func<SessionBase, string, JsonElement, (ErrorCode, ITapoPassThroughResponse?)>? FuncGeneratePassThroughResponse { get; set; }
 
   public PseudoTapoDevice()
+    : this(state: null)
   {
+  }
+
+  public PseudoTapoDevice(object? state)
+  {
+    State = state;
     EndPoint = null;
   }
 
@@ -267,11 +282,15 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     HttpListenerResponse response,
     string content
   )
-    => WritePlainTextContentAsync(
+  {
+    Console.Error.WriteLine("400 Bad request: {0}", content);
+
+    return WritePlainTextContentAsync(
       response,
       HttpStatusCode.BadRequest,
       content
     );
+  }
 
   private static async Task WritePlainTextContentAsync(
     HttpListenerResponse response,
@@ -280,10 +299,11 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string contentType = "text/plain";
+    var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
-      response.ContentEncoding = utf8nobom;
+      response.ContentEncoding = contentEndcoding;
       response.ContentType = contentType;
     }
     catch (ObjectDisposedException) {
@@ -291,16 +311,21 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
 
     using var buffer = new MemoryStream();
-    using var writer = new StreamWriter(buffer, response.ContentEncoding, 1024, leaveOpen: true);
+    using var writer = new StreamWriter(buffer, contentEndcoding, 1024, leaveOpen: true);
 
     await writer.WriteLineAsync(content).ConfigureAwait(false);
     await writer.FlushAsync().ConfigureAwait(false);
 
-    response.ContentLength64 = buffer.Length;
+    try {
+      response.ContentLength64 = buffer.Length;
 
-    buffer.Position = 0L;
+      buffer.Position = 0L;
 
-    await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+      await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
   }
 
   private async Task ProcessRequestAsync(HttpListenerContext context)
@@ -460,10 +485,11 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string contentType = "application/json";
+    var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
-      response.ContentEncoding = utf8nobom;
+      response.ContentEncoding = contentEndcoding;
       response.ContentType = contentType;
     }
     catch (ObjectDisposedException) {
@@ -471,20 +497,25 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
 
     using var buffer = new MemoryStream();
-    using var writer = new StreamWriter(buffer, response.ContentEncoding, 1024, leaveOpen: true);
+    using var writer = new StreamWriter(buffer, contentEndcoding, 1024, leaveOpen: true);
 
     await JsonSerializer.SerializeAsync(buffer, content).ConfigureAwait(false);
 
-    response.ContentLength64 = buffer.Length;
+    try {
+      response.ContentLength64 = buffer.Length;
 
-    buffer.Position = 0L;
+      buffer.Position = 0L;
 
 #if false
-    Console.WriteLine(new StreamReader(buffer).ReadToEnd());
-    buffer.Position = 0L;
+      Console.WriteLine(new StreamReader(buffer).ReadToEnd());
+      buffer.Position = 0L;
 #endif
 
-    await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+      await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
   }
 
   private async Task<UnauthorizedSession> ProcessHandshakeMethodRequestAsync(
@@ -510,6 +541,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     var sessionExpiresOn = DateTime.Now + TimeSpan.FromDays(1.0);
 
     var session = UnauthorizedSession.Create(
+      state: State,
       remoteEndPoint: context.Request.RemoteEndPoint,
       sessionId: sessionId,
       expiresOn: sessionExpiresOn,
@@ -586,10 +618,11 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string contentType = "application/json";
+    var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)HttpStatusCode.OK;
-      response.ContentEncoding = utf8nobom;
+      response.ContentEncoding = contentEndcoding;
       response.ContentType = contentType;
     }
     catch (ObjectDisposedException) {
@@ -623,16 +656,21 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       options: options
     ).ConfigureAwait(false);
 
-    response.ContentLength64 = buffer.Length;
+    try {
+      response.ContentLength64 = buffer.Length;
 
-    buffer.Position = 0L;
+      buffer.Position = 0L;
 
 #if false
-    Console.WriteLine(new StreamReader(buffer).ReadToEnd());
-    buffer.Position = 0L;
+      Console.WriteLine(new StreamReader(buffer).ReadToEnd());
+      buffer.Position = 0L;
 #endif
 
-    await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+      await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
   }
 
   private async Task<AuthorizedSession?> ProcessLoginDeviceMethodRequestAsync(
