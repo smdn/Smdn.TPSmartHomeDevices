@@ -543,9 +543,18 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     var sessionId = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
     var sessionExpiresOn = DateTime.Now + TimeSpan.FromDays(1.0);
 
+    IPEndPoint? remoteEndPoint = null;
+
+    try {
+      remoteEndPoint = context.Request.RemoteEndPoint;
+    }
+    catch (NullReferenceException) when (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      throw new ClientDisconnectedException();
+    }
+
     var session = UnauthorizedSession.Create(
       state: State,
-      remoteEndPoint: context.Request.RemoteEndPoint,
+      remoteEndPoint: remoteEndPoint!,
       sessionId: sessionId,
       expiresOn: sessionExpiresOn,
       key: keyAndIv.AsSpan(0, 16).ToArray(),
