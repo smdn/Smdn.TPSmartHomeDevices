@@ -26,6 +26,11 @@ public class TapoDeviceEndPointProviderTests {
       new DnsEndPoint("localhost", 80),
       await provider.GetEndPointAsync(default)
     );
+    Assert.AreEqual(
+      new DnsEndPoint("localhost", 80).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
+    );
   }
 
   [Test]
@@ -44,6 +49,11 @@ public class TapoDeviceEndPointProviderTests {
       new IPEndPoint(IPAddress.Parse("127.0.0.1"), 80),
       await provider.GetEndPointAsync(default)
     );
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Parse("127.0.0.1"), 80).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
+    );
   }
 
   [Test]
@@ -57,6 +67,11 @@ public class TapoDeviceEndPointProviderTests {
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("::1"), 80),
       await provider.GetEndPointAsync(default)
+    );
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Parse("::1"), 80).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
     );
   }
 

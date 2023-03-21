@@ -26,6 +26,11 @@ public class KasaDeviceEndPointProviderTests {
       new DnsEndPoint("localhost", 9999),
       await provider.GetEndPointAsync(default)
     );
+    Assert.AreEqual(
+      new DnsEndPoint("localhost", 9999).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
+    );
   }
 
   [Test]
@@ -44,6 +49,11 @@ public class KasaDeviceEndPointProviderTests {
       new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9999),
       await provider.GetEndPointAsync(default)
     );
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9999).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
+    );
   }
 
   [Test]
@@ -57,6 +67,11 @@ public class KasaDeviceEndPointProviderTests {
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("::1"), 9999),
       await provider.GetEndPointAsync(default)
+    );
+    Assert.AreEqual(
+      new IPEndPoint(IPAddress.Parse("::1"), 9999).ToString(),
+      provider.ToString(),
+      nameof(provider.ToString)
     );
   }
 

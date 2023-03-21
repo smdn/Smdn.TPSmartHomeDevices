@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Smdn.Net;
 using Smdn.Net.AddressResolution;
 
 namespace Smdn.TPSmartHomeDevices;
@@ -137,6 +138,15 @@ public class MacAddressDeviceEndPointFactoryTests {
     {
       invalidatedAddresses.Add(resolvedAddress);
     }
+  }
+
+  [Test]
+  public async Task CreatedDeviceEndPointProvider_ToString()
+  {
+    using var factory = new MacAddressDeviceEndPointFactory(resolver: MacAddressResolver.Null);
+    var endPoint = factory.Create(address: TestMacAddress);
+
+    Assert.AreEqual(TestMacAddress.ToMacAddressString(), endPoint.ToString(), nameof(endPoint.ToString));
   }
 
   [Test]

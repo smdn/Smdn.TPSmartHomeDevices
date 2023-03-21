@@ -27,6 +27,9 @@ internal static class DeviceEndPointProvider {
           ValueTaskShim.FromCanceled<EndPoint?>(cancellationToken)
 #endif
         : staticEndPointValueTaskResult;
+
+    public override string ToString()
+      => staticEndPointValueTaskResult.Result!.ToString();
   }
 
   public static IDeviceEndPointProvider Create(string host, int port)

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Smdn.Net;
 using Smdn.Net.AddressResolution;
 
 namespace Smdn.TPSmartHomeDevices;
@@ -47,6 +48,9 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
       if (latestResolvedAddress is not null)
         resolver.Invalidate(latestResolvedAddress);
     }
+
+    public override string ToString()
+      => address.ToMacAddressString();
   }
 
   /*
