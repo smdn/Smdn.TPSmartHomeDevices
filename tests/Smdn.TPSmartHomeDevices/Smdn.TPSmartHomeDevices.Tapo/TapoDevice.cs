@@ -465,12 +465,16 @@ public class TapoDeviceTests {
 
   private class HandleAsEndPointUnreachableExceptionHandler : TapoClientExceptionHandler {
     public override TapoClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
-      =>
-        attempt == 0
-          ? exception is HttpRequestException httpRequestException && httpRequestException.InnerException is SocketException
-            ? TapoClientExceptionHandling.RetryAfterResolveEndPoint
-            : default
-          : default;
+      => Default.DetermineHandling(
+        exception: new HttpRequestException(
+          message: "reproduces the case of unreachable condition",
+          inner: new SocketException(
+            errorCode: (int)SocketError.HostUnreachable
+          )
+        ),
+        attempt: attempt,
+        logger: logger
+      );
   }
 
   [Test]
@@ -525,7 +529,14 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint()
+  public Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint_RetrySuccess()
+    => SendRequestAsync_EndPointUnreachable_DynamicEndPoint(caseWhenRetrySuccess: true);
+
+  [Test]
+  public Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint_RetryFailure()
+    => SendRequestAsync_EndPointUnreachable_DynamicEndPoint(caseWhenRetrySuccess: false);
+
+  private async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint(bool caseWhenRetrySuccess)
   {
     const string returnTokenFromEndPoint1 = "token1";
     const string returnTokenFromEndPoint2 = "token2";
@@ -546,7 +557,13 @@ public class TapoDeviceTests {
         Assert.AreEqual("get_device_info", method, "received request method");
         return (
           ErrorCode.Success,
-          new GetDeviceInfoResponse()
+          new GetDeviceInfoResponse() {
+            ErrorCode = caseWhenRetrySuccess
+              ? ErrorCode.Success
+              // this causes an exception to be raised in the request to the pseudo device #2,
+              // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+              : (ErrorCode)9999
+          }
         );
       }
     };
@@ -573,21 +590,43 @@ public class TapoDeviceTests {
     Assert.IsNotNull(device.Session, nameof(device.Session));
 
     var prevSession = device.Session;
+    var invalidatedEndPoints = new List<EndPoint>();
 
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    endPoint.Invalidated +=
-      (_, _) => endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
+    endPoint.Invalidated += (_, _) => {
+      invalidatedEndPoints.Add(endPoint.EndPoint);
+      endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
+    };
 
     // dispose endpoint #1
     // this causes an exception to be raised in the request to the pseudo device #1,
     // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
     await pseudoDeviceEndPoint1.DisposeAsync();
 
-    Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
-    Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
+    if (caseWhenRetrySuccess) {
+      Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
+
+      Assert.IsNotNull(device.Session, nameof(device.Session));
+      Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
+
+      // only first endpoint must have been invalidated
+      Assert.AreEqual(1, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
+      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
+    }
+    else {
+      Assert.CatchAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
+
+      Assert.IsNull(device.Session, nameof(device.Session));
+
+      // both of two endpoint must have been invalidated
+      Assert.AreEqual(2, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
+
+      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
+      Assert.AreEqual(pseudoDeviceEndPoint2.EndPoint, invalidatedEndPoints[1], nameof(invalidatedEndPoints) + "[1]");
+    }
+
     Assert.IsTrue(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 

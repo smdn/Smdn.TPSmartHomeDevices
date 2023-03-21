@@ -378,6 +378,16 @@ public partial class TapoDevice : IDisposable {
             client = null;
             throw;
 
+          case TapoClientExceptionHandling.ThrowAndInvalidateEndPoint: {
+            if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
+              // mark end point as invalid to have the end point refreshed or rescanned
+              dynamicEndPoint.InvalidateEndPoint();
+
+            client.Dispose();
+            client = null;
+            throw;
+          }
+
           case TapoClientExceptionHandling.ThrowWrapTapoProtocolException:
             client.Dispose();
             client = null;
@@ -412,7 +422,7 @@ public partial class TapoDevice : IDisposable {
             client.CloseSession();
             continue;
 
-          case TapoClientExceptionHandling.RetryAfterResolveEndPoint:
+          case TapoClientExceptionHandling.RetryAfterResolveEndPoint: {
             if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
               goto case TapoClientExceptionHandling.Throw;
 
@@ -420,6 +430,7 @@ public partial class TapoDevice : IDisposable {
             dynamicEndPoint.InvalidateEndPoint();
 
             continue;
+          }
         } // switch (handling)
       } // try
     } // for

@@ -10,16 +10,22 @@ internal class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
     switch (exception) {
       case SocketException socketException:
         if (
-          attempt == 0 && // retry just once
           socketException.SocketErrorCode is
             SocketError.ConnectionRefused or // ECONNREFUSED
             SocketError.HostUnreachable or // EHOSTUNREACH
             SocketError.NetworkUnreachable // ENETUNREACH
         ) {
-          // The end point may have changed.
-          logger?.LogInformation($"Endpoint may have changed ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
+          if (attempt == 0 /* retry just once */) {
+            // The end point may have changed.
+            logger?.LogInformation($"Endpoint may have changed ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
 
-          return KasaClientExceptionHandling.RetryAfterResolveEndPoint;
+            return KasaClientExceptionHandling.RetryAfterResolveEndPoint;
+          }
+          else {
+            logger?.LogError($"Endpoint unreachable ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
+
+            return KasaClientExceptionHandling.ThrowAndInvalidateEndPoint;
+          }
         }
 
         // The client may have been invalid due to an exception at the transport layer.

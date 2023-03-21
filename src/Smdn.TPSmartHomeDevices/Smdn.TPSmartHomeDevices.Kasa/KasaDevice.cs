@@ -328,6 +328,16 @@ public partial class KasaDevice : IDisposable {
             client = null;
             throw;
 
+          case KasaClientExceptionHandling.ThrowAndInvalidateEndPoint: {
+            if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
+              // mark end point as invalid to have the end point refreshed or rescanned
+              dynamicEndPoint.InvalidateEndPoint();
+
+            client.Dispose();
+            client = null;
+            throw;
+          }
+
           case KasaClientExceptionHandling.Retry:
             continue;
 
@@ -336,7 +346,7 @@ public partial class KasaDevice : IDisposable {
             client = null;
             continue;
 
-          case KasaClientExceptionHandling.RetryAfterResolveEndPoint:
+          case KasaClientExceptionHandling.RetryAfterResolveEndPoint: {
             if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
               goto case KasaClientExceptionHandling.Throw;
 
@@ -346,6 +356,7 @@ public partial class KasaDevice : IDisposable {
             endPoint = null; // should resolve end point
 
             continue;
+          }
         } // switch (handling)
       } // try
     } // for

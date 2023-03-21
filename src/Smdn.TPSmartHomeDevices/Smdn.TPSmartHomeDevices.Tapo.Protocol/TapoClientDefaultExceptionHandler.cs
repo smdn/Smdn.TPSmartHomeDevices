@@ -13,16 +13,22 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
       case HttpRequestException httpRequestException:
         if (httpRequestException.InnerException is SocketException innerSocketException) {
           if (
-            attempt == 0 && // retry just once
             innerSocketException.SocketErrorCode is
               SocketError.ConnectionRefused or // ECONNREFUSED
               SocketError.HostUnreachable or // EHOSTUNREACH
               SocketError.NetworkUnreachable // ENETUNREACH
           ) {
-            // The end point may have changed.
-            logger?.LogInformation($"Endpoint may have changed ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+            if (attempt == 0 /* retry just once */) {
+              // The end point may have changed.
+              logger?.LogInformation($"Endpoint may have changed ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
 
-            return TapoClientExceptionHandling.RetryAfterResolveEndPoint;
+              return TapoClientExceptionHandling.RetryAfterResolveEndPoint;
+            }
+            else {
+              logger?.LogError($"Endpoint unreachable ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+
+              return TapoClientExceptionHandling.ThrowAndInvalidateEndPoint;
+            }
           }
 
           // The HTTP client may have been invalid due to an exception at the transport layer.

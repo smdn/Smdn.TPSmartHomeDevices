@@ -4,7 +4,8 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 public enum TapoClientExceptionHandling {
   Throw = default,
-  ThrowWrapTapoProtocolException = 1,
+  ThrowAndInvalidateEndPoint = 1,
+  ThrowWrapTapoProtocolException = 2,
 
   Retry = 100,
   RetryAfterReconnect = 101,

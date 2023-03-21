@@ -3,6 +3,7 @@
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -406,12 +407,14 @@ public class KasaDeviceTests {
 
   private class HandleAsEndPointUnreachableExceptionHandler : KasaClientExceptionHandler {
     public override KasaClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
-      =>
-        attempt == 0
-          ? exception is SocketException or KasaProtocolException
-            ? KasaClientExceptionHandling.RetryAfterResolveEndPoint
-            : default
-          : default;
+      => Default.DetermineHandling(
+        // reproduces the case of unreachable condition
+        exception: new SocketException(
+          errorCode: (int)SocketError.HostUnreachable
+        ),
+        attempt: attempt,
+        logger: logger
+      );
   }
 
   [Test]
@@ -476,7 +479,14 @@ public class KasaDeviceTests {
   }
 
   [Test]
-  public async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint()
+  public Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint_RetrySuccess()
+    => SendRequestAsync_EndPointUnreachable_DynamicEndPoint(caseWhenRetrySuccess: true);
+
+  [Test]
+  public Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint_RetryFailure()
+    => SendRequestAsync_EndPointUnreachable_DynamicEndPoint(caseWhenRetrySuccess: false);
+
+  private async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint(bool caseWhenRetrySuccess)
   {
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
       Assert.Ignore("disconnection of device causes test runner timeout");
@@ -493,12 +503,21 @@ public class KasaDeviceTests {
       },
     };
     await using var pseudoDeviceEndPoint2 = new PseudoKasaDevice() {
-      FuncGenerateResponse = static (_, req) => {
+      FuncGenerateResponse = (_, req) => {
         Assert.IsTrue(req.RootElement.TryGetProperty("module2", out var _));
 
-        return JsonDocument.Parse(
-          @"{""module2"":{""method"":{""err_code"":0,""endpoint"":2}}}"
-        );
+        if (caseWhenRetrySuccess) {
+          return JsonDocument.Parse(
+            @"{""module2"":{""method"":{""err_code"":0,""endpoint"":2}}}"
+          );
+        }
+        else {
+          // this causes an exception to be raised in the request to the pseudo device #2,
+          // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+          return JsonDocument.Parse(
+            @"{""module2"":{""method"":{""err_code"":9999,""endpoint"":2}}}"
+          );
+        }
       },
     };
 
@@ -529,8 +548,12 @@ public class KasaDeviceTests {
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    endPoint.Invalidated +=
-      (_, _) => endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
+    var invalidatedEndPoints = new List<EndPoint>();
+
+    endPoint.Invalidated += (_, _) => {
+      invalidatedEndPoints.Add(endPoint.EndPoint);
+      endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
+    };
 
     // dispose endpoint #1
     // this causes an exception to be raised in the request to the pseudo device #1,
@@ -539,16 +562,41 @@ public class KasaDeviceTests {
 
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
 
-    Assert.DoesNotThrowAsync(
-      async () => await device.SendRequestAsync(
-        module: JsonEncodedText.Encode("module2"),
-        method: JsonEncodedText.Encode("method"),
-        composeResult: static _ => 0,
-        cancellationToken: cts.Token
-      ),
-      "request #2"
-    );
-    Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+      if (caseWhenRetrySuccess) {
+      Assert.DoesNotThrowAsync(
+        async () => await device.SendRequestAsync(
+          module: JsonEncodedText.Encode("module2"),
+          method: JsonEncodedText.Encode("method"),
+          composeResult: static _ => 0,
+          cancellationToken: cts.Token
+        ),
+        "request #2"
+      );
+      Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
+
+      // only first endpoint must have been invalidated
+      Assert.AreEqual(1, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
+      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
+    }
+    else {
+      Assert.CatchAsync(
+        async () => await device.SendRequestAsync(
+          module: JsonEncodedText.Encode("module2"),
+          method: JsonEncodedText.Encode("method"),
+          composeResult: static _ => 0,
+          cancellationToken: cts.Token
+        ),
+        "request #2"
+      );
+      Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
+
+      // both of two endpoint must have been invalidated
+      Assert.AreEqual(2, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
+
+      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
+      Assert.AreEqual(pseudoDeviceEndPoint2.EndPoint, invalidatedEndPoints[1], nameof(invalidatedEndPoints) + "[1]");
+    }
+
     Assert.IsTrue(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
