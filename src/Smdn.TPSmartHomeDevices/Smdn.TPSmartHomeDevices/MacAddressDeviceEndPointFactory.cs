@@ -34,10 +34,12 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
 
-      return new IPEndPoint(
-        address: latestResolvedAddress,
-        port: port
-      );
+      return latestResolvedAddress is null
+        ? null
+        : new IPEndPoint(
+            address: latestResolvedAddress,
+            port: port
+          );
     }
 
     public void InvalidateEndPoint()

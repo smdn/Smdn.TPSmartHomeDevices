@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -43,6 +44,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   private static readonly IPAddress TestIPAddress = IPAddress.Parse("192.0.2.255");
+  private static readonly PhysicalAddress TestMacAddress = PhysicalAddress.Parse("00:00:5E:00:53:00");
 
   [Test]
   public void Ctor_ArgumentNull_IAddressResolver()
@@ -98,5 +100,119 @@ public class MacAddressDeviceEndPointFactoryTests {
     using var factory = new MacAddressDeviceEndPointFactory(resolver: MacAddressResolver.Null);
 
     Assert.Throws<ArgumentNullException>(() => factory.Create(address: null!));
+  }
+
+  private class ConcreteMacAddressDeviceEndPointFactory : MacAddressDeviceEndPointFactory {
+    public ConcreteMacAddressDeviceEndPointFactory(
+      IAddressResolver<PhysicalAddress, IPAddress> resolver,
+      IServiceProvider? serviceProvider = null
+    )
+      : base(resolver, serviceProvider)
+    {
+    }
+  }
+
+  private class PseudoMacAddressResolver : IAddressResolver<PhysicalAddress, IPAddress> {
+    private readonly IReadOnlyDictionary<PhysicalAddress, IPAddress> addressMap;
+    private readonly List<IPAddress> invalidatedAddresses = new();
+
+    public PseudoMacAddressResolver(IReadOnlyDictionary<PhysicalAddress, IPAddress> addressMap)
+    {
+      this.addressMap = addressMap ?? throw new ArgumentNullException(nameof(addressMap));
+    }
+
+    public ValueTask<IPAddress?> ResolveAsync(PhysicalAddress address, CancellationToken cancellationToken)
+    {
+      if (addressMap.TryGetValue(address, out var resolvedAddress)) {
+        if (invalidatedAddresses.Contains(resolvedAddress))
+          return default;
+
+        return new ValueTask<IPAddress?>(resolvedAddress);
+      }
+
+      return default;
+    }
+
+    public void Invalidate(IPAddress resolvedAddress)
+    {
+      invalidatedAddresses.Add(resolvedAddress);
+    }
+  }
+
+  [Test]
+  public async Task CreatedDeviceEndPointProvider_GetEndPointAsync_Resolved()
+  {
+    const int port = 80;
+
+    using var factory = new ConcreteMacAddressDeviceEndPointFactory(
+      resolver: new PseudoMacAddressResolver(
+        new Dictionary<PhysicalAddress, IPAddress>() {
+          { TestMacAddress, TestIPAddress }
+        }
+      )
+    );
+
+    var endPoint = factory.Create(address: TestMacAddress, port: port);
+
+    Assert.IsNotNull(endPoint, nameof(endPoint));
+
+    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
+    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.GetEndPointAsync());
+  }
+
+  [Test]
+  public async Task CreatedDeviceEndPointProvider_GetEndPointAsync_NotResolved()
+  {
+    const int port = 80;
+
+    using var factory = new ConcreteMacAddressDeviceEndPointFactory(
+      resolver: new PseudoMacAddressResolver(
+        new Dictionary<PhysicalAddress, IPAddress>() { }
+      )
+    );
+
+    var endPoint = factory.Create(address: TestMacAddress, port: port);
+
+    Assert.IsNotNull(endPoint, nameof(endPoint));
+
+    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
+    Assert.IsNull(await endPoint.GetEndPointAsync());
+  }
+
+  [Test]
+  public async Task CreatedDeviceEndPointProvider_Invalidate()
+  {
+    const int port = 80;
+
+    using var factory = new ConcreteMacAddressDeviceEndPointFactory(
+      resolver: new PseudoMacAddressResolver(
+        new Dictionary<PhysicalAddress, IPAddress>() {
+          { TestMacAddress, TestIPAddress }
+        }
+      )
+    );
+
+    var endPoint = factory.Create(address: TestMacAddress, port: port);
+
+    Assert.IsNotNull(endPoint, nameof(endPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
+
+    EndPoint? resolvedEndPointAddress = null;
+
+    Assert.DoesNotThrowAsync(
+      async () => resolvedEndPointAddress = await endPoint.GetEndPointAsync()
+    );
+    Assert.IsNotNull(resolvedEndPointAddress, nameof(resolvedEndPointAddress));
+    Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, port), nameof(resolvedEndPointAddress));
+
+    // invalidate
+    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPointProvider).InvalidateEndPoint());
+
+    EndPoint? resolvedEndPointAddressAfterInvalidation = null;
+
+    Assert.DoesNotThrowAsync(
+      async () => resolvedEndPointAddressAfterInvalidation = await endPoint.GetEndPointAsync()
+    );
+    Assert.IsNull(resolvedEndPointAddressAfterInvalidation, nameof(resolvedEndPointAddressAfterInvalidation));
   }
 }
