@@ -420,15 +420,19 @@ public class KasaDeviceTests {
   [Test]
   public async Task SendRequestAsync_EndPointUnreachable_StaticEndPoint()
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-      Assert.Ignore("disconnection of device causes test runner timeout");
-      return;
-    }
+    var request = 0;
 
     await using var pseudoDevice = new PseudoKasaDevice() {
-      FuncGenerateResponse = static (_, _) => JsonDocument.Parse(
-        @"{""module"":{""method"":{""err_code"":0}}}"
-      ),
+      FuncGenerateResponse = (_, _) =>
+        request++ == 0
+          ? JsonDocument.Parse(
+              @"{""module"":{""method"":{""err_code"":0}}}"
+            )
+          // this causes an exception to be raised in the request to the pseudo device,
+          // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+          : JsonDocument.Parse(
+              @"{""module"":{""method"":{""err_code"":9999}}}"
+            )
     };
 
     pseudoDevice.Start();
@@ -458,20 +462,11 @@ public class KasaDeviceTests {
     );
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
-    // dispose endpoint
-    // this causes an exception to be raised in the request to the pseudo device,
-    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
-    await pseudoDevice.DisposeAsync();
-
-    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
-
-    var ex = Assert.ThrowsAsync(
-      Is.InstanceOf<SocketException>().Or.InstanceOf<KasaDisconnectedException>(),
+    Assert.CatchAsync(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
-        composeResult: static _ => 0,
-        cancellationToken: cts.Token
+        composeResult: static _ => 0
       )
     );
 
@@ -495,11 +490,18 @@ public class KasaDeviceTests {
 
     await using var pseudoDeviceEndPoint1 = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, req) => {
-        Assert.IsTrue(req.RootElement.TryGetProperty("module1", out var _));
-
-        return JsonDocument.Parse(
-          @"{""module1"":{""method"":{""err_code"":0,""endpoint"":1}}}"
-        );
+        if (req.RootElement.TryGetProperty("module1", out var _)) {
+          return JsonDocument.Parse(
+            @"{""module1"":{""method"":{""err_code"":0,""endpoint"":1}}}"
+          );
+        }
+        else {
+          // this causes an exception to be raised in the request to the pseudo device #1,
+          // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
+          return JsonDocument.Parse(
+            @"{""module1"":{""method"":{""err_code"":9999,""endpoint"":1}}}"
+          );
+        }
       },
     };
     await using var pseudoDeviceEndPoint2 = new PseudoKasaDevice() {
@@ -555,20 +557,12 @@ public class KasaDeviceTests {
       endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
     };
 
-    // dispose endpoint #1
-    // this causes an exception to be raised in the request to the pseudo device #1,
-    // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
-    await pseudoDeviceEndPoint1.DisposeAsync();
-
-    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
-
-      if (caseWhenRetrySuccess) {
+    if (caseWhenRetrySuccess) {
       Assert.DoesNotThrowAsync(
         async () => await device.SendRequestAsync(
           module: JsonEncodedText.Encode("module2"),
           method: JsonEncodedText.Encode("method"),
-          composeResult: static _ => 0,
-          cancellationToken: cts.Token
+          composeResult: static _ => 0
         ),
         "request #2"
       );
@@ -583,8 +577,7 @@ public class KasaDeviceTests {
         async () => await device.SendRequestAsync(
           module: JsonEncodedText.Encode("module2"),
           method: JsonEncodedText.Encode("method"),
-          composeResult: static _ => 0,
-          cancellationToken: cts.Token
+          composeResult: static _ => 0
         ),
         "request #2"
       );
