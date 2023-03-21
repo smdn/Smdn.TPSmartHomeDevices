@@ -483,11 +483,6 @@ public class KasaDeviceTests {
 
   private async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint(bool caseWhenRetrySuccess)
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-      Assert.Ignore("disconnection of device causes test runner timeout");
-      return;
-    }
-
     await using var pseudoDeviceEndPoint1 = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, req) => {
         if (req.RootElement.TryGetProperty("module1", out var _)) {
