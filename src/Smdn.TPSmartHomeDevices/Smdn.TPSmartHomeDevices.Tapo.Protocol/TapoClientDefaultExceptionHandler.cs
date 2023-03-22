@@ -51,13 +51,16 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
         return TapoClientExceptionHandling.ThrowWrapTapoProtocolException;
 
       case TapoErrorResponseException errorResponseException:
-        // request failed with error code -1301
         if (attempt == 0 /* retry just once */) {
           switch (errorResponseException.ErrorCode) {
             // The session might have been in invalid state(?)
-            case (ErrorCode)(-1301):
+            case TapoErrorCodes.DeviceBusy:
               logger?.LogWarning(errorResponseException, "Error code -1301");
               return TapoClientExceptionHandling.RetryAfterReconnect;
+
+            case TapoErrorCodes.RequestParameterError:
+              logger?.LogWarning(errorResponseException, "Error code -1008");
+              return TapoClientExceptionHandling.Throw;
 
             default:
               logger?.LogWarning(errorResponseException, $"Unexpected error ({nameof(errorResponseException.ErrorCode)}: {(int)errorResponseException.ErrorCode})");
