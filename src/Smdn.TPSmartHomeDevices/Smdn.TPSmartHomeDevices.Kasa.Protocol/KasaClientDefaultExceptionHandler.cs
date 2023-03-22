@@ -8,36 +8,39 @@ internal class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
   public override KasaClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
   {
     switch (exception) {
-      case SocketException socketException:
+      case SocketException socketException: {
+        var socketErrorCode = socketException.SocketErrorCode;
+
         if (
-          socketException.SocketErrorCode is
+          socketErrorCode is
             SocketError.ConnectionRefused or // ECONNREFUSED
             SocketError.HostUnreachable or // EHOSTUNREACH
             SocketError.NetworkUnreachable // ENETUNREACH
         ) {
           if (attempt == 0 /* retry just once */) {
             // The end point may have changed.
-            logger?.LogInformation($"Endpoint may have changed ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
+            logger?.LogInformation($"Endpoint may have changed ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
             return KasaClientExceptionHandling.RetryAfterResolveEndPoint;
           }
           else {
-            logger?.LogError($"Endpoint unreachable ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
+            logger?.LogError($"Endpoint unreachable ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
             return KasaClientExceptionHandling.ThrowAndInvalidateEndPoint;
           }
         }
 
         // The client may have been invalid due to an exception at the transport layer.
-        logger?.LogError(socketException, $"Unexpected socket exception ({nameof(socketException.SocketErrorCode)}: {(int)socketException.SocketErrorCode})");
+        logger?.LogError(socketException, $"Unexpected socket exception ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
         return KasaClientExceptionHandling.Throw;
+      }
 
       case KasaDisconnectedException disconnectedException:
         if (attempt == 0) { // retry just once
           // The peer device disconnected the connection, or may have dropped the connection.
           if (disconnectedException.InnerException is SocketException innerSocketException)
-            logger?.LogDebug($"Disconnected ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+            logger?.LogDebug($"Disconnected ({nameof(SocketError)}: {(int)innerSocketException.SocketErrorCode} {innerSocketException.SocketErrorCode})");
           else
             logger?.LogDebug($"Disconnected ({disconnectedException.Message})");
 

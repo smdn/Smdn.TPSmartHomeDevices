@@ -12,27 +12,29 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
     switch (exception) {
       case HttpRequestException httpRequestException:
         if (httpRequestException.InnerException is SocketException innerSocketException) {
+          var socketErrorCode = innerSocketException.SocketErrorCode;
+
           if (
-            innerSocketException.SocketErrorCode is
+            socketErrorCode is
               SocketError.ConnectionRefused or // ECONNREFUSED
               SocketError.HostUnreachable or // EHOSTUNREACH
               SocketError.NetworkUnreachable // ENETUNREACH
           ) {
             if (attempt == 0 /* retry just once */) {
               // The end point may have changed.
-              logger?.LogInformation($"Endpoint may have changed ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+              logger?.LogInformation($"Endpoint may have changed ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
               return TapoClientExceptionHandling.RetryAfterResolveEndPoint;
             }
             else {
-              logger?.LogError($"Endpoint unreachable ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+              logger?.LogError($"Endpoint unreachable ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
               return TapoClientExceptionHandling.ThrowAndInvalidateEndPoint;
             }
           }
 
           // The HTTP client may have been invalid due to an exception at the transport layer.
-          logger?.LogError(innerSocketException, $"Unexpected socket exception ({nameof(innerSocketException.SocketErrorCode)}: {(int)innerSocketException.SocketErrorCode})");
+          logger?.LogError(innerSocketException, $"Unexpected socket exception ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
           return TapoClientExceptionHandling.Throw;
         }
