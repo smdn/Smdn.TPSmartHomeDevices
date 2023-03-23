@@ -24,55 +24,27 @@ partial class TapoClient {
     var prevSession = session;
 
     try {
+      /*
+       * handshake
+       */
       logger?.LogDebug("Handshake starting: {EndPointUri}", endPointUri);
 
       session = await HandshakeAsync(cancellationToken).ConfigureAwait(false);
 
       logger?.LogDebug("Handshake completed.");
 
-      cancellationToken.ThrowIfCancellationRequested();
+      /*
+       * login_device
+       */
+      logger?.LogDebug("Login starting: {EndPointUri}", endPointUri);
 
-      string token;
-
-      try {
-        logger?.LogDebug("Login starting: {EndPointUri}", endPointUri);
-
-        var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
-          request: new(
-            password: credential.GetBase64EncodedPassword(endPointUri.Host),
-            userName: credential.GetBase64EncodedUserNameSHA1Digest(endPointUri.Host)
-          ),
-          cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
-
-        token = loginDeviceResponse.Result.Token;
-      }
-      catch (TapoErrorResponseException ex) {
-        throw new TapoAuthenticationException(
-          message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {(int)ex.ErrorCode})",
-          endPoint: endPointUri,
-          innerException: ex
-        );
-      }
-      catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
-        logger?.LogCritical("Failed to initiate authorized session due to timeout. ({ExceptionMessage})", ex.Message);
-        throw new TapoAuthenticationException(
-          message: $"Failed to initiate authorized session with the device at '{endPointUri}' due to timeout. ({ex.Message})",
-          endPoint: endPointUri,
-          innerException: exTimeout
-        );
-      }
-
-      if (string.IsNullOrEmpty(token)) {
-        logger?.LogError("Access token has not been issued.");
-        throw new TapoAuthenticationException(
-          message: $"An access token was not issued from the device at '{endPointUri}'.",
-          endPoint: endPointUri
-        );
-      }
+      var token = await LoginDeviceAsync(credential, cancellationToken).ConfigureAwait(false);
 
       logger?.LogDebug("Login completed, access token has issued: {Token}", token);
 
+      /*
+       * session established
+       */
       session.SetToken(token);
 
       logger?.LogDebug("Request path and query for the session: '{PathAndQuery}'", session.RequestPathAndQuery);
@@ -212,5 +184,52 @@ partial class TapoClient {
       => TapoSessionCookieUtils.TryGetCookie(response, out var sessionId, out var sessionTimeout)
         ? (sessionId, sessionTimeout)
         : default;
+  }
+
+  private async ValueTask<string> LoginDeviceAsync(
+    ITapoCredentialProvider credential,
+    CancellationToken cancellationToken
+  )
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+
+    string token;
+
+    try {
+      var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
+        request: new(
+          password: credential.GetBase64EncodedPassword(endPointUri.Host),
+          userName: credential.GetBase64EncodedUserNameSHA1Digest(endPointUri.Host)
+        ),
+        cancellationToken: cancellationToken
+      ).ConfigureAwait(false);
+
+      token = loginDeviceResponse.Result.Token;
+    }
+    catch (TapoErrorResponseException ex) {
+      throw new TapoAuthenticationException(
+        message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {(int)ex.ErrorCode})",
+        endPoint: endPointUri,
+        innerException: ex
+      );
+    }
+    catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException exTimeout) {
+      logger?.LogCritical("Failed to initiate authorized session due to timeout. ({ExceptionMessage})", ex.Message);
+      throw new TapoAuthenticationException(
+        message: $"Failed to initiate authorized session with the device at '{endPointUri}' due to timeout. ({ex.Message})",
+        endPoint: endPointUri,
+        innerException: exTimeout
+      );
+    }
+
+    if (string.IsNullOrEmpty(token)) {
+      logger?.LogError("Access token has not been issued.");
+      throw new TapoAuthenticationException(
+        message: $"An access token was not issued from the device at '{endPointUri}'.",
+        endPoint: endPointUri
+      );
+    }
+
+    return token;
   }
 }
