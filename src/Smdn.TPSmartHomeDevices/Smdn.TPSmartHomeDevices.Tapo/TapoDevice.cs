@@ -278,8 +278,13 @@ public partial class TapoDevice : IDisposable {
     client ??= new TapoClient(
       endPoint: endPoint,
       httpClientFactory: serviceProvider?.GetService<IHttpClientFactory>(),
-      logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(TapoClient)}({endPoint})") // TODO: logger category name
+      logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger(GenerateLoggerCategoryName())
     );
+
+    string GenerateLoggerCategoryName()
+      => deviceEndPointProvider is IDynamicDeviceEndPointProvider
+        ? $"{nameof(TapoClient)}({endPoint}, {deviceEndPointProvider})"
+        : $"{nameof(TapoClient)}({endPoint})";
 
     if (client.Session is not null)
       return;

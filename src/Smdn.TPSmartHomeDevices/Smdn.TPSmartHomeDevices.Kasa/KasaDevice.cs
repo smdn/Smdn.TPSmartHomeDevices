@@ -306,8 +306,13 @@ public partial class KasaDevice : IDisposable {
       client ??= new KasaClient(
         endPoint: endPoint,
         buffer: buffer,
-        logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger($"{nameof(KasaClient)}({endPoint})") // TODO: logger category name
+        logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger(GenerateLoggerCategoryName())
       );
+
+      string GenerateLoggerCategoryName()
+        => deviceEndPointProvider is IDynamicDeviceEndPointProvider
+          ? $"{nameof(KasaClient)}({endPoint}, {deviceEndPointProvider})"
+          : $"{nameof(KasaClient)}({endPoint})";
 
       try {
         return await client.SendAsync(
