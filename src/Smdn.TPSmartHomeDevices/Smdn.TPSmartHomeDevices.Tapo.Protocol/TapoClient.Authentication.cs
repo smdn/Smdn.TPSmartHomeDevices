@@ -28,19 +28,15 @@ partial class TapoClient {
 
       session = await HandshakeAsync(cancellationToken).ConfigureAwait(false);
 
-      logger?.LogInformation(
-        "Session initiated: {EndPointUri} {SessionIDPrefix}{SessionID}, expires on {ExpiresOn}",
-        endPointUri,
-        TapoSessionCookieUtils.HttpCookiePrefixForSessionId,
-        session.SessionId,
-        session.ExpiresOn.ToString("o", provider: null)
-      );
+      logger?.LogDebug("Handshake completed.");
 
       cancellationToken.ThrowIfCancellationRequested();
 
       string token;
 
       try {
+        logger?.LogDebug("Login starting: {EndPointUri}", endPointUri);
+
         var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
           request: new(
             password: credential.GetBase64EncodedPassword(endPointUri.Host),
@@ -75,11 +71,19 @@ partial class TapoClient {
         );
       }
 
-      logger?.LogInformation("Access token has issued: {Token}", token);
+      logger?.LogDebug("Login completed, access token has issued: {Token}", token);
 
       session.SetToken(token);
 
       logger?.LogDebug("Request path and query for the session: '{PathAndQuery}'", session.RequestPathAndQuery);
+
+      logger?.LogInformation(
+        "Session established: {SessionRequestPathAndQuery}; {SessionIDPrefix}{SessionID}; expires on {ExpiresOn}",
+        session.RequestPathAndQuery,
+        TapoSessionCookieUtils.HttpCookiePrefixForSessionId,
+        session.SessionId,
+        session.ExpiresOn.ToString("o", provider: null)
+      );
 
       prevSession?.Dispose();
     }
