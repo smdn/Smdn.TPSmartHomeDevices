@@ -42,10 +42,11 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
         return TapoClientExceptionHandling.Throw;
 
       case SecurePassThroughInvalidPaddingException securePassThroughInvalidPaddingException:
-        // The session might have been in invalid state(?)
         if (attempt == 0 /* retry just once */) {
           logger?.LogWarning(securePassThroughInvalidPaddingException, "Invalid padding in secure pass through");
-          return TapoClientExceptionHandling.RetryAfterReestablishSession;
+
+          // The session might have been in invalid state(?)
+          return TapoClientExceptionHandling.RetryAfterReconnect;
         }
 
         return TapoClientExceptionHandling.ThrowWrapTapoProtocolException;
@@ -53,9 +54,10 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
       case TapoErrorResponseException errorResponseException:
         if (attempt == 0 /* retry just once */) {
           switch (errorResponseException.ErrorCode) {
-            // The session might have been in invalid state(?)
             case TapoErrorCodes.DeviceBusy:
               logger?.LogWarning(errorResponseException, "Error code -1301");
+
+              // The session might have been in invalid state(?)
               return TapoClientExceptionHandling.RetryAfterReconnect;
 
             case TapoErrorCodes.RequestParameterError:
@@ -64,7 +66,9 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
 
             default:
               logger?.LogWarning(errorResponseException, $"Unexpected error ({nameof(errorResponseException.ErrorCode)}: {(int)errorResponseException.ErrorCode})");
-              return TapoClientExceptionHandling.RetryAfterReestablishSession;
+
+              // The session might have been in invalid state(?)
+              return TapoClientExceptionHandling.RetryAfterReconnect;
           }
         }
 

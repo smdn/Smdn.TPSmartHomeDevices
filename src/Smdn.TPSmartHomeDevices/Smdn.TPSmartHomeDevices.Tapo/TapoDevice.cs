@@ -435,10 +435,6 @@ public partial class TapoDevice : IDisposable {
             client = null;
             continue;
 
-          case TapoClientExceptionHandling.RetryAfterReestablishSession:
-            client.CloseSession();
-            continue;
-
           case TapoClientExceptionHandling.RetryAfterResolveEndPoint: {
             if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
               goto case TapoClientExceptionHandling.Throw;

@@ -132,15 +132,6 @@ public sealed partial class TapoClient : IDisposable {
     );
   }
 
-  public void CloseSession()
-  {
-    ThrowIfDisposed();
-
-    // dispose the established session and set to null
-    session?.Dispose();
-    session = null;
-  }
-
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )

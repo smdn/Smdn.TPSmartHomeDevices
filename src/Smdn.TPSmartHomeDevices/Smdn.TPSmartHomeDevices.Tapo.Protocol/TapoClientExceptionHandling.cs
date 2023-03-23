@@ -9,6 +9,5 @@ public enum TapoClientExceptionHandling {
 
   Retry = 100,
   RetryAfterReconnect = 101,
-  RetryAfterReestablishSession = 102,
-  RetryAfterResolveEndPoint = 103,
+  RetryAfterResolveEndPoint = 102,
 }
