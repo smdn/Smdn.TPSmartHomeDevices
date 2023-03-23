@@ -15,7 +15,6 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;
     private readonly int port;
-    private IPAddress? latestResolvedAddress;
 
     public MacAddressDeviceEndPointProvider(
       IAddressResolver<PhysicalAddress, IPAddress> resolver,
@@ -30,24 +29,21 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
 
     public async ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
     {
-      latestResolvedAddress = await resolver.ResolveAsync(
+      var resolvedAddress = await resolver.ResolveAsync(
         address: address,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
 
-      return latestResolvedAddress is null
+      return resolvedAddress is null
         ? null
         : new IPEndPoint(
-            address: latestResolvedAddress,
+            address: resolvedAddress,
             port: port
           );
     }
 
     public void InvalidateEndPoint()
-    {
-      if (latestResolvedAddress is not null)
-        resolver.Invalidate(latestResolvedAddress);
-    }
+      => resolver.Invalidate(address);
 
     public override string ToString()
       => address.ToMacAddressString();
