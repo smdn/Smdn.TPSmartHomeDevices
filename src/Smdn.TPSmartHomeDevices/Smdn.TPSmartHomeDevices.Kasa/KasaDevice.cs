@@ -324,22 +324,31 @@ public partial class KasaDevice : IDisposable {
         ).ConfigureAwait(false);
       }
       catch (Exception ex) {
+        static void LogRequest(ILogger? logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
+          => logger?.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");
+
         var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
         switch (handling) {
           case KasaClientExceptionHandling.Throw:
           default:
+            LogRequest(client.Logger, module, method, parameters);
+
             client.Dispose();
             client = null;
+
             throw;
 
           case KasaClientExceptionHandling.ThrowAndInvalidateEndPoint: {
+            LogRequest(client.Logger, module, method, parameters);
+
             if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
               // mark end point as invalid to have the end point refreshed or rescanned
               dynamicEndPoint.InvalidateEndPoint();
 
             client.Dispose();
             client = null;
+
             throw;
           }
 

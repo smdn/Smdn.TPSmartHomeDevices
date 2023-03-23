@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -373,27 +374,38 @@ public partial class TapoDevice : IDisposable {
         return composeResult(response);
       }
       catch (Exception ex) {
+        static void LogRequest(ILogger? logger, TRequest req)
+          => logger?.LogError(JsonSerializer.Serialize(req));
+
         var endPointUri = client.EndPointUri;
         var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
         switch (handling) {
           case TapoClientExceptionHandling.Throw:
           default:
+            LogRequest(client.Logger, request);
+
             client.Dispose();
             client = null;
+
             throw;
 
           case TapoClientExceptionHandling.ThrowAndInvalidateEndPoint: {
+            LogRequest(client.Logger, request);
+
             if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
               // mark end point as invalid to have the end point refreshed or rescanned
               dynamicEndPoint.InvalidateEndPoint();
 
             client.Dispose();
             client = null;
+
             throw;
           }
 
           case TapoClientExceptionHandling.ThrowWrapTapoProtocolException:
+            LogRequest(client.Logger, request);
+
             client.Dispose();
             client = null;
 
