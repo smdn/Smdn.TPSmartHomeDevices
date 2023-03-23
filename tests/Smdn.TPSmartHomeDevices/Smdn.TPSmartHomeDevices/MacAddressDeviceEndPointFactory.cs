@@ -35,7 +35,7 @@ public class MacAddressDeviceEndPointFactoryTests {
       public ValueTask<IPAddress?> ResolveAsync(PhysicalAddress address, CancellationToken cancellationToken)
         => new(ipAddress);
 
-      public void Invalidate(IPAddress address) { }
+      public void Invalidate(PhysicalAddress address) { }
     }
 
     public StaticMacAddressDeviceEndPointFactory(IPAddress ipAddress)
@@ -134,9 +134,10 @@ public class MacAddressDeviceEndPointFactoryTests {
       return default;
     }
 
-    public void Invalidate(IPAddress resolvedAddress)
+    public void Invalidate(PhysicalAddress address)
     {
-      invalidatedAddresses.Add(resolvedAddress);
+      if (addressMap.TryGetValue(address, out var resolvedAddress))
+        invalidatedAddresses.Add(resolvedAddress);
     }
   }
 
