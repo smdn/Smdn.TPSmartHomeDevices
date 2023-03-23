@@ -44,7 +44,9 @@ internal class TapoHttpClientFactory : IHttpClientFactory {
     var client = new HttpClient(
       handler: DefaultHandler,
       disposeHandler: false
-    );
+    ) {
+      Timeout = TimeSpan.FromSeconds(20),
+    };
 
     configureClient?.Invoke(client);
 
