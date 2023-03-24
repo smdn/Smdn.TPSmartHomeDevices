@@ -359,8 +359,12 @@ public partial class TapoDevice : IDisposable {
     where TResponse : ITapoPassThroughResponse
   {
     const int maxAttempts = 5;
+    var delay = TimeSpan.Zero;
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (TimeSpan.Zero < delay)
+        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+
       await EnsureSessionEstablishedAsync(cancellationToken).ConfigureAwait(false);
 
       cancellationToken.ThrowIfCancellationRequested();
@@ -374,77 +378,74 @@ public partial class TapoDevice : IDisposable {
         return composeResult(response);
       }
       catch (Exception ex) {
-        static void LogRequest(ILogger? logger, TRequest req)
-          => logger?.LogError(JsonSerializer.Serialize(req));
+        static void LogRequest(ILogger logger, TRequest req)
+          => logger.LogError(JsonSerializer.Serialize(req));
 
-        var endPointUri = client.EndPointUri;
         var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
-        switch (handling) {
-          case TapoClientExceptionHandling.Throw:
-          default:
-            LogRequest(client.Logger, request);
+        client.Logger?.LogTrace(
+          "Exception handling for {TypeOfException}: {ExceptionHandling}",
+          ex.GetType().FullName,
+          handling
+        );
 
-            client.Dispose();
-            client = null;
+        if (client.Logger is not null && !handling.ShouldRetry)
+          LogRequest(client.Logger, request);
 
-            throw;
-
-          case TapoClientExceptionHandling.ThrowAndInvalidateEndPoint: {
-            LogRequest(client.Logger, request);
-
-            if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
-              // mark end point as invalid to have the end point refreshed or rescanned
-              dynamicEndPoint.InvalidateEndPoint();
-
-            client.Dispose();
-            client = null;
-
-            throw;
-          }
-
-          case TapoClientExceptionHandling.ThrowWrapTapoProtocolException:
-            LogRequest(client.Logger, request);
-
-            client.Dispose();
-            client = null;
-
-            if (
-              ex is TaskCanceledException exTaskCanceled &&
-              exTaskCanceled.InnerException is TimeoutException exInnerTimeout
-            ) {
-              throw new TapoProtocolException(
-                message: $"Request timed out; {ex.Message}",
-                endPoint: endPointUri,
-                innerException: exInnerTimeout
-              );
-            }
-            else {
-              throw new TapoProtocolException(
-                message: "Unhandled exception",
-                endPoint: endPointUri,
-                innerException: ex
-              );
-            }
-
-          case TapoClientExceptionHandling.Retry:
-            continue;
-
-          case TapoClientExceptionHandling.RetryAfterReconnect:
-            client.Dispose();
-            client = null;
-            continue;
-
-          case TapoClientExceptionHandling.RetryAfterResolveEndPoint: {
-            if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
-              goto case TapoClientExceptionHandling.Throw;
-
+        if (handling.ShouldInvalidateEndPoint) {
+          if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
             dynamicEndPoint.InvalidateEndPoint();
-
-            continue;
           }
-        } // switch (handling)
+          else {
+            // disallow retry
+            handling = handling with { ShouldRetry = false };
+          }
+        }
+
+        if (handling.ShouldRetry) {
+          /*
+           * retry
+           */
+          delay = handling.RetryAfter;
+
+          if (handling.ShouldReconnect) {
+            client.Dispose();
+            client = null;
+          }
+
+          continue;
+        }
+
+        /*
+         * rethrow
+         */
+        var endPointUri = client.EndPointUri;
+
+        client.Dispose();
+        client = null;
+
+        if (handling.ShouldWrapIntoTapoProtocolException) {
+          if (
+            ex is TaskCanceledException exTaskCanceled &&
+            exTaskCanceled.InnerException is TimeoutException exInnerTimeout
+          ) {
+            throw new TapoProtocolException(
+              message: $"Request timed out; {ex.Message}",
+              endPoint: endPointUri,
+              innerException: exInnerTimeout
+            );
+          }
+          else {
+            throw new TapoProtocolException(
+              message: "Unhandled exception",
+              endPoint: endPointUri,
+              innerException: ex
+            );
+          }
+        }
+
+        throw;
       } // try
     } // for
 

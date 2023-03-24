@@ -21,12 +21,12 @@ internal class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
             // The end point may have changed.
             logger?.LogInformation($"Endpoint may have changed ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
-            return KasaClientExceptionHandling.RetryAfterResolveEndPoint;
+            return KasaClientExceptionHandling.InvalidateEndPointAndRetry;
           }
           else {
             logger?.LogError($"Endpoint unreachable ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
-            return KasaClientExceptionHandling.ThrowAndInvalidateEndPoint;
+            return KasaClientExceptionHandling.InvalidateEndPointAndThrow;
           }
         }
 

@@ -24,12 +24,12 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
               // The end point may have changed.
               logger?.LogInformation($"Endpoint may have changed ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
-              return TapoClientExceptionHandling.RetryAfterResolveEndPoint;
+              return TapoClientExceptionHandling.InvalidateEndPointAndRetry;
             }
             else {
               logger?.LogError($"Endpoint unreachable ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
 
-              return TapoClientExceptionHandling.ThrowAndInvalidateEndPoint;
+              return TapoClientExceptionHandling.InvalidateEndPointAndThrow;
             }
           }
 
@@ -49,7 +49,7 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
           return TapoClientExceptionHandling.RetryAfterReconnect;
         }
 
-        return TapoClientExceptionHandling.ThrowWrapTapoProtocolException;
+        return TapoClientExceptionHandling.ThrowAsTapoProtocolException;
 
       case TapoErrorResponseException errorResponseException:
         if (attempt == 0 /* retry just once */) {
@@ -83,7 +83,7 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
 
           logger?.LogError(taskCanceledException, "Request timed out");
 
-          return TapoClientExceptionHandling.ThrowWrapTapoProtocolException;
+          return TapoClientExceptionHandling.ThrowAsTapoProtocolException;
         }
 
         return TapoClientExceptionHandling.Throw;

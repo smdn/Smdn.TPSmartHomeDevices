@@ -287,9 +287,13 @@ public partial class KasaDevice : IDisposable {
   )
   {
     const int maxAttempts = 5;
+    var delay = TimeSpan.Zero;
     EndPoint? endPoint = null;
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      if (TimeSpan.Zero < delay)
+        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+
       if (endPoint is null) {
         endPoint = await ResolveEndPointAsync(cancellationToken).ConfigureAwait(false);
 
@@ -324,54 +328,54 @@ public partial class KasaDevice : IDisposable {
         ).ConfigureAwait(false);
       }
       catch (Exception ex) {
-        static void LogRequest(ILogger? logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
-          => logger?.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");
+        static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
+          => logger.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");
 
         var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
 
-        switch (handling) {
-          case KasaClientExceptionHandling.Throw:
-          default:
-            LogRequest(client.Logger, module, method, parameters);
+        client.Logger?.LogTrace(
+          "Exception handling for {TypeOfException}: {ExceptionHandling}",
+          ex.GetType().FullName,
+          handling
+        );
 
-            client.Dispose();
-            client = null;
+        if (client.Logger is not null && !handling.ShouldRetry)
+          LogRequest(client.Logger, module, method, parameters);
 
-            throw;
-
-          case KasaClientExceptionHandling.ThrowAndInvalidateEndPoint: {
-            LogRequest(client.Logger, module, method, parameters);
-
-            if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint)
-              // mark end point as invalid to have the end point refreshed or rescanned
-              dynamicEndPoint.InvalidateEndPoint();
-
-            client.Dispose();
-            client = null;
-
-            throw;
-          }
-
-          case KasaClientExceptionHandling.Retry:
-            continue;
-
-          case KasaClientExceptionHandling.RetryAfterReconnect:
-            client.Dispose();
-            client = null;
-            continue;
-
-          case KasaClientExceptionHandling.RetryAfterResolveEndPoint: {
-            if (deviceEndPointProvider is not IDynamicDeviceEndPointProvider dynamicEndPoint)
-              goto case KasaClientExceptionHandling.Throw;
-
+        if (handling.ShouldInvalidateEndPoint) {
+          if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
             dynamicEndPoint.InvalidateEndPoint();
 
             endPoint = null; // should resolve end point
-
-            continue;
           }
-        } // switch (handling)
+          else {
+            // disallow retry
+            handling = handling with { ShouldRetry = false };
+          }
+        }
+
+        if (handling.ShouldRetry) {
+          /*
+           * retry
+           */
+          delay = handling.RetryAfter;
+
+          if (handling.ShouldReconnect) {
+            client.Dispose();
+            client = null;
+          }
+
+          continue;
+        }
+
+        /*
+         * rethrow
+         */
+        client.Dispose();
+        client = null;
+
+        throw;
       } // try
     } // for
 
