@@ -12,58 +12,91 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// This implementation is based on and ported from the following implementation: <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>.
 /// </remarks>
 public static class TapoCredentialUtils {
+#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHSIZEINBYTES
+  private const int SHA1HashSizeInBytes = SHA1.HashSizeInBytes;
+#else
+  private const int SHA1HashSizeInBytes = 160/*bits*/ / 8;
+#endif
+  public const int HexSHA1HashSizeInBytes = SHA1HashSizeInBytes * 2; // byte array -> hex byte array
+
+  /// <summary>
+  /// Hash the string passed by the <paramref name="str"/> with SHA-1 algorithm and converts to the base64 format used for authentication of Tapo devices.
+  /// </summary>
+  /// <param name="str">The string to convert.</param>
+  /// <returns>The <see cref="string"/> containing the result of the conversion.</returns>
   public static string ToBase64EncodedSHA1DigestString(ReadOnlySpan<char> str)
   {
-#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHSIZEINBYTES
-    const int SHA1HashSizeInBytes = SHA1.HashSizeInBytes;
-#else
-    const int SHA1HashSizeInBytes = 160/*bits*/ / 8;
-#endif
-
     byte[]? bytes = null;
 
     try {
-      /*
-       * string -> UTF-8 byte array
-       */
+      // string -> UTF-8 byte array
       var length = Encoding.UTF8.GetByteCount(str);
 
       bytes = ArrayPool<byte>.Shared.Rent(length);
 
       Encoding.UTF8.GetBytes(str, bytes);
 
-      /*
-       * UTF-8 byte array -> SHA-1 hash byte array
-       */
-      Span<byte> sha1hash = stackalloc byte[SHA1HashSizeInBytes];
+      // UTF-8 byte array -> hex SHA-1 hash byte array
+      Span<byte> hexSHA1Hash = stackalloc byte[HexSHA1HashSizeInBytes];
 
-#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHDATA
-      var bytesWritten = SHA1.HashData(bytes.AsSpan(0, length), sha1hash);
+      if (!TryConvertToHexSHA1Hash(bytes.AsSpan(0, length), hexSHA1Hash, out _))
+        throw new InvalidOperationException("failed to convert hex SHA-1 hash");
+
+      // hex SHA-1 hash byte array -> base64 string
+      return Convert.ToBase64String(hexSHA1Hash, Base64FormattingOptions.None);
+    }
+    finally {
+      if (bytes is not null)
+        ArrayPool<byte>.Shared.Return(bytes, clearArray: true);
+    }
+  }
+
+  /// <summary>
+  /// Attempts to convert the UTF-8 string passed by the <paramref name="input"/> to the SHA-1 hash represented in the hexadecimal format (base16).
+  /// </summary>
+  /// <param name="input">The UTF-8 string to convert.</param>
+  /// <param name="destination">The buffer to receive the converted value.</param>
+  /// <param name="bytesWritten">When this method returns, the total number of bytes written into destination.</param>
+  /// <returns><see langword="false"/> if <paramref name="destination"/> is too small to hold the calculated hash, <see langword="true"/> otherwise.</returns>
+  public static bool TryConvertToHexSHA1Hash(
+    ReadOnlySpan<byte> input,
+    Span<byte> destination,
+    out int bytesWritten
+  )
+  {
+    bytesWritten = 0;
+
+    if (destination.Length < HexSHA1HashSizeInBytes)
+      return false;
+
+    Span<byte> sha1hash = stackalloc byte[SHA1HashSizeInBytes];
+
+    try {
+#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
+      if (!SHA1.TryHashData(input, sha1hash, out var bytesWrittenSHA1))
+        return false; // destination too short
 #else
 #pragma warning disable CA5350
       using var sha1 = SHA1.Create();
 #pragma warning restore CA5350
 
-      if (!sha1.TryComputeHash(bytes.AsSpan(0, length), sha1hash, out var bytesWritten))
-        throw new InvalidOperationException("destination too short");
+      if (!sha1.TryComputeHash(input, sha1hash, out var bytesWrittenSHA1))
+        return false; // destination too short
 #endif
 
-      Span<byte> hashLowerCaseHex = stackalloc byte[bytesWritten * 2];
+      if (bytesWrittenSHA1 != SHA1HashSizeInBytes)
+        return false; // unexpected state
 
       /*
-       * SHA-1 hash byte array -> hex byte array
-       */
-      if (!Hexadecimal.TryEncodeLowerCase(sha1hash.Slice(0, bytesWritten), hashLowerCaseHex, out var bytesEncoded))
-        throw new InvalidOperationException("destination too short");
+        * SHA-1 hash byte array -> hex byte array
+        */
+      if (!Hexadecimal.TryEncodeLowerCase(sha1hash, destination, out bytesWritten))
+        return false; // destination too short
 
-      /*
-       * hex byte array -> base64 string
-       */
-      return Convert.ToBase64String(hashLowerCaseHex.Slice(0, bytesEncoded), Base64FormattingOptions.None);
+      return true;
     }
     finally {
-      if (bytes is not null)
-        ArrayPool<byte>.Shared.Return(bytes, clearArray: true);
+      sha1hash.Clear();
     }
   }
 
