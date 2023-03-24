@@ -58,7 +58,10 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
               logger?.LogWarning(errorResponseException, "Error code -1301");
 
               // The session might have been in invalid state(?)
-              return TapoClientExceptionHandling.RetryAfterReconnect;
+              return TapoClientExceptionHandling.CreateRetry(
+                retryAfter: TimeSpan.FromSeconds(2.0),
+                shouldReconnect: true
+              );
 
             case TapoErrorCodes.RequestParameterError:
               logger?.LogWarning(errorResponseException, "Error code -1008");

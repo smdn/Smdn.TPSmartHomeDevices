@@ -56,7 +56,10 @@ internal class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
 
         if (nextAttempt < maxRetryIncompleteResponse) { // retry up to max attempts
           logger?.LogWarning(ex.Message);
-          return KasaClientExceptionHandling.RetryAfterReconnect;
+          return KasaClientExceptionHandling.CreateRetry(
+            retryAfter: TimeSpan.FromSeconds(2.0),
+            shouldReconnect: true
+          );
         }
 
         return KasaClientExceptionHandling.Throw;
