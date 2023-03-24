@@ -17,7 +17,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 /// </remarks>
 public sealed partial class KasaClient : IDisposable {
   public const int DefaultPort = 9999;
-  internal const int DefaultBufferCapacity = 1024; // TODO: best initial capacity
+  internal const int DefaultBufferCapacity = 1536; // 1.5 [kB]
   private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "err_code"u8
