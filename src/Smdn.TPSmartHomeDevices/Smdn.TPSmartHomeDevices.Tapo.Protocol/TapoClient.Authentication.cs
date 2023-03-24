@@ -3,6 +3,7 @@
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -96,6 +97,7 @@ partial class TapoClient {
         (string?, int?)
       >(
         request: new(key: publicKeyInfoPem),
+        jsonSerializerOptions: CommonJsonSerializerOptions,
         processHttpResponse: ParseSessionCookie,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
@@ -171,11 +173,12 @@ partial class TapoClient {
     );
 
     return new(
+      host: endPointUri.Host,
       sessionId: sessionId,
       expiresOn: expiresOn,
       key: keyBytes.AsSpan(0, 16),
       iv: keyBytes.AsSpan(16, 16),
-      plainTextJsonSerializerOptions: defaultJsonSerializerOptions,
+      baseJsonSerializerOptions: CommonJsonSerializerOptions,
       logger: logger
     );
 
@@ -197,10 +200,7 @@ partial class TapoClient {
 
     try {
       var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
-        request: new(
-          password: credential.GetBase64EncodedPassword(endPointUri.Host),
-          userName: credential.GetBase64EncodedUserNameSHA1Digest(endPointUri.Host)
-        ),
+        request: new(credential: credential),
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
 

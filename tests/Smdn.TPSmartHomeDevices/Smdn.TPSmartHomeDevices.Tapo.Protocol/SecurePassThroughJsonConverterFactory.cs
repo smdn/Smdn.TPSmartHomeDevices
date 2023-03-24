@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Smdn.IO.Streams;
@@ -97,9 +98,10 @@ public class SecurePassThroughJsonConverterFactoryTests {
     ILogger? logger = null
   )
     => new(
+      host: string.Empty,
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
       decryptorForPassThroughResponse: decryptorForPassThroughResponse ?? new NullTransform(),
-      plainTextJsonSerializerOptions: baseJsonSerializerOptions,
+      baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,
       logger: logger
     );
 
@@ -198,9 +200,18 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughRequest()
   {
+    var services = new ServiceCollection();
+
+    services.AddTapoCredential(
+      email: "user",
+      password: "pass"
+    );
+
+    var credentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
+
     yield return new object[] {
-      new LoginDeviceRequest("pass", "user"),
-      @"{""method"":""login_device"",""params"":{""password"":""pass"",""username"":""user""},""requestTimeMils"":0}"
+      new LoginDeviceRequest(credentialProvider),
+      @"{""method"":""login_device"",""params"":{""password"":""cGFzcw=="",""username"":""MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ==""},""requestTimeMils"":0}"
     };
     yield return new object[] {
       new GetDeviceInfoRequest(),

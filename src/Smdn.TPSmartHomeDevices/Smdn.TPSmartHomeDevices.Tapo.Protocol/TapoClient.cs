@@ -3,6 +3,8 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -39,6 +41,19 @@ public sealed partial class TapoClient : IDisposable {
     return uriBuilder.Uri;
   }
 
+  private static readonly JsonSerializerOptions CommonJsonSerializerOptions = new() {
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+
+#if false
+    // disable encoding '+' in base64 strings
+    // ref: https://github.com/dotnet/runtime/issues/35281
+    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+#endif
+  };
+
+  /*
+   * instance members
+   */
   private bool IsDisposed => httpClientFactory is null;
 
   private IHttpClientFactory? httpClientFactory; // if null, it indicates a 'disposed' state.
@@ -154,12 +169,13 @@ public sealed partial class TapoClient : IDisposable {
 
     ThrowIfDisposed();
 
-    if (Session is null)
+    if (session is null)
       throw new InvalidOperationException("The session for this instance has not been established.");
 
     return PostSecurePassThroughRequestAsync<TRequest, TResponse>(
-      request,
-      cancellationToken
+      request: request,
+      jsonSerializerOptions: session.SecurePassThroughJsonSerializerOptions,
+      cancellationToken: cancellationToken
     );
   }
 }

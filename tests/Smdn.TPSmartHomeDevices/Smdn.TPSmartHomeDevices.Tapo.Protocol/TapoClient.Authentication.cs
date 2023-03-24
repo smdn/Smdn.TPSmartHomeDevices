@@ -273,13 +273,85 @@ partial class TapoClientTests {
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
   }
 
+  private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeConverted()
+  {
+    const string expectedUsernamePropertyValue = "MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ=="; // "user"
+    const string expectedPasswordPropertyValue = "cGFzcw=="; // "pass"
+
+    var servicesForCaseOfPlainText = new ServiceCollection();
+
+    servicesForCaseOfPlainText.AddTapoCredential("user", "pass");
+
+    yield return new object[] {
+      servicesForCaseOfPlainText.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>(),
+      expectedUsernamePropertyValue,
+      expectedPasswordPropertyValue
+    };
+
+    var servicesForCaseOfBase64Encoded = new ServiceCollection();
+
+    servicesForCaseOfBase64Encoded.AddTapoBase64EncodedCredential(expectedUsernamePropertyValue, expectedPasswordPropertyValue);
+
+    yield return new object[] {
+      servicesForCaseOfBase64Encoded.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>(),
+      expectedUsernamePropertyValue,
+      expectedPasswordPropertyValue
+    };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeConverted))]
+  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeConverted(
+    ITapoCredentialProvider credential,
+    string expectedUsernamePropertyValue,
+    string expectedPasswordPropertyValue
+  )
+  {
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateLoginDeviceResponse = (session, param) => {
+        Assert.IsTrue(param.TryGetProperty("username", out var propUsername), $"{nameof(param)} must have 'username' property");
+        Assert.IsTrue(param.TryGetProperty("password", out var propPassword), $"{nameof(param)} must have 'password' property");
+
+        Assert.AreEqual(expectedUsernamePropertyValue, propUsername.GetString(), nameof(propUsername));
+        Assert.AreEqual(expectedPasswordPropertyValue, propPassword.GetString(), nameof(propPassword));
+
+        return new LoginDeviceResponse() {
+          ErrorCode = ErrorCode.Success,
+          Result = new LoginDeviceResponse.ResponseResult(Token: token)
+        };
+      },
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(credential: credential)
+    );
+
+    Assert.IsNotNull(client.Session);
+    Assert.IsNotNull(client.Session!.Token);
+    Assert.AreEqual(token, client.Session.Token);
+    Assert.IsNotNull(client.Session!.SessionId);
+    Assert.IsNotEmpty(client.Session.SessionId);
+    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
+    Assert.IsFalse(client.Session.HasExpired);
+    Assert.AreEqual(
+      new Uri($"/app?token={token}", UriKind.Relative),
+      client.Session.RequestPathAndQuery
+    );
+  }
+
   [Test]
   public async Task AuthenticateAsync_LoginDevice_ErrorResponse()
   {
     const ErrorCode loginDeviceErrorCode = (ErrorCode)(-9999);
 
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = static token => new LoginDeviceResponse() {
+      FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
         ErrorCode = loginDeviceErrorCode,
         Result = new LoginDeviceResponse.ResponseResult(Token: string.Empty)
       },
@@ -333,7 +405,7 @@ partial class TapoClientTests {
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => token,
-      FuncGenerateLoginDeviceResponse = static _ => {
+      FuncGenerateLoginDeviceResponse = static (_, _) => {
         System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5)); // perform latency
 
         return new LoginDeviceResponse() {

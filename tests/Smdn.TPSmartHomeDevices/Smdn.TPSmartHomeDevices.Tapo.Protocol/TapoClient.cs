@@ -11,23 +11,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 [TestFixture]
 public partial class TapoClientTests {
-  private class CredentialProvider : ITapoCredentialProvider {
-    private readonly string base64UserNameSHA1Digest;
-    private readonly string base64Password;
-
-    public CredentialProvider(
-      string base64UserNameSHA1Digest,
-      string base64Password
-    )
-    {
-      this.base64UserNameSHA1Digest = base64UserNameSHA1Digest;
-      this.base64Password = base64Password;
-    }
-
-    public string GetBase64EncodedUserNameSHA1Digest(string host) => base64UserNameSHA1Digest;
-    public string GetBase64EncodedPassword(string host) => base64Password;
-  }
-
   private ServiceCollection? services;
   private ITapoCredentialProvider? defaultCredentialProvider;
 

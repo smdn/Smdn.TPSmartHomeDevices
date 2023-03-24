@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -14,6 +17,42 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   private const string Base64UserNameSHA1Digest = "YjhlY2VjNWIzNjk0ZTVlNzE0YTYxMmNhZTZlZTJiNmExMjQ5ZmZmZQ==";
   private const string Base64Password = "cGFzc3dvcmQ=";
 
+  private static (string Username, string Password) GetEncodedCredential(
+    ITapoCredentialProvider provider,
+    string host
+  )
+  {
+    using var credential = provider.GetCredential(host: host);
+
+    using var usernameStream = new MemoryStream(capacity: 64);
+    using var usernameWriter = new Utf8JsonWriter(usernameStream);
+
+    credential.WriteUsernamePropertyValue(usernameWriter);
+
+    usernameWriter.Flush();
+
+    using var passwordStream = new MemoryStream(capacity: 32);
+    using var passwordWriter = new Utf8JsonWriter(passwordStream);
+
+    credential.WritePasswordPropertyValue(passwordWriter);
+
+    passwordWriter.Flush();
+
+    var quotedUsername = Encoding.UTF8.GetString(usernameStream.ToArray());
+    var quotedPassword = Encoding.UTF8.GetString(passwordStream.ToArray());
+
+    if (!(quotedUsername.StartsWith("\"") && quotedUsername.StartsWith("\"")))
+      throw new InvalidOperationException($"unexpected username: {quotedUsername}");
+
+    if (!(quotedPassword.StartsWith("\"") && quotedPassword.StartsWith("\"")))
+      throw new InvalidOperationException($"unexpected password: {quotedPassword}");
+
+    var username = quotedUsername.Substring(1, quotedUsername.Length - 2);
+    var password = quotedPassword.Substring(1, quotedPassword.Length - 2);
+
+    return (username, password);
+  }
+
   [Test]
   public void AddTapoCredential()
   {
@@ -24,11 +63,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       password: Password
     );
 
-    var cred = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(cred, nameof(cred));
-    Assert.AreEqual(Base64UserNameSHA1Digest, cred.GetBase64EncodedUserNameSHA1Digest(host: string.Empty));
-    Assert.AreEqual(Base64Password, cred.GetBase64EncodedPassword(host: string.Empty));
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+
+    Assert.AreEqual(Base64UserNameSHA1Digest, username);
+    Assert.AreEqual(Base64Password, password);
   }
 
   [Test]
@@ -45,11 +87,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       password: "this must not be selected"
     );
 
-    var cred = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(cred, nameof(cred));
-    Assert.AreEqual(Base64UserNameSHA1Digest, cred.GetBase64EncodedUserNameSHA1Digest(host: string.Empty));
-    Assert.AreEqual(Base64Password, cred.GetBase64EncodedPassword(host: string.Empty));
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+
+    Assert.AreEqual(Base64UserNameSHA1Digest, username);
+    Assert.AreEqual(Base64Password, password);
   }
 
   [TestCase(EMail, null)]
@@ -76,11 +121,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       base64Password: Base64Password
     );
 
-    var cred = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(cred, nameof(cred));
-    Assert.AreEqual(Base64UserNameSHA1Digest, cred.GetBase64EncodedUserNameSHA1Digest(host: string.Empty));
-    Assert.AreEqual(Base64Password, cred.GetBase64EncodedPassword(host: string.Empty));
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+
+    Assert.AreEqual(Base64UserNameSHA1Digest, username);
+    Assert.AreEqual(Base64Password, password);
   }
 
   [Test]
@@ -97,11 +145,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       base64Password: "this must not be selected"
     );
 
-    var cred = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(cred, nameof(cred));
-    Assert.AreEqual(Base64UserNameSHA1Digest, cred.GetBase64EncodedUserNameSHA1Digest(host: string.Empty));
-    Assert.AreEqual(Base64Password, cred.GetBase64EncodedPassword(host: string.Empty));
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+
+    Assert.AreEqual(Base64UserNameSHA1Digest, username);
+    Assert.AreEqual(Base64Password, password);
   }
 
   [TestCase(Base64UserNameSHA1Digest, null)]

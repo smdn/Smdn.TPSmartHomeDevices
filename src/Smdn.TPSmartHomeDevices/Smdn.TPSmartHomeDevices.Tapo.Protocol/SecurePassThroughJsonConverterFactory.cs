@@ -32,21 +32,29 @@ public sealed class SecurePassThroughJsonConverterFactory :
 
   private ICryptoTransform? encryptorForPassThroughRequest;
   private ICryptoTransform? decryptorForPassThroughResponse;
-  private readonly JsonSerializerOptions? plainTextJsonSerializerOptions;
+
+  // used for avoiding JsonSerializer to (de)serialize recursively
+  private readonly JsonSerializerOptions jsonSerializerOptionsForPassThroughMessage;
+
   private readonly ILogger? logger;
   private bool disposed;
 
   public SecurePassThroughJsonConverterFactory(
+    string host,
     ICryptoTransform? encryptorForPassThroughRequest,
     ICryptoTransform? decryptorForPassThroughResponse,
-    JsonSerializerOptions? plainTextJsonSerializerOptions,
+    JsonSerializerOptions? baseJsonSerializerOptionsForPassThroughMessage,
     ILogger? logger = null
   )
   {
     this.encryptorForPassThroughRequest = encryptorForPassThroughRequest;
     this.decryptorForPassThroughResponse = decryptorForPassThroughResponse;
-    this.plainTextJsonSerializerOptions = plainTextJsonSerializerOptions; // used for avoiding JsonSerializer to (de)serialize recursively
     this.logger = logger;
+
+    jsonSerializerOptionsForPassThroughMessage = baseJsonSerializerOptionsForPassThroughMessage is null
+      ? new()
+      : new(baseJsonSerializerOptionsForPassThroughMessage);
+    jsonSerializerOptionsForPassThroughMessage.Converters.Add(LoginDeviceRequest.CreateJsonConverter(host: host));
   }
 
   public void Dispose()
@@ -108,7 +116,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
   {
     logger?.LogTrace(
       "PassThroughRequest: {RawJson} ({TypeFullName})",
-      JsonSerializer.Serialize(value: value, options: plainTextJsonSerializerOptions),
+      JsonSerializer.Serialize(value: value, options: jsonSerializerOptionsForPassThroughMessage),
       typeof(TValue).FullName
     );
 
@@ -119,7 +127,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
     JsonSerializer.Serialize(
       utf8Json: encryptingStream,
       value: value,
-      options: plainTextJsonSerializerOptions
+      options: jsonSerializerOptionsForPassThroughMessage
     );
 
     encryptingStream.Close();
@@ -148,7 +156,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
         return (TValue?)JsonSerializer.Deserialize(
           utf8Json: decryptingStream,
           returnType: typeToConvert,
-          options: plainTextJsonSerializerOptions
+          options: jsonSerializerOptionsForPassThroughMessage
         );
       }
       catch (CryptographicException ex) when (IsInvalidPaddingException(ex)) {

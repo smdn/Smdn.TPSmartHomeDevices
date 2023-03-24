@@ -125,7 +125,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public Func<SessionBase, string?>? FuncGenerateToken { get; set; }
   public Func<SessionBase, RSA, HandshakeResponse>? FuncGenerateHandshakeResponse { get; set; }
   public Func<SessionBase, string?>? FuncGenerateCookieValue { get; set; }
-  public Func<SessionBase, LoginDeviceResponse>? FuncGenerateLoginDeviceResponse { get; set; }
+  public Func<SessionBase, JsonElement, LoginDeviceResponse>? FuncGenerateLoginDeviceResponse { get; set; }
   public Func<SessionBase, string, JsonElement, (ErrorCode, ITapoPassThroughResponse?)>? FuncGeneratePassThroughResponse { get; set; }
 
   public PseudoTapoDevice()
@@ -646,9 +646,10 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     options.Converters.Add(
       new SecurePassThroughJsonConverterFactory(
+        host: string.Empty,
         encryptorForPassThroughRequest: session.Encryptor,
         decryptorForPassThroughResponse: null,
-        plainTextJsonSerializerOptions: null
+        baseJsonSerializerOptionsForPassThroughMessage: null
       )
     );
 
@@ -699,7 +700,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       ? null
       : new AuthorizedSession(token, unauthorizedSession);
 
-    var loginDeviceResponse = FuncGenerateLoginDeviceResponse?.Invoke(unauthorizedSession)
+    loginDeviceMethodJsonDocument.RootElement.TryGetProperty("params", out var loginDeviceMethodParamsProperty);
+
+    var loginDeviceResponse = FuncGenerateLoginDeviceResponse?.Invoke(unauthorizedSession, loginDeviceMethodParamsProperty)
       ?? new LoginDeviceResponse() {
         ErrorCode = ErrorCode.Success,
         Result = new LoginDeviceResponse.ResponseResult() {

@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,20 +15,11 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 #pragma warning disable IDE0040
 partial class TapoClient {
 #pragma warning restore IDE0040
-  private static readonly JsonSerializerOptions defaultJsonSerializerOptions = new() {
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-
-#if false
-    // disable encoding '+' in base64 strings
-    // ref: https://github.com/dotnet/runtime/issues/35281
-    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-#endif
-  };
-
   private static readonly MediaTypeHeaderValue mediaTypeJson = new(mediaType: "application/json");
 
   private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
     TRequest request,
+    JsonSerializerOptions jsonSerializerOptions,
     CancellationToken cancellationToken
   )
     where TRequest : ITapoPassThroughRequest
@@ -37,7 +27,7 @@ partial class TapoClient {
   {
     cancellationToken.ThrowIfCancellationRequested();
 
-    logger?.LogDebug("Request: {Request}", JsonSerializer.Serialize(request, defaultJsonSerializerOptions));
+    logger?.LogDebug("Request: {Request}", JsonSerializer.Serialize(request, jsonSerializerOptions));
 
     var (securePassThroughResponse, requestUri) = await PostPlainTextRequestAsync<
       SecurePassThroughRequest<TRequest>,
@@ -45,6 +35,7 @@ partial class TapoClient {
       Uri
     >(
       request: new(passThroughRequest: request),
+      jsonSerializerOptions: jsonSerializerOptions,
       processHttpResponse: static httpResponse => httpResponse.RequestMessage.RequestUri,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
@@ -68,6 +59,7 @@ partial class TapoClient {
   )>
   PostPlainTextRequestAsync<TRequest, TResponse, THttpResult>(
     TRequest request,
+    JsonSerializerOptions jsonSerializerOptions,
     Func<HttpResponseMessage, THttpResult?>? processHttpResponse,
     CancellationToken cancellationToken
   )
@@ -77,10 +69,6 @@ partial class TapoClient {
     cancellationToken.ThrowIfCancellationRequested();
 
     logger?.LogDebug("HTTP Transaction: Session={SessionId}, Token={Token}", session?.SessionId, session?.Token);
-
-    var jsonSerializerOptions = session is null
-      ? defaultJsonSerializerOptions
-      : session.SecurePassThroughJsonSerializerOptions;
 
     using var requestContent = JsonContent.Create(
       inputValue: request,
