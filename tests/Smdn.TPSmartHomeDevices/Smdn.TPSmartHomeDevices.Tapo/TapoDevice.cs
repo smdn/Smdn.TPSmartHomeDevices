@@ -823,6 +823,7 @@ public class TapoDeviceTests {
   {
     const int maxRetry = 3;
 
+    using var cts = new CancellationTokenSource();
     var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
 
     for (var attempt = 0; attempt < maxRetry; attempt++) {
@@ -838,7 +839,7 @@ public class TapoDeviceTests {
           FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            System.Threading.Thread.Sleep((session.State as Tuple<TimeSpan, string>).Item1);
+            Task.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token).GetAwaiter().GetResult();
 
             return (
               ErrorCode.Success,
@@ -874,6 +875,8 @@ public class TapoDeviceTests {
       Assert.AreEqual("token-request2", device.Session.Token, nameof(device.Session.Token));
     }
     finally {
+      cts.Cancel();
+
       foreach (var pseudoDevice in pseudoDevices) {
         await pseudoDevice.DisposeAsync();
       }
@@ -885,6 +888,7 @@ public class TapoDeviceTests {
   {
     const int maxRetry = 3;
 
+    using var cts = new CancellationTokenSource();
     var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
 
     for (var attempt = 0; attempt < maxRetry; attempt++) {
@@ -898,7 +902,7 @@ public class TapoDeviceTests {
           FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            System.Threading.Thread.Sleep((session.State as Tuple<TimeSpan, string>).Item1);
+            Task.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token).GetAwaiter().GetResult();
 
             return (
               ErrorCode.Success,
@@ -935,6 +939,8 @@ public class TapoDeviceTests {
       Assert.IsNull(device.Session, nameof(device.Session));
     }
     finally {
+      cts.Cancel();
+
       foreach (var pseudoDevice in pseudoDevices) {
         await pseudoDevice.DisposeAsync();
       }

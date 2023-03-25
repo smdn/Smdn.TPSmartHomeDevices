@@ -480,6 +480,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       await WriteBadRequestPlainTextContentAsync(context.Response, $"method not supported or unknown: '{method}'").ConfigureAwait(false);
       return;
     }
+    catch (OperationCanceledException) {
+      // swallow
+    }
     catch (ClientDisconnectedException) {
       throw;
     }

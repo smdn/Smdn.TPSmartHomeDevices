@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -368,10 +369,13 @@ partial class TapoClientTests {
   {
     const string token = "token";
 
+    using var cts = new CancellationTokenSource();
+
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => token,
-      FuncGenerateHandshakeResponse = static (_, _) => {
-        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5)); // perform latency
+      FuncGenerateHandshakeResponse = (_, _) => {
+        // perform latency
+        Task.Delay(TimeSpan.FromSeconds(5), cts.Token).GetAwaiter().GetResult();
 
         return new HandshakeResponse() {
           ErrorCode = (ErrorCode)9999,
@@ -395,17 +399,22 @@ partial class TapoClientTests {
       httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(
-        identity: null,
-        credential: defaultCredentialProvider
-      )
-    );
+    try {
+      var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+        async () => await client.AuthenticateAsync(
+          identity: null,
+          credential: defaultCredentialProvider
+        )
+      );
 
-    Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+      Assert.IsNull(client.Session);
+      Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    }
+    finally {
+      cts.Cancel();
+    }
   }
 
   private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeConverted()
@@ -547,10 +556,13 @@ partial class TapoClientTests {
   {
     const string token = "token";
 
+    var cts = new CancellationTokenSource();
+
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => token,
-      FuncGenerateLoginDeviceResponse = static (_, _) => {
-        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5)); // perform latency
+      FuncGenerateLoginDeviceResponse = (_, _) => {
+        // perform latency
+        Task.Delay(TimeSpan.FromSeconds(5), cts.Token).GetAwaiter().GetResult();
 
         return new LoginDeviceResponse() {
           ErrorCode = ErrorCode.Success,
@@ -574,17 +586,22 @@ partial class TapoClientTests {
       httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(
-        identity: null,
-        credential: defaultCredentialProvider
-      )
-    );
+    try {
+      var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+        async () => await client.AuthenticateAsync(
+          identity: null,
+          credential: defaultCredentialProvider
+        )
+      );
 
-    Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+      Assert.IsNull(client.Session);
+      Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    }
+    finally {
+      cts.Cancel();
+    }
   }
 
   private class Logger : ILogger {
