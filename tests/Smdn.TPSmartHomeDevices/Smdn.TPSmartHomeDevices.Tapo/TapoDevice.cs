@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,10 +32,7 @@ public class TapoDeviceTests {
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
 
-    if (
-      !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) &&
-      RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-    ) {
+    if (TestEnvironment.IsRunningOnGitHubActionsMacOSRunner) {
       services.AddTapoHttpClient(
         configureClient: client => {
           client.Timeout = TimeSpan.FromMinutes(1.0);
@@ -829,8 +825,8 @@ public class TapoDeviceTests {
     for (var attempt = 0; attempt < maxRetry; attempt++) {
       var state = Tuple.Create(
         attempt < maxRetry - 1
-          ? TimeSpan.FromSeconds(5)
-          : TimeSpan.FromMilliseconds(0),
+          ? TimeSpan.FromSeconds(60)
+          : TimeSpan.Zero,
         $"token-request{attempt}"
       );
 
@@ -856,7 +852,10 @@ public class TapoDeviceTests {
     }
 
     services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(200)
+      configureClient: static client => client.Timeout =
+        TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
+          ? TimeSpan.FromSeconds(20)
+          : TimeSpan.FromMilliseconds(200)
     );
 
     using var device = TapoDevice.Create(
@@ -893,7 +892,7 @@ public class TapoDeviceTests {
 
     for (var attempt = 0; attempt < maxRetry; attempt++) {
       var state = Tuple.Create(
-        TimeSpan.FromSeconds(5),
+        TimeSpan.FromSeconds(60),
         $"token-request{attempt}"
       );
 
@@ -919,7 +918,10 @@ public class TapoDeviceTests {
     }
 
     services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(200)
+      configureClient: static client => client.Timeout =
+        TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
+          ? TimeSpan.FromSeconds(20)
+          : TimeSpan.FromMilliseconds(200)
     );
 
     using var device = TapoDevice.Create(

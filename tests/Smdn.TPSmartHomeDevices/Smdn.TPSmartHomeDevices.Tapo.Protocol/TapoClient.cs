@@ -3,7 +3,6 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,10 +27,7 @@ public partial class TapoClientTests {
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
 
-    if (
-      !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) &&
-      RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-    ) {
+    if (TestEnvironment.IsRunningOnGitHubActionsMacOSRunner) {
       services.AddTapoHttpClient(
         configureClient: client => {
           client.Timeout = TimeSpan.FromMinutes(1.0);
