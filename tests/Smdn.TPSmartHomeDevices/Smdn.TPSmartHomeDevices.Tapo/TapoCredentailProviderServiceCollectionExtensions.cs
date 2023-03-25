@@ -168,4 +168,58 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       )
     );
   }
+
+  private class ConcreteTapoCredentialProvider : ITapoCredentialProvider {
+    public ITapoCredential GetCredential(ITapoCredentialIdentity identity)
+      => throw new NotSupportedException();
+  }
+
+  [Test]
+  public void AddTapoCredentialProvider()
+  {
+    var services = new ServiceCollection();
+    var credentialProvider = new ConcreteTapoCredentialProvider();
+
+    services.AddTapoCredentialProvider(
+      credentialProvider: credentialProvider
+    );
+
+    var registeredCredentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.IsNotNull(registeredCredentialProvider, nameof(registeredCredentialProvider));
+    Assert.AreSame(credentialProvider, registeredCredentialProvider);
+  }
+
+  [Test]
+  public void AddTapoCredentialProvider_TryAddMultiple()
+  {
+    var services = new ServiceCollection();
+    var firstCredentialProvider = new ConcreteTapoCredentialProvider();
+    var secondCredentialProvider = new ConcreteTapoCredentialProvider();
+
+    services.AddTapoCredentialProvider(
+      credentialProvider: firstCredentialProvider
+    );
+    services.AddTapoCredentialProvider(
+      credentialProvider: secondCredentialProvider
+    );
+
+    var registeredCredentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.IsNotNull(registeredCredentialProvider, nameof(registeredCredentialProvider));
+    Assert.AreSame(firstCredentialProvider, registeredCredentialProvider);
+  }
+
+  [TestCase(Base64UserNameSHA1Digest, null)]
+  [TestCase(null, Base64Password)]
+  public void AddTapoCredentialProvider_ArgumentNull(string base64UserNameSHA1Digest, string base64Password)
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<ArgumentNullException>(
+      () => services.AddTapoCredentialProvider(
+        credentialProvider: null
+      )
+    );
+  }
 }

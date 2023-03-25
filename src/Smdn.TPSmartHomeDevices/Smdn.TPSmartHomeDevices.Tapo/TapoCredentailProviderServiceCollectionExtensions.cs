@@ -44,4 +44,21 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
 
     return services;
   }
+
+  public static IServiceCollection AddTapoCredentialProvider(
+    this IServiceCollection services,
+    ITapoCredentialProvider credentialProvider
+  )
+  {
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+    if (credentialProvider is null)
+      throw new ArgumentNullException(nameof(credentialProvider));
+
+    services.TryAdd(
+      ServiceDescriptor.Singleton(typeof(ITapoCredentialProvider), credentialProvider)
+    );
+
+    return services;
+  }
 }
