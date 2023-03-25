@@ -25,7 +25,7 @@ internal static class TapoCredentialProviderFactory {
       isPlainText: false
     );
 
-  private sealed class StringCredentialProvider : ITapoCredentialProvider {
+  private sealed class StringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
     private readonly byte[] utf8Username;
     private readonly byte[] utf8Password;
     private readonly bool isPlainText;
@@ -41,44 +41,35 @@ internal static class TapoCredentialProviderFactory {
       this.isPlainText = isPlainText;
     }
 
-    public ITapoCredential GetCredential(string host) => new Credential(this);
+    ITapoCredential ITapoCredentialProvider.GetCredential(string host) => this;
 
-    private readonly struct Credential : ITapoCredential {
-      private readonly StringCredentialProvider provider;
+    void IDisposable.Dispose() { /* nothing to do */ }
 
-      public Credential(StringCredentialProvider provider)
-      {
-        this.provider = provider;
-      }
+    void ITapoCredential.WritePasswordPropertyValue(Utf8JsonWriter writer)
+    {
+      if (isPlainText)
+        writer.WriteBase64StringValue(utf8Password);
+      else
+        writer.WriteStringValue(utf8Password);
+    }
 
-      public void Dispose() { /* nothing to do */ }
+    void ITapoCredential.WriteUsernamePropertyValue(Utf8JsonWriter writer)
+    {
+      if (isPlainText) {
+        Span<byte> buffer = stackalloc byte[TapoCredentialUtils.HexSHA1HashSizeInBytes];
 
-      public void WritePasswordPropertyValue(Utf8JsonWriter writer)
-      {
-        if (provider.isPlainText)
-          writer.WriteBase64StringValue(provider.utf8Password);
-        else
-          writer.WriteStringValue(provider.utf8Password);
-      }
+        try {
+          if (!TapoCredentialUtils.TryConvertToHexSHA1Hash(utf8Username, buffer, out _))
+            throw new InvalidOperationException("failed to encode username property");
 
-      public void WriteUsernamePropertyValue(Utf8JsonWriter writer)
-      {
-        if (provider.isPlainText) {
-          Span<byte> buffer = stackalloc byte[TapoCredentialUtils.HexSHA1HashSizeInBytes];
-
-          try {
-            if (!TapoCredentialUtils.TryConvertToHexSHA1Hash(provider.utf8Username, buffer, out _))
-              throw new InvalidOperationException("failed to encode username property");
-
-            writer.WriteBase64StringValue(buffer);
-          }
-          finally {
-            buffer.Clear();
-          }
+          writer.WriteBase64StringValue(buffer);
         }
-        else {
-          writer.WriteStringValue(provider.utf8Username);
+        finally {
+          buffer.Clear();
         }
+      }
+      else {
+        writer.WriteStringValue(utf8Username);
       }
     }
   }
