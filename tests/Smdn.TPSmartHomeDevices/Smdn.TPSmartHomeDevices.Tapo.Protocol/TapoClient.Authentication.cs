@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -27,10 +29,16 @@ partial class TapoClientTests {
     Assert.IsNull(client.Session);
 
     Assert.Throws<ArgumentNullException>(
-      () => client.AuthenticateAsync(credential: null!)
+      () => client.AuthenticateAsync(
+        identity: null,
+        credential: null!
+      )
     );
     Assert.ThrowsAsync<ArgumentNullException>(
-      async () => await client.AuthenticateAsync(credential: null!)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: null!
+      )
     );
 
     Assert.IsNull(client.Session);
@@ -51,7 +59,10 @@ partial class TapoClientTests {
     );
 
     Assert.DoesNotThrowAsync(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNotNull(client.Session);
@@ -80,11 +91,113 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  private class TapoCredentialNotFoundException : Exception { }
+
+  private class TapoMultipleCredentialProvider : ITapoCredentialProvider {
+    private readonly Dictionary<ITapoCredentialIdentity, ITapoCredential> credentials = new();
+
+    public void AddCredential(ITapoCredentialIdentity identity, ITapoCredential credentialForIdentity)
+      => credentials[identity] = credentialForIdentity;
+
+    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+    {
+      if (identity is null)
+        throw new InvalidOperationException("identity must be specified");
+      if (!credentials.TryGetValue(identity, out var credential))
+        throw new TapoCredentialNotFoundException();
+
+      return credential;
+    }
+  }
+
+  private class TapoCredential : ITapoCredentialIdentity, ITapoCredential {
+    public string Name => $"{nameof(TapoCredential)}:{Username}";
+    public string Username { get; }
+    public string Password { get; }
+
+    public TapoCredential(string username, string password)
+    {
+      Username = username;
+      Password = password;
+    }
+
+    public void Dispose() { } // do nothing
+
+    public void WriteUsernamePropertyValue(Utf8JsonWriter writer)
+      => writer.WriteStringValue(Username); // write non-encoded string
+
+    public void WritePasswordPropertyValue(Utf8JsonWriter writer)
+      => writer.WriteStringValue(Password); // write non-encoded string
+  }
+
+  [Test]
+  public async Task AuthenticateAsync_IdentifyCredentialForIdentity()
+  {
+    var credentialProvider = new TapoMultipleCredentialProvider();
+    var user1 = new TapoCredential("user1", "pass1");
+    var user2 = new TapoCredential("user2", "pass2");
+    var userNotRegisteredInCredentialProvider = new TapoCredential("user3", "pass3");
+
+    credentialProvider.AddCredential(user1, user1);
+    credentialProvider.AddCredential(user2, user2);
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateLoginDeviceResponse = (_, param) => {
+        var username = param.GetProperty("username").GetString();
+
+        return new LoginDeviceResponse() {
+          ErrorCode = ErrorCode.Success,
+          Result = new LoginDeviceResponse.ResponseResult() {
+            Token = username, // return login username as token
+          },
+        };
+      },
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: user1,
+        credential: credentialProvider
+      ),
+      $"select identity {nameof(user1)}"
+    );
+
+    Assert.IsNotNull(client.Session);
+    Assert.AreEqual(user1.Username, client.Session.Token);
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: user2,
+        credential: credentialProvider
+      ),
+      $"select identity {nameof(user1)}"
+    );
+
+    Assert.IsNotNull(client.Session);
+    Assert.AreEqual(user2.Username, client.Session.Token);
+
+    Assert.ThrowsAsync<TapoCredentialNotFoundException>(
+      async () => await client.AuthenticateAsync(
+        identity: userNotRegisteredInCredentialProvider,
+        credential: credentialProvider
+      ),
+      $"cannot select appropriate identity"
+    );
   }
 
   [Test]
@@ -105,7 +218,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
@@ -136,7 +252,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNull(client.Session);
@@ -161,7 +280,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNull(client.Session);
@@ -189,7 +311,10 @@ partial class TapoClientTests {
     );
 
     Assert.DoesNotThrowAsync(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNotNull(client.Session);
@@ -221,7 +346,10 @@ partial class TapoClientTests {
     );
 
     Assert.DoesNotThrowAsync(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNotNull(client.Session);
@@ -264,7 +392,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
@@ -329,7 +460,10 @@ partial class TapoClientTests {
     );
 
     Assert.DoesNotThrowAsync(
-      async () => await client.AuthenticateAsync(credential: credential)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: credential
+      )
     );
 
     Assert.IsNotNull(client.Session);
@@ -363,7 +497,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
@@ -391,7 +528,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsNull(client.Session);
@@ -431,7 +571,10 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
-      async () => await client.AuthenticateAsync(credential: defaultCredentialProvider)
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
     );
 
     Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));

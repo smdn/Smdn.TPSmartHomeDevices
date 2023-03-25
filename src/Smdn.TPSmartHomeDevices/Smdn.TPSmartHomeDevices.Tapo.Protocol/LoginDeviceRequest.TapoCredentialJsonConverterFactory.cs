@@ -9,15 +9,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 #pragma warning disable IDE0040
 partial struct LoginDeviceRequest {
 #pragma warning restore IDE0040
-  public static JsonConverter CreateJsonConverter(string host)
-    => new TapoCredentialJsonConverterFactory(host ?? throw new ArgumentNullException(nameof(host)));
+  internal sealed class TapoCredentialJsonConverterFactory : JsonConverterFactory {
+    private readonly ITapoCredentialIdentity? identity;
 
-  private sealed class TapoCredentialJsonConverterFactory : JsonConverterFactory {
-    private readonly string host;
-
-    internal TapoCredentialJsonConverterFactory(string host)
+    internal TapoCredentialJsonConverterFactory(ITapoCredentialIdentity? identity)
     {
-      this.host = host;
+      this.identity = identity;
     }
 
     public override bool CanConvert(Type typeToConvert)
@@ -28,7 +25,7 @@ partial struct LoginDeviceRequest {
       JsonSerializerOptions options
     )
       => CanConvert(typeToConvert)
-        ? new TapoCredentialJsonConverter(host)
+        ? new TapoCredentialJsonConverter(identity)
         : null;
 
     private sealed class TapoCredentialJsonConverter : JsonConverter<ITapoCredentialProvider> {
@@ -47,11 +44,11 @@ partial struct LoginDeviceRequest {
 #endif
       );
 
-      private readonly string host;
+      private readonly ITapoCredentialIdentity? identity;
 
-      public TapoCredentialJsonConverter(string host)
+      public TapoCredentialJsonConverter(ITapoCredentialIdentity? identity)
       {
-        this.host = host;
+        this.identity = identity;
       }
 
       public override ITapoCredentialProvider? Read(
@@ -67,7 +64,10 @@ partial struct LoginDeviceRequest {
         JsonSerializerOptions options
       )
       {
-        using var credential = value.GetCredential(host);
+        using var credential = value.GetCredential(identity);
+
+        if (credential is null)
+          throw new InvalidOperationException($"Could not get a credential for an identity '{identity?.Name ?? "(null)"}'");
 
         writer.WriteStartObject();
 

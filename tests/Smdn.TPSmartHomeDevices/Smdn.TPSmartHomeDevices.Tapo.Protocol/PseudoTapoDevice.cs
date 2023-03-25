@@ -646,7 +646,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     options.Converters.Add(
       new SecurePassThroughJsonConverterFactory(
-        host: string.Empty,
+        identity: null,
         encryptorForPassThroughRequest: session.Encryptor,
         decryptorForPassThroughResponse: null,
         baseJsonSerializerOptionsForPassThroughMessage: null

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -40,7 +41,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
   private bool disposed;
 
   public SecurePassThroughJsonConverterFactory(
-    string host,
+    ITapoCredentialIdentity? identity,
     ICryptoTransform? encryptorForPassThroughRequest,
     ICryptoTransform? decryptorForPassThroughResponse,
     JsonSerializerOptions? baseJsonSerializerOptionsForPassThroughMessage,
@@ -54,7 +55,9 @@ public sealed class SecurePassThroughJsonConverterFactory :
     jsonSerializerOptionsForPassThroughMessage = baseJsonSerializerOptionsForPassThroughMessage is null
       ? new()
       : new(baseJsonSerializerOptionsForPassThroughMessage);
-    jsonSerializerOptionsForPassThroughMessage.Converters.Add(LoginDeviceRequest.CreateJsonConverter(host: host));
+    jsonSerializerOptionsForPassThroughMessage.Converters.Add(
+      new LoginDeviceRequest.TapoCredentialJsonConverterFactory(identity: identity)
+    );
   }
 
   public void Dispose()

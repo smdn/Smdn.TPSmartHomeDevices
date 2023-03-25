@@ -3,7 +3,6 @@
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,6 +15,7 @@ partial class TapoClient {
   private const int KeyExchangeAlgorithmKeySizeInBytes = 128;
 
   private async ValueTask AuthenticateAsyncCore(
+    ITapoCredentialIdentity identity,
     ITapoCredentialProvider credential,
     CancellationToken cancellationToken
   )
@@ -30,7 +30,7 @@ partial class TapoClient {
        */
       logger?.LogDebug("Handshake starting: {EndPointUri}", endPointUri);
 
-      session = await HandshakeAsync(cancellationToken).ConfigureAwait(false);
+      session = await HandshakeAsync(identity, cancellationToken).ConfigureAwait(false);
 
       logger?.LogDebug("Handshake completed.");
 
@@ -69,6 +69,7 @@ partial class TapoClient {
   }
 
   private async ValueTask<TapoSession> HandshakeAsync(
+    ITapoCredentialIdentity? identity,
     CancellationToken cancellationToken
   )
   {
@@ -173,7 +174,7 @@ partial class TapoClient {
     );
 
     return new(
-      host: endPointUri.Host,
+      identity: identity,
       sessionId: sessionId,
       expiresOn: expiresOn,
       key: keyBytes.AsSpan(0, 16),

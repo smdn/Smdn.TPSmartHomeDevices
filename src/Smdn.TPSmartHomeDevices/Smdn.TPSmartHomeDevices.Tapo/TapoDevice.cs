@@ -16,7 +16,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-public partial class TapoDevice : IDisposable {
+public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
   protected bool IsDisposed => deviceEndPointProvider is null;
 
@@ -32,6 +32,13 @@ public partial class TapoDevice : IDisposable {
   /// If session has not been established or been disposed, returns <see langword="null"/>.
   /// </summary>
   public TapoSession? Session => client?.Session;
+
+  string ITapoCredentialIdentity.Name {
+    get {
+      ThrowIfDisposed();
+      return $"{GetType().FullName} ({deviceEndPointProvider})";
+    }
+  }
 
   /// <summary>
   /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by host name.
@@ -294,6 +301,7 @@ public partial class TapoDevice : IDisposable {
 
     try {
       await client.AuthenticateAsync(
+        identity: this,
         credential: credential,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);

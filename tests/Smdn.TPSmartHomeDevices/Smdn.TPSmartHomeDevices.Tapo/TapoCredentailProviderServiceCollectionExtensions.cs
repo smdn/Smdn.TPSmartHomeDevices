@@ -19,10 +19,10 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
   private static (string Username, string Password) GetEncodedCredential(
     ITapoCredentialProvider provider,
-    string host
+    ITapoCredentialIdentity? identity
   )
   {
-    using var credential = provider.GetCredential(host: host);
+    using var credential = provider.GetCredential(identity: identity);
 
     using var usernameStream = new MemoryStream(capacity: 64);
     using var usernameWriter = new Utf8JsonWriter(usernameStream);
@@ -67,7 +67,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
 
-    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+    var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
     Assert.AreEqual(Base64UserNameSHA1Digest, username);
     Assert.AreEqual(Base64Password, password);
@@ -91,7 +91,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
 
-    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+    var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
     Assert.AreEqual(Base64UserNameSHA1Digest, username);
     Assert.AreEqual(Base64Password, password);
@@ -125,7 +125,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
 
-    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+    var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
     Assert.AreEqual(Base64UserNameSHA1Digest, username);
     Assert.AreEqual(Base64Password, password);
@@ -149,7 +149,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
 
-    var (username, password) = GetEncodedCredential(credentialProvider, host: string.Empty);
+    var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
     Assert.AreEqual(Base64UserNameSHA1Digest, username);
     Assert.AreEqual(Base64Password, password);

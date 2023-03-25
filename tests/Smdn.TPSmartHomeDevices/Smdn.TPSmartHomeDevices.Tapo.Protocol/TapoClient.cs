@@ -92,7 +92,12 @@ public partial class TapoClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
-    Assert.Throws<ObjectDisposedException>(() => client.AuthenticateAsync(credential: defaultCredentialProvider));
+    Assert.Throws<ObjectDisposedException>(
+      () => client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
   }
 
   [Test]
@@ -107,7 +112,10 @@ public partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    await client.AuthenticateAsync(credential: defaultCredentialProvider);
+    await client.AuthenticateAsync(
+      identity: null,
+      credential: defaultCredentialProvider
+    );
 
     Assert.IsNotNull(client.Session, "Session before dispose");
 
@@ -116,6 +124,11 @@ public partial class TapoClientTests {
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
     Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>());
-    Assert.Throws<ObjectDisposedException>(() => client.AuthenticateAsync(credential: defaultCredentialProvider));
+    Assert.Throws<ObjectDisposedException>(
+      () => client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
   }
 }

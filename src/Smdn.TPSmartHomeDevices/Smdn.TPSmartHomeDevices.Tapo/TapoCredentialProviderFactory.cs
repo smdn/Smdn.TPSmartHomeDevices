@@ -9,7 +9,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 internal static class TapoCredentialProviderFactory {
   public static ITapoCredentialProvider CreateFromPlainText(string email, string password)
-    => new StringCredentialProvider(
+    => new SingleIdentityStringCredentialProvider(
       username: email ?? throw new ArgumentNullException(nameof(email)),
       password: password ?? throw new ArgumentNullException(nameof(password)),
       isPlainText: true
@@ -19,18 +19,18 @@ internal static class TapoCredentialProviderFactory {
     string base64UserNameSHA1Digest,
     string base64Password
   )
-    => new StringCredentialProvider(
+    => new SingleIdentityStringCredentialProvider(
       username: base64UserNameSHA1Digest ?? throw new ArgumentNullException(nameof(base64UserNameSHA1Digest)),
       password: base64Password ?? throw new ArgumentNullException(nameof(base64Password)),
       isPlainText: false
     );
 
-  private sealed class StringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
+  private sealed class SingleIdentityStringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
     private readonly byte[] utf8Username;
     private readonly byte[] utf8Password;
     private readonly bool isPlainText;
 
-    public StringCredentialProvider(
+    public SingleIdentityStringCredentialProvider(
       string username,
       string password,
       bool isPlainText
@@ -41,7 +41,7 @@ internal static class TapoCredentialProviderFactory {
       this.isPlainText = isPlainText;
     }
 
-    ITapoCredential ITapoCredentialProvider.GetCredential(string host) => this;
+    ITapoCredential ITapoCredentialProvider.GetCredential(ITapoCredentialIdentity? identity) => this;
 
     void IDisposable.Dispose() { /* nothing to do */ }
 

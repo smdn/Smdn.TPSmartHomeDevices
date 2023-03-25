@@ -22,7 +22,7 @@ public sealed class TapoSession : IDisposable {
   internal JsonSerializerOptions SecurePassThroughJsonSerializerOptions { get; }
 
   internal TapoSession(
-    string host,
+    ITapoCredentialIdentity? identity,
     string? sessionId,
     DateTime expiresOn,
     ReadOnlySpan<byte> key,
@@ -41,7 +41,7 @@ public sealed class TapoSession : IDisposable {
     aes.IV = iv.ToArray();
 
     securePassThroughJsonConverterFactory = new(
-      host: host,
+      identity: identity,
       encryptorForPassThroughRequest: aes.CreateEncryptor(),
       decryptorForPassThroughResponse: aes.CreateDecryptor(),
       baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,

@@ -2,6 +2,6 @@
 // SPDX-License-Identifier: MIT
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-public interface ITapoCredentialProvider {
-  ITapoCredential GetCredential(ITapoCredentialIdentity? identity);
+public interface ITapoCredentialIdentity {
+  string Name { get; }
 }

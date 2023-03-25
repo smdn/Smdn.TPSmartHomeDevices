@@ -28,7 +28,12 @@ partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
 
     GetDeviceInfoResponse? nullableResponse = null;
 
@@ -80,7 +85,12 @@ partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()
@@ -112,7 +122,12 @@ partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(async () => await client.AuthenticateAsync(credential: defaultCredentialProvider));
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()

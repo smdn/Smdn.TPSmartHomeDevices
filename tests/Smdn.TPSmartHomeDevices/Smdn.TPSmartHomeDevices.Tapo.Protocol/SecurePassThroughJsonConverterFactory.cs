@@ -98,7 +98,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
     ILogger? logger = null
   )
     => new(
-      host: string.Empty,
+      identity: null,
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
       decryptorForPassThroughResponse: decryptorForPassThroughResponse ?? new NullTransform(),
       baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,

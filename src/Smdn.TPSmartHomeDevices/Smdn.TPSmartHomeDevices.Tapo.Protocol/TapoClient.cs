@@ -132,6 +132,7 @@ public sealed partial class TapoClient : IDisposable {
   }
 
   public ValueTask AuthenticateAsync(
+    ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credential,
     CancellationToken cancellationToken = default
   )
@@ -142,6 +143,7 @@ public sealed partial class TapoClient : IDisposable {
     ThrowIfDisposed();
 
     return AuthenticateAsyncCore(
+      identity,
       credential,
       cancellationToken
     );
