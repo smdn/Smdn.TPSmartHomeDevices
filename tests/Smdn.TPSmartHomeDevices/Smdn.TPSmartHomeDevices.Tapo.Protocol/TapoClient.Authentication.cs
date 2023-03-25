@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -582,5 +585,80 @@ partial class TapoClientTests {
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  private class Logger : ILogger {
+    private readonly List<string> logs = new();
+    public IReadOnlyList<string> Logs => logs;
+
+    public IDisposable? BeginScope<TState> (TState state) => null; // do nothing
+    public bool IsEnabled(LogLevel logLevel) => true;
+    public void Log<TState>(
+      LogLevel logLevel,
+      EventId eventId,
+      TState state,
+      Exception? exception,
+      Func<TState,Exception?,string> formatter
+    )
+    {
+      logs.Add(formatter(state, exception));
+    }
+  }
+
+  [Test]
+  public async Task AuthenticateAsync_LoginDevice_MaskedCredentialMustBeOutputToLogger()
+  {
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => token,
+    };
+
+    var endPoint = device.Start();
+
+    var services = new ServiceCollection();
+    var logger = new Logger();
+
+    const string username = "<username>";
+    const string password = "<password>";
+
+    services.AddTapoCredential("username", "password");
+    services.TryAdd(
+      ServiceDescriptor.Singleton(typeof(ILogger), logger)
+    );
+
+    using var client = new TapoClient(
+      endPoint: endPoint,
+      logger: logger
+    );
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
+
+    Assert.IsTrue(logger.Logs.Any(static line => line.Contains("\"username\":\"****\"")), "contains masked username");
+    Assert.IsTrue(logger.Logs.Any(static line => line.Contains("\"password\":\"****\"")), "contains masked password");
+
+    Assert.IsTrue(
+      logger.Logs.All(static line => !line.Contains(username)),
+      "does not contain unmasked username");
+    Assert.IsTrue(
+      logger.Logs.All(static line => !line.Contains(password)),
+      "does not contain unmasked password"
+    );
+
+    var encodedUsername = TapoCredentialUtils.ToBase64EncodedSHA1DigestString(username);
+    var encodedPassword = TapoCredentialUtils.ToBase64EncodedString(password);
+
+    Assert.IsTrue(
+      logger.Logs.All(line => !line.Contains(encodedUsername)),
+      "does not contain unmasked-encoded username");
+    Assert.IsTrue(
+      logger.Logs.All(line => !line.Contains(encodedPassword)),
+      "does not contain unmasked-encoded password"
+    );
   }
 }

@@ -11,6 +11,26 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 partial struct LoginDeviceRequest {
 #pragma warning restore IDE0040
   internal sealed class TapoCredentialJsonConverterFactory : JsonConverterFactory {
+    public static readonly JsonConverter Mask = new TapoCredentialMaskingJsonConverter();
+
+    private protected static readonly JsonEncodedText PropertyNamePassword = JsonEncodedText.Encode(
+#if LANG_VERSION_11_OR_GREATER
+      "password"u8
+#else
+      "password"
+#endif
+    );
+    private protected static readonly JsonEncodedText PropertyNameUsername = JsonEncodedText.Encode(
+#if LANG_VERSION_11_OR_GREATER
+      "username"u8
+#else
+      "username"
+#endif
+    );
+
+    /*
+     * insteance members
+     */
     private readonly ITapoCredentialIdentity? identity;
 
     internal TapoCredentialJsonConverterFactory(ITapoCredentialIdentity? identity)
@@ -30,21 +50,6 @@ partial struct LoginDeviceRequest {
         : null;
 
     private sealed class TapoCredentialJsonConverter : JsonConverter<ITapoCredentialProvider> {
-      private static readonly JsonEncodedText PropertyNamePassword = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
-        "password"u8
-#else
-        "password"
-#endif
-      );
-      private static readonly JsonEncodedText PropertyNameUsername = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
-        "username"u8
-#else
-        "username"
-#endif
-      );
-
       private readonly ITapoCredentialIdentity? identity;
 
       public TapoCredentialJsonConverter(ITapoCredentialIdentity? identity)
@@ -80,6 +85,39 @@ partial struct LoginDeviceRequest {
 
         credential.WriteUsernamePropertyValue(writer);
 
+        writer.WriteEndObject();
+      }
+    }
+
+    private sealed class TapoCredentialMaskingJsonConverter : JsonConverter<ITapoCredentialProvider> {
+      private static readonly JsonEncodedText PropertyValueMaskedCredential = JsonEncodedText.Encode(
+#if LANG_VERSION_11_OR_GREATER
+        "****"u8
+#else
+        "****"
+#endif
+      );
+
+      public TapoCredentialMaskingJsonConverter()
+      {
+      }
+
+      public override ITapoCredentialProvider? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+      )
+        => throw new NotSupportedException();
+
+      public override void Write(
+        Utf8JsonWriter writer,
+        ITapoCredentialProvider value,
+        JsonSerializerOptions options
+      )
+      {
+        writer.WriteStartObject();
+        writer.WriteString(PropertyNamePassword, PropertyValueMaskedCredential);
+        writer.WriteString(PropertyNameUsername, PropertyValueMaskedCredential);
         writer.WriteEndObject();
       }
     }

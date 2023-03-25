@@ -38,6 +38,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
 
   // used for avoiding JsonSerializer to (de)serialize recursively
   private readonly JsonSerializerOptions jsonSerializerOptionsForPassThroughMessage;
+  private readonly JsonSerializerOptions? jsonSerializerOptionsForPassThroughMessageLogger;
 
   private readonly ILogger? logger;
   private bool disposed;
@@ -60,6 +61,15 @@ public sealed class SecurePassThroughJsonConverterFactory :
     jsonSerializerOptionsForPassThroughMessage.Converters.Add(
       new LoginDeviceRequest.TapoCredentialJsonConverterFactory(identity: identity)
     );
+
+    if (logger is not null) {
+      jsonSerializerOptionsForPassThroughMessageLogger = baseJsonSerializerOptionsForPassThroughMessage is null
+        ? new()
+        : new(baseJsonSerializerOptionsForPassThroughMessage);
+      jsonSerializerOptionsForPassThroughMessageLogger.Converters.Add(
+        LoginDeviceRequest.TapoCredentialJsonConverterFactory.Mask // mask credentials for logger output
+      );
+    }
   }
 
   public void Dispose()
@@ -121,7 +131,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
   {
     logger?.LogTrace(
       "PassThroughRequest: {RawJson} ({TypeFullName})",
-      JsonSerializer.Serialize(value: value, options: jsonSerializerOptionsForPassThroughMessage),
+      JsonSerializer.Serialize(value: value, options: jsonSerializerOptionsForPassThroughMessageLogger),
       typeof(TValue).FullName
     );
 
