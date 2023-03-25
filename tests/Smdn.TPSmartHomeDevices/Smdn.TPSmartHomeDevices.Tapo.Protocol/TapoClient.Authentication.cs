@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading;
@@ -367,6 +368,11 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_Handshake_Timeout()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+      Assert.Ignore("disabled this test case because the test runner process crashes");
+      return;
+    }
+
     const string token = "token";
 
     using var cts = new CancellationTokenSource();
@@ -375,7 +381,7 @@ partial class TapoClientTests {
       FuncGenerateToken = static _ => token,
       FuncGenerateHandshakeResponse = (_, _) => {
         // perform latency
-        Task.Delay(TimeSpan.FromSeconds(5), cts.Token).GetAwaiter().GetResult();
+        DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
         return new HandshakeResponse() {
           ErrorCode = (ErrorCode)9999,
@@ -554,6 +560,11 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_LoginDevice_Timeout()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+      Assert.Ignore("disabled this test case because the test runner process crashes");
+      return;
+    }
+
     const string token = "token";
 
     var cts = new CancellationTokenSource();
@@ -562,7 +573,7 @@ partial class TapoClientTests {
       FuncGenerateToken = static _ => token,
       FuncGenerateLoginDeviceResponse = (_, _) => {
         // perform latency
-        Task.Delay(TimeSpan.FromSeconds(5), cts.Token).GetAwaiter().GetResult();
+        DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
         return new LoginDeviceResponse() {
           ErrorCode = ErrorCode.Success,

@@ -823,6 +823,11 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_Timeout_RetrySuccess()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+      Assert.Ignore("disabled this test case because the test runner process crashes");
+      return;
+    }
+
     const int maxRetry = 3;
 
     using var cts = new CancellationTokenSource();
@@ -841,7 +846,7 @@ public class TapoDeviceTests {
           FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            Task.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token).GetAwaiter().GetResult();
+            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
 
             return (
               ErrorCode.Success,
@@ -891,6 +896,11 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_Timeout_RetryFailedWithTimeout()
   {
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+      Assert.Ignore("disabled this test case because the test runner process crashes");
+      return;
+    }
+
     const int maxRetry = 3;
 
     using var cts = new CancellationTokenSource();
@@ -907,7 +917,7 @@ public class TapoDeviceTests {
           FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            Task.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token).GetAwaiter().GetResult();
+            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
 
             return (
               ErrorCode.Success,
