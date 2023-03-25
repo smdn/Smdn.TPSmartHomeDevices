@@ -251,7 +251,14 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         if (listener is null)
           return; // disposed
 
-        var context = await listener!.GetContextAsync().ConfigureAwait(false);
+        HttpListenerContext? context = null;
+
+        try {
+          context = await listener!.GetContextAsync().ConfigureAwait(false);
+        }
+        catch (ArgumentException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+          return; // disposed
+        }
 
         if (context is not null) {
           try {
