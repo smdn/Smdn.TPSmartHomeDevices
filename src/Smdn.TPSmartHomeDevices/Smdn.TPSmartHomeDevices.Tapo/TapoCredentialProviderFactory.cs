@@ -3,7 +3,7 @@
 using System;
 using System.Text;
 using System.Text.Json;
-using Smdn.TPSmartHomeDevices.Tapo.Protocol;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 

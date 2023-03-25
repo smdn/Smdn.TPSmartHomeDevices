@@ -3,6 +3,7 @@
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 

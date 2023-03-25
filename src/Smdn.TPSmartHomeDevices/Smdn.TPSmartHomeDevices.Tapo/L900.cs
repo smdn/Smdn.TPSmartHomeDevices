@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 

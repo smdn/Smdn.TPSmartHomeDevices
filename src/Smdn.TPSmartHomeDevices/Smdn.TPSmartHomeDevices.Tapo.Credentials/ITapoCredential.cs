@@ -3,7 +3,7 @@
 using System;
 using System.Text.Json;
 
-namespace Smdn.TPSmartHomeDevices.Tapo;
+namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 public interface ITapoCredential : IDisposable {
   void WritePasswordPropertyValue(Utf8JsonWriter writer);

@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Smdn.Formats;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
+namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 /// <remarks>
 /// This implementation is based on and ported from the following implementation: <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>.

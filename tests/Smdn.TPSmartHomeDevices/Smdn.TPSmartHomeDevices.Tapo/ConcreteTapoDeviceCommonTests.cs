@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 

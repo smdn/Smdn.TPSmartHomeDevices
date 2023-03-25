@@ -10,6 +10,8 @@ using System.Text.Json.Serialization;
 
 using Microsoft.Extensions.Logging;
 
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
+
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 /// <remarks>

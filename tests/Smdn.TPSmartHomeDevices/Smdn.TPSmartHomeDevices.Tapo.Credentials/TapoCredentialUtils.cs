@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
+namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 [TestFixture]
 public class TapoCredentialUtilsTests {
