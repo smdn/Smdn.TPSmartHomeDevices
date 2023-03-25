@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -439,6 +440,11 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_SocketException()
   {
+    if (new Version(7, 0) <= Environment.Version && RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+      Assert.Ignore("SocketException is not thrown and a timeout occurs on MacOS + .NET 7.x");
+      return;
+    }
+
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
     };
