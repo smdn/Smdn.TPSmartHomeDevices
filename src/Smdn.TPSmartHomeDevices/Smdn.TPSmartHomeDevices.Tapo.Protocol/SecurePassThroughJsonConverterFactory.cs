@@ -59,7 +59,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
       ? new()
       : new(baseJsonSerializerOptionsForPassThroughMessage);
     jsonSerializerOptionsForPassThroughMessage.Converters.Add(
-      new LoginDeviceRequest.TapoCredentialJsonConverterFactory(identity: identity)
+      new LoginDeviceRequest.TapoCredentialJsonConverter(identity: identity)
     );
 
     if (logger is not null) {
@@ -67,7 +67,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
         ? new()
         : new(baseJsonSerializerOptionsForPassThroughMessage);
       jsonSerializerOptionsForPassThroughMessageLogger.Converters.Add(
-        LoginDeviceRequest.TapoCredentialJsonConverterFactory.Mask // mask credentials for logger output
+        LoginDeviceRequest.TapoCredentialMaskingJsonConverter.Instance // mask credentials for logger output
       );
     }
   }
