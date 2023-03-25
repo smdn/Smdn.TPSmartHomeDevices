@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +32,17 @@ public class TapoDeviceTests {
       base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
+
+    if (
+      !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) &&
+      RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+    ) {
+      services.AddTapoHttpClient(
+        configureClient: client => {
+          client.Timeout = TimeSpan.FromMinutes(1.0);
+        }
+      );
+    }
   }
 
   [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net;
+using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 public partial class TapoClientTests {
   private ServiceCollection? services;
   private ITapoCredentialProvider? defaultCredentialProvider;
+  private IHttpClientFactory? defaultHttpClientFactory;
 
   [OneTimeSetUp]
   public void SetUp()
@@ -25,7 +28,19 @@ public partial class TapoClientTests {
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
 
+    if (
+      !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) &&
+      RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+    ) {
+      services.AddTapoHttpClient(
+        configureClient: client => {
+          client.Timeout = TimeSpan.FromMinutes(1.0);
+        }
+      );
+    }
+
     defaultCredentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
+    defaultHttpClientFactory = services?.BuildServiceProvider()!.GetService<IHttpClientFactory>();
   }
 
   [Test]

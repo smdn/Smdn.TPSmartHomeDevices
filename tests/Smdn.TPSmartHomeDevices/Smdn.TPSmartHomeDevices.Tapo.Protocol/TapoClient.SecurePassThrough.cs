@@ -25,7 +25,8 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: endPoint,
+      httpClientFactory: defaultHttpClientFactory
     );
 
     Assert.DoesNotThrowAsync(
@@ -53,7 +54,8 @@ partial class TapoClientTests {
   public void SendRequestAsync_SessionNotEstablished()
   {
     using var client = new TapoClient(
-      endPoint: new DnsEndPoint("localhost", 0)
+      endPoint: new DnsEndPoint("localhost", 0),
+      httpClientFactory: defaultHttpClientFactory
     );
 
     Assert.ThrowsAsync<InvalidOperationException>(
@@ -82,7 +84,8 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: endPoint,
+      httpClientFactory: defaultHttpClientFactory
     );
 
     Assert.DoesNotThrowAsync(
@@ -119,7 +122,8 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: endPoint,
+      httpClientFactory: defaultHttpClientFactory
     );
 
     Assert.DoesNotThrowAsync(
