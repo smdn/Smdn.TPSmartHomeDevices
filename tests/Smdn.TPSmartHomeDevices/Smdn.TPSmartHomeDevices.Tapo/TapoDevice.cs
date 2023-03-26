@@ -479,8 +479,9 @@ public class TapoDeviceTests {
   }
 
   private class HandleAsEndPointUnreachableExceptionHandler : TapoClientExceptionHandler {
-    public override TapoClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
+    public override TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
       => Default.DetermineHandling(
+        device: device,
         exception: new HttpRequestException(
           message: "reproduces the case of unreachable condition",
           inner: new SocketException(

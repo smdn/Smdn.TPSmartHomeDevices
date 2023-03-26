@@ -8,5 +8,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 public abstract class KasaClientExceptionHandler {
   protected internal static readonly KasaClientExceptionHandler Default = new KasaClientDefaultExceptionHandler();
 
-  public abstract KasaClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger);
+  public abstract KasaClientExceptionHandling DetermineHandling(
+    KasaDevice device,
+    Exception exception,
+    int attempt,
+    ILogger? logger
+  );
 }

@@ -7,7 +7,12 @@ using Microsoft.Extensions.Logging;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
-  public override TapoClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
+  public override TapoClientExceptionHandling DetermineHandling(
+    TapoDevice device,
+    Exception exception,
+    int attempt,
+    ILogger? logger
+  )
   {
     switch (exception) {
       case HttpRequestException httpRequestException:

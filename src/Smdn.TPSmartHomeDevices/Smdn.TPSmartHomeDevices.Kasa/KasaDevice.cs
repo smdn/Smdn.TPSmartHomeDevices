@@ -331,7 +331,7 @@ public partial class KasaDevice : IDisposable {
         static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
           => logger.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");
 
-        var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
+        var handling = exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         client.Logger?.LogTrace(
           "Exception handling for {TypeOfException}: {ExceptionHandling}",

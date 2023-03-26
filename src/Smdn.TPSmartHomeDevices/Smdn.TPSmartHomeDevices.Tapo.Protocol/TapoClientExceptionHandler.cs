@@ -8,5 +8,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 public abstract class TapoClientExceptionHandler {
   protected internal static readonly TapoClientExceptionHandler Default = new TapoClientDefaultExceptionHandler();
 
-  public abstract TapoClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger);
+  public abstract TapoClientExceptionHandling DetermineHandling(
+    TapoDevice device,
+    Exception exception,
+    int attempt,
+    ILogger? logger
+  );
 }

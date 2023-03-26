@@ -390,7 +390,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
         static void LogRequest(ILogger logger, TRequest req)
           => logger.LogError(JsonSerializer.Serialize(req));
 
-        var handling = exceptionHandler.DetermineHandling(ex, attempt, client.Logger);
+        var handling = exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         client.Logger?.LogTrace(
           "Exception handling for {TypeOfException}: {ExceptionHandling}",

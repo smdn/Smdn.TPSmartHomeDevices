@@ -406,8 +406,9 @@ public class KasaDeviceTests {
   }
 
   private class HandleAsEndPointUnreachableExceptionHandler : KasaClientExceptionHandler {
-    public override KasaClientExceptionHandling DetermineHandling(Exception exception, int attempt, ILogger? logger)
+    public override KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
       => Default.DetermineHandling(
+        device: device,
         // reproduces the case of unreachable condition
         exception: new SocketException(
           errorCode: (int)SocketError.HostUnreachable
