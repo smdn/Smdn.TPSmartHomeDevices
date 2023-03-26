@@ -966,6 +966,63 @@ public class TapoDeviceTests {
     }
   }
 
+  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : TapoClientExceptionHandler {
+    public override TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
+    {
+      Assert.IsNotInstanceOf<OperationCanceledException>(exception);
+
+      return Default.DetermineHandling(
+        device: device,
+        exception: exception,
+        attempt: attempt,
+        logger: logger
+      );
+    }
+  }
+
+  [Test]
+  public async Task SendRequestAsync_ExceptionHandlerMustNotHandleOperationCanceledException()
+  {
+    var ctsRequest = new CancellationTokenSource();
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = (_, passThroughMethod, _) => {
+        ctsRequest.Cancel();
+
+        return new(
+          ErrorCode.Success,
+          new GetDeviceInfoResponse() {
+            ErrorCode = ErrorCode.Success,
+            Result = new(),
+          }
+        );
+      },
+    };
+
+    pseudoDevice.Start();
+
+    services.AddSingleton<TapoClientExceptionHandler>(
+      // asserts that the OperationCanceledException must not be handled
+      new AssertOperationCanceledMustNotBeHandledExceptionHandler()
+    );
+
+    using var device = new ConcreteTapoDevice(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.IsNull(device.Session, nameof(device.Session));
+
+    var ex = Assert.CatchAsync(
+      async () => await device.GetDeviceInfoAsync(cancellationToken: ctsRequest.Token)
+    );
+
+    Assert.IsInstanceOf<OperationCanceledException>(ex);
+
+    Assert.IsNull(device.Session, nameof(device.Session));
+  }
+
   [Test]
   public async Task GetDeviceInfoAsync()
   {

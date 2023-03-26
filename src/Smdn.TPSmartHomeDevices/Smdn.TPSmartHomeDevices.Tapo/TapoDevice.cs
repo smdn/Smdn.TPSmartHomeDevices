@@ -386,6 +386,13 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
         return composeResult(response);
       }
+      catch (OperationCanceledException) {
+        // OperationCanceledException must not to be handled by exception handler, just rethrow
+        client.Dispose();
+        client = null;
+
+        throw;
+      }
       catch (Exception ex) {
         static void LogRequest(ILogger logger, TRequest req)
           => logger.LogError(JsonSerializer.Serialize(req));

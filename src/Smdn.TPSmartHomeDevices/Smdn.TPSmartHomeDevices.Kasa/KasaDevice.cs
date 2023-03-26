@@ -327,6 +327,13 @@ public partial class KasaDevice : IDisposable {
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }
+      catch (OperationCanceledException) {
+        // OperationCanceledException must not to be handled by exception handler, just rethrow
+        client.Dispose();
+        client = null;
+
+        throw;
+      }
       catch (Exception ex) {
         static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
           => logger.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");

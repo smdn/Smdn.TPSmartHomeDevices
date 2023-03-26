@@ -174,6 +174,9 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
         try {
           await ProcessClientAsync(socket, cancellationToken);
         }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.ConnectionReset) {
+          // disconnected
+        }
         catch (AbortProcessException) {
           // expected
         }

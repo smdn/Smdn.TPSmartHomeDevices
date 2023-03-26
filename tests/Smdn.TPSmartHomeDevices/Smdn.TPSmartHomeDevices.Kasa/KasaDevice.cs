@@ -683,4 +683,58 @@ public class KasaDeviceTests {
     Assert.AreEqual(RertyMaxAttemptsForIncompleteResponse, request, nameof(request));
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
+
+  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : KasaClientExceptionHandler {
+    public override KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
+    {
+      Assert.IsNotInstanceOf<OperationCanceledException>(exception);
+
+      return Default.DetermineHandling(
+        device: device,
+        exception: exception,
+        attempt: attempt,
+        logger: logger
+      );
+    }
+  }
+
+  [Test]
+  public async Task SendRequestAsync_ExceptionHandlerMustNotHandleOperationCanceledException()
+  {
+    var ctsRequest = new CancellationTokenSource();
+
+    await using var pseudoDevice = new PseudoKasaDevice() {
+      FuncGenerateResponse = (_, request) => {
+        ctsRequest.Cancel();
+        return JsonDocument.Parse(@"{""module"":{""method"":{""err_code"":0}}}");
+      }
+    };
+
+    pseudoDevice.Start();
+
+    var services = new ServiceCollection();
+
+    services.AddSingleton<KasaClientExceptionHandler>(
+      // asserts that the OperationCanceledException must not be handled
+      new AssertOperationCanceledMustNotBeHandledExceptionHandler()
+    );
+
+    using var device = new ConcreteKasaDevice(
+      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+    );
+
+    Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
+
+    var ex = Assert.CatchAsync(
+      async () => await device.SendRequestAsync(
+        module: JsonEncodedText.Encode("module"),
+        method: JsonEncodedText.Encode("method"),
+        cancellationToken: ctsRequest.Token
+      )
+    );
+
+    Assert.IsInstanceOf<OperationCanceledException>(ex);
+
+    Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
+  }
 }
