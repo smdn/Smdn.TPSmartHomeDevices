@@ -386,18 +386,19 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
         return composeResult(response);
       }
-      catch (OperationCanceledException) {
-        // OperationCanceledException must not to be handled by exception handler, just rethrow
-        client.Dispose();
-        client = null;
-
-        throw;
-      }
       catch (Exception ex) {
+        // OperationCanceledException and TaskCanceledException due to a cancel
+        // request triggered by a given CancellationToken must not be handled
+        // by exception handler, just rethrow instead.
+        var handling = (
+          ex is OperationCanceledException exOperationCanceled &&
+          exOperationCanceled.CancellationToken.Equals(cancellationToken)
+        )
+          ? TapoClientExceptionHandling.Throw
+          : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
+
         static void LogRequest(ILogger logger, TRequest req)
           => logger.LogError(JsonSerializer.Serialize(req));
-
-        var handling = exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         client.Logger?.LogTrace(
           "Exception handling for {TypeOfException}: {ExceptionHandling}",

@@ -733,7 +733,7 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.IsInstanceOf<OperationCanceledException>(ex);
+    Assert.IsAssignableFrom<OperationCanceledException>(ex);
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
   }

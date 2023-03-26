@@ -969,7 +969,7 @@ public class TapoDeviceTests {
   private class AssertOperationCanceledMustNotBeHandledExceptionHandler : TapoClientExceptionHandler {
     public override TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
     {
-      Assert.IsNotInstanceOf<OperationCanceledException>(exception);
+      Assert.IsNotAssignableFrom<OperationCanceledException>(exception);
 
       return Default.DetermineHandling(
         device: device,
