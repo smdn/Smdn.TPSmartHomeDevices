@@ -42,6 +42,15 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   }
 
   /// <summary>
+  /// Gets or sets the timeout value for HTTP requests.
+  /// </summary>
+  /// <value>
+  /// <para>If the value is <see langword="null"/>, the timeout value configured by the <see cref="IHttpClientFactory"/> is used. Otherwise, the specified <see cref="TimeSpan"/> is used for the timeout value for this instance.</para>
+  /// <para>Therefore, even if the value is <see langword="null"/>, a timeout may still occur. If you do not want to timeout for this instance, specify <see cref="Timeout.InfiniteTimeSpan"/> explicitly.</para>
+  /// </value>
+  public TimeSpan? Timeout { get; set; }
+
+  /// <summary>
   /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by host name.
   /// </summary>
   /// <param name="host">
@@ -377,6 +386,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
       await EnsureSessionEstablishedAsync(cancellationToken).ConfigureAwait(false);
 
       cancellationToken.ThrowIfCancellationRequested();
+
+      client.Timeout = Timeout;
 
       try {
         var response = await client.SendRequestAsync<TRequest, TResponse>(

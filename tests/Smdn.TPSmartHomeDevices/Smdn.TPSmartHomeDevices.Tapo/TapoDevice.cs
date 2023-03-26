@@ -822,7 +822,14 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task SendRequestAsync_Timeout_RetrySuccess()
+  public async Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory()
+    => SendRequestAsync_Timeout_RetrySuccess(setTimeoutViaIHttpClientFactory: true);
+
+  [Test]
+  public async Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithDeviceTimeoutProperty()
+    => SendRequestAsync_Timeout_RetrySuccess(setTimeoutViaIHttpClientFactory: false);
+
+  private async Task SendRequestAsync_Timeout_RetrySuccess(bool setTimeoutViaIHttpClientFactory)
   {
     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
       Assert.Ignore("disabled this test case because the test runner process crashes");
@@ -863,12 +870,16 @@ public class TapoDeviceTests {
       pseudoDevices[attempt].Start();
     }
 
-    services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout =
-        TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
-          ? TimeSpan.FromSeconds(20)
-          : TimeSpan.FromMilliseconds(200)
-    );
+    static TimeSpan GetTimeout()
+      => TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
+        ? TimeSpan.FromSeconds(20)
+        : TimeSpan.FromMilliseconds(200);
+
+    if (setTimeoutViaIHttpClientFactory) {
+      services.AddTapoHttpClient(
+        configureClient: static client => client.Timeout = GetTimeout()
+      );
+    }
 
     using var device = TapoDevice.Create(
       deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
@@ -876,6 +887,9 @@ public class TapoDeviceTests {
       ),
       serviceProvider: services.BuildServiceProvider()
     );
+
+    if (!setTimeoutViaIHttpClientFactory)
+      device.Timeout = GetTimeout();
 
     try {
       Assert.IsNull(device.Session, nameof(device.Session));
@@ -934,19 +948,16 @@ public class TapoDeviceTests {
       pseudoDevices[attempt].Start();
     }
 
-    services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout =
-        TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
-          ? TimeSpan.FromSeconds(20)
-          : TimeSpan.FromMilliseconds(200)
-    );
-
     using var device = TapoDevice.Create(
       deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
         pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
       ),
       serviceProvider: services.BuildServiceProvider()
     );
+
+    device.Timeout = TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
+      ? TimeSpan.FromSeconds(20)
+      : TimeSpan.FromMilliseconds(200);
 
     try {
       Assert.IsNull(device.Session, nameof(device.Session));

@@ -17,6 +17,8 @@ partial class TapoClient {
 #pragma warning restore IDE0040
   private static readonly MediaTypeHeaderValue mediaTypeJson = new(mediaType: "application/json");
 
+  public TimeSpan? Timeout { get; set; }
+
   private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
     TRequest request,
     JsonSerializerOptions jsonSerializerOptions,
@@ -110,6 +112,10 @@ partial class TapoClient {
     );
 
     httpClient.BaseAddress = endPointUri;
+
+    if (Timeout.HasValue)
+      // override timeout value configured by IHttpClientFactory
+      httpClient.Timeout = Timeout.Value;
 
     using var httpResponse = await httpClient.PostAsync(
       requestUri: requestUri,

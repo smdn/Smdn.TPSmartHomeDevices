@@ -392,18 +392,13 @@ partial class TapoClientTests {
       },
     };
 
-    var services = new ServiceCollection();
-
-    services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(1)
-    );
-
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint,
-      httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+      endPoint: endPoint
     );
+
+    client.Timeout = TimeSpan.FromMilliseconds(1);
 
     try {
       var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -584,18 +579,13 @@ partial class TapoClientTests {
       },
     };
 
-    var services = new ServiceCollection();
-
-    services.AddTapoHttpClient(
-      configureClient: static client => client.Timeout = TimeSpan.FromMilliseconds(1)
-    );
-
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint,
-      httpClientFactory: services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+      endPoint: endPoint
     );
+
+    client.Timeout = TimeSpan.FromMilliseconds(1);
 
     try {
       var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
