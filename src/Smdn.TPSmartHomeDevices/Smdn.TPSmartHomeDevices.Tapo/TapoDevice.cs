@@ -30,8 +30,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
   /// <summary>
   /// Gets a current session information represented by <see cref="TapoSession" />.
-  /// If session has not been established or been disposed, returns <see langword="null"/>.
   /// </summary>
+  /// <value>
+  /// The <see cref="TapoSession" />. <see langword="null"/> if the session for this instance has not been established or been disposed.
+  /// </value>
   public TapoSession? Session => client?.Session;
 
   string ITapoCredentialIdentity.Name {
