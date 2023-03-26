@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.dll (Smdn.TPSmartHomeDevices-1.0.0-preview2)
+// Smdn.TPSmartHomeDevices.dll (Smdn.TPSmartHomeDevices-1.0.0-preview3)
 //   Name: Smdn.TPSmartHomeDevices
 //   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0-preview2+81e3802b1dec05701f67b90fc3e31867a1d3af11
+//   InformationalVersion: 1.0.0-preview3+ae327055c2651d84fffc372b481a72257af2a9d8
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -34,13 +34,24 @@ using Smdn.TPSmartHomeDevices;
 using Smdn.TPSmartHomeDevices.Kasa;
 using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 using Smdn.TPSmartHomeDevices.Tapo;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices {
-  public interface IDeviceEndPointProvider {
-    bool IsStaticEndPoint { get; }
+  public interface IDeviceEndPointFactory<TAddress> {
+    IDeviceEndPointProvider Create(TAddress address, int port = 0);
+  }
 
+  public interface IDeviceEndPointProvider {
     ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken = default);
+  }
+
+  public interface IDynamicDeviceEndPointProvider : IDeviceEndPointProvider {
+    void InvalidateEndPoint();
+  }
+
+  public static class DeviceEndPointFactoryServiceCollectionExtensions {
+    public static IServiceCollection AddDeviceEndPointFactory<TAddress>(this IServiceCollection services, IDeviceEndPointFactory<TAddress> endPointFactory) {}
   }
 
   public class DeviceEndPointResolutionException : Exception {
@@ -50,13 +61,16 @@ namespace Smdn.TPSmartHomeDevices {
     public IDeviceEndPointProvider EndPointProvider { get; }
   }
 
-  public class MacAddressDeviceEndPointFactory : IDisposable {
-    protected class MacAddressDeviceEndPointProvider : IDeviceEndPointProvider {
+  public class MacAddressDeviceEndPointFactory :
+    IDeviceEndPointFactory<PhysicalAddress>,
+    IDisposable
+  {
+    protected class MacAddressDeviceEndPointProvider : IDynamicDeviceEndPointProvider {
       public MacAddressDeviceEndPointProvider(IAddressResolver<PhysicalAddress, IPAddress> resolver, PhysicalAddress address, int port) {}
 
-      public bool IsStaticEndPoint { get; }
-
       public async ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken) {}
+      public void InvalidateEndPoint() {}
+      public override string ToString() {}
     }
 
     protected MacAddressDeviceEndPointFactory(IAddressResolver<PhysicalAddress, IPAddress> resolver, IServiceProvider? serviceProvider = null) {}
@@ -74,26 +88,28 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
   public class HS105 : KasaDevice {
     public HS105(IDeviceEndPointProvider deviceEndPointProvider, IServiceProvider? serviceProvider = null) {}
     public HS105(IPAddress ipAddress, IServiceProvider? serviceProvider = null) {}
-    public HS105(string hostName, IServiceProvider? serviceProvider = null) {}
+    public HS105(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public HS105(string host, IServiceProvider? serviceProvider = null) {}
 
-    public Task<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
-    public Task SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
-    public Task TurnOffAsync(CancellationToken cancellationToken = default) {}
-    public Task TurnOnAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
   }
 
   public class KL130 : KasaDevice {
     public KL130(IDeviceEndPointProvider deviceEndPointProvider, IServiceProvider? serviceProvider = null) {}
     public KL130(IPAddress ipAddress, IServiceProvider? serviceProvider = null) {}
-    public KL130(string hostName, IServiceProvider? serviceProvider = null) {}
+    public KL130(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public KL130(string host, IServiceProvider? serviceProvider = null) {}
 
-    public Task<KL130LightState> GetLightStateAsync(CancellationToken cancellationToken = default) {}
-    public Task<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
-    public Task SetColorAsync(int hue, int saturation, int? brightness = null, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
-    public Task SetColorTemperatureAsync(int colorTemperature, int? brightness = null, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
-    public Task SetOnOffStateAsync(bool newOnOffState, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
-    public Task TurnOffAsync(TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
-    public Task TurnOnAsync(TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
+    public ValueTask<KL130LightState> GetLightStateAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorAsync(int hue, int saturation, int? brightness = null, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetOnOffStateAsync(bool newOnOffState, TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOffAsync(TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOnAsync(TimeSpan? transitionPeriod = null, CancellationToken cancellationToken = default) {}
   }
 
   public class KasaDevice : IDisposable {
@@ -104,12 +120,14 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     protected static readonly JsonEncodedText ModuleTextSystem;
 
     public static KasaDevice Create(IDeviceEndPointProvider deviceEndPointProvider, IServiceProvider? serviceProvider = null) {}
-    public static KasaDevice Create(IPAddress deviceAddress, IServiceProvider? serviceProvider = null) {}
-    public static KasaDevice Create(string hostName, IServiceProvider? serviceProvider = null) {}
+    public static KasaDevice Create(IPAddress ipAddress, IServiceProvider? serviceProvider = null) {}
+    public static KasaDevice Create(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public static KasaDevice Create(string host, IServiceProvider? serviceProvider = null) {}
 
     protected KasaDevice(IDeviceEndPointProvider deviceEndPointProvider, IServiceProvider? serviceProvider = null) {}
     protected KasaDevice(IPAddress ipAddress, IServiceProvider? serviceProvider = null) {}
-    protected KasaDevice(string hostName, IServiceProvider? serviceProvider = null) {}
+    protected KasaDevice(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    protected KasaDevice(string host, IServiceProvider? serviceProvider = null) {}
 
     public bool IsConnected { get; }
     protected bool IsDisposed { get; }
@@ -117,14 +135,16 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
     public ValueTask<EndPoint> ResolveEndPointAsync(CancellationToken cancellationToken = default) {}
-    protected Task SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, CancellationToken cancellationToken) {}
-    protected Task<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
-    protected Task<TMethodResult> SendRequestAsync<TMethodResult>(JsonEncodedText module, JsonEncodedText method, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
+    protected ValueTask SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, CancellationToken cancellationToken) {}
+    protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
+    protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(JsonEncodedText module, JsonEncodedText method, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
   }
 
   public static class KasaDeviceEndPointProvider {
     public static IDeviceEndPointProvider Create(IPAddress ipAddress) {}
-    public static IDeviceEndPointProvider Create(string hostName) {}
+    public static IDeviceEndPointProvider Create(PhysicalAddress macAddress, IDeviceEndPointFactory<PhysicalAddress> endPointFactory) {}
+    public static IDeviceEndPointProvider Create(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public static IDeviceEndPointProvider Create(string host) {}
   }
 
   public class KasaDisconnectedException : KasaProtocolException {
@@ -179,13 +199,21 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
   public sealed class KasaClient : IDisposable {
     public const int DefaultPort = 9999;
 
-    public KasaClient(EndPoint endPoint, IServiceProvider? serviceProvider = null) {}
+    public KasaClient(EndPoint endPoint, ILogger? logger = null) {}
 
     public EndPoint EndPoint { get; }
     public bool IsConnected { get; }
 
     public void Dispose() {}
-    public Task<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken = default) {}
+    public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken = default) {}
+  }
+
+  public abstract class KasaClientExceptionHandler {
+    internal protected static readonly KasaClientExceptionHandler Default; // = "Smdn.TPSmartHomeDevices.Kasa.Protocol.KasaClientDefaultExceptionHandler"
+
+    protected KasaClientExceptionHandler() {}
+
+    public abstract KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger);
   }
 
   public static class KasaJsonSerializer {
@@ -211,44 +239,65 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
   public class KasaMessageHeaderTooShortException : KasaMessageException {
     public KasaMessageHeaderTooShortException(string message) {}
   }
+
+  public readonly struct KasaClientExceptionHandling {
+    public static readonly KasaClientExceptionHandling InvalidateEndPointAndRetry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldInvalidateEndPoint=True}"
+    public static readonly KasaClientExceptionHandling InvalidateEndPointAndThrow; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldInvalidateEndPoint=True}"
+    public static readonly KasaClientExceptionHandling Retry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldInvalidateEndPoint=False}"
+    public static readonly KasaClientExceptionHandling RetryAfterReconnect; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=True, ShouldInvalidateEndPoint=False}"
+    public static readonly KasaClientExceptionHandling Throw; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldInvalidateEndPoint=False}"
+
+    public static KasaClientExceptionHandling CreateRetry(TimeSpan retryAfter, bool shouldReconnect = false) {}
+
+    public TimeSpan RetryAfter { get; init; }
+    public bool ShouldInvalidateEndPoint { get; init; }
+    public bool ShouldReconnect { get; init; }
+    public bool ShouldRetry { get; init; }
+
+    public override string ToString() {}
+  }
 }
 
 namespace Smdn.TPSmartHomeDevices.Tapo {
-  public interface ITapoCredentialProvider {
-    string GetBase64EncodedPassword(string host);
-    string GetBase64EncodedUserNameSHA1Digest(string host);
-  }
-
   public class L530 : TapoDevice {
-    public L530(IDeviceEndPointProvider deviceEndPointProvider, Guid? terminalUuid = null, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
+    public L530(IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
+    public L530(IPAddress ipAddress, IServiceProvider serviceProvider) {}
     public L530(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
-    public L530(string hostName, IServiceProvider? serviceProvider = null) {}
-    public L530(string hostName, string email, string password, IServiceProvider? serviceProvider = null) {}
+    public L530(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public L530(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    public L530(string host, IServiceProvider serviceProvider) {}
+    public L530(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
 
-    public Task SetBrightnessAsync(int brightness, CancellationToken cancellationToken = default) {}
-    public Task SetColorAsync(int hue, int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
-    public Task SetColorHueAsync(int hue, int? brightness = null, CancellationToken cancellationToken = default) {}
-    public Task SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
-    public Task SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetBrightnessAsync(int brightness, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorAsync(int hue, int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorHueAsync(int hue, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
   }
 
   public class L900 : TapoDevice {
-    public L900(IDeviceEndPointProvider deviceEndPointProvider, Guid? terminalUuid = null, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
+    public L900(IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
+    public L900(IPAddress ipAddress, IServiceProvider serviceProvider) {}
     public L900(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
-    public L900(string hostName, IServiceProvider? serviceProvider = null) {}
-    public L900(string hostName, string email, string password, IServiceProvider? serviceProvider = null) {}
+    public L900(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public L900(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    public L900(string host, IServiceProvider serviceProvider) {}
+    public L900(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
 
-    public Task SetBrightnessAsync(int brightness, CancellationToken cancellationToken = default) {}
-    public Task SetColorAsync(int hue, int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
-    public Task SetColorHueAsync(int hue, int? brightness, CancellationToken cancellationToken = default) {}
-    public Task SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetBrightnessAsync(int brightness, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorAsync(int hue, int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorHueAsync(int hue, int? brightness, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
   }
 
   public class P105 : TapoDevice {
-    public P105(IDeviceEndPointProvider deviceEndPointProvider, Guid? terminalUuid = null, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
+    public P105(IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
+    public P105(IPAddress ipAddress, IServiceProvider serviceProvider) {}
     public P105(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
-    public P105(string hostName, IServiceProvider? serviceProvider = null) {}
-    public P105(string hostName, string email, string password, IServiceProvider? serviceProvider = null) {}
+    public P105(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public P105(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    public P105(string host, IServiceProvider serviceProvider) {}
+    public P105(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
   }
 
   public class TapoAuthenticationException : TapoProtocolException {
@@ -257,38 +306,54 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
   public static class TapoCredentailProviderServiceCollectionExtensions {
     public static IServiceCollection AddTapoBase64EncodedCredential(this IServiceCollection services, string base64UserNameSHA1Digest, string base64Password) {}
-    public static IServiceCollection AddTapoCredential(this IServiceCollection services, string userName, string password) {}
+    public static IServiceCollection AddTapoCredential(this IServiceCollection services, string email, string password) {}
+    public static IServiceCollection AddTapoCredentialProvider(this IServiceCollection services, ITapoCredentialProvider credentialProvider) {}
   }
 
-  public class TapoDevice : IDisposable {
-    public static TapoDevice Create(IDeviceEndPointProvider deviceEndPointProvider, Guid? terminalUuid = null, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
-    public static TapoDevice Create(IPAddress deviceAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
-    public static TapoDevice Create(string hostName, string email, string password, IServiceProvider? serviceProvider = null) {}
+  public class TapoDevice :
+    IDisposable,
+    ITapoCredentialIdentity
+  {
+    public static TapoDevice Create(IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
+    public static TapoDevice Create(IPAddress ipAddress, IServiceProvider serviceProvider) {}
+    public static TapoDevice Create(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
+    public static TapoDevice Create(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public static TapoDevice Create(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    public static TapoDevice Create(string host, IServiceProvider serviceProvider) {}
+    public static TapoDevice Create(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
 
-    protected TapoDevice(IDeviceEndPointProvider deviceEndPointProvider, Guid? terminalUuid = null, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
-    protected TapoDevice(IPAddress ipAddress, string email, string password, Guid? terminalUuid = null, IServiceProvider? serviceProvider = null) {}
-    protected TapoDevice(string hostName, Guid? terminalUuid = null, IServiceProvider? serviceProvider = null) {}
-    protected TapoDevice(string hostName, string email, string password, Guid? terminalUuid = null, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, TapoClientExceptionHandler? exceptionHandler = null, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(IPAddress ipAddress, IServiceProvider serviceProvider) {}
+    protected TapoDevice(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    protected TapoDevice(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    protected TapoDevice(string host, IServiceProvider serviceProvider) {}
+    protected TapoDevice(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
 
     protected bool IsDisposed { get; }
     public TapoSession? Session { get; }
+    string ITapoCredentialIdentity.Name { get; }
     public string TerminalUuidString { get; }
+    public TimeSpan? Timeout { get; set; }
 
     protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
     protected ValueTask EnsureSessionEstablishedAsync(CancellationToken cancellationToken = default) {}
-    public Task<TapoDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask<TapoDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default) {}
     public ValueTask<EndPoint> ResolveEndPointAsync(CancellationToken cancellationToken = default) {}
-    protected Task<TResult> SendRequestAsync<TRequest, TResponse, TResult>(TRequest request, Func<TResponse, TResult> composeResult, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
-    public Task SetDeviceInfoAsync<TParameters>(TParameters parameters, CancellationToken cancellationToken = default) {}
-    public Task SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
-    public Task TurnOffAsync(CancellationToken cancellationToken = default) {}
-    public Task TurnOnAsync(CancellationToken cancellationToken = default) {}
+    protected ValueTask SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
+    protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(TRequest request, Func<TResponse, TResult> composeResult, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
+    public ValueTask SetDeviceInfoAsync<TParameters>(TParameters parameters, CancellationToken cancellationToken = default) {}
+    public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
+    public ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
   }
 
   public static class TapoDeviceEndPointProvider {
     public static IDeviceEndPointProvider Create(IPAddress ipAddress) {}
-    public static IDeviceEndPointProvider Create(string hostName) {}
+    public static IDeviceEndPointProvider Create(PhysicalAddress macAddress, IDeviceEndPointFactory<PhysicalAddress> endPointFactory) {}
+    public static IDeviceEndPointProvider Create(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public static IDeviceEndPointProvider Create(string host) {}
   }
 
   public class TapoDeviceInfo {
@@ -364,14 +429,36 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
   }
 
   public static class TapoHttpClientFactoryServiceCollectionExtensions {
-    public static IHttpClientBuilder AddTapoHttpClient(this IServiceCollection services, string name, Action<IServiceProvider, HttpClient>? configureClient = null) {}
-    public static IHttpClientBuilder AddTapoHttpClient(this IServiceCollection services, string name, TimeSpan timeout, Action<IServiceProvider, HttpClient>? configureClient = null) {}
+    public static IServiceCollection AddTapoHttpClient(this IServiceCollection services, Action<HttpClient>? configureClient = null) {}
   }
 
-  public abstract class TapoProtocolException : InvalidOperationException {
-    protected TapoProtocolException(string message, Uri endPoint, Exception? innerException) {}
+  public class TapoProtocolException : InvalidOperationException {
+    internal protected TapoProtocolException(string message, Uri endPoint, Exception? innerException) {}
 
     public Uri EndPoint { get; }
+  }
+}
+
+namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
+  public interface ITapoCredential : IDisposable {
+    [...] <unknown> WritePasswordPropertyValue(...);
+    [...] <unknown> WriteUsernamePropertyValue(...);
+  }
+
+  public interface ITapoCredentialIdentity {
+    string Name { get; }
+  }
+
+  public interface ITapoCredentialProvider {
+    ITapoCredential GetCredential(ITapoCredentialIdentity? identity);
+  }
+
+  public static class TapoCredentialUtils {
+    public const int HexSHA1HashSizeInBytes = 40;
+
+    public static string ToBase64EncodedSHA1DigestString(ReadOnlySpan<char> str) {}
+    public static string ToBase64EncodedString(ReadOnlySpan<char> str) {}
+    public static bool TryConvertToHexSHA1Hash(ReadOnlySpan<byte> input, Span<byte> destination, out int bytesWritten) {}
   }
 }
 
@@ -402,7 +489,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     JsonConverterFactory,
     IDisposable
   {
-    public SecurePassThroughJsonConverterFactory(ICryptoTransform? encryptorForPassThroughRequest, ICryptoTransform? decryptorForPassThroughResponse, JsonSerializerOptions? plainTextJsonSerializerOptions, ILogger? logger = null) {}
+    public SecurePassThroughJsonConverterFactory(ITapoCredentialIdentity? identity, ICryptoTransform? encryptorForPassThroughRequest, ICryptoTransform? decryptorForPassThroughResponse, JsonSerializerOptions? baseJsonSerializerOptionsForPassThroughMessage, ILogger? logger = null) {}
 
     public override bool CanConvert(Type typeToConvert) {}
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options) {}
@@ -412,21 +499,24 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
   public sealed class TapoClient : IDisposable {
     public const int DefaultPort = 80;
 
-    public TapoClient(EndPoint endPoint, ITapoCredentialProvider? credentialProvider = null, IServiceProvider? serviceProvider = null) {}
+    public TapoClient(EndPoint endPoint, IHttpClientFactory? httpClientFactory = null, ILogger? logger = null) {}
 
     public Uri EndPointUri { get; }
     public TapoSession? Session { get; }
+    public TimeSpan? Timeout { get; set; }
 
-    public Task AuthenticateAsync(CancellationToken cancellationToken = default) {}
-    public void CloseSession() {}
+    public ValueTask AuthenticateAsync(ITapoCredentialIdentity? identity, ITapoCredentialProvider credential, CancellationToken cancellationToken = default) {}
     public void Dispose() {}
-    public Task<TResponse> SendRequestAsync<TRequest, TResponse>(CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest, new() where TResponse : ITapoPassThroughResponse {}
-    public Task<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
+    public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest, new() where TResponse : ITapoPassThroughResponse {}
+    public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
   }
 
-  public static class TapoCredentialUtils {
-    public static string ToBase64EncodedSHA1DigestString(ReadOnlySpan<char> str) {}
-    public static string ToBase64EncodedString(ReadOnlySpan<char> str) {}
+  public abstract class TapoClientExceptionHandler {
+    internal protected static readonly TapoClientExceptionHandler Default; // = "Smdn.TPSmartHomeDevices.Tapo.Protocol.TapoClientDefaultExceptionHandler"
+
+    protected TapoClientExceptionHandler() {}
+
+    public abstract TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger);
   }
 
   public sealed class TapoSession : IDisposable {
@@ -526,38 +616,13 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
   }
 
   public readonly struct LoginDeviceRequest : ITapoPassThroughRequest {
-    public readonly struct RequestParameters : IEquatable<RequestParameters> {
-      [CompilerGenerated]
-      public static bool operator == (LoginDeviceRequest.RequestParameters left, LoginDeviceRequest.RequestParameters right) {}
-      [CompilerGenerated]
-      public static bool operator != (LoginDeviceRequest.RequestParameters left, LoginDeviceRequest.RequestParameters right) {}
-
-      public RequestParameters(string Password, string UserName) {}
-
-      [JsonPropertyName("password")]
-      public string Password { get; init; }
-      [JsonPropertyName("username")]
-      public string UserName { get; init; }
-
-      [CompilerGenerated]
-      public void Deconstruct(out string Password, out string UserName) {}
-      [CompilerGenerated]
-      public bool Equals(LoginDeviceRequest.RequestParameters other) {}
-      [CompilerGenerated]
-      public override bool Equals(object obj) {}
-      [CompilerGenerated]
-      public override int GetHashCode() {}
-      [CompilerGenerated]
-      public override string ToString() {}
-    }
-
-    public LoginDeviceRequest(string password, string userName) {}
+    public LoginDeviceRequest(ITapoCredentialProvider credential) {}
 
     [JsonPropertyName("method")]
     [JsonPropertyOrder(0)]
     public string Method { get; }
     [JsonPropertyName("params")]
-    public LoginDeviceRequest.RequestParameters Parameters { get; }
+    public ITapoCredentialProvider Parameters { get; }
     [JsonPropertyName("requestTimeMils")]
     public long RequestTimeMilliseconds { get; }
   }
@@ -700,6 +765,25 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     [JsonPropertyName("result")]
     public SetDeviceInfoResponse.ResponseResult Result { get; init; }
   }
+
+  public readonly struct TapoClientExceptionHandling {
+    public static readonly TapoClientExceptionHandling InvalidateEndPointAndRetry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
+    public static readonly TapoClientExceptionHandling InvalidateEndPointAndThrow; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
+    public static readonly TapoClientExceptionHandling Retry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoClientExceptionHandling RetryAfterReconnect; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=True, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoClientExceptionHandling Throw; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoClientExceptionHandling ThrowAsTapoProtocolException; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=True, ShouldInvalidateEndPoint=False}"
+
+    public static TapoClientExceptionHandling CreateRetry(TimeSpan retryAfter, bool shouldReconnect = false) {}
+
+    public TimeSpan RetryAfter { get; init; }
+    public bool ShouldInvalidateEndPoint { get; init; }
+    public bool ShouldReconnect { get; init; }
+    public bool ShouldRetry { get; init; }
+    public bool ShouldWrapIntoTapoProtocolException { get; init; }
+
+    public override string ToString() {}
+  }
 }
-// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.2.1.0.
+// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.2.2.0.
 // Smdn.Reflection.ReverseGenerating.ListApi.Core v1.2.0.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
