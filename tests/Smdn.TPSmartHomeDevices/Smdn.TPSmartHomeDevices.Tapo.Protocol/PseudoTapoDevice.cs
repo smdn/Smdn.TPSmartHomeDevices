@@ -515,7 +515,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     await JsonSerializer.SerializeAsync(buffer, content).ConfigureAwait(false);
 
     try {
-      response.ContentLength64 = buffer.Length;
+      try {
+        response.ContentLength64 = buffer.Length;
+      }
+      catch (InvalidOperationException) {
+        throw new ClientDisconnectedException();
+      }
 
       buffer.Position = 0L;
 
