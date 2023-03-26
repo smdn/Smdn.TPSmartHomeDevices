@@ -687,7 +687,7 @@ public class KasaDeviceTests {
   private class AssertOperationCanceledMustNotBeHandledExceptionHandler : KasaClientExceptionHandler {
     public override KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
     {
-      Assert.IsNotInstanceOf<OperationCanceledException>(exception);
+      Assert.IsNotAssignableFrom<OperationCanceledException>(exception);
 
       return Default.DetermineHandling(
         device: device,
@@ -733,7 +733,7 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.IsAssignableFrom<OperationCanceledException>(ex);
+    Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
   }

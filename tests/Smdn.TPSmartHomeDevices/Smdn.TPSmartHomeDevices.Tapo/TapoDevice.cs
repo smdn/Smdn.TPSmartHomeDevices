@@ -1018,7 +1018,7 @@ public class TapoDeviceTests {
       async () => await device.GetDeviceInfoAsync(cancellationToken: ctsRequest.Token)
     );
 
-    Assert.IsInstanceOf<OperationCanceledException>(ex);
+    Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
     Assert.IsNull(device.Session, nameof(device.Session));
   }
