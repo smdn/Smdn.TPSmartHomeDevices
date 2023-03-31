@@ -20,6 +20,7 @@ SPDX-License-Identifier: MIT
 
   <ItemGroup>
     <PackageReference Include="Smdn.Fundamental.Stream" Version="3.*" />
+    <PackageReference Include="Smdn.Fundamental.PortNumber" Version="3.*" />
     <PackageReference Include="Smdn.Test.NUnit.Constraints" Version="1.*" />
   </ItemGroup>
 </Project>

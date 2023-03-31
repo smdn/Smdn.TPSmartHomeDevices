@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Smdn.Net;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
@@ -180,57 +181,41 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     int? exceptPort = 0
   )
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-      if (!EndPointUtils.TryFindUnusedPort(exceptPort, out var port))
-        throw new InvalidOperationException("could not find unused port");
+    (EndPoint, listener) = PortNumberUtils.CreateServiceWithAvailablePort(
+      createService: CreateListener,
+      exceptPort: port => port == exceptPort,
+      isPortInUseException: static ex => ex is HttpListenerException
+    );
 
-      EndPoint = new IPEndPoint(
-        Socket.OSSupportsIPv6
+    static (IPEndPoint endPoint, HttpListener listener) CreateListener(int port)
+    {
+      var enableIPv6 = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? true
+        : false; // HttpListener on non-Windows platform does not support Socket.DualMode(?)
+
+      var endPoint = new IPEndPoint(
+        enableIPv6 && Socket.OSSupportsIPv6
           ? IPAddress.IPv6Loopback
           : IPAddress.Loopback,
         port
       );
 
-      listener = new HttpListener();
-      listener.Prefixes.Add(CreateEndPointHttpUrl(EndPoint));
-      listener.Start();
-    }
-    else {
-      foreach (var port in EndPointUtils.EnumerateIANASuggestedDynamicPorts(exceptPort)) {
-        var l = new HttpListener();
+      var listener = new HttpListener();
 
-        try {
-          var endPoint = new IPEndPoint(
-#if false // IPv6
-            Socket.OSSupportsIPv6
-              ? IPAddress.IPv6Loopback
-              : IPAddress.Loopback,
-#else
-            IPAddress.Loopback,
-#endif
-            port
-          );
+      try {
+        if (enableIPv6)
+          listener.Prefixes.Add($"http://+:{port}/");
+        else
+          listener.Prefixes.Add(CreateEndPointHttpUrl(endPoint));
 
-#if false // IPv6
-          // HttpListener on non-Windows platform does not support Socket.DualMode(?)
-          l.Prefixes.Add($"http://+:{port}/");
-#else
-          l.Prefixes.Add(CreateEndPointHttpUrl(endPoint));
-#endif
-          l.Start();
+        listener.Start();
 
-          EndPoint = endPoint;
-          listener = l;
-          break;
-        }
-        catch (HttpListenerException) {
-          (l as IDisposable).Dispose();
-          continue;
-        }
+        return (endPoint, listener);
       }
-
-      if (listener is null)
-        throw new InvalidOperationException("could not find unused port");
+      catch {
+        (listener as IDisposable).Dispose();
+        throw;
+      }
     }
 
     if (!listener.IsListening)

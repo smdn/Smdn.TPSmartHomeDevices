@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Smdn.Net;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
@@ -87,40 +88,18 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     int? exceptPort = 0
   )
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-      if (!EndPointUtils.TryFindUnusedPort(exceptPort, out var port))
-        throw new InvalidOperationException("could not find unused port");
-
-      listener = CreateListeningSocket(
+    listener = PortNumberUtils.CreateServiceWithAvailablePort(
+      createService: port => CreateListeningSocket(
         new IPEndPoint(
           Socket.OSSupportsIPv6
             ? IPAddress.IPv6Loopback
             : IPAddress.Loopback,
           port
         )
-      );
-    }
-    else {
-      foreach (var port in EndPointUtils.EnumerateIANASuggestedDynamicPorts(exceptPort)) {
-        try {
-          listener = CreateListeningSocket(
-            new IPEndPoint(
-              Socket.OSSupportsIPv6
-                ? IPAddress.IPv6Any
-                : IPAddress.Any,
-              port
-            )
-          );
-          break;
-        }
-        catch (SocketException) {
-          continue;
-        }
-      }
-
-      if (listener is null)
-        throw new InvalidOperationException("could not find unused port");
-    }
+      ),
+      exceptPort: port => port == exceptPort,
+      isPortInUseException: ex => ex is SocketException
+    );
 
     taskProcessListener = Task.Run(() => ProcessListenerAsync(listenerCancellationTokenSource.Token));
 
