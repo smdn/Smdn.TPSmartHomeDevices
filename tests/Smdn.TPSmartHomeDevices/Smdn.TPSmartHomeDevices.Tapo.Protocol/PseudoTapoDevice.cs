@@ -173,7 +173,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     listener?.Stop();
     listener = null;
 
-    taskProcessListener?.Dispose();
+    try {
+      taskProcessListener?.Dispose();
+    }
+    catch {
+    }
+
     taskProcessListener = null;
   }
 
@@ -189,28 +194,25 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     static (IPEndPoint endPoint, HttpListener listener) CreateListener(int port)
     {
-      var enableIPv6 = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-        ? true
-        : false; // HttpListener on non-Windows platform does not support Socket.DualMode(?)
-
-      var endPoint = new IPEndPoint(
-        enableIPv6 && Socket.OSSupportsIPv6
-          ? IPAddress.IPv6Loopback
-          : IPAddress.Loopback,
-        port
-      );
-
+      // HttpListener on non-Windows platform does not support Socket.DualMode(?)
+      var enableIPv6 = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Socket.OSSupportsIPv6;
       var listener = new HttpListener();
 
       try {
+        listener.Prefixes.Add(CreateEndPointHttpUrl(new IPEndPoint(IPAddress.Loopback, port)));
+
         if (enableIPv6)
-          listener.Prefixes.Add($"http://+:{port}/");
-        else
-          listener.Prefixes.Add(CreateEndPointHttpUrl(endPoint));
+          listener.Prefixes.Add(CreateEndPointHttpUrl(new IPEndPoint(IPAddress.IPv6Loopback, port)));
 
         listener.Start();
 
-        return (endPoint, listener);
+        return (
+          new(
+            enableIPv6 ? IPAddress.IPv6Loopback : IPAddress.Loopback,
+            port
+          ),
+          listener
+        );
       }
       catch {
         (listener as IDisposable).Dispose();
@@ -309,7 +311,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     await writer.FlushAsync().ConfigureAwait(false);
 
     try {
-      response.ContentLength64 = buffer.Length;
+      try {
+        response.ContentLength64 = buffer.Length;
+      }
+      catch (InvalidOperationException) {
+        throw new ClientDisconnectedException();
+      }
 
       buffer.Position = 0L;
 
@@ -514,7 +521,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       buffer.Position = 0L;
 #endif
 
-      await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+      try {
+        await buffer.CopyToAsync(response.OutputStream).ConfigureAwait(false);
+      }
+      catch (HttpListenerException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+        throw new ClientDisconnectedException();
+      }
     }
     catch (ObjectDisposedException) {
       throw new ClientDisconnectedException();
@@ -670,7 +682,12 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     ).ConfigureAwait(false);
 
     try {
-      response.ContentLength64 = buffer.Length;
+      try {
+        response.ContentLength64 = buffer.Length;
+      }
+      catch (InvalidOperationException) {
+        throw new ClientDisconnectedException();
+      }
 
       buffer.Position = 0L;
 

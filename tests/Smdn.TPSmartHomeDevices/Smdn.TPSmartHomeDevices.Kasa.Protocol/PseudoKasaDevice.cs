@@ -88,8 +88,16 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     int? exceptPort = 0
   )
   {
-    listener = PortNumberUtils.CreateServiceWithAvailablePort(
-      createService: port => CreateListeningSocket(
+    (listener, EndPoint) = PortNumberUtils.CreateServiceWithAvailablePort(
+      createService: port => (
+        CreateListeningSocket(
+          new IPEndPoint(
+            Socket.OSSupportsIPv6
+              ? IPAddress.IPv6Any
+              : IPAddress.Any,
+            port
+          )
+        ),
         new IPEndPoint(
           Socket.OSSupportsIPv6
             ? IPAddress.IPv6Loopback
@@ -102,8 +110,6 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     );
 
     taskProcessListener = Task.Run(() => ProcessListenerAsync(listenerCancellationTokenSource.Token));
-
-    EndPoint = (listener?.LocalEndPoint as IPEndPoint) ?? throw new InvalidOperationException("could not get listener end point");
 
     return EndPoint;
 
