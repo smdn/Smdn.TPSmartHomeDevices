@@ -252,6 +252,9 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         catch (ArgumentException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
           return; // disposed
         }
+        catch (InvalidOperationException) when (listener is null) {
+          return; // disposed
+        }
 
         if (context is not null) {
           try {
