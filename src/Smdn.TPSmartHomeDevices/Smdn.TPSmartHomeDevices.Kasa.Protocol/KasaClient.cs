@@ -233,7 +233,7 @@ public sealed partial class KasaClient : IDisposable {
     */
     try {
       const SocketFlags receiveSocketFlags = default;
-      const int receiveBlockSize = 0x100;
+      const int receiveBlockSize = 0x400;
 
       for (; ;) {
         var buf = buffer.GetMemory(receiveBlockSize);
