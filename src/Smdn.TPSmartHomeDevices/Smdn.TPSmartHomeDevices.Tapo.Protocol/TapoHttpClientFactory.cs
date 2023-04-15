@@ -9,7 +9,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 internal class TapoHttpClientFactory : IHttpClientFactory {
   private static HttpMessageHandler CreateHandler()
     =>
-#if NETCOREAPP2_1_OR_GREATER || NET5_0_OR_GREATER
+#if SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER
       new SocketsHttpHandler()
 #else
       new HttpClientHandler()
