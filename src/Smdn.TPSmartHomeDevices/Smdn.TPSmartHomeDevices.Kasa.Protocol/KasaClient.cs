@@ -365,7 +365,7 @@ public sealed partial class KasaClient : IDisposable {
           KasaJsonSerializer.TryReadMessageBodyLength(buffer.WrittenMemory, out expectedBodyLength) &&
           buffer.WrittenMemory.Length < KasaJsonSerializer.SizeOfHeaderInBytes + expectedBodyLength
         ) {
-          logger?.LogWarning(
+          logger?.LogInformation(
             "Not received up to expected message size, continue receiving. (expect {RestOfBodyLength} more bytes of {ExpectedBodyLength} bytes body, timeout {Timeout} ms)",
             expectedBodyLength - (buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes),
             expectedBodyLength,
