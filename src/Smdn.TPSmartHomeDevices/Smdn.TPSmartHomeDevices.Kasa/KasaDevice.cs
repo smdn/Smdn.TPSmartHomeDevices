@@ -372,8 +372,13 @@ public partial class KasaDevice : IDisposable {
           delay = handling.RetryAfter;
 
           if (handling.ShouldReconnect) {
+            client.Logger?.LogInformation("Closing the current connection and will retry after {DelayMilliseconds} ms.", delay.TotalMilliseconds);
+
             client.Dispose();
             client = null;
+          }
+          else {
+            client.Logger?.LogInformation("Will retry after {DelayMilliseconds} ms.", delay.TotalMilliseconds);
           }
 
           continue;
