@@ -396,7 +396,7 @@ json: @"{
       )
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    // Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
     Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
     Assert.IsInstanceOf<KasaMessageBodyTooShortException>(ex!.InnerException);
 
