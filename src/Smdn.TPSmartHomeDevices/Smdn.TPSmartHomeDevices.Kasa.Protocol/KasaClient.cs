@@ -29,6 +29,9 @@ public sealed partial class KasaClient : IDisposable {
   // Kasa device seems to automatically close connection within approx 30 secs since the lastest request.
   private static readonly TimeSpan connectionRefreshInterval = TimeSpan.FromSeconds(30);
 
+  // The timeout for receiving the rest of the response when the device sends a split partial response.
+  private static readonly TimeSpan receiveRestOfBodyTimeout = TimeSpan.FromMilliseconds(500);
+
   private bool IsDisposed => endPoint is null;
 
   private EndPoint? endPoint; // if null, it indicates a 'disposed' state.
@@ -231,20 +234,24 @@ public sealed partial class KasaClient : IDisposable {
     /*
     * receive
     */
+    var cancellationTokenForReceive = cancellationToken;
+    CancellationTokenSource? cancellationTokenSourceForReceiveRestOfBody = null;
+    CancellationTokenSource? linkedCancellationTokenSourceForReceive = null;
+
     try {
       const SocketFlags receiveSocketFlags = default;
       const int receiveBlockSize = 0x400;
+      int expectedBodyLength = default;
 
       for (; ;) {
         var buf = buffer.GetMemory(receiveBlockSize);
-
         int len = default;
 
         try {
           len = await socket.ReceiveAsync(
             buf,
             receiveSocketFlags,
-            cancellationToken: cancellationToken
+            cancellationToken: cancellationTokenForReceive
           ).ConfigureAwait(false);
         }
         catch (SocketException ex) when (
@@ -253,14 +260,60 @@ public sealed partial class KasaClient : IDisposable {
         ) {
           throw new KasaDisconnectedException(ex.Message, endPoint, ex);
         }
+        catch (OperationCanceledException) when (
+          cancellationTokenSourceForReceiveRestOfBody is not null &&
+          cancellationTokenSourceForReceiveRestOfBody.IsCancellationRequested
+        ) {
+          logger?.LogWarning(
+            "Timed out receiving up to expected message size. ({ReceivedBodyLength}/{ExpectedBodyLength} bytes)",
+            buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes,
+            expectedBodyLength
+          );
+
+          break; // expected cancellation
+        }
 
         if (len <= 0)
-          break;
+          goto RECEIVE_DONE;
 
         buffer.Advance(len);
 
         if (len < buf.Length)
-          break;
+          goto RECEIVE_DONE;
+
+        continue;
+
+      RECEIVE_DONE:
+        // If the buffer is not filled up to the expected body size, attempt to receive
+        // the rest of body after creating CancellationToken with a specific timeout duration.
+        if (
+          cancellationTokenSourceForReceiveRestOfBody is null &&
+          KasaJsonSerializer.TryReadMessageBodyLength(buffer.WrittenMemory, out expectedBodyLength) &&
+          buffer.WrittenMemory.Length < KasaJsonSerializer.SizeOfHeaderInBytes + expectedBodyLength
+        ) {
+          logger?.LogWarning(
+            "Not received up to expected message size, continue receiving. (expect {RestOfBodyLength} more bytes of {ExpectedBodyLength} bytes body, timeout {Timeout} ms)",
+            expectedBodyLength - (buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes),
+            expectedBodyLength,
+            receiveRestOfBodyTimeout.TotalMilliseconds
+          );
+
+          // create CancellationTokenSource for timeout
+          cancellationTokenSourceForReceiveRestOfBody = new CancellationTokenSource(delay: receiveRestOfBodyTimeout);
+
+          // link with the supplied CancellationToken
+          linkedCancellationTokenSourceForReceive = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            cancellationTokenSourceForReceiveRestOfBody.Token
+          );
+
+          // replace to linked CancellationToken
+          cancellationTokenForReceive = linkedCancellationTokenSourceForReceive.Token;
+
+          continue;
+        }
+
+        break;
       }
 
       lastSentAt = DateTime.Now;
@@ -322,6 +375,9 @@ public sealed partial class KasaClient : IDisposable {
       }
     }
     finally {
+      linkedCancellationTokenSourceForReceive?.Dispose();
+      cancellationTokenSourceForReceiveRestOfBody?.Dispose();
+
       buffer.Clear(); // clear buffer state for next use
     }
   }

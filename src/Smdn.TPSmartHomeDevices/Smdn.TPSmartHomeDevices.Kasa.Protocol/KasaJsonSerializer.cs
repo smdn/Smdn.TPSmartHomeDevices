@@ -16,7 +16,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 /// </remarks>
 public static class KasaJsonSerializer {
   public const byte InitialKey = 0xAB;
-  private const int SizeOfHeaderInBytes = 4;
+  internal const int SizeOfHeaderInBytes = 4;
 
   private static readonly JsonSerializerOptions serializerOptions = new() {
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -81,6 +81,21 @@ public static class KasaJsonSerializer {
     }
   }
 
+  internal static bool TryReadMessageBodyLength(
+    ReadOnlyMemory<byte> message,
+    out int length
+  )
+  {
+    length = default;
+
+    if (message.Length < 4)
+      return false;
+
+    length = BinaryPrimitives.ReadInt32BigEndian(message.Slice(0, 4).Span);
+
+    return true;
+  }
+
   public static JsonElement Deserialize(
     ArrayBufferWriter<byte> buffer,
     JsonEncodedText module,
@@ -93,10 +108,9 @@ public static class KasaJsonSerializer {
 
     var buf = buffer.WrittenMemory;
 
-    if (buf.Length < 4)
+    if (!TryReadMessageBodyLength(buf, out var length))
       throw new KasaMessageHeaderTooShortException($"input too short (expects at least 4 bytes of header but was {buf.Length})");
 
-    var length = BinaryPrimitives.ReadInt32BigEndian(buf.Slice(0, 4).Span);
     var body = buf.Slice(4);
 
     if (body.Length < length)
