@@ -149,7 +149,13 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public async ValueTask DisposeAsync()
   {
     try {
-      listener?.Stop();
+      try {
+        listener?.Stop();
+      }
+      catch (NullReferenceException) {
+        // clean-up performed by HttpListener.Stop may occasionally throws NullReferenceException
+      }
+
       listener = null;
 
       try {
