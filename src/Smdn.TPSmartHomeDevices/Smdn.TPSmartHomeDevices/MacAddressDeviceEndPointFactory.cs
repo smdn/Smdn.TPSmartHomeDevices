@@ -55,12 +55,12 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   private IAddressResolver<PhysicalAddress, IPAddress>? resolver; // if null, it indicates a 'disposed' state.
 
   public MacAddressDeviceEndPointFactory(
-    MacAddressResolverOptions? options = null,
+    IPNetworkProfile networkProfile,
     IServiceProvider? serviceProvider = null
   )
     : this(
-      resolver: (IAddressResolver<PhysicalAddress, IPAddress>)MacAddressResolver.Create(
-        options: options,
+      resolver: (IAddressResolver<PhysicalAddress, IPAddress>)new MacAddressResolver(
+        networkProfile: networkProfile,
         serviceProvider: serviceProvider
       ),
       serviceProvider: serviceProvider
@@ -69,7 +69,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   }
 
   public MacAddressDeviceEndPointFactory(
-    MacAddressResolver resolver,
+    MacAddressResolverBase resolver,
     IServiceProvider? serviceProvider = null
   )
     : this(
