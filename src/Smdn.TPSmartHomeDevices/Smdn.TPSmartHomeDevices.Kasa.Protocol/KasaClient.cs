@@ -231,90 +231,13 @@ public sealed partial class KasaClient : IDisposable {
       buffer.Clear(); // clear buffer state for next use
     }
 
-    /*
-    * receive
-    */
-    var cancellationTokenForReceive = cancellationToken;
-    CancellationTokenSource? cancellationTokenSourceForReceiveRestOfBody = null;
-    CancellationTokenSource? linkedCancellationTokenSourceForReceive = null;
-
     try {
-      const SocketFlags receiveSocketFlags = default;
-      const int receiveBlockSize = 0x400;
-      int expectedBodyLength = default;
-
-      for (; ;) {
-        var buf = buffer.GetMemory(receiveBlockSize);
-        int len = default;
-
-        try {
-          len = await socket.ReceiveAsync(
-            buf,
-            receiveSocketFlags,
-            cancellationToken: cancellationTokenForReceive
-          ).ConfigureAwait(false);
-        }
-        catch (SocketException ex) when (
-          ex.SocketErrorCode is
-            SocketError.ConnectionReset // ECONNRESET
-        ) {
-          throw new KasaDisconnectedException(ex.Message, endPoint, ex);
-        }
-        catch (OperationCanceledException) when (
-          cancellationTokenSourceForReceiveRestOfBody is not null &&
-          cancellationTokenSourceForReceiveRestOfBody.IsCancellationRequested
-        ) {
-          logger?.LogWarning(
-            "Timed out receiving up to expected message size. ({ReceivedBodyLength}/{ExpectedBodyLength} bytes)",
-            buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes,
-            expectedBodyLength
-          );
-
-          break; // expected cancellation
-        }
-
-        if (len <= 0)
-          goto RECEIVE_DONE;
-
-        buffer.Advance(len);
-
-        if (len < buf.Length)
-          goto RECEIVE_DONE;
-
-        continue;
-
-      RECEIVE_DONE:
-        // If the buffer is not filled up to the expected body size, attempt to receive
-        // the rest of body after creating CancellationToken with a specific timeout duration.
-        if (
-          cancellationTokenSourceForReceiveRestOfBody is null &&
-          KasaJsonSerializer.TryReadMessageBodyLength(buffer.WrittenMemory, out expectedBodyLength) &&
-          buffer.WrittenMemory.Length < KasaJsonSerializer.SizeOfHeaderInBytes + expectedBodyLength
-        ) {
-          logger?.LogWarning(
-            "Not received up to expected message size, continue receiving. (expect {RestOfBodyLength} more bytes of {ExpectedBodyLength} bytes body, timeout {Timeout} ms)",
-            expectedBodyLength - (buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes),
-            expectedBodyLength,
-            receiveRestOfBodyTimeout.TotalMilliseconds
-          );
-
-          // create CancellationTokenSource for timeout
-          cancellationTokenSourceForReceiveRestOfBody = new CancellationTokenSource(delay: receiveRestOfBodyTimeout);
-
-          // link with the supplied CancellationToken
-          linkedCancellationTokenSourceForReceive = CancellationTokenSource.CreateLinkedTokenSource(
-            cancellationToken,
-            cancellationTokenSourceForReceiveRestOfBody.Token
-          );
-
-          // replace to linked CancellationToken
-          cancellationTokenForReceive = linkedCancellationTokenSourceForReceive.Token;
-
-          continue;
-        }
-
-        break;
-      }
+      /*
+       * receive
+       */
+      await ReceiveAsync(
+        cancellationToken: cancellationToken
+      ).ConfigureAwait(false);
 
       lastSentAt = DateTime.Now;
 
@@ -324,6 +247,9 @@ public sealed partial class KasaClient : IDisposable {
       logger?.LogTrace("Received response {ResponseSize} bytes", buffer.WrittenCount);
       logger?.LogTrace("Buffer capacity: {Capacity} bytes", buffer.Capacity);
 
+      /*
+       * decrypt and parse
+       */
       JsonElement result = default;
 
       try {
@@ -375,10 +301,98 @@ public sealed partial class KasaClient : IDisposable {
       }
     }
     finally {
-      linkedCancellationTokenSourceForReceive?.Dispose();
-      cancellationTokenSourceForReceiveRestOfBody?.Dispose();
-
       buffer.Clear(); // clear buffer state for next use
+    }
+  }
+
+  private async ValueTask ReceiveAsync(
+    CancellationToken cancellationToken
+  )
+  {
+    CancellationTokenSource? cancellationTokenSourceForReceiveRestOfBody = null;
+    CancellationTokenSource? linkedCancellationTokenSource = null;
+
+    try {
+      const SocketFlags receiveSocketFlags = default;
+      const int receiveBlockSize = 0x400;
+      int expectedBodyLength = default;
+
+      for (; ;) {
+        var buf = buffer.GetMemory(receiveBlockSize);
+        int len = default;
+
+        try {
+          len = await socket.ReceiveAsync(
+            buf,
+            receiveSocketFlags,
+            cancellationToken: cancellationToken
+          ).ConfigureAwait(false);
+        }
+        catch (SocketException ex) when (
+          ex.SocketErrorCode is
+            SocketError.ConnectionReset // ECONNRESET
+        ) {
+          throw new KasaDisconnectedException(ex.Message, endPoint, ex);
+        }
+        catch (OperationCanceledException) when (
+          cancellationTokenSourceForReceiveRestOfBody is not null &&
+          cancellationTokenSourceForReceiveRestOfBody.IsCancellationRequested
+        ) {
+          logger?.LogWarning(
+            "Timed out receiving up to expected message size. ({ReceivedBodyLength}/{ExpectedBodyLength} bytes)",
+            buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes,
+            expectedBodyLength
+          );
+
+          return; // expected cancellation
+        }
+
+        if (len <= 0)
+          goto RECEIVE_DONE;
+
+        buffer.Advance(len);
+
+        if (len < buf.Length)
+          goto RECEIVE_DONE;
+
+        continue;
+
+      RECEIVE_DONE:
+        // If the buffer is not filled up to the expected body size, attempt to receive
+        // the rest of body after creating CancellationToken with a specific timeout duration.
+        if (
+          cancellationTokenSourceForReceiveRestOfBody is null &&
+          KasaJsonSerializer.TryReadMessageBodyLength(buffer.WrittenMemory, out expectedBodyLength) &&
+          buffer.WrittenMemory.Length < KasaJsonSerializer.SizeOfHeaderInBytes + expectedBodyLength
+        ) {
+          logger?.LogWarning(
+            "Not received up to expected message size, continue receiving. (expect {RestOfBodyLength} more bytes of {ExpectedBodyLength} bytes body, timeout {Timeout} ms)",
+            expectedBodyLength - (buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes),
+            expectedBodyLength,
+            receiveRestOfBodyTimeout.TotalMilliseconds
+          );
+
+          // create CancellationTokenSource for timeout
+          cancellationTokenSourceForReceiveRestOfBody = new CancellationTokenSource(delay: receiveRestOfBodyTimeout);
+
+          // link with the supplied CancellationToken
+          linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            cancellationTokenSourceForReceiveRestOfBody.Token
+          );
+
+          // replace to linked CancellationToken
+          cancellationToken = linkedCancellationTokenSource.Token;
+
+          continue;
+        }
+
+        return;
+      } // for
+    }
+    finally {
+      cancellationTokenSourceForReceiveRestOfBody?.Dispose();
+      linkedCancellationTokenSource?.Dispose();
     }
   }
 }
