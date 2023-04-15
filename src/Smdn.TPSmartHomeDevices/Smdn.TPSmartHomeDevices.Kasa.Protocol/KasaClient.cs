@@ -26,10 +26,14 @@ public sealed partial class KasaClient : IDisposable {
 #endif
   );
 
+  // Kasa device seems to automatically close connection within approx 30 secs since the lastest request.
+  private static readonly TimeSpan connectionRefreshInterval = TimeSpan.FromSeconds(30);
+
   private bool IsDisposed => endPoint is null;
 
   private EndPoint? endPoint; // if null, it indicates a 'disposed' state.
   private Socket? socket;
+  private DateTime lastSentAt;
   private readonly ILogger? logger;
   private readonly ArrayBufferWriter<byte> buffer;
 
@@ -178,6 +182,14 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken = default
   )
   {
+    // If some period of interval has elapsed since the lastest request,
+    // dispose the current connection since since it is likely that the
+    // connection has already been disconnected.
+    if (socket is not null && lastSentAt + connectionRefreshInterval <= DateTime.Now) {
+      socket.Dispose();
+      socket = null;
+    }
+
     if (socket is null) {
       // ensure socket created and connected
       socket = await ConnectAsync(cancellationToken);
@@ -250,6 +262,8 @@ public sealed partial class KasaClient : IDisposable {
         if (len < buf.Length)
           break;
       }
+
+      lastSentAt = DateTime.Now;
 
       if (buffer.WrittenCount == 0)
         throw new KasaDisconnectedException("The peer may have dropped connection", endPoint, innerException: null);
