@@ -426,6 +426,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
           if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
             dynamicEndPoint.InvalidateEndPoint();
+
+            client.Logger?.LogInformation("Marked end point {EndPoint} as invalid.", dynamicEndPoint);
           }
           else {
             // disallow retry

@@ -356,6 +356,8 @@ public partial class KasaDevice : IDisposable {
             dynamicEndPoint.InvalidateEndPoint();
 
             endPoint = null; // should resolve end point
+
+            client.Logger?.LogInformation("Marked end point {EndPoint} as invalid.", dynamicEndPoint);
           }
           else {
             // disallow retry
