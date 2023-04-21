@@ -822,11 +822,11 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory()
+  public Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory()
     => SendRequestAsync_Timeout_RetrySuccess(setTimeoutViaIHttpClientFactory: true);
 
   [Test]
-  public async Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithDeviceTimeoutProperty()
+  public Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithDeviceTimeoutProperty()
     => SendRequestAsync_Timeout_RetrySuccess(setTimeoutViaIHttpClientFactory: false);
 
   private async Task SendRequestAsync_Timeout_RetrySuccess(bool setTimeoutViaIHttpClientFactory)
