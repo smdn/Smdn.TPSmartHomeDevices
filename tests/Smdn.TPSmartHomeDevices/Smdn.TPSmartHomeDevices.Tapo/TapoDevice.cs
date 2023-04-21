@@ -253,6 +253,9 @@ public class TapoDeviceTests {
 
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.TurnOnAsync(), nameof(device.TurnOnAsync));
     Assert.Throws<ObjectDisposedException>(() => device.TurnOnAsync(), nameof(device.TurnOnAsync));
+
+    Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.GetOnOffStateAsync(), nameof(device.GetOnOffStateAsync));
+    Assert.Throws<ObjectDisposedException>(() => device.GetOnOffStateAsync(), nameof(device.GetOnOffStateAsync));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
@@ -1395,5 +1398,40 @@ public class TapoDeviceTests {
     );
 
     await device.SetOnOffStateAsync(newState);
+  }
+
+  private readonly struct GetDeviceInfoResponseGetOnOffStateResult {
+    [JsonPropertyName("device_on")]
+    public bool DeviceOn { get; init; }
+  }
+
+  [TestCase(true)]
+  [TestCase(false)]
+  public async Task GetOnOffStateAsync(bool currentState)
+  {
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+        return (
+          KnownErrorCodes.Success,
+          new GetDeviceInfoResponse<GetDeviceInfoResponseGetOnOffStateResult>() {
+            ErrorCode = KnownErrorCodes.Success,
+            Result = new() { DeviceOn = currentState },
+          }
+        );
+      }
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.AreEqual(
+      currentState,
+      await device.GetOnOffStateAsync()
+    );
   }
 }
