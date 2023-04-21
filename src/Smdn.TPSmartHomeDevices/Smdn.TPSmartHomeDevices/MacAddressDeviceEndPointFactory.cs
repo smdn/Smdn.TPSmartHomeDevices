@@ -42,7 +42,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
           );
     }
 
-    public void InvalidateEndPoint()
+    public void Invalidate()
       => resolver.Invalidate(address);
 
     public override string ToString()

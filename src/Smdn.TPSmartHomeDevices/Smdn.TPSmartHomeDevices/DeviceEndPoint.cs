@@ -85,7 +85,7 @@ internal static class DeviceEndPoint {
     var endPoint = await deviceEndPoint.ResolveAsync(cancellationToken);
 
     if (endPoint is null && deviceEndPoint is IDynamicDeviceEndPoint dynamicDeviceEndPoint)
-      dynamicDeviceEndPoint.InvalidateEndPoint();
+      dynamicDeviceEndPoint.Invalidate();
 
     return endPoint switch {
       IPEndPoint ipEndPoint => ipEndPoint.Port == 0

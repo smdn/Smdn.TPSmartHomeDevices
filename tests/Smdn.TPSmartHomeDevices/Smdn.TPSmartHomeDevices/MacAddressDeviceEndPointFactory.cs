@@ -217,7 +217,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, port), nameof(resolvedEndPointAddress));
 
     // invalidate
-    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint).InvalidateEndPoint());
+    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint).Invalidate());
 
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 

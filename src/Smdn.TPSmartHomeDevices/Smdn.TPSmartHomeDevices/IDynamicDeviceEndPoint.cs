@@ -3,5 +3,5 @@
 namespace Smdn.TPSmartHomeDevices;
 
 public interface IDynamicDeviceEndPoint : IDeviceEndPoint {
-  void InvalidateEndPoint();
+  void Invalidate();
 }

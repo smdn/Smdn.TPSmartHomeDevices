@@ -353,7 +353,7 @@ public partial class KasaDevice : IDisposable {
         if (handling.ShouldInvalidateEndPoint) {
           if (deviceEndPoint is IDynamicDeviceEndPoint dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
-            dynamicEndPoint.InvalidateEndPoint();
+            dynamicEndPoint.Invalidate();
 
             endPoint = null; // should resolve end point
 
