@@ -3,8 +3,7 @@
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 public interface ITapoResponse {
-/*
-  [JsonPropertyName("error_code")]
-*/
-  public int ErrorCode { get; init; }
+  /// <summary>Gets a value of response error code.</summary>
+  /// <remarks>For types implementing this interface, the following attributes must be specified for this member: <c>[JsonPropertyName("error_code")]</c>.</remarks>
+  int ErrorCode { get; }
 }
