@@ -17,6 +17,8 @@ public partial class TapoClientTests {
   private ITapoCredentialProvider? defaultCredentialProvider;
   private IHttpClientFactory? defaultHttpClientFactory;
 
+  private readonly struct NullResult { }
+
   [OneTimeSetUp]
   public void SetUp()
   {
@@ -135,7 +137,7 @@ public partial class TapoClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
-    Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>());
+    Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());
     Assert.Throws<ObjectDisposedException>(
       () => client.AuthenticateAsync(
         identity: null,

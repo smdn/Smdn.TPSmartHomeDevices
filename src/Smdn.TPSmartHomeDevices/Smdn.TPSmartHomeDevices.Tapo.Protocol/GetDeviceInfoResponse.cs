@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-public readonly struct GetDeviceInfoResponse : ITapoPassThroughResponse {
+public readonly struct GetDeviceInfoResponse<TResult> : ITapoPassThroughResponse {
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; init; }
 
   [JsonPropertyName("result")]
-  public TapoDeviceInfo Result { get; init; }
+  public TResult Result { get; init; }
 }

@@ -493,14 +493,28 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 #endif
   }
 
-  public ValueTask<TapoDeviceInfo> GetDeviceInfoAsync(
+  public ValueTask<TResponseResult> GetDeviceInfoAsync<TResponseResult>(
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse, TapoDeviceInfo>(
-      request: default,
-      composeResult: static resp => resp.Result,
+    => GetDeviceInfoAsync<TResponseResult, TResponseResult>(
+      composeResult: static resp => resp,
       cancellationToken: cancellationToken
     );
+
+  public ValueTask<TResult> GetDeviceInfoAsync<TResponseResult, TResult>(
+    Func<TResponseResult, TResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (composeResult is null)
+      throw new ArgumentNullException(nameof(composeResult));
+
+    return SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<TResponseResult>, TResult>(
+      request: default,
+      composeResult: result => composeResult(result.Result),
+      cancellationToken: cancellationToken
+    );
+  }
 
   public ValueTask SetDeviceInfoAsync<TParameters>(
     TParameters parameters,

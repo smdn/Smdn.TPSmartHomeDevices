@@ -106,12 +106,14 @@ public class SecurePassThroughJsonConverterFactoryTests {
       logger: logger
     );
 
+  private readonly struct NullResult { }
+
   [TestCase(typeof(HandshakeRequest), false)]
   [TestCase(typeof(HandshakeResponse), false)]
   [TestCase(typeof(LoginDeviceRequest), true)]
   [TestCase(typeof(LoginDeviceResponse), true)]
   [TestCase(typeof(GetDeviceInfoRequest), true)]
-  [TestCase(typeof(GetDeviceInfoResponse), true)]
+  [TestCase(typeof(GetDeviceInfoResponse<NullResult>), true)]
   [TestCase(typeof(SecurePassThroughRequest<LoginDeviceRequest>), false)]
   [TestCase(typeof(SecurePassThroughResponse<LoginDeviceResponse>), false)]
   public void CanConvert(Type typeToConvert, bool expected)
@@ -144,7 +146,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   [TestCase(typeof(LoginDeviceResponse))]
-  [TestCase(typeof(GetDeviceInfoResponse))]
+  [TestCase(typeof(GetDeviceInfoResponse<NullResult>))]
   public void CreateConverter_ITapoPassThroughResponse(Type typeToConvert)
   {
     var factory = CreateFactory();
@@ -312,6 +314,17 @@ public class SecurePassThroughJsonConverterFactoryTests {
     );
   }
 
+  private readonly struct GetDeviceInfoResponseResult {
+    [JsonPropertyName("device_id")]
+    public string? Id { get; init; }
+
+    [JsonPropertyName("device_on")]
+    public bool IsOn { get; init; }
+
+    [JsonPropertyName("nickname")]
+    public string? NickName { get; init; }
+  }
+
   [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughRequest))]
   public void ConverterForITapoPassThroughRequest_OptionsSuppliedByFactoryMustBeUsed(
     ITapoPassThroughRequest request,
@@ -352,18 +365,18 @@ public class SecurePassThroughJsonConverterFactoryTests {
     };
 
     yield return new object[] {
-      typeof(GetDeviceInfoResponse),
+      typeof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>),
       @"{""error_code"":-1,""result"":{""device_id"":""<device-id>"",""device_on"":true}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.IsInstanceOf<GetDeviceInfoResponse>(deserialized);
+          Assert.IsInstanceOf<GetDeviceInfoResponse<GetDeviceInfoResponseResult>>(deserialized);
 
-          var resp = (GetDeviceInfoResponse)deserialized;
-          Assert.AreEqual(-1, resp.ErrorCode, nameof(GetDeviceInfoResponse.ErrorCode));
-          Assert.IsNotNull(resp.Result, nameof(GetDeviceInfoResponse.Result));
-          Assert.AreEqual("<device-id>", resp.Result.Id, nameof(GetDeviceInfoResponse.Result.Id));
-          Assert.IsTrue(resp.Result.IsOn, nameof(GetDeviceInfoResponse.Result.IsOn));
-          Assert.IsNull(resp.Result.NickName, nameof(GetDeviceInfoResponse.Result.NickName));
+          var resp = (GetDeviceInfoResponse<GetDeviceInfoResponseResult>)deserialized;
+          Assert.AreEqual(-1, resp.ErrorCode, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.ErrorCode));
+          Assert.IsNotNull(resp.Result, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result));
+          Assert.AreEqual("<device-id>", resp.Result.Id, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.Id));
+          Assert.IsTrue(resp.Result.IsOn, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.IsOn));
+          Assert.IsNull(resp.Result.NickName, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.NickName));
         }
       )
     };
