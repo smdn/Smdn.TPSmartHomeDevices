@@ -33,7 +33,7 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
-    <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0-rc2" />
+    <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0" />
   </ItemGroup>
 
   <PropertyGroup>
