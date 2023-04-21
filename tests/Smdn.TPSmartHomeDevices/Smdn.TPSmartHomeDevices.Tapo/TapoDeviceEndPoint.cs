@@ -24,7 +24,7 @@ public class TapoDeviceEndPointTests {
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
     Assert.AreEqual(
       new DnsEndPoint("localhost", 80),
-      await endPoint.GetEndPointAsync(default)
+      await endPoint.ResolveAsync(default)
     );
     Assert.AreEqual(
       new DnsEndPoint("localhost", 80).ToString(),
@@ -47,7 +47,7 @@ public class TapoDeviceEndPointTests {
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("127.0.0.1"), 80),
-      await endPoint.GetEndPointAsync(default)
+      await endPoint.ResolveAsync(default)
     );
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("127.0.0.1"), 80).ToString(),
@@ -66,7 +66,7 @@ public class TapoDeviceEndPointTests {
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("::1"), 80),
-      await endPoint.GetEndPointAsync(default)
+      await endPoint.ResolveAsync(default)
     );
     Assert.AreEqual(
       new IPEndPoint(IPAddress.Parse("::1"), 80).ToString(),
@@ -75,22 +75,22 @@ public class TapoDeviceEndPointTests {
     );
   }
 
-  private static System.Collections.IEnumerable YieldTestCases_IDeviceEndPoint_GetEndPointAsync_WithCancelledToken()
+  private static System.Collections.IEnumerable YieldTestCases_IDeviceEndPoint_ResolveAsync_WithCancelledToken()
   {
     yield return new object[] { TapoDeviceEndPoint.Create(host: "localhost") };
     yield return new object[] { TapoDeviceEndPoint.Create(ipAddress: IPAddress.Loopback) };
     yield return new object[] { TapoDeviceEndPoint.Create(ipAddress: IPAddress.IPv6Loopback) };
   }
 
-  [TestCaseSource(nameof(YieldTestCases_IDeviceEndPoint_GetEndPointAsync_WithCancelledToken))]
-  public void IDeviceEndPoint_GetEndPointAsync_WithCancelledToken(IDeviceEndPoint endPoint)
+  [TestCaseSource(nameof(YieldTestCases_IDeviceEndPoint_ResolveAsync_WithCancelledToken))]
+  public void IDeviceEndPoint_ResolveAsync_WithCancelledToken(IDeviceEndPoint endPoint)
   {
     using var cts = new CancellationTokenSource();
 
     cts.Cancel();
 
     Assert.ThrowsAsync<TaskCanceledException>(
-      async () => await endPoint.GetEndPointAsync(cts.Token)
+      async () => await endPoint.ResolveAsync(cts.Token)
     );
   }
 }

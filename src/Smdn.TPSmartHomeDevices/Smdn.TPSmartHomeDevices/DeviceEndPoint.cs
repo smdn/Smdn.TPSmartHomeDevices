@@ -18,7 +18,7 @@ internal static class DeviceEndPoint {
       staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
     }
 
-    public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+    public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
       => cancellationToken.IsCancellationRequested
         ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
@@ -82,7 +82,7 @@ internal static class DeviceEndPoint {
     CancellationToken cancellationToken
   )
   {
-    var endPoint = await deviceEndPoint.GetEndPointAsync(cancellationToken);
+    var endPoint = await deviceEndPoint.ResolveAsync(cancellationToken);
 
     if (endPoint is null && deviceEndPoint is IDynamicDeviceEndPoint dynamicDeviceEndPoint)
       dynamicDeviceEndPoint.InvalidateEndPoint();

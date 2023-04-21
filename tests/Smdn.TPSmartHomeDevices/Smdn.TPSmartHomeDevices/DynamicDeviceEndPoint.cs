@@ -18,7 +18,7 @@ internal sealed class DynamicDeviceEndPoint : IDynamicDeviceEndPoint {
     EndPoint = endPoint;
   }
 
-  public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
     => ValueTask.FromResult(EndPoint);
 
   public void InvalidateEndPoint()

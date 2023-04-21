@@ -9,6 +9,6 @@ namespace Smdn.TPSmartHomeDevices;
 internal sealed class UnresolvedDeviceEndPoint : IDeviceEndPoint {
   private readonly ValueTask<EndPoint?> unresolvedEndPointValueTaskResult = new((EndPoint?)null);
 
-  public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
     => unresolvedEndPointValueTaskResult;
 }

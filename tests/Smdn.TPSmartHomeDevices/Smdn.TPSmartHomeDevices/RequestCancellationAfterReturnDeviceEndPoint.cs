@@ -19,7 +19,7 @@ internal sealed class RequestCancellationAfterReturnDeviceEndPoint : IDeviceEndP
     staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
   }
 
-  public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
   {
     try {
       return staticEndPointValueTaskResult;

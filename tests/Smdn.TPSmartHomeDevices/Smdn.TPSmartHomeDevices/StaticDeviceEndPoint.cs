@@ -14,7 +14,7 @@ internal sealed class StaticDeviceEndPoint : IDeviceEndPoint {
     staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
   }
 
-  public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
     => cancellationToken.IsCancellationRequested
       ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED

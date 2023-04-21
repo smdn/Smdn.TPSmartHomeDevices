@@ -27,7 +27,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
       this.port = port;
     }
 
-    public async ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+    public async ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
     {
       var resolvedAddress = await resolver.ResolveAsync(
         address: address,

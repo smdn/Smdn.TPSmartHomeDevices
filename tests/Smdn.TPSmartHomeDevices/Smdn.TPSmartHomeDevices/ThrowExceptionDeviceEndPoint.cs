@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 internal sealed class ThrowExceptionDeviceEndPoint : IDeviceEndPoint {
-  public ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
     => throw new NotSupportedException();
 }

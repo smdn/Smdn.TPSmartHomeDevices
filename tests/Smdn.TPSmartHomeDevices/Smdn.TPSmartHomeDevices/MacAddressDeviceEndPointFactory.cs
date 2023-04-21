@@ -76,8 +76,8 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
     Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
-    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.GetEndPointAsync());
+    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.ResolveAsync());
   }
 
   [TestCase(0)]
@@ -91,8 +91,8 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
     Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
-    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.GetEndPointAsync());
+    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.ResolveAsync());
   }
 
   [Test]
@@ -151,7 +151,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPoint_GetEndPointAsync_Resolved()
+  public async Task CreatedDeviceEndPoint_ResolveAsync_Resolved()
   {
     const int port = 80;
 
@@ -167,12 +167,12 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
 
-    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.GetEndPointAsync());
+    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.ResolveAsync());
   }
 
   [Test]
-  public async Task CreatedDeviceEndPoint_GetEndPointAsync_NotResolved()
+  public async Task CreatedDeviceEndPoint_ResolveAsync_NotResolved()
   {
     const int port = 80;
 
@@ -186,8 +186,8 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
 
-    Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
-    Assert.IsNull(await endPoint.GetEndPointAsync());
+    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.IsNull(await endPoint.ResolveAsync());
   }
 
   [Test]
@@ -211,7 +211,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     EndPoint? resolvedEndPointAddress = null;
 
     Assert.DoesNotThrowAsync(
-      async () => resolvedEndPointAddress = await endPoint.GetEndPointAsync()
+      async () => resolvedEndPointAddress = await endPoint.ResolveAsync()
     );
     Assert.IsNotNull(resolvedEndPointAddress, nameof(resolvedEndPointAddress));
     Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, port), nameof(resolvedEndPointAddress));
@@ -222,7 +222,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 
     Assert.DoesNotThrowAsync(
-      async () => resolvedEndPointAddressAfterInvalidation = await endPoint.GetEndPointAsync()
+      async () => resolvedEndPointAddressAfterInvalidation = await endPoint.ResolveAsync()
     );
     Assert.IsNull(resolvedEndPointAddressAfterInvalidation, nameof(resolvedEndPointAddressAfterInvalidation));
   }
