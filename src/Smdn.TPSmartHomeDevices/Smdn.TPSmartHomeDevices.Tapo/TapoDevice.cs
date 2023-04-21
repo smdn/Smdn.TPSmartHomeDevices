@@ -18,8 +18,8 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
-  private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
-  protected bool IsDisposed => deviceEndPointProvider is null;
+  private IDeviceEndPoint? deviceEndPoint; // if null, it indicates a 'disposed' state.
+  protected bool IsDisposed => deviceEndPoint is null;
 
   private readonly ITapoCredentialProvider? credential;
   private readonly TapoClientExceptionHandler exceptionHandler;
@@ -39,7 +39,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   string ITapoCredentialIdentity.Name {
     get {
       ThrowIfDisposed();
-      return $"{GetType().FullName} ({deviceEndPointProvider})";
+      return $"{GetType().FullName} ({deviceEndPoint})";
     }
   }
 
@@ -74,7 +74,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
+      deviceEndPoint: TapoDeviceEndPoint.Create(host),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -95,7 +95,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(host),
+      deviceEndPoint: TapoDeviceEndPoint.Create(host),
       credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -117,7 +117,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
+      deviceEndPoint: TapoDeviceEndPoint.Create(ipAddress),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -135,7 +135,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(ipAddress),
+      deviceEndPoint: TapoDeviceEndPoint.Create(ipAddress),
       credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -162,7 +162,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
+      deviceEndPoint: TapoDeviceEndPoint.Create(macAddress, serviceProvider),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -173,7 +173,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// <see cref="ITapoCredentialProvider"/> must be registered in order to retrieve the credentials required for authentication.
-  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must also be registered to create an <see cref="IDeviceEndPointProvider" />, corresponding to the <paramref name="macAddress"/>.
+  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must also be registered to create an <see cref="IDeviceEndPoint" />, corresponding to the <paramref name="macAddress"/>.
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   /// <inheritdoc cref="TapoDevice(PhysicalAddress, string, string, IServiceProvider?)" path="/summary | /param[@name='macAddress']"/>
@@ -182,7 +182,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: TapoDeviceEndPointProvider.Create(macAddress, serviceProvider),
+      deviceEndPoint: TapoDeviceEndPoint.Create(macAddress, serviceProvider),
       credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -193,8 +193,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// <summary>
   /// Initializes a new instance of the <see cref="TapoDevice"/> class.
   /// </summary>
-  /// <param name="deviceEndPointProvider">
-  /// A <see cref="IDeviceEndPointProvider"/> that provides the device end point.
+  /// <param name="deviceEndPoint">
+  /// A <see cref="IDeviceEndPoint"/> that provides the device end point.
   /// </param>
   /// <param name="credential">
   /// A <see cref="ITapoCredentialProvider"/> that provides the credentials required for authentication.
@@ -207,16 +207,16 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   /// <exception cref="ArgumentNullException">
-  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>, or both <paramref name="credential"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
+  /// <paramref name="deviceEndPoint"/> is <see langword="null"/>, or both <paramref name="credential"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
   /// </exception>
   protected TapoDevice(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     ITapoCredentialProvider? credential = null,
     TapoClientExceptionHandler? exceptionHandler = null,
     IServiceProvider? serviceProvider = null
   )
   {
-    this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
+    this.deviceEndPoint = deviceEndPoint ?? throw new ArgumentNullException(nameof(deviceEndPoint));
     this.credential = credential
       ?? (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider))).GetRequiredService<ITapoCredentialProvider>();
     this.exceptionHandler = exceptionHandler
@@ -238,7 +238,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     if (!disposing)
       return;
 
-    deviceEndPointProvider = null; // mark as disposed
+    deviceEndPoint = null; // mark as disposed
 
     client?.Dispose();
     client = null;
@@ -263,7 +263,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 #else
         ValueTaskShim.FromCanceled<EndPoint>(cancellationToken)
 #endif
-      : deviceEndPointProvider.ResolveOrThrowAsync(
+      : deviceEndPoint.ResolveOrThrowAsync(
         defaultPort: TapoClient.DefaultPort,
         cancellationToken: cancellationToken
       );
@@ -302,8 +302,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     );
 
     string GenerateLoggerCategoryName()
-      => deviceEndPointProvider is IDynamicDeviceEndPointProvider
-        ? $"{nameof(TapoClient)}({endPoint}, {deviceEndPointProvider})"
+      => deviceEndPoint is IDynamicDeviceEndPoint
+        ? $"{nameof(TapoClient)}({endPoint}, {deviceEndPoint})"
         : $"{nameof(TapoClient)}({endPoint})";
 
     if (client.Session is not null)
@@ -423,7 +423,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
           LogRequest(client.Logger, request);
 
         if (handling.ShouldInvalidateEndPoint) {
-          if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint) {
+          if (deviceEndPoint is IDynamicDeviceEndPoint dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
             dynamicEndPoint.InvalidateEndPoint();
 

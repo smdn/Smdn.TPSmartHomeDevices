@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class StaticDeviceEndPointProvider : IDeviceEndPointProvider {
+internal sealed class StaticDeviceEndPoint : IDeviceEndPoint {
   private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
 
-  public StaticDeviceEndPointProvider(EndPoint endPoint)
+  public StaticDeviceEndPoint(EndPoint endPoint)
   {
     staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
   }

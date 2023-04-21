@@ -36,7 +36,7 @@ public class L530Tests {
   )
   {
     using var device = new L530(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -72,7 +72,7 @@ public class L530Tests {
     pseudoDevice.Start();
 
     using var device = new L530(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -90,7 +90,7 @@ public class L530Tests {
   )
   {
     using var device = new L530(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -131,7 +131,7 @@ public class L530Tests {
     pseudoDevice.Start();
 
     using var device = new L530(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -153,7 +153,7 @@ public class L530Tests {
   )
   {
     using var device = new L530(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -201,7 +201,7 @@ public class L530Tests {
     pseudoDevice.Start();
 
     using var device = new L530(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -220,7 +220,7 @@ public class L530Tests {
   )
   {
     using var device = new L530(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -264,7 +264,7 @@ public class L530Tests {
     pseudoDevice.Start();
 
     using var device = new L530(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -283,7 +283,7 @@ public class L530Tests {
   )
   {
     using var device = new L530(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -327,7 +327,7 @@ public class L530Tests {
     pseudoDevice.Start();
 
     using var device = new L530(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 

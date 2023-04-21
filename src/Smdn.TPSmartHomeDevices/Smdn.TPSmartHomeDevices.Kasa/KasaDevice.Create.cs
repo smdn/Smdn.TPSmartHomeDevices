@@ -39,13 +39,13 @@ partial class KasaDevice {
       serviceProvider: serviceProvider
     );
 
-  /// <inheritdoc cref="KasaDevice(IDeviceEndPointProvider, IServiceProvider?)" />
+  /// <inheritdoc cref="KasaDevice(IDeviceEndPoint, IServiceProvider?)" />
   public static KasaDevice Create(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     IServiceProvider? serviceProvider = null
   )
     => new(
-      deviceEndPointProvider: deviceEndPointProvider,
+      deviceEndPoint: deviceEndPoint,
       serviceProvider: serviceProvider
     );
 }

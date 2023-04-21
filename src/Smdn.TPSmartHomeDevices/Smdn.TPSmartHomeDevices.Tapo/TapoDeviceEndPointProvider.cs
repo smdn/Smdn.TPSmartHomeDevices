@@ -7,22 +7,22 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-public static class TapoDeviceEndPointProvider {
-  public static IDeviceEndPointProvider Create(string host)
-    => DeviceEndPointProvider.Create(host, TapoClient.DefaultPort);
+public static class TapoDeviceEndPoint {
+  public static IDeviceEndPoint Create(string host)
+    => DeviceEndPoint.Create(host, TapoClient.DefaultPort);
 
-  public static IDeviceEndPointProvider Create(IPAddress ipAddress)
-    => DeviceEndPointProvider.Create(ipAddress, TapoClient.DefaultPort);
+  public static IDeviceEndPoint Create(IPAddress ipAddress)
+    => DeviceEndPoint.Create(ipAddress, TapoClient.DefaultPort);
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
   )
-    => DeviceEndPointProvider.Create(macAddress, TapoClient.DefaultPort, serviceProvider);
+    => DeviceEndPoint.Create(macAddress, TapoClient.DefaultPort, serviceProvider);
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
-    => DeviceEndPointProvider.Create(macAddress, TapoClient.DefaultPort, endPointFactory);
+    => DeviceEndPoint.Create(macAddress, TapoClient.DefaultPort, endPointFactory);
 }

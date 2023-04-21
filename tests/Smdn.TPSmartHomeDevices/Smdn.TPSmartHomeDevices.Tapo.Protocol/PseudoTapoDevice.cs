@@ -234,8 +234,8 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     return EndPoint!;
   }
 
-  public IDeviceEndPointProvider GetEndPointProvider()
-    => new StaticDeviceEndPointProvider(EndPoint);
+  public IDeviceEndPoint GetEndPoint()
+    => new StaticDeviceEndPoint(EndPoint);
 
   private async Task ProcessListenerAsync()
   {

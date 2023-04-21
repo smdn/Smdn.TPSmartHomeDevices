@@ -81,8 +81,8 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     listener = null;
   }
 
-  public IDeviceEndPointProvider GetEndPointProvider()
-    => new StaticDeviceEndPointProvider(EndPoint);
+  public IDeviceEndPoint GetEndPoint()
+    => new StaticDeviceEndPoint(EndPoint);
 
   public IPEndPoint Start(
     int? exceptPort = 0

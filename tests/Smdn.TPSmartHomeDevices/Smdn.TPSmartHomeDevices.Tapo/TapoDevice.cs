@@ -64,7 +64,7 @@ public class TapoDeviceTests {
     Assert.DoesNotThrow(
       () => {
         using var device = TapoDevice.Create(
-          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           credential: services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>()
         );
       }
@@ -77,7 +77,7 @@ public class TapoDeviceTests {
     Assert.DoesNotThrow(
       () => {
         using var device = TapoDevice.Create(
-          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           serviceProvider: services?.BuildServiceProvider()
         );
       }
@@ -90,7 +90,7 @@ public class TapoDeviceTests {
     Assert.Throws<ArgumentNullException>(
       () => {
         using var device = TapoDevice.Create(
-          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           credential: null,
           serviceProvider: null
         );
@@ -104,7 +104,7 @@ public class TapoDeviceTests {
     Assert.Throws<InvalidOperationException>(
       () => {
         using var device = TapoDevice.Create(
-          deviceEndPointProvider: new StaticDeviceEndPointProvider(new IPEndPoint(IPAddress.Loopback, 0)),
+          deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           credential: null,
           serviceProvider: new ServiceCollection().BuildServiceProvider()
         );
@@ -180,10 +180,10 @@ public class TapoDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithEndPointProvider()
+  public async Task Create_WithEndPoint()
   {
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(new DnsEndPoint("localhost", 0)),
+      deviceEndPoint: new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0)),
       serviceProvider: services!.BuildServiceProvider()
     );
 
@@ -201,7 +201,7 @@ public class TapoDeviceTests {
   public void Create_TerminalUuid_UserSupplied(string uuid)
   {
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       terminalUuid: new Guid(uuid),
       serviceProvider: services!.BuildServiceProvider()
     );
@@ -264,7 +264,7 @@ public class TapoDeviceTests {
   public async Task ResolveEndPointAsync_ResolveToDefaultPort(EndPoint endPoint, EndPoint expectedEndPoint)
   {
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(endPoint),
+      deviceEndPoint: new StaticDeviceEndPoint(endPoint),
       serviceProvider: services!.BuildServiceProvider()
     );
 
@@ -277,17 +277,17 @@ public class TapoDeviceTests {
   [Test]
   public void ResolveEndPointAsync_FailedToResolve()
   {
-    var provider = new UnresolvedDeviceEndPointProvider();
+    var endPoint = new UnresolvedDeviceEndPoint();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: provider,
+      deviceEndPoint: endPoint,
       serviceProvider: services!.BuildServiceProvider()
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.ResolveEndPointAsync());
 
-    Assert.IsNotNull(ex!.EndPointProvider, nameof(ex.EndPointProvider));
-    Assert.AreSame(provider, ex.EndPointProvider, nameof(ex.EndPointProvider));
+    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
   }
 
   [Test]
@@ -295,7 +295,7 @@ public class TapoDeviceTests {
   {
     using var cts = new CancellationTokenSource();
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services!.BuildServiceProvider()
     );
 
@@ -308,11 +308,11 @@ public class TapoDeviceTests {
 
   private class ConcreteTapoDevice : TapoDevice {
     public ConcreteTapoDevice(
-      IDeviceEndPointProvider deviceEndPointProvider,
+      IDeviceEndPoint deviceEndPoint,
       IServiceProvider? serviceProvider = null
     )
       : base(
-        deviceEndPointProvider: deviceEndPointProvider,
+        deviceEndPoint: deviceEndPoint,
         serviceProvider: serviceProvider
       )
     {
@@ -335,7 +335,7 @@ public class TapoDeviceTests {
   public void EnsureSessionEstablishedAsync_Disposed()
   {
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services!.BuildServiceProvider()
     );
 
@@ -349,17 +349,17 @@ public class TapoDeviceTests {
   [Test]
   public void EnsureSessionEstablishedAsync_FailedToResolveDeviceEndPoint()
   {
-    var provider = new UnresolvedDeviceEndPointProvider();
+    var endPoint = new UnresolvedDeviceEndPoint();
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: provider,
+      deviceEndPoint: endPoint,
       serviceProvider: services!.BuildServiceProvider()
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.EnsureSessionEstablishedAsync());
 
-    Assert.IsNotNull(ex!.EndPointProvider, nameof(ex.EndPointProvider));
-    Assert.AreSame(provider, ex.EndPointProvider, nameof(ex.EndPointProvider));
+    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
 
     Assert.IsNull(device.Session);
   }
@@ -369,7 +369,7 @@ public class TapoDeviceTests {
   {
     using var cts = new CancellationTokenSource();
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: new RequestCancellationAfterReturnDeviceEndPointProvider(
+      deviceEndPoint: new RequestCancellationAfterReturnDeviceEndPoint(
         cancellationTokenSource: cts,
         endPoint: new IPEndPoint(IPAddress.Loopback, 0)
       ),
@@ -397,10 +397,10 @@ public class TapoDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var provider = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPoint(pseudoDeviceEndPoint1.EndPoint);
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: provider,
+      deviceEndPoint: endPoint,
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -418,7 +418,7 @@ public class TapoDeviceTests {
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    provider.EndPoint = pseudoDeviceEndPoint2.EndPoint;
+    endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint;
 
     // dispose endpoint #1
     await pseudoDeviceEndPoint1.DisposeAsync();
@@ -434,7 +434,7 @@ public class TapoDeviceTests {
     );
 
     // end point should not be marked as invalidated in this scenario
-    Assert.IsFalse(provider.HasInvalidated, nameof(provider.HasInvalidated));
+    Assert.IsFalse(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
   [Test]
@@ -452,7 +452,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -509,10 +509,10 @@ public class TapoDeviceTests {
 
     pseudoDevice.Start();
 
-    var endPoint = pseudoDevice.GetEndPointProvider();
+    var endPoint = pseudoDevice.GetEndPoint();
 
-    Assert.That(endPoint, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(endPoint));
-    Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(endPoint));
+    Assert.That(endPoint, Is.AssignableTo<IDeviceEndPoint>(), nameof(endPoint));
+    Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
 
     var serviceCollection = new ServiceCollection();
 
@@ -525,7 +525,7 @@ public class TapoDeviceTests {
     );
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: endPoint,
+      deviceEndPoint: endPoint,
       serviceProvider: serviceCollection.BuildServiceProvider()
     );
 
@@ -586,7 +586,7 @@ public class TapoDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var endPoint = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPoint(pseudoDeviceEndPoint1.EndPoint);
     var serviceCollection = new ServiceCollection();
 
     serviceCollection.AddTapoBase64EncodedCredential(
@@ -598,7 +598,7 @@ public class TapoDeviceTests {
     );
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: endPoint,
+      deviceEndPoint: endPoint,
       serviceProvider: serviceCollection.BuildServiceProvider()
     );
 
@@ -663,7 +663,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -700,7 +700,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -737,7 +737,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -769,7 +769,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -805,7 +805,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -880,7 +880,7 @@ public class TapoDeviceTests {
     }
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
+      deviceEndPoint: new TransitionalDeviceEndPoint(
         pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
       ),
       serviceProvider: services.BuildServiceProvider()
@@ -947,7 +947,7 @@ public class TapoDeviceTests {
     }
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: new TransitionalDeviceEndPointProvider(
+      deviceEndPoint: new TransitionalDeviceEndPoint(
         pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
       ),
       serviceProvider: services.BuildServiceProvider()
@@ -1017,7 +1017,7 @@ public class TapoDeviceTests {
     );
 
     using var device = new ConcreteTapoDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1058,7 +1058,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1101,7 +1101,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1129,7 +1129,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1179,7 +1179,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1220,7 +1220,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1256,7 +1256,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1284,7 +1284,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -1313,7 +1313,7 @@ public class TapoDeviceTests {
     pseudoDevice.Start();
 
     using var device = TapoDevice.Create(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 

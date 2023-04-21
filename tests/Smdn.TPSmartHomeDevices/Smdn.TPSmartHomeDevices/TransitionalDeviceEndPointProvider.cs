@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class TransitionalDeviceEndPointProvider : IDeviceEndPointProvider {
+internal sealed class TransitionalDeviceEndPoint : IDeviceEndPoint {
   private int current;
   private readonly EndPoint[] endPoints;
 
-  public TransitionalDeviceEndPointProvider(IEnumerable<EndPoint> endPoints)
+  public TransitionalDeviceEndPoint(IEnumerable<EndPoint> endPoints)
   {
     this.endPoints = endPoints.ToArray();
   }

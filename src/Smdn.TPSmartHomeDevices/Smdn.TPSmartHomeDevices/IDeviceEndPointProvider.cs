@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-public interface IDeviceEndPointProvider {
+public interface IDeviceEndPoint {
   ValueTask<EndPoint?> GetEndPointAsync(CancellationToken cancellationToken = default);
 }

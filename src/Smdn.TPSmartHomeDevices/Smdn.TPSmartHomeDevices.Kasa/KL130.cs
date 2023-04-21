@@ -75,13 +75,13 @@ public class KL130 : KasaDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="KL130"/> class.
   /// </summary>
-  /// <inheritdoc cref="KasaDevice(IDeviceEndPointProvider, IServiceProvider?)" />
+  /// <inheritdoc cref="KasaDevice(IDeviceEndPoint, IServiceProvider?)" />
   public KL130(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      deviceEndPointProvider: deviceEndPointProvider,
+      deviceEndPoint: deviceEndPoint,
       serviceProvider: serviceProvider
     )
   {

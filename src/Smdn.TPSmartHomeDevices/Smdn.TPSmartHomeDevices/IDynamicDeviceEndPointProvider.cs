@@ -2,6 +2,6 @@
 // SPDX-License-Identifier: MIT
 namespace Smdn.TPSmartHomeDevices;
 
-public interface IDynamicDeviceEndPointProvider : IDeviceEndPointProvider {
+public interface IDynamicDeviceEndPoint : IDeviceEndPoint {
   void InvalidateEndPoint();
 }

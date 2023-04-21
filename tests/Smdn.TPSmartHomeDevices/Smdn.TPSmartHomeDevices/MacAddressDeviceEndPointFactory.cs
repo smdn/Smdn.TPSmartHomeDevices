@@ -75,7 +75,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     var endPoint = factory.Create(PhysicalAddress.None);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
     Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.GetEndPointAsync());
   }
@@ -90,7 +90,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     var endPoint = factory.Create(PhysicalAddress.None, port);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.GetEndPointAsync());
     Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.GetEndPointAsync());
   }
@@ -142,7 +142,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPointProvider_ToString()
+  public async Task CreatedDeviceEndPoint_ToString()
   {
     using var factory = new MacAddressDeviceEndPointFactory(resolver: MacAddressResolver.Null);
     var endPoint = factory.Create(address: TestMacAddress);
@@ -151,7 +151,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPointProvider_GetEndPointAsync_Resolved()
+  public async Task CreatedDeviceEndPoint_GetEndPointAsync_Resolved()
   {
     const int port = 80;
 
@@ -172,7 +172,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPointProvider_GetEndPointAsync_NotResolved()
+  public async Task CreatedDeviceEndPoint_GetEndPointAsync_NotResolved()
   {
     const int port = 80;
 
@@ -191,7 +191,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPointProvider_Invalidate()
+  public async Task CreatedDeviceEndPoint_Invalidate()
   {
     const int port = 80;
 
@@ -206,7 +206,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     var endPoint = factory.Create(address: TestMacAddress, port: port);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPointProvider>(endPoint, nameof(endPoint));
+    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
 
     EndPoint? resolvedEndPointAddress = null;
 
@@ -217,7 +217,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, port), nameof(resolvedEndPointAddress));
 
     // invalidate
-    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPointProvider).InvalidateEndPoint());
+    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint).InvalidateEndPoint());
 
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 

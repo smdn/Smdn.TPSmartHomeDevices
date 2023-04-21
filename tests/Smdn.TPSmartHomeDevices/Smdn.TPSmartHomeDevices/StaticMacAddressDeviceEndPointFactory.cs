@@ -11,6 +11,6 @@ internal class StaticMacAddressDeviceEndPointFactory : IDeviceEndPointFactory<Ph
     ResolvedIPAddress = resolvedIPAddress;
   }
 
-  public IDeviceEndPointProvider Create(PhysicalAddress address, int port = 0)
-    => new DynamicDeviceEndPointProvider(new IPEndPoint(ResolvedIPAddress, port));
+  public IDeviceEndPoint Create(PhysicalAddress address, int port = 0)
+    => new DynamicDeviceEndPoint(new IPEndPoint(ResolvedIPAddress, port));
 }

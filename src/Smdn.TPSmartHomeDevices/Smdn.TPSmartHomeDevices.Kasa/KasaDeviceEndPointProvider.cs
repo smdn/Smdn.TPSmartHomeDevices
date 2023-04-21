@@ -7,22 +7,22 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
-public static class KasaDeviceEndPointProvider {
-  public static IDeviceEndPointProvider Create(string host)
-    => DeviceEndPointProvider.Create(host, KasaClient.DefaultPort);
+public static class KasaDeviceEndPoint {
+  public static IDeviceEndPoint Create(string host)
+    => DeviceEndPoint.Create(host, KasaClient.DefaultPort);
 
-  public static IDeviceEndPointProvider Create(IPAddress ipAddress)
-    => DeviceEndPointProvider.Create(ipAddress, KasaClient.DefaultPort);
+  public static IDeviceEndPoint Create(IPAddress ipAddress)
+    => DeviceEndPoint.Create(ipAddress, KasaClient.DefaultPort);
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
   )
-    => DeviceEndPointProvider.Create(macAddress, KasaClient.DefaultPort, serviceProvider);
+    => DeviceEndPoint.Create(macAddress, KasaClient.DefaultPort, serviceProvider);
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
-    => DeviceEndPointProvider.Create(macAddress, KasaClient.DefaultPort, endPointFactory);
+    => DeviceEndPoint.Create(macAddress, KasaClient.DefaultPort, endPointFactory);
 }

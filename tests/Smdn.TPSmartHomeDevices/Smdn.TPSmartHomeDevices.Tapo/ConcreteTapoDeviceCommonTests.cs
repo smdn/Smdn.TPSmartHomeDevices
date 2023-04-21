@@ -181,9 +181,9 @@ internal class ConcreteTapoDeviceCommonTests {
     };
 
     /*
-     * IDeviceEndPointProvider deviceEndPointProvider, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null
+     * IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null
      */
-    parameterTypes = new[] { typeof(IDeviceEndPointProvider), typeof(ITapoCredentialProvider), typeof(IServiceProvider) };
+    parameterTypes = new[] { typeof(IDeviceEndPoint), typeof(ITapoCredentialProvider), typeof(IServiceProvider) };
 
     services = new ServiceCollection();
     services.AddTapoCredential(email, password);
@@ -195,17 +195,17 @@ internal class ConcreteTapoDeviceCommonTests {
       parameterTypes,
       new object?[] { null, credential, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
-      "deviceEndPointProvider"
+      "deviceEndPoint"
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { new ThrowExceptionDeviceEndPointProvider(), null, new ServiceCollection().BuildServiceProvider() },
+      new object?[] { new ThrowExceptionDeviceEndPoint(), null, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
       null
     };
     yield return new object[] {
       parameterTypes,
-      new object?[] { new ThrowExceptionDeviceEndPointProvider(), null, null },
+      new object?[] { new ThrowExceptionDeviceEndPoint(), null, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };

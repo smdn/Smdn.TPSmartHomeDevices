@@ -40,7 +40,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync());
@@ -67,7 +67,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync(transitionPeriod: transitionPeriod));
@@ -91,7 +91,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync());
@@ -118,7 +118,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync(transitionPeriod: transitionPeriod));
@@ -145,7 +145,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState));
@@ -183,7 +183,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState, transitionPeriod: transitionPeriod));
@@ -223,7 +223,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -271,7 +271,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -350,7 +350,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     KL130LightState lightState = default;
@@ -398,7 +398,7 @@ public class KL130Tests {
     pseudoDevice.Start();
 
     using var device = new KL130(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     bool? state = null;

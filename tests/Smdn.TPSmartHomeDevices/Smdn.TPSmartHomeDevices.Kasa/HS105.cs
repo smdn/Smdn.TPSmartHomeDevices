@@ -32,7 +32,7 @@ public class HS105Tests {
     pseudoDevice.Start();
 
     using var device = new HS105(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync());
@@ -56,7 +56,7 @@ public class HS105Tests {
     pseudoDevice.Start();
 
     using var device = new HS105(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync());
@@ -81,7 +81,7 @@ public class HS105Tests {
     pseudoDevice.Start();
 
     using var device = new HS105(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState));
@@ -121,7 +121,7 @@ public class HS105Tests {
     pseudoDevice.Start();
 
     using var device = new HS105(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.DoesNotThrowAsync(async () => {

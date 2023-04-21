@@ -5,13 +5,13 @@ using System;
 namespace Smdn.TPSmartHomeDevices;
 
 public class DeviceEndPointResolutionException : Exception {
-  public IDeviceEndPointProvider EndPointProvider { get; }
+  public IDeviceEndPoint DeviceEndPoint { get; }
 
   public DeviceEndPointResolutionException(
-    IDeviceEndPointProvider deviceEndPointProvider
+    IDeviceEndPoint deviceEndPoint
   )
     : this(
-      deviceEndPointProvider: deviceEndPointProvider,
+      deviceEndPoint: deviceEndPoint,
       message: "Could not get or resolve the device endpoint.",
       innerException: null
     )
@@ -19,7 +19,7 @@ public class DeviceEndPointResolutionException : Exception {
   }
 
   public DeviceEndPointResolutionException(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     string message,
     Exception? innerException
   )
@@ -28,6 +28,6 @@ public class DeviceEndPointResolutionException : Exception {
       innerException: innerException
     )
   {
-    EndPointProvider = deviceEndPointProvider;
+    DeviceEndPoint = deviceEndPoint;
   }
 }

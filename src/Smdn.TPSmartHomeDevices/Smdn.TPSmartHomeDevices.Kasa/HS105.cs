@@ -68,13 +68,13 @@ public class HS105 : KasaDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="HS105"/> class.
   /// </summary>
-  /// <inheritdoc cref="KasaDevice(IDeviceEndPointProvider, IServiceProvider?)" />
+  /// <inheritdoc cref="KasaDevice(IDeviceEndPoint, IServiceProvider?)" />
   public HS105(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     IServiceProvider? serviceProvider = null
   )
     : base(
-      deviceEndPointProvider: deviceEndPointProvider,
+      deviceEndPoint: deviceEndPoint,
       serviceProvider: serviceProvider
     )
   {

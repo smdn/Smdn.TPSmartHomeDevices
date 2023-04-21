@@ -11,12 +11,12 @@ using Smdn.Net.AddressResolution;
 namespace Smdn.TPSmartHomeDevices;
 
 public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAddress>, IDisposable {
-  protected class MacAddressDeviceEndPointProvider : IDynamicDeviceEndPointProvider {
+  protected class MacAddressDeviceEndPoint : IDynamicDeviceEndPoint {
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;
     private readonly int port;
 
-    public MacAddressDeviceEndPointProvider(
+    public MacAddressDeviceEndPoint(
       IAddressResolver<PhysicalAddress, IPAddress> resolver,
       PhysicalAddress address,
       int port
@@ -110,14 +110,14 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
       throw new ObjectDisposedException(GetType().FullName);
   }
 
-  public virtual IDeviceEndPointProvider Create(
+  public virtual IDeviceEndPoint Create(
     PhysicalAddress address,
     int port = 0
   )
   {
     ThrowIfDisposed();
 
-    return new MacAddressDeviceEndPointProvider(
+    return new MacAddressDeviceEndPoint(
       resolver: resolver,
       address: address ?? throw new ArgumentNullException(nameof(address)),
       port: port

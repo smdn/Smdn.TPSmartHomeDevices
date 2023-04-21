@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class RequestCancellationAfterReturnDeviceEndPointProvider : IDeviceEndPointProvider {
+internal sealed class RequestCancellationAfterReturnDeviceEndPoint : IDeviceEndPoint {
   private readonly CancellationTokenSource cancellationTokenSource;
   private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
 
-  public RequestCancellationAfterReturnDeviceEndPointProvider(
+  public RequestCancellationAfterReturnDeviceEndPoint(
     CancellationTokenSource cancellationTokenSource,
     EndPoint endPoint
   )

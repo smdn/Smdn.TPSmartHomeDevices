@@ -98,10 +98,10 @@ public class KasaDeviceTests {
   }
 
   [Test]
-  public async Task Create_WithEndPointProvider()
+  public async Task Create_WithEndPoint()
   {
     using var device = KasaDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(new DnsEndPoint("localhost", 0))
+      deviceEndPoint: new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0))
     );
 
     Assert.AreEqual(
@@ -137,7 +137,7 @@ public class KasaDeviceTests {
   public async Task ResolveEndPointAsync_ResolveToDefaultPort(EndPoint endPoint, EndPoint expectedEndPoint)
   {
     using var device = KasaDevice.Create(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(endPoint)
+      deviceEndPoint: new StaticDeviceEndPoint(endPoint)
     );
 
     Assert.AreEqual(
@@ -149,16 +149,16 @@ public class KasaDeviceTests {
   [Test]
   public void ResolveEndPointAsync_FailedToResolve()
   {
-    var provider = new UnresolvedDeviceEndPointProvider();
+    var endPoint = new UnresolvedDeviceEndPoint();
 
     using var device = KasaDevice.Create(
-      deviceEndPointProvider: provider
+      deviceEndPoint: endPoint
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.ResolveEndPointAsync());
 
-    Assert.IsNotNull(ex!.EndPointProvider, nameof(ex.EndPointProvider));
-    Assert.AreSame(provider, ex.EndPointProvider, nameof(ex.EndPointProvider));
+    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
   }
 
   [Test]
@@ -166,7 +166,7 @@ public class KasaDeviceTests {
   {
     using var cts = new CancellationTokenSource();
     using var device = KasaDevice.Create(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider()
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint()
     );
 
     cts.Cancel();
@@ -178,11 +178,11 @@ public class KasaDeviceTests {
 
   private class ConcreteKasaDevice : KasaDevice {
     public ConcreteKasaDevice(
-      IDeviceEndPointProvider deviceEndPointProvider,
+      IDeviceEndPoint deviceEndPoint,
       IServiceProvider serviceProvider = null
     )
       : base(
-        deviceEndPointProvider: deviceEndPointProvider,
+        deviceEndPoint: deviceEndPoint,
         serviceProvider: serviceProvider
       )
     {
@@ -233,7 +233,7 @@ public class KasaDeviceTests {
     pseudoDevice.Start();
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
@@ -252,7 +252,7 @@ public class KasaDeviceTests {
   public void SendRequestAsync_Disposed()
   {
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider()
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint()
     );
 
     device.Dispose();
@@ -274,10 +274,10 @@ public class KasaDeviceTests {
   [Test]
   public void SendRequestAsync_FailedToResolveDeviceEndPoint()
   {
-    var provider = new UnresolvedDeviceEndPointProvider();
+    var endPoint = new UnresolvedDeviceEndPoint();
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: provider
+      deviceEndPoint: endPoint
     );
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(
@@ -287,8 +287,8 @@ public class KasaDeviceTests {
       )
     );
 
-    Assert.IsNotNull(ex!.EndPointProvider, nameof(ex.EndPointProvider));
-    Assert.AreSame(provider, ex.EndPointProvider, nameof(ex.EndPointProvider));
+    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
   }
 
@@ -296,7 +296,7 @@ public class KasaDeviceTests {
   public void SendRequestAsync_SocketException()
   {
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: new StaticDeviceEndPointProvider(
+      deviceEndPoint: new StaticDeviceEndPoint(
         new DnsEndPoint("device.invalid", KasaClient.DefaultPort, AddressFamily.InterNetwork)
       )
     );
@@ -322,7 +322,7 @@ public class KasaDeviceTests {
   {
     using var cts = new CancellationTokenSource();
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: new RequestCancellationAfterReturnDeviceEndPointProvider(
+      deviceEndPoint: new RequestCancellationAfterReturnDeviceEndPoint(
         cts,
         new IPEndPoint(IPAddress.Loopback, 0)
       )
@@ -366,10 +366,10 @@ public class KasaDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var provider = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPoint(pseudoDeviceEndPoint1.EndPoint);
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: provider
+      deviceEndPoint: endPoint
     );
 
     var resultFromEndPoint1 = await device.SendRequestAsync(
@@ -384,7 +384,7 @@ public class KasaDeviceTests {
     // endpoint changed
     pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
 
-    provider.EndPoint = pseudoDeviceEndPoint2.EndPoint;
+    endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint;
 
     // dispose endpoint #1
     await pseudoDeviceEndPoint1.DisposeAsync();
@@ -402,7 +402,7 @@ public class KasaDeviceTests {
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
     // end point should not be marked as invalidated in this scenario
-    Assert.IsFalse(provider.HasInvalidated, nameof(provider.HasInvalidated));
+    Assert.IsFalse(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
   private class HandleAsEndPointUnreachableExceptionHandler : KasaClientExceptionHandler {
@@ -438,10 +438,10 @@ public class KasaDeviceTests {
 
     pseudoDevice.Start();
 
-    var endPoint = pseudoDevice.GetEndPointProvider();
+    var endPoint = pseudoDevice.GetEndPoint();
 
-    Assert.That(endPoint, Is.AssignableTo<IDeviceEndPointProvider>(), nameof(endPoint));
-    Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPointProvider>(), nameof(endPoint));
+    Assert.That(endPoint, Is.AssignableTo<IDeviceEndPoint>(), nameof(endPoint));
+    Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
 
     var services = new ServiceCollection();
 
@@ -450,7 +450,7 @@ public class KasaDeviceTests {
     );
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: endPoint,
+      deviceEndPoint: endPoint,
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -521,7 +521,7 @@ public class KasaDeviceTests {
 
     pseudoDeviceEndPoint1.Start();
 
-    var endPoint = new DynamicDeviceEndPointProvider(pseudoDeviceEndPoint1.EndPoint);
+    var endPoint = new DynamicDeviceEndPoint(pseudoDeviceEndPoint1.EndPoint);
     var services = new ServiceCollection();
 
     services.AddSingleton<KasaClientExceptionHandler>(
@@ -529,7 +529,7 @@ public class KasaDeviceTests {
     );
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: endPoint,
+      deviceEndPoint: endPoint,
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -633,7 +633,7 @@ public class KasaDeviceTests {
     pseudoDevice.Start();
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
@@ -668,7 +668,7 @@ public class KasaDeviceTests {
     pseudoDevice.Start();
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));
@@ -720,7 +720,7 @@ public class KasaDeviceTests {
     );
 
     using var device = new ConcreteKasaDevice(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider()
+      deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
     Assert.IsFalse(device.IsConnected, nameof(device.IsConnected));

@@ -36,7 +36,7 @@ public class L900Tests {
   )
   {
     using var device = new L900(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -73,7 +73,7 @@ public class L900Tests {
     pseudoDevice.Start();
 
     using var device = new L900(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -95,7 +95,7 @@ public class L900Tests {
   )
   {
     using var device = new L900(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -144,7 +144,7 @@ public class L900Tests {
     pseudoDevice.Start();
 
     using var device = new L900(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -163,7 +163,7 @@ public class L900Tests {
   )
   {
     using var device = new L900(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -208,7 +208,7 @@ public class L900Tests {
     pseudoDevice.Start();
 
     using var device = new L900(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -227,7 +227,7 @@ public class L900Tests {
   )
   {
     using var device = new L900(
-      deviceEndPointProvider: new ThrowExceptionDeviceEndPointProvider(),
+      deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 
@@ -272,7 +272,7 @@ public class L900Tests {
     pseudoDevice.Start();
 
     using var device = new L900(
-      deviceEndPointProvider: pseudoDevice.GetEndPointProvider(),
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
       serviceProvider: services.BuildServiceProvider()
     );
 

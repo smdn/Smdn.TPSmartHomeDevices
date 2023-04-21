@@ -34,8 +34,8 @@ public partial class KasaDevice : IDisposable {
 
   protected readonly struct NullParameter { }
 
-  private IDeviceEndPointProvider? deviceEndPointProvider; // if null, it indicates a 'disposed' state.
-  protected bool IsDisposed => deviceEndPointProvider is null;
+  private IDeviceEndPoint? deviceEndPoint; // if null, it indicates a 'disposed' state.
+  protected bool IsDisposed => deviceEndPoint is null;
 
   private readonly KasaClientExceptionHandler exceptionHandler;
   private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: KasaClient.DefaultBufferCapacity);
@@ -64,7 +64,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(host),
+      deviceEndPoint: KasaDeviceEndPoint.Create(host),
       serviceProvider: serviceProvider
     )
   {
@@ -84,7 +84,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(ipAddress),
+      deviceEndPoint: KasaDeviceEndPoint.Create(ipAddress),
       serviceProvider: serviceProvider
     )
   {
@@ -106,7 +106,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPointProvider: KasaDeviceEndPointProvider.Create(macAddress, serviceProvider),
+      deviceEndPoint: KasaDeviceEndPoint.Create(macAddress, serviceProvider),
       serviceProvider: serviceProvider
     )
   {
@@ -115,22 +115,22 @@ public partial class KasaDevice : IDisposable {
   /// <summary>
   /// Initializes a new instance of the <see cref="KasaDevice"/> class.
   /// </summary>
-  /// <param name="deviceEndPointProvider">
-  /// A <see cref="IDeviceEndPointProvider"/> that provides the device end point.
+  /// <param name="deviceEndPoint">
+  /// A <see cref="IDeviceEndPoint"/> that provides the device end point.
   /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   /// <exception cref="ArgumentNullException">
-  /// <paramref name="deviceEndPointProvider"/> is <see langword="null"/>.
+  /// <paramref name="deviceEndPoint"/> is <see langword="null"/>.
   /// </exception>
   protected KasaDevice(
-    IDeviceEndPointProvider deviceEndPointProvider,
+    IDeviceEndPoint deviceEndPoint,
     IServiceProvider? serviceProvider = null
   )
   {
-    this.deviceEndPointProvider = deviceEndPointProvider ?? throw new ArgumentNullException(nameof(deviceEndPointProvider));
+    this.deviceEndPoint = deviceEndPoint ?? throw new ArgumentNullException(nameof(deviceEndPoint));
     this.serviceProvider = serviceProvider;
 
     exceptionHandler = serviceProvider?.GetService<KasaClientExceptionHandler>() ?? KasaClientExceptionHandler.Default;
@@ -147,7 +147,7 @@ public partial class KasaDevice : IDisposable {
     if (!disposing)
       return;
 
-    deviceEndPointProvider = null; // mark as disposed
+    deviceEndPoint = null; // mark as disposed
 
     client?.Dispose();
     client = null;
@@ -172,7 +172,7 @@ public partial class KasaDevice : IDisposable {
 #else
         ValueTaskShim.FromCanceled<EndPoint>(cancellationToken)
 #endif
-      : deviceEndPointProvider.ResolveOrThrowAsync(
+      : deviceEndPoint.ResolveOrThrowAsync(
         defaultPort: KasaClient.DefaultPort,
         cancellationToken: cancellationToken
       );
@@ -314,8 +314,8 @@ public partial class KasaDevice : IDisposable {
       );
 
       string GenerateLoggerCategoryName()
-        => deviceEndPointProvider is IDynamicDeviceEndPointProvider
-          ? $"{nameof(KasaClient)}({endPoint}, {deviceEndPointProvider})"
+        => deviceEndPoint is IDynamicDeviceEndPoint
+          ? $"{nameof(KasaClient)}({endPoint}, {deviceEndPoint})"
           : $"{nameof(KasaClient)}({endPoint})";
 
       try {
@@ -351,7 +351,7 @@ public partial class KasaDevice : IDisposable {
           LogRequest(client.Logger, module, method, parameters);
 
         if (handling.ShouldInvalidateEndPoint) {
-          if (deviceEndPointProvider is IDynamicDeviceEndPointProvider dynamicEndPoint) {
+          if (deviceEndPoint is IDynamicDeviceEndPoint dynamicEndPoint) {
             // mark end point as invalid to have the end point refreshed or rescanned
             dynamicEndPoint.InvalidateEndPoint();
 

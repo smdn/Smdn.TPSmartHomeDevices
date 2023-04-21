@@ -9,11 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal static class DeviceEndPointProvider {
-  private sealed class StaticDeviceEndPointProvider : IDeviceEndPointProvider {
+internal static class DeviceEndPoint {
+  private sealed class StaticDeviceEndPoint : IDeviceEndPoint {
     private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
 
-    public StaticDeviceEndPointProvider(EndPoint endPoint)
+    public StaticDeviceEndPoint(EndPoint endPoint)
     {
       staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
     }
@@ -32,7 +32,7 @@ internal static class DeviceEndPointProvider {
       => staticEndPointValueTaskResult.Result!.ToString();
   }
 
-  public static IDeviceEndPointProvider Create(string host, int port)
+  public static IDeviceEndPoint Create(string host, int port)
     => Create(
       new DnsEndPoint(
         host: host ?? throw new ArgumentNullException(nameof(host)),
@@ -40,7 +40,7 @@ internal static class DeviceEndPointProvider {
       )
     );
 
-  public static IDeviceEndPointProvider Create(IPAddress ipAddress, int port)
+  public static IDeviceEndPoint Create(IPAddress ipAddress, int port)
     => Create(
       new IPEndPoint(
         address: ipAddress ?? throw new ArgumentNullException(nameof(ipAddress)),
@@ -48,12 +48,12 @@ internal static class DeviceEndPointProvider {
       )
     );
 
-  public static IDeviceEndPointProvider Create(EndPoint endPoint)
-    => new StaticDeviceEndPointProvider(
+  public static IDeviceEndPoint Create(EndPoint endPoint)
+    => new StaticDeviceEndPoint(
       endPoint ?? throw new ArgumentNullException(nameof(endPoint))
     );
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     int port,
     IServiceProvider serviceProvider
@@ -65,7 +65,7 @@ internal static class DeviceEndPointProvider {
         .GetRequiredService<IDeviceEndPointFactory<PhysicalAddress>>()
     );
 
-  public static IDeviceEndPointProvider Create(
+  public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     int port,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
@@ -77,15 +77,15 @@ internal static class DeviceEndPointProvider {
       );
 
   internal static async ValueTask<EndPoint> ResolveOrThrowAsync(
-    this IDeviceEndPointProvider provider,
+    this IDeviceEndPoint deviceEndPoint,
     int defaultPort,
     CancellationToken cancellationToken
   )
   {
-    var endPoint = await provider.GetEndPointAsync(cancellationToken);
+    var endPoint = await deviceEndPoint.GetEndPointAsync(cancellationToken);
 
-    if (endPoint is null && provider is IDynamicDeviceEndPointProvider dynamicEndPoint)
-      dynamicEndPoint.InvalidateEndPoint();
+    if (endPoint is null && deviceEndPoint is IDynamicDeviceEndPoint dynamicDeviceEndPoint)
+      dynamicDeviceEndPoint.InvalidateEndPoint();
 
     return endPoint switch {
       IPEndPoint ipEndPoint => ipEndPoint.Port == 0
@@ -98,7 +98,7 @@ internal static class DeviceEndPointProvider {
 
       EndPoint ep => ep,
 
-      null => throw new DeviceEndPointResolutionException(provider),
+      null => throw new DeviceEndPointResolutionException(deviceEndPoint),
     };
   }
 }
