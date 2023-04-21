@@ -8,7 +8,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 public readonly struct HandshakeResponse : ITapoResponse {
   [JsonPropertyName("error_code")]
-  public ErrorCode ErrorCode { get; init; }
+  public int ErrorCode { get; init; }
 
   [JsonPropertyName("result")]
   public ResponseResult Result { get; init; }

@@ -58,7 +58,7 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
 
       case TapoErrorResponseException errorResponseException:
         if (attempt == 0 /* retry just once */) {
-          switch (errorResponseException.ErrorCode) {
+          switch (errorResponseException.RawErrorCode) {
             case TapoErrorCodes.DeviceBusy:
               logger?.LogWarning(errorResponseException.Message);
 
@@ -73,7 +73,7 @@ internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
               return TapoClientExceptionHandling.Throw;
 
             default:
-              logger?.LogWarning($"Unexpected error ({nameof(errorResponseException.ErrorCode)}: {(int)errorResponseException.ErrorCode})");
+              logger?.LogWarning($"Unexpected error ({nameof(errorResponseException.RawErrorCode)}: {errorResponseException.RawErrorCode})");
 
               // The session might have been in invalid state(?)
               return TapoClientExceptionHandling.RetryAfterReconnect;

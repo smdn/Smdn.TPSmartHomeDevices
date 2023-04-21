@@ -162,7 +162,7 @@ partial class TapoClientTests {
         var username = param.GetProperty("username").GetString();
 
         return new LoginDeviceResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new LoginDeviceResponse.ResponseResult() {
             Token = username, // return login username as token
           },
@@ -209,7 +209,7 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_Handshake_ErrorResponse()
   {
-    const ErrorCode handshakeErrorCode = (ErrorCode)(-9999);
+    const int handshakeErrorCode = -9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
@@ -236,7 +236,7 @@ partial class TapoClientTests {
 
     Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
     Assert.AreEqual("handshake", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
-    Assert.AreEqual(handshakeErrorCode, innerErrorResponseException.ErrorCode, nameof(innerErrorResponseException.ErrorCode));
+    Assert.AreEqual(handshakeErrorCode, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
@@ -247,7 +247,7 @@ partial class TapoClientTests {
   {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
-        ErrorCode = ErrorCode.Success,
+        ErrorCode = KnownErrorCodes.Success,
         Result = new HandshakeResponse.ResponseResult(Key: null)
       },
     };
@@ -275,7 +275,7 @@ partial class TapoClientTests {
   {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = (_, _) => new HandshakeResponse() {
-        ErrorCode = ErrorCode.Success,
+        ErrorCode = KnownErrorCodes.Success,
         Result = new HandshakeResponse.ResponseResult(Key: Convert.ToBase64String(RandomNumberGenerator.GetBytes(keyLength)))
       },
     };
@@ -384,7 +384,7 @@ partial class TapoClientTests {
         DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
         return new HandshakeResponse() {
-          ErrorCode = (ErrorCode)9999,
+          ErrorCode = 9999,
           Result = new HandshakeResponse.ResponseResult(
             Key: null
           )
@@ -462,7 +462,7 @@ partial class TapoClientTests {
         Assert.AreEqual(expectedPasswordPropertyValue, propPassword.GetString(), nameof(propPassword));
 
         return new LoginDeviceResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new LoginDeviceResponse.ResponseResult(Token: token)
         };
       },
@@ -496,7 +496,7 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_LoginDevice_ErrorResponse()
   {
-    const ErrorCode loginDeviceErrorCode = (ErrorCode)(-9999);
+    const int loginDeviceErrorCode = -9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
@@ -523,7 +523,7 @@ partial class TapoClientTests {
 
     Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
     Assert.AreEqual("login_device", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
-    Assert.AreEqual(loginDeviceErrorCode, innerErrorResponseException.ErrorCode, nameof(innerErrorResponseException.ErrorCode));
+    Assert.AreEqual(loginDeviceErrorCode, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
@@ -571,7 +571,7 @@ partial class TapoClientTests {
         DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
         return new LoginDeviceResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new LoginDeviceResponse.ResponseResult() {
             Token = token,
           }

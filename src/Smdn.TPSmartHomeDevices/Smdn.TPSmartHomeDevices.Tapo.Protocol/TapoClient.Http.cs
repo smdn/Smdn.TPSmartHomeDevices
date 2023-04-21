@@ -44,7 +44,7 @@ partial class TapoClient {
 
     var response = securePassThroughResponse.Result.PassThroughResponse;
 
-    logger?.LogDebug("Respose error code: {ErrorCode}", (int)response.ErrorCode);
+    logger?.LogDebug("Respose error code: {ErrorCode}", response.ErrorCode);
 
     TapoErrorResponseException.ThrowIfError(
       requestUri,

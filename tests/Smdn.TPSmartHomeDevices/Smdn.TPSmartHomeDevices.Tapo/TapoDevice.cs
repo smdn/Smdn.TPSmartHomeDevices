@@ -501,7 +501,7 @@ public class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.AreEqual("get_device_info", method, "received request method");
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse()
         );
       }
@@ -562,7 +562,7 @@ public class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.AreEqual("get_device_info", method, "received request method");
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse()
         );
       }
@@ -572,13 +572,13 @@ public class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.AreEqual("get_device_info", method, "received request method");
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
             ErrorCode = caseWhenRetrySuccess
-              ? ErrorCode.Success
+              ? KnownErrorCodes.Success
               // this causes an exception to be raised in the request to the pseudo device #2,
               // and the exception will be handled as an 'unreachable' event by HandleAsEndPointUnreachableExceptionHandler
-              : (ErrorCode)9999
+              : 9999
           }
         );
       }
@@ -652,9 +652,9 @@ public class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
       ),
@@ -683,15 +683,15 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_RetrySuccess()
   {
-    const ErrorCode getDeviceInfoErrorCode = (ErrorCode)1234;
+    const int getDeviceInfoErrorCode = 1234;
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = _ => $"token-request{request}",
       FuncGeneratePassThroughResponse = (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
-          ErrorCode = request++ == 0 ? getDeviceInfoErrorCode : ErrorCode.Success,
+          ErrorCode = request++ == 0 ? getDeviceInfoErrorCode : KnownErrorCodes.Success,
           Result = new(),
         }
       ),
@@ -716,7 +716,7 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_RetryFailedWithErrorResponse()
   {
-    const ErrorCode getDeviceInfoErrorCode = (ErrorCode)1234;
+    const int getDeviceInfoErrorCode = 1234;
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
@@ -725,7 +725,7 @@ public class TapoDeviceTests {
         request++;
 
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
             ErrorCode = getDeviceInfoErrorCode,
             Result = new(),
@@ -753,15 +753,14 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ResponseWithErrorCodeMinus1301_RetrySuccess()
   {
-    const ErrorCode errorCodeMinus1301 = (ErrorCode)(-1301);
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = _ => $"token-request{request}",
       FuncGeneratePassThroughResponse = (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
-          ErrorCode = request++ == 0 ? errorCodeMinus1301 : ErrorCode.Success,
+          ErrorCode = request++ == 0 ? KnownErrorCodes.Minus1301 : KnownErrorCodes.Success,
           Result = new(),
         }
       ),
@@ -786,7 +785,6 @@ public class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ResponseWithErrorCodeMinus1301_RetryFailedWithErrorResponse()
   {
-    const ErrorCode errorCodeMinus1301 = (ErrorCode)(-1301);
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
@@ -795,9 +793,9 @@ public class TapoDeviceTests {
         request++;
 
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
-            ErrorCode = errorCodeMinus1301,
+            ErrorCode = KnownErrorCodes.Minus1301,
             Result = new(),
           }
         );
@@ -816,7 +814,7 @@ public class TapoDeviceTests {
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
 
     Assert.AreEqual(2, request, nameof(request));
-    Assert.AreEqual(errorCodeMinus1301, ex.ErrorCode, nameof(ex.ErrorCode));
+    Assert.AreEqual(KnownErrorCodes.Minus1301, ex.RawErrorCode, nameof(ex.RawErrorCode));
     StringAssert.Contains("token=token-request1", ex.EndPoint.Query, nameof(ex.EndPoint.Query));
     Assert.IsNull(device.Session, nameof(device.Session));
   }
@@ -857,9 +855,9 @@ public class TapoDeviceTests {
             DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
 
             return (
-              ErrorCode.Success,
+              KnownErrorCodes.Success,
               new GetDeviceInfoResponse() {
-                ErrorCode = ErrorCode.Success,
+                ErrorCode = KnownErrorCodes.Success,
                 Result = new(),
               }
             );
@@ -935,9 +933,9 @@ public class TapoDeviceTests {
             DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
 
             return (
-              ErrorCode.Success,
+              KnownErrorCodes.Success,
               new GetDeviceInfoResponse() {
-                ErrorCode = ErrorCode.Success,
+                ErrorCode = KnownErrorCodes.Success,
                 Result = new(),
               }
             );
@@ -1002,9 +1000,9 @@ public class TapoDeviceTests {
         ctsRequest.Cancel();
 
         return new(
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -1044,9 +1042,9 @@ public class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.AreEqual("get_device_info", method, "received request method");
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               // response #0: IsOn = true
               // response #1: IsOn = false
@@ -1089,9 +1087,9 @@ public class TapoDeviceTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => {
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new GetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               // cannnot construct with extra data
             },
@@ -1115,12 +1113,12 @@ public class TapoDeviceTests {
   [Test]
   public async Task GetDeviceInfoAsync_ErrorResponse()
   {
-    const ErrorCode getDeviceInfoErrorCode = (ErrorCode)1234;
+    const int getDeviceInfoErrorCode = 1234;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
           ErrorCode = getDeviceInfoErrorCode,
           Result = new(),
@@ -1141,7 +1139,7 @@ public class TapoDeviceTests {
       async () => await device.GetDeviceInfoAsync()
     );
     Assert.AreEqual("get_device_info", ex!.RequestMethod);
-    Assert.AreEqual(getDeviceInfoErrorCode, ex.ErrorCode);
+    Assert.AreEqual(getDeviceInfoErrorCode, ex.RawErrorCode);
     Assert.IsNull(device.Session, $"{nameof(device.Session)} after GetDeviceInfoAsync");
   }
 
@@ -1169,9 +1167,9 @@ public class TapoDeviceTests {
         }
 
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -1203,14 +1201,14 @@ public class TapoDeviceTests {
   [Test]
   public async Task SetDeviceInfoAsync_ErrorResponse()
   {
-    const ErrorCode setDeviceInfoErrorCode = (ErrorCode)1234;
+    const int setDeviceInfoErrorCode = 1234;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.AreEqual("set_device_info", method, "received request method");
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
             ErrorCode = setDeviceInfoErrorCode,
             Result = new(),
@@ -1232,7 +1230,7 @@ public class TapoDeviceTests {
       async () => await device.SetDeviceInfoAsync(new { device_on = true })
     );
     Assert.AreEqual("set_device_info", ex!.RequestMethod);
-    Assert.AreEqual(setDeviceInfoErrorCode, ex.ErrorCode);
+    Assert.AreEqual(setDeviceInfoErrorCode, ex.RawErrorCode);
 
     Assert.IsNull(device.Session, $"{nameof(device.Session)} after SetDeviceInfoAsync");
   }
@@ -1246,9 +1244,9 @@ public class TapoDeviceTests {
         Assert.AreEqual("set_device_info", method, "received request method");
         Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -1274,9 +1272,9 @@ public class TapoDeviceTests {
         Assert.AreEqual("set_device_info", method, "received request method");
         Assert.IsFalse(requestParams.GetProperty("device_on")!.GetBoolean());
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -1303,9 +1301,9 @@ public class TapoDeviceTests {
         Assert.AreEqual("set_device_info", method, "received request method");
         Assert.AreEqual(newState, requestParams.GetProperty("device_on")!.GetBoolean());
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );

@@ -127,7 +127,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public Func<SessionBase, RSA, HandshakeResponse>? FuncGenerateHandshakeResponse { get; set; }
   public Func<SessionBase, string?>? FuncGenerateCookieValue { get; set; }
   public Func<SessionBase, JsonElement, LoginDeviceResponse>? FuncGenerateLoginDeviceResponse { get; set; }
-  public Func<SessionBase, string, JsonElement, (ErrorCode, ITapoPassThroughResponse?)>? FuncGeneratePassThroughResponse { get; set; }
+  public Func<SessionBase, string, JsonElement, (int, ITapoPassThroughResponse?)>? FuncGeneratePassThroughResponse { get; set; }
 
   public PseudoTapoDevice()
     : this(state: null)
@@ -584,7 +584,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     var response = FuncGenerateHandshakeResponse?.Invoke(session, rsa)
       ?? new HandshakeResponse() {
-        ErrorCode = ErrorCode.Success,
+        ErrorCode = KnownErrorCodes.Success,
         Result = new HandshakeResponse.ResponseResult(
           Key: Convert.ToBase64String(encryptedKeyAndIv)
         )
@@ -646,7 +646,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   private async Task WriteSecurePassThroughJsonContentAsync(
     HttpListenerResponse response,
     SessionBase session,
-    ErrorCode errorCode,
+    int errorCode,
     ITapoPassThroughResponse passThroughResponse
   )
   {
@@ -730,7 +730,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     var loginDeviceResponse = FuncGenerateLoginDeviceResponse?.Invoke(unauthorizedSession, loginDeviceMethodParamsProperty)
       ?? new LoginDeviceResponse() {
-        ErrorCode = ErrorCode.Success,
+        ErrorCode = KnownErrorCodes.Success,
         Result = new LoginDeviceResponse.ResponseResult() {
           Token = authorizedSession?.Token ?? string.Empty,
         }
@@ -739,7 +739,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     await WriteSecurePassThroughJsonContentAsync(
       context.Response,
       (SessionBase?)authorizedSession ?? unauthorizedSession,
-      ErrorCode.Success,
+      KnownErrorCodes.Success,
       loginDeviceResponse
     ).ConfigureAwait(false);
 

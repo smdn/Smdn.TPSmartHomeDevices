@@ -6,5 +6,5 @@ public interface ITapoResponse {
 /*
   [JsonPropertyName("error_code")]
 */
-  public ErrorCode ErrorCode { get; init; }
+  public int ErrorCode { get; init; }
 }

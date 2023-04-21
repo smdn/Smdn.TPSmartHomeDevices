@@ -6,22 +6,22 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 public class KasaErrorResponseException : KasaUnexpectedResponseException {
-  public ErrorCode ErrorCode { get; }
+  public int RawErrorCode { get; }
 
   public KasaErrorResponseException(
     EndPoint deviceEndPoint,
     string requestModule,
     string requestMethod,
-    ErrorCode errorCode
+    int rawErrorCode
   )
     : base(
-      message: $"Request '{requestModule}:{requestMethod}' failed with error code {(int)errorCode}. (Device end point: {deviceEndPoint})",
+      message: $"Request '{requestModule}:{requestMethod}' failed with error code {rawErrorCode}. (Device end point: {deviceEndPoint})",
       deviceEndPoint: deviceEndPoint,
       requestModule: requestModule,
       requestMethod: requestMethod,
       innerException: null
     )
   {
-    ErrorCode = errorCode;
+    RawErrorCode = rawErrorCode;
   }
 }

@@ -15,9 +15,9 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
       )
@@ -46,7 +46,7 @@ partial class TapoClientTests {
 
     var response = nullableResponse!.Value;
 
-    Assert.AreEqual(ErrorCode.Success, response.ErrorCode, nameof(response.ErrorCode));
+    Assert.AreEqual(KnownErrorCodes.Success, response.ErrorCode, nameof(response.ErrorCode));
     Assert.IsNotNull(response.Result, nameof(response.Result));
   }
 
@@ -69,12 +69,12 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_PassThroughResponse()
   {
-    const ErrorCode errorCode = (ErrorCode)9999;
+    const int errorCode = 9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
-        ErrorCode.Success,
+        KnownErrorCodes.Success,
         new GetDeviceInfoResponse() {
           ErrorCode = errorCode,
           Result = new(),
@@ -99,7 +99,7 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()
     );
 
-    Assert.AreEqual(errorCode, ex!.ErrorCode, nameof(ex.ErrorCode));
+    Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual(new GetDeviceInfoRequest().Method, ex.RequestMethod, nameof(ex.RequestMethod));
     Assert.AreEqual(new Uri(device.EndPointUri!, client.Session.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
   }
@@ -107,14 +107,14 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_SecurePassThroughResponse()
   {
-    const ErrorCode errorCode = (ErrorCode)9999;
+    const int errorCode = 9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         errorCode,
         new GetDeviceInfoResponse() {
-          ErrorCode = ErrorCode.Success,
+          ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
       )
@@ -137,7 +137,7 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse>()
     );
 
-    Assert.AreEqual(errorCode, ex!.ErrorCode, nameof(ex.ErrorCode));
+    Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual("securePassthrough", ex.RequestMethod, nameof(ex.RequestMethod));
     Assert.AreEqual(new Uri(device.EndPointUri!, client.Session.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
   }

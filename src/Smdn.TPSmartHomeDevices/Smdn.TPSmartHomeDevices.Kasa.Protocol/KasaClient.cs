@@ -274,16 +274,18 @@ public sealed partial class KasaClient : IDisposable {
         );
       }
 
+      const int ErrorCodeSuccess = 0;
+
       if (
         result.TryGetProperty(PropertyNameForErrorCode.EncodedUtf8Bytes, out var propErrorCode) &&
         propErrorCode.TryGetInt32(out var errorCode) &&
-        errorCode != 0
+        errorCode != ErrorCodeSuccess
       ) {
         throw new KasaErrorResponseException(
           deviceEndPoint: endPoint,
           requestModule: Encoding.UTF8.GetString(module.EncodedUtf8Bytes),
           requestMethod: Encoding.UTF8.GetString(method.EncodedUtf8Bytes),
-          errorCode: (ErrorCode)errorCode
+          rawErrorCode: errorCode
         );
       }
 

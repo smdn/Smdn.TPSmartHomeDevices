@@ -115,9 +115,9 @@ partial class TapoClient {
       base64EncryptedKey = response.Result.Key;
     }
     catch (TapoErrorResponseException ex) {
-      logger?.LogCritical("Failed to handshake with error code {ErrorCode}.", (int)ex.ErrorCode);
+      logger?.LogCritical("Failed to handshake with error code {ErrorCode}.", ex.RawErrorCode);
       throw new TapoAuthenticationException(
-        message: $"Failed to handshake with the device at '{endPointUri}' with error code {(int)ex.ErrorCode}.",
+        message: $"Failed to handshake with the device at '{endPointUri}' with error code {ex.RawErrorCode}.",
         endPoint: endPointUri,
         innerException: ex
       );
@@ -210,7 +210,7 @@ partial class TapoClient {
     }
     catch (TapoErrorResponseException ex) {
       throw new TapoAuthenticationException(
-        message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {(int)ex.ErrorCode})",
+        message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {ex.RawErrorCode})",
         endPoint: endPointUri,
         innerException: ex
       );

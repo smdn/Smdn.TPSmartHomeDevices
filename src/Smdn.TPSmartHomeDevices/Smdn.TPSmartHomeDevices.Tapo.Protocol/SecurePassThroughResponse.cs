@@ -9,13 +9,13 @@ public readonly struct SecurePassThroughResponse<TPassThroughResponse> :
   where TPassThroughResponse : ITapoPassThroughResponse
 {
   [JsonPropertyName("error_code")]
-  public ErrorCode ErrorCode { get; init; }
+  public int ErrorCode { get; init; }
 
   [JsonPropertyName("result")]
   public ResponseResult Result { get; init; }
 
   public SecurePassThroughResponse(
-    ErrorCode errorCode,
+    int errorCode,
     TPassThroughResponse passThroughResponse
   )
   {

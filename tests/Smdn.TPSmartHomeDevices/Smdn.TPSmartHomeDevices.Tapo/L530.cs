@@ -60,9 +60,9 @@ public class L530Tests {
         Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
         Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -119,9 +119,9 @@ public class L530Tests {
         else
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -189,9 +189,9 @@ public class L530Tests {
         else
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -252,9 +252,9 @@ public class L530Tests {
         else
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
@@ -315,9 +315,9 @@ public class L530Tests {
         else
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
-          ErrorCode.Success,
+          KnownErrorCodes.Success,
           new SetDeviceInfoResponse() {
-            ErrorCode = ErrorCode.Success,
+            ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
         );
