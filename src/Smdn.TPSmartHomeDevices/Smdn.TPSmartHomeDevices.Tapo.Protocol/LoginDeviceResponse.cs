@@ -13,7 +13,8 @@ public readonly struct LoginDeviceResponse : ITapoPassThroughResponse {
   [JsonPropertyName("result")]
   public ResponseResult Result { get; init; }
 
-  public readonly record struct ResponseResult(
-    [property: JsonPropertyName("token")] string Token
-  );
+  public readonly struct ResponseResult {
+    [JsonPropertyName("token")]
+    public string Token { get; init; }
+  }
 }

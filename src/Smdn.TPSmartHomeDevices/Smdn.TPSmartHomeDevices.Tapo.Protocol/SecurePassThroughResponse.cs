@@ -20,13 +20,11 @@ public readonly struct SecurePassThroughResponse<TPassThroughResponse> :
   )
   {
     ErrorCode = errorCode;
-    Result = new(passThroughResponse);
+    Result = new() { PassThroughResponse = passThroughResponse };
   }
 
-  public readonly record struct ResponseResult(
-#pragma warning disable SA1313
-    [property: JsonPropertyName("response")]
-    TPassThroughResponse PassThroughResponse
-#pragma warning restore SA1313
-  );
+  public readonly struct ResponseResult {
+    [JsonPropertyName("response")]
+    public TPassThroughResponse PassThroughResponse { get; init; }
+  }
 }

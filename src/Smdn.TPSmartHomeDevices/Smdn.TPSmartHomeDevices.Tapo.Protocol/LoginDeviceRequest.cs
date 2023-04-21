@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+using System;
 using System.Text.Json.Serialization;
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -20,6 +21,6 @@ public readonly partial struct LoginDeviceRequest : ITapoPassThroughRequest {
 
   public LoginDeviceRequest(ITapoCredentialProvider credential)
   {
-    Parameters = credential;
+    Parameters = credential ?? throw new ArgumentNullException(nameof(credential));
   }
 }

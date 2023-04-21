@@ -13,7 +13,8 @@ public readonly struct SetDeviceInfoResponse : ITapoPassThroughResponse {
   [JsonPropertyName("result")]
   public ResponseResult Result { get; init; }
 
-  public readonly record struct ResponseResult(
-    [property: JsonExtensionData] IDictionary<string, object>? ExtraData
-  );
+  public readonly struct ResponseResult {
+    [JsonExtensionData]
+    public IDictionary<string, object>? ExtraData { get; init; }
+  }
 }

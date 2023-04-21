@@ -214,7 +214,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
         ErrorCode = handshakeErrorCode,
-        Result = new HandshakeResponse.ResponseResult(Key: null)
+        Result = new() { Key = null },
       },
     };
     var endPoint = device.Start();
@@ -248,7 +248,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
         ErrorCode = KnownErrorCodes.Success,
-        Result = new HandshakeResponse.ResponseResult(Key: null)
+        Result = new() { Key = null },
       },
     };
     var endPoint = device.Start();
@@ -276,7 +276,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateHandshakeResponse = (_, _) => new HandshakeResponse() {
         ErrorCode = KnownErrorCodes.Success,
-        Result = new HandshakeResponse.ResponseResult(Key: Convert.ToBase64String(RandomNumberGenerator.GetBytes(keyLength)))
+        Result = new() { Key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(keyLength)) },
       },
     };
     var endPoint = device.Start();
@@ -385,9 +385,7 @@ partial class TapoClientTests {
 
         return new HandshakeResponse() {
           ErrorCode = 9999,
-          Result = new HandshakeResponse.ResponseResult(
-            Key: null
-          )
+          Result = new() { Key = null },
         };
       },
     };
@@ -463,7 +461,7 @@ partial class TapoClientTests {
 
         return new LoginDeviceResponse() {
           ErrorCode = KnownErrorCodes.Success,
-          Result = new LoginDeviceResponse.ResponseResult(Token: token)
+          Result = new() { Token = token },
         };
       },
     };
@@ -501,7 +499,7 @@ partial class TapoClientTests {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
         ErrorCode = loginDeviceErrorCode,
-        Result = new LoginDeviceResponse.ResponseResult(Token: string.Empty)
+        Result = new() { Token = string.Empty },
       },
     };
     var endPoint = device.Start();

@@ -15,15 +15,13 @@ public readonly struct SecurePassThroughRequest<TPassThroughRequest> :
   [JsonPropertyName("params")]
   public RequestParams Params { get; }
 
-  public readonly record struct RequestParams(
-#pragma warning disable SA1313
-    [property: JsonPropertyName("request")]
-    TPassThroughRequest PassThroughRequest
-#pragma warning restore SA1313
-  );
+  public readonly struct RequestParams {
+    [JsonPropertyName("request")]
+    public TPassThroughRequest PassThroughRequest { get; init; }
+  }
 
   public SecurePassThroughRequest(TPassThroughRequest passThroughRequest)
   {
-    Params = new(passThroughRequest);
+    Params = new() { PassThroughRequest = passThroughRequest };
   }
 }

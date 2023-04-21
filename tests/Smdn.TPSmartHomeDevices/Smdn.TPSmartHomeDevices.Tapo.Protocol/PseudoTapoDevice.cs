@@ -585,9 +585,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     var response = FuncGenerateHandshakeResponse?.Invoke(session, rsa)
       ?? new HandshakeResponse() {
         ErrorCode = KnownErrorCodes.Success,
-        Result = new HandshakeResponse.ResponseResult(
-          Key: Convert.ToBase64String(encryptedKeyAndIv)
-        )
+        Result = new() { Key = Convert.ToBase64String(encryptedKeyAndIv) },
       };
 
     var cookieValue = FuncGenerateCookieValue?.Invoke(session)
