@@ -8,8 +8,29 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 public class TapoErrorResponseException : TapoProtocolException {
   internal static void ThrowIfError(Uri requestUri, string requestMethod, int errorCode)
   {
-    if (errorCode != TapoErrorCodes.Success)
-      throw new TapoErrorResponseException(requestUri, requestMethod, errorCode);
+    if (errorCode == TapoErrorCodes.Success)
+      return;
+
+    throw new TapoErrorResponseException(
+      requestUri,
+      requestMethod,
+      errorCode
+    );
+  }
+
+  private static string GetMessage(
+    Uri requestEndPoint,
+    string requestMethod,
+    int rawErrorCode
+  )
+  {
+    var informationalErrorMessage = rawErrorCode switch {
+      TapoErrorCodes.DeviceBusy => " Device may be busy. Retry after a few moments.",
+      TapoErrorCodes.RequestParameterError => " It may be an error in the request parameters. It is possible that the value may be out of range, etc.",
+      _ => null,
+    };
+
+    return $"Request '{requestMethod}' failed with error code {rawErrorCode}. {informationalErrorMessage} (Request URI: {requestEndPoint})";
   }
 
   public string RequestMethod { get; }
@@ -21,7 +42,7 @@ public class TapoErrorResponseException : TapoProtocolException {
     int rawErrorCode
   )
     : base(
-      message: $"Request '{requestMethod}' failed with error code {rawErrorCode}. (Request URI: {requestEndPoint})",
+      message: GetMessage(requestEndPoint, requestMethod, rawErrorCode),
       endPoint: requestEndPoint,
       innerException: null
     )
