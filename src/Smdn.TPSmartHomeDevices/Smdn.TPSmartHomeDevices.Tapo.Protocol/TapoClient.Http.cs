@@ -1,5 +1,8 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#if NET5_0_OR_GREATER
+#define SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
+#endif
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -104,7 +107,11 @@ partial class TapoClient {
     );
     logger?.LogTrace(
       "HTTP Request content: {RequestContent}",
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
+      await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+#else
       await requestContent.ReadAsStringAsync().ConfigureAwait(false)
+#endif
     );
 
     using var httpClient = httpClientFactory.CreateClient(
@@ -136,7 +143,14 @@ partial class TapoClient {
       "HTTP Response headers: {ResponseHeaders}",
       string.Join(" ", httpResponse.Content.Headers.Concat(httpResponse.Headers).Select(static header => string.Concat(header.Key, ": ", string.Join("; ", header.Value))))
     );
-    logger?.LogTrace("HTTP Response content: {ResponseContent}", await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
+    logger?.LogTrace(
+      "HTTP Response content: {ResponseContent}",
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
+      await httpResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+#else
+      await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false)
+#endif
+    );
 
     httpResponse.EnsureSuccessStatusCode();
 
