@@ -15,12 +15,6 @@ public class TapoDeviceInfo {
   public DateTimeOffset TimeStamp { get; } = DateTimeOffset.Now;
 
   /*
-   * storage for the device-specific informations
-   */
-  [JsonExtensionData]
-  internal IDictionary<string, object>? ExtraData { get; init; }
-
-  /*
    * properties for the informations common to the devices
    */
   [JsonPropertyName("device_id")]
