@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Json;
 
-internal sealed class GeolocationInDecimalDegreesJsonConverter : JsonConverter<decimal?> {
+public sealed class GeolocationInDecimalDegreesJsonConverter : JsonConverter<decimal?> {
   private const decimal Scaler = 10000m;
 
   public override decimal? Read(

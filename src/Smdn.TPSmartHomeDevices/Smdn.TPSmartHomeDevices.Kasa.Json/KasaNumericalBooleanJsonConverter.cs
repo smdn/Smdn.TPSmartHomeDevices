@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Json;
 
-internal sealed class KasaNumericalBooleanJsonConverter : JsonConverter<bool> {
+public sealed class KasaNumericalBooleanJsonConverter : JsonConverter<bool> {
   public override bool Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,

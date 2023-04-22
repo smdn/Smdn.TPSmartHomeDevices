@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Json;
 
-internal sealed class MacAddressJsonConverter : JsonConverter<PhysicalAddress> {
+public sealed class MacAddressJsonConverter : JsonConverter<PhysicalAddress> {
   public override PhysicalAddress? Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,

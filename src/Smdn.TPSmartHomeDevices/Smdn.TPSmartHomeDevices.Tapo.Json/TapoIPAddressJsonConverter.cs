@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Json;
 
-internal sealed class TapoIPAddressJsonConverter : JsonConverter<IPAddress> {
+public sealed class TapoIPAddressJsonConverter : JsonConverter<IPAddress> {
   public override IPAddress? Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,

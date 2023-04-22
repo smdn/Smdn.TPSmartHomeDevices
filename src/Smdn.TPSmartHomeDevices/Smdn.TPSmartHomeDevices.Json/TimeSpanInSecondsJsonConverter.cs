@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Json;
 
-internal sealed class TimeSpanInSecondsJsonConverter : JsonConverter<TimeSpan?> {
+public sealed class TimeSpanInSecondsJsonConverter : JsonConverter<TimeSpan?> {
   public override TimeSpan? Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,

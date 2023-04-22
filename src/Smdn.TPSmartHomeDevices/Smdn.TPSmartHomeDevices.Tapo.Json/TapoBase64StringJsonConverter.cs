@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Json;
 
-internal sealed class TapoBase64StringJsonConverter : JsonConverter<string?> {
+public sealed class TapoBase64StringJsonConverter : JsonConverter<string?> {
   public override string? Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,
