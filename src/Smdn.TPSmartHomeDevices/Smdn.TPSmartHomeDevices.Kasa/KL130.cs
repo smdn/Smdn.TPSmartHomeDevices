@@ -12,6 +12,7 @@ using Smdn.TPSmartHomeDevices.Kasa.Json;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 public class KL130 : KasaDevice {
+#pragma warning disable SA1114
   private static readonly JsonEncodedText ModuleTextLightingService = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "smartlife.iot.smartbulb.lightingservice"u8
@@ -26,6 +27,7 @@ public class KL130 : KasaDevice {
     "transition_light_state"
 #endif
   );
+#pragma warning restore SA1114
 
   /// <summary>
   /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by host name.

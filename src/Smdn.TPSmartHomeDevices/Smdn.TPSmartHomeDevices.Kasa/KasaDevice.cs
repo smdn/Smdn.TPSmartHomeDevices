@@ -20,6 +20,7 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 public partial class KasaDevice : IDisposable {
+#pragma warning disable SA1114
   protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "system"u8
@@ -34,6 +35,7 @@ public partial class KasaDevice : IDisposable {
     "get_sysinfo"
 #endif
   );
+#pragma warning restore SA1114
 
   protected readonly struct NullParameter { }
 

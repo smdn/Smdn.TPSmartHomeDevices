@@ -12,6 +12,7 @@ using Smdn.TPSmartHomeDevices.Kasa.Json;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 public class HS105 : KasaDevice {
+#pragma warning disable SA1114
   private static readonly JsonEncodedText MethodTextSetRelayState = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "set_relay_state"u8
@@ -19,6 +20,7 @@ public class HS105 : KasaDevice {
     "set_relay_state"
 #endif
   );
+#pragma warning restore SA1114
 
   /// <summary>
   /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by host name.

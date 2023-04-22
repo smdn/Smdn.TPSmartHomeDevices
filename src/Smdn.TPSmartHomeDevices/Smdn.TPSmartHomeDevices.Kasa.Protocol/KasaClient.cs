@@ -21,6 +21,8 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 public sealed partial class KasaClient : IDisposable {
   public const int DefaultPort = 9999;
   internal const int DefaultBufferCapacity = 1536; // 1.5 [kB]
+
+#pragma warning disable SA1114
   private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "err_code"u8
@@ -28,6 +30,7 @@ public sealed partial class KasaClient : IDisposable {
     "err_code"
 #endif
   );
+#pragma warning restore SA1114
 
   // Kasa device seems to automatically close connection within approx 30 secs since the lastest request.
   private static readonly TimeSpan connectionRefreshInterval = TimeSpan.FromSeconds(30);
