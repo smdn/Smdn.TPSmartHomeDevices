@@ -28,7 +28,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 #endif
   protected bool IsDisposed => deviceEndPoint is null;
 
-  private readonly ITapoCredentialProvider? credential;
+  private readonly ITapoCredentialProvider credential;
   private readonly TapoClientExceptionHandler exceptionHandler;
   private readonly IServiceProvider? serviceProvider;
   public string TerminalUuidString { get; } // must be in the format of 00000000-0000-0000-0000-000000000000
@@ -394,9 +394,14 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
       await EnsureSessionEstablishedAsync(cancellationToken).ConfigureAwait(false);
 
+#if DEBUG
+      if (client is null)
+        throw new InvalidOperationException($"{nameof(client)} is null");
+#endif
+
       cancellationToken.ThrowIfCancellationRequested();
 
-      client.Timeout = Timeout;
+      client!.Timeout = Timeout;
 
       try {
         var response = await client.SendRequestAsync<TRequest, TResponse>(

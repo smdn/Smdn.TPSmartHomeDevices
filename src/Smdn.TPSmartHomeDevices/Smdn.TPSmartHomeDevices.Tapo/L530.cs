@@ -168,7 +168,12 @@ public class L530 : TapoDevice {
   )
     => SetDeviceInfoAsync(
       new SetBrightnessParameter(
-        Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness)).Value
+        Brightness:
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+          MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness)).Value
+#else
+          MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))!.Value
+#endif
       ),
       cancellationToken
     );

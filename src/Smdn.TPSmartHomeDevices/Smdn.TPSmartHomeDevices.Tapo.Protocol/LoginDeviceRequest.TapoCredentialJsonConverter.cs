@@ -48,10 +48,8 @@ partial struct LoginDeviceRequest {
       JsonSerializerOptions options
     )
     {
-      using var credential = value.GetCredential(identity);
-
-      if (credential is null)
-        throw new InvalidOperationException($"Could not get a credential for an identity '{identity?.Name ?? "(null)"}'");
+      using var credential = value.GetCredential(identity)
+        ?? throw new InvalidOperationException($"Could not get a credential for an identity '{identity?.Name ?? "(null)"}'");
 
       writer.WriteStartObject();
 

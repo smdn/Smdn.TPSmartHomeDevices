@@ -31,14 +31,14 @@ partial class TapoClient {
 
     logger?.LogDebug("Request: {Request}", JsonSerializer.Serialize(request, jsonSerializerOptions));
 
-    var (securePassThroughResponse, requestUri) = await PostPlainTextRequestAsync<
+    var (requestUri, securePassThroughResponse, _) = await PostPlainTextRequestAsync<
       SecurePassThroughRequest<TRequest>,
       SecurePassThroughResponse<TResponse>,
-      Uri
+      None
     >(
       request: new(passThroughRequest: request),
       jsonSerializerOptions: jsonSerializerOptions,
-      processHttpResponse: static httpResponse => httpResponse.RequestMessage.RequestUri,
+      processHttpResponse: static _ => default,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
@@ -56,13 +56,14 @@ partial class TapoClient {
   }
 
   private async ValueTask<(
-    TResponse? Response,
+    Uri RequestUri,
+    TResponse Response,
     THttpResult? HttpResult
   )>
   PostPlainTextRequestAsync<TRequest, TResponse, THttpResult>(
     TRequest request,
     JsonSerializerOptions jsonSerializerOptions,
-    Func<HttpResponseMessage, THttpResult?>? processHttpResponse,
+    Func<HttpResponseMessage, THttpResult?> processHttpResponse,
     CancellationToken cancellationToken
   )
     where TRequest : ITapoRequest
@@ -127,9 +128,7 @@ partial class TapoClient {
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
-    var httpResult = processHttpResponse is null
-      ? default
-      : processHttpResponse(httpResponse);
+    var httpResult = processHttpResponse(httpResponse);
 
     logger?.LogTrace(
       "HTTP Response status: {ResponseStatusCode} {ResponseReasonPhrase}",
@@ -151,25 +150,28 @@ partial class TapoClient {
 
     httpResponse.EnsureSuccessStatusCode();
 
+    var requestAbsoluteUri = new Uri(httpClient.BaseAddress, requestUri);
+
     var response = await httpResponse.Content.ReadFromJsonAsync<TResponse>(
       cancellationToken: cancellationToken,
       options: jsonSerializerOptions
-    ).ConfigureAwait(false);
-
-    if (response is null) {
-      throw new TapoProtocolException(
+    ).ConfigureAwait(false)
+      ?? throw new TapoProtocolException(
         message: "Unexpected null response.",
-        endPoint: httpResponse.RequestMessage.RequestUri,
+        endPoint: requestAbsoluteUri,
         innerException: null
       );
-    }
 
     TapoErrorResponseException.ThrowIfError(
-      httpResponse.RequestMessage.RequestUri,
+      requestAbsoluteUri,
       request.Method,
       response.ErrorCode
     );
 
-    return (response, httpResult);
+    return (
+      requestAbsoluteUri,
+      response,
+      httpResult
+    );
   }
 }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
-#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
 using System.Diagnostics.CodeAnalysis;
 #endif
 
@@ -31,9 +31,17 @@ internal static class MulticolorLightUtils {
     "The value for saturation must be in range of {ColorTemperatureMinValue}~{ColorTemperatureMaxValue}";
 #endif
 
-#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(nameof(newValue))]
+#pragma warning disable SA1114
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+  [return: NotNullIfNotNull(
+#if LANG_VERSION_11_OR_GREATER
+    nameof(newValue)
+#else
+    "newValue"
 #endif
+  )]
+#endif
+#pragma warning restore SA1114
   public static int? ValidateBrightnessValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -50,9 +58,17 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(nameof(newValue))]
+#pragma warning disable SA1114
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+  [return: NotNullIfNotNull(
+#if LANG_VERSION_11_OR_GREATER
+    nameof(newValue)
+#else
+    "newValue"
 #endif
+  )]
+#endif
+#pragma warning restore SA1114
   public static int? ValidateHueValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -69,9 +85,17 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(nameof(newValue))]
+#pragma warning disable SA1114
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+  [return: NotNullIfNotNull(
+#if LANG_VERSION_11_OR_GREATER
+    nameof(newValue)
+#else
+    "newValue"
 #endif
+  )]
+#endif
+#pragma warning restore SA1114
   public static int? ValidateSaturationValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -88,9 +112,17 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(nameof(newValue))]
+#pragma warning disable SA1114
+#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+  [return: NotNullIfNotNull(
+#if LANG_VERSION_11_OR_GREATER
+    nameof(newValue)
+#else
+    "newValue"
 #endif
+  )]
+#endif
+#pragma warning restore SA1114
   public static int ValidateColorTemperatureValue(int newValue, string paramName)
   {
 #if false // TODO

@@ -16,7 +16,7 @@ partial class TapoClient {
   private const int KeyExchangeAlgorithmKeySizeInBytes = 128;
 
   private async ValueTask AuthenticateAsyncCore(
-    ITapoCredentialIdentity identity,
+    ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credential,
     CancellationToken cancellationToken
   )
@@ -93,7 +93,7 @@ partial class TapoClient {
     int? sessionTimeout;
 
     try {
-      (var response, (sessionId, sessionTimeout)) = await PostPlainTextRequestAsync<
+      (_, var response, (sessionId, sessionTimeout)) = await PostPlainTextRequestAsync<
         HandshakeRequest,
         HandshakeResponse,
         (string?, int?)

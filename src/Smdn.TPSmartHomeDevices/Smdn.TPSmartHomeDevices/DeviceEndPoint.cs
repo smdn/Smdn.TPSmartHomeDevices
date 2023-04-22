@@ -11,11 +11,11 @@ namespace Smdn.TPSmartHomeDevices;
 
 internal static class DeviceEndPoint {
   private sealed class StaticDeviceEndPoint : IDeviceEndPoint {
-    private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
+    private readonly EndPoint endPoint;
 
     public StaticDeviceEndPoint(EndPoint endPoint)
     {
-      staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
+      this.endPoint = endPoint;
     }
 
     public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
@@ -26,10 +26,10 @@ internal static class DeviceEndPoint {
 #else
           ValueTaskShim.FromCanceled<EndPoint?>(cancellationToken)
 #endif
-        : staticEndPointValueTaskResult;
+        : new(endPoint);
 
-    public override string ToString()
-      => staticEndPointValueTaskResult.Result!.ToString();
+    public override string? ToString()
+      => endPoint.ToString();
   }
 
   public static IDeviceEndPoint Create(string host, int port)
