@@ -52,7 +52,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /*
    * instance members
    */
-  private IAddressResolver<PhysicalAddress, IPAddress>? resolver; // if null, it indicates a 'disposed' state.
+  private IAddressResolver<PhysicalAddress, IPAddress> resolver; // if null, it indicates a 'disposed' state.
 
   public MacAddressDeviceEndPointFactory(
     IPNetworkProfile networkProfile,
@@ -101,7 +101,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
       return;
 
     (resolver as IDisposable)?.Dispose();
-    resolver = null; // mark as disposed
+    resolver = null!; // mark as disposed
   }
 
   protected void ThrowIfDisposed()

@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Buffers;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -32,9 +35,12 @@ public sealed partial class KasaClient : IDisposable {
   // The timeout for receiving the rest of the response when the device sends a split partial response.
   private static readonly TimeSpan receiveRestOfBodyTimeout = TimeSpan.FromMilliseconds(500);
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+  [MemberNotNullWhen(false, nameof(endPoint))]
+#endif
   private bool IsDisposed => endPoint is null;
 
-  private EndPoint? endPoint; // if null, it indicates a 'disposed' state.
+  private EndPoint endPoint; // if null, it indicates a 'disposed' state.
   private Socket? socket;
   private DateTime lastSentAt;
   private readonly ILogger? logger;
@@ -106,7 +112,7 @@ public sealed partial class KasaClient : IDisposable {
     if (!disposing)
       return;
 
-    endPoint = null;
+    endPoint = null!;
 
     socket?.Dispose();
     socket = null;

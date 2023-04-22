@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -55,9 +58,12 @@ public sealed partial class TapoClient : IDisposable {
   /*
    * instance members
    */
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+  [MemberNotNullWhen(false, nameof(httpClientFactory))]
+#endif
   private bool IsDisposed => httpClientFactory is null;
 
-  private IHttpClientFactory? httpClientFactory; // if null, it indicates a 'disposed' state.
+  private IHttpClientFactory httpClientFactory; // if null, it indicates a 'disposed' state.
   private readonly Uri endPointUri;
   private readonly EndPoint endPoint;
   private readonly ILogger? logger;
@@ -117,7 +123,7 @@ public sealed partial class TapoClient : IDisposable {
     session?.Dispose();
     session = null;
 
-    httpClientFactory = null;
+    httpClientFactory = null!;
   }
 
   public void Dispose()

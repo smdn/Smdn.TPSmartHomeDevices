@@ -5,6 +5,9 @@ using System.Buffers;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json;
@@ -34,7 +37,11 @@ public partial class KasaDevice : IDisposable {
 
   protected readonly struct NullParameter { }
 
-  private IDeviceEndPoint? deviceEndPoint; // if null, it indicates a 'disposed' state.
+  private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+  [MemberNotNullWhen(false, nameof(deviceEndPoint))]
+#endif
   protected bool IsDisposed => deviceEndPoint is null;
 
   private readonly KasaClientExceptionHandler exceptionHandler;
@@ -147,7 +154,7 @@ public partial class KasaDevice : IDisposable {
     if (!disposing)
       return;
 
-    deviceEndPoint = null; // mark as disposed
+    deviceEndPoint = null!; // mark as disposed
 
     client?.Dispose();
     client = null;

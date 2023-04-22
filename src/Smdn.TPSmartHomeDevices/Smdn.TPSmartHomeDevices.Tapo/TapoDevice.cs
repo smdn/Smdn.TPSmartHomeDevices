@@ -4,6 +4,9 @@ using System;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -18,7 +21,11 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
-  private IDeviceEndPoint? deviceEndPoint; // if null, it indicates a 'disposed' state.
+  private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+  [MemberNotNullWhen(false, nameof(deviceEndPoint))]
+#endif
   protected bool IsDisposed => deviceEndPoint is null;
 
   private readonly ITapoCredentialProvider? credential;
@@ -238,7 +245,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     if (!disposing)
       return;
 
-    deviceEndPoint = null; // mark as disposed
+    deviceEndPoint = null!; // mark as disposed
 
     client?.Dispose();
     client = null;
