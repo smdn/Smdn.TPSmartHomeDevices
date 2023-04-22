@@ -82,7 +82,7 @@ internal static class DeviceEndPoint {
     CancellationToken cancellationToken
   )
   {
-    var endPoint = await deviceEndPoint.ResolveAsync(cancellationToken);
+    var endPoint = await deviceEndPoint.ResolveAsync(cancellationToken).ConfigureAwait(false);
 
     if (endPoint is null && deviceEndPoint is IDynamicDeviceEndPoint dynamicDeviceEndPoint)
       dynamicDeviceEndPoint.Invalidate();

@@ -216,9 +216,9 @@ public sealed partial class KasaClient : IDisposable {
       // ensure socket created and connected
       socket =
 #if SYSTEM_NET_SOCKETS_SOCKET_CONNECTASYNC_REMOTEEP_CANCELLATIONTOKEN
-        await ConnectAsync(cancellationToken);
+        await ConnectAsync(cancellationToken).ConfigureAwait(false);
 #else
-        await ConnectAsync();
+        await ConnectAsync().ConfigureAwait(false);
 #endif
 
       // clear buffer for the initial use

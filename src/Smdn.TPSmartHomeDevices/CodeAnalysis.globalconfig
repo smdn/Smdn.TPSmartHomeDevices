@@ -1,0 +1,6 @@
+# code-analysis
+#   https://learn.microsoft.com/ja-jp/dotnet/fundamentals/code-analysis/configuration-files
+#   https://learn.microsoft.com/ja-jp/dotnet/fundamentals/code-analysis/quality-rules/
+is_global = true
+
+dotnet_diagnostic.CA2007.severity = warning # Do not directly await a Task
