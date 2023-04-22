@@ -72,17 +72,17 @@ public static class TapoCredentialUtils {
     Span<byte> sha1hash = stackalloc byte[SHA1HashSizeInBytes];
 
     try {
+#pragma warning disable CA5350
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
       if (!SHA1.TryHashData(input, sha1hash, out var bytesWrittenSHA1))
         return false; // destination too short
 #else
-#pragma warning disable CA5350
       using var sha1 = SHA1.Create();
-#pragma warning restore CA5350
 
       if (!sha1.TryComputeHash(input, sha1hash, out var bytesWrittenSHA1))
         return false; // destination too short
 #endif
+#pragma warning restore CA5350
 
       if (bytesWrittenSHA1 != SHA1HashSizeInBytes)
         return false; // unexpected state
