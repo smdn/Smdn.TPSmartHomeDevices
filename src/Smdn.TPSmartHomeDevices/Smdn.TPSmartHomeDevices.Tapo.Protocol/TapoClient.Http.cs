@@ -1,8 +1,5 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-#if NET5_0_OR_GREATER
-#define SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
-#endif
 using System;
 using System.Linq;
 using System.Net.Http;
