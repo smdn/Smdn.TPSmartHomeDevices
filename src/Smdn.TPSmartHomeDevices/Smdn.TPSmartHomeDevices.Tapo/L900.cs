@@ -166,6 +166,10 @@ public class L900 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%].
   /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask SetBrightnessAsync(
     int brightness,
     CancellationToken cancellationToken = default
@@ -185,6 +189,10 @@ public class L900 : TapoDevice {
   /// </param>
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
   /// </param>
   public ValueTask SetColorAsync(
     int hue,
@@ -207,6 +215,10 @@ public class L900 : TapoDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask SetColorHueAsync(
     int hue,
     int? brightness,
@@ -226,6 +238,10 @@ public class L900 : TapoDevice {
   /// </param>
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
   /// </param>
   public ValueTask SetColorSaturationAsync(
     int saturation,

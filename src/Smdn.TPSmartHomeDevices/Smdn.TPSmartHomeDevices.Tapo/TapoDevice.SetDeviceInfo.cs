@@ -39,7 +39,14 @@ partial class TapoDevice {
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
   /// </param>
-  public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default)
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  public ValueTask SetOnOffStateAsync(
+    bool newOnOffState,
+    CancellationToken cancellationToken = default
+  )
     => newOnOffState
       ? TurnOnAsync(cancellationToken)
       : TurnOffAsync(cancellationToken);

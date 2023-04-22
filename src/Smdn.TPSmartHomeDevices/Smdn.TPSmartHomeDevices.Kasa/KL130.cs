@@ -149,6 +149,14 @@ public class KL130 : KasaDevice {
   /// <param name="newOnOffState">
   /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
   /// </param>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask SetOnOffStateAsync(
     bool newOnOffState,
     TimeSpan? transitionPeriod = null,
@@ -215,6 +223,14 @@ public class KL130 : KasaDevice {
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
   /// </param>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness = null,
@@ -265,6 +281,14 @@ public class KL130 : KasaDevice {
   /// </param>
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%]. If <see langword="null"/>, the current brightness will be kept.
+  /// </param>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
   /// </param>
   public ValueTask SetColorAsync(
     int hue,

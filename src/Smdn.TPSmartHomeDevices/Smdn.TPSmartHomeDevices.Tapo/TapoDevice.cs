@@ -89,6 +89,9 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by host name.
+  /// </summary>
   /// <param name="host">
   /// A <see cref="string"/> that holds the host name or IP address string, representing the device endpoint.
   /// </param>
@@ -116,7 +119,15 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// <param name="ipAddress">
   /// A <see cref="IPAddress"/> that holds the IP address representing the device end point.
   /// </param>
-  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/param[@name='email' or @name='password' or @name='serviceProvider']"/>
+  /// <param name="email">
+  /// A <see cref="string"/> representing the e-mail address used for authentication to control the device.
+  /// </param>
+  /// <param name="password">
+  /// A <see cref="string"/> representing the password used for authentication to control the device.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// </param>
   protected TapoDevice(
     IPAddress ipAddress,
     string email,
@@ -156,12 +167,17 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// <param name="macAddress">
   /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
   /// </param>
+  /// <param name="email">
+  /// A <see cref="string"/> representing the e-mail address used for authentication to control the device.
+  /// </param>
+  /// <param name="password">
+  /// A <see cref="string"/> representing the password used for authentication to control the device.
+  /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must be registered to create an end point from the <paramref name="macAddress"/>.
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
-  /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)" path="/param[@name='email' or @name='password']"/>
   protected TapoDevice(
     PhysicalAddress macAddress,
     string email,
@@ -177,13 +193,18 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="TapoDevice"/> class with specifying the device endpoint by MAC address.
+  /// </summary>
+  /// <param name="macAddress">
+  /// A <see cref="PhysicalAddress"/> that holds the MAC address representing the device end point.
+  /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// <see cref="ITapoCredentialProvider"/> must be registered in order to retrieve the credentials required for authentication.
   /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must also be registered to create an <see cref="IDeviceEndPoint" />, corresponding to the <paramref name="macAddress"/>.
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
-  /// <inheritdoc cref="TapoDevice(PhysicalAddress, string, string, IServiceProvider?)" path="/summary | /param[@name='macAddress']"/>
   protected TapoDevice(
     PhysicalAddress macAddress,
     IServiceProvider serviceProvider
