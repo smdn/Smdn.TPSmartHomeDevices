@@ -156,6 +156,14 @@ partial class TapoClient {
       options: jsonSerializerOptions
     ).ConfigureAwait(false);
 
+    if (response is null) {
+      throw new TapoProtocolException(
+        message: "Unexpected null response.",
+        endPoint: httpResponse.RequestMessage.RequestUri,
+        innerException: null
+      );
+    }
+
     TapoErrorResponseException.ThrowIfError(
       httpResponse.RequestMessage.RequestUri,
       request.Method,
