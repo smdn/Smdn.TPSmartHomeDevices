@@ -23,10 +23,6 @@ internal class TapoHttpClientFactory : IHttpClientFactory {
 
   private static HttpMessageHandler DefaultHandler { get; } = CreateHandler();
 
-  public static IHttpClientFactory Default { get; } = new TapoHttpClientFactory(
-    configureClient: null
-  );
-
   /*
    * instance members
    */

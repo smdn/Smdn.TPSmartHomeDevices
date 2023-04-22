@@ -21,6 +21,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 public sealed partial class TapoClient : IDisposable {
   public const int DefaultPort = 80; // HTTP
 
+  public static IHttpClientFactory DefaultHttpClientFactory => new TapoHttpClientFactory(
+    configureClient: null
+  );
+
   internal static Uri GetEndPointUri(EndPoint endPoint)
   {
     // 'http://<endPoint.Host>:<endPoint.Port>/'
@@ -110,7 +114,7 @@ public sealed partial class TapoClient : IDisposable {
 
     logger?.LogTrace("Device end point: {DeviceEndPointUri}", endPointUri);
 
-    this.httpClientFactory = httpClientFactory ?? TapoHttpClientFactory.Default;
+    this.httpClientFactory = httpClientFactory ?? DefaultHttpClientFactory;
 
     logger?.LogTrace("IHttpClientFactory: {IHttpClientFactory}", this.httpClientFactory.GetType().FullName);
   }
