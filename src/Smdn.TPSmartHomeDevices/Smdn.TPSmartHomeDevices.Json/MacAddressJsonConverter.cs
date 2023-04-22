@@ -14,7 +14,11 @@ internal sealed class MacAddressJsonConverter : JsonConverter<PhysicalAddress> {
     JsonSerializerOptions options
   )
   {
-    var str = reader.GetString();
+    var str = reader.TokenType switch {
+      JsonTokenType.Null => null,
+      JsonTokenType.String => reader.GetString(),
+      _ => null,
+    };
 
     if (str is null)
       return null;

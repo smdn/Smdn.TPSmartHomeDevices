@@ -12,7 +12,10 @@ internal sealed class KasaNumericalBooleanJsonConverter : JsonConverter<bool> {
     Type typeToConvert,
     JsonSerializerOptions options
   )
-    => reader.TryGetInt32(out var numericalBool) && numericalBool != 0;
+    =>
+      reader.TokenType == JsonTokenType.Number &&
+      reader.TryGetInt32(out var numericalBool) &&
+      numericalBool != 0;
 
   public override void Write(
     Utf8JsonWriter writer,

@@ -13,7 +13,7 @@ internal sealed class TapoBase64StringJsonConverter : JsonConverter<string?> {
     Type typeToConvert,
     JsonSerializerOptions options
   )
-    => reader.TryGetBytesFromBase64(out var base64) && base64 is not null
+    => reader.TokenType == JsonTokenType.String && reader.TryGetBytesFromBase64(out var base64) && base64 is not null
       ? Encoding.UTF8.GetString(base64)
       : null;
 

@@ -14,7 +14,7 @@ internal sealed class GeolocationInDecimalDegreesJsonConverter : JsonConverter<d
     Type typeToConvert,
     JsonSerializerOptions options
   )
-    => reader.TryGetDecimal(out var scaledDecimalDegrees)
+    => reader.TokenType == JsonTokenType.Number && reader.TryGetDecimal(out var scaledDecimalDegrees)
       ? scaledDecimalDegrees / Scaler
       : null;
 

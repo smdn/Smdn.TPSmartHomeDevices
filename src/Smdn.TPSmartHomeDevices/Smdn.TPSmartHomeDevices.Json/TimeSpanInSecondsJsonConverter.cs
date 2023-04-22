@@ -12,7 +12,7 @@ internal sealed class TimeSpanInSecondsJsonConverter : JsonConverter<TimeSpan?> 
     Type typeToConvert,
     JsonSerializerOptions options
   )
-    => reader.TryGetInt32(out var onTime)
+    => reader.TokenType == JsonTokenType.Number && reader.TryGetInt32(out var onTime)
       ? TimeSpan.FromSeconds(onTime)
       : null;
 
