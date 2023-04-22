@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
-internal class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
+internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
   public override KasaClientExceptionHandling DetermineHandling(
     KasaDevice device,
     Exception exception,

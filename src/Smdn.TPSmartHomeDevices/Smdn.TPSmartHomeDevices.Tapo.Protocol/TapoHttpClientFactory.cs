@@ -6,7 +6,7 @@ using System.Net.Http;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-internal class TapoHttpClientFactory : IHttpClientFactory {
+internal sealed class TapoHttpClientFactory : IHttpClientFactory {
   private static HttpMessageHandler CreateHandler()
     =>
 #if SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER

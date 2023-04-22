@@ -209,7 +209,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
     }
   }
 
-  private class PassThroughObjectJsonConverter<TPassThroughObject>
+  private sealed class PassThroughObjectJsonConverter<TPassThroughObject>
     : JsonConverter<TPassThroughObject>
     // where TPassThroughObject : ITapoPassThroughRequest or ITapoPassThroughResponse
   {

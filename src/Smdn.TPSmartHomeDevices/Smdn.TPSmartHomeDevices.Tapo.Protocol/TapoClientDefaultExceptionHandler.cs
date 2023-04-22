@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-internal class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
+internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
   public override TapoClientExceptionHandling DetermineHandling(
     TapoDevice device,
     Exception exception,
