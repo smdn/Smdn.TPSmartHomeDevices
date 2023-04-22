@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
-#if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
+#if LANG_VERSION_11_OR_GREATER && NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
 using System.Diagnostics.CodeAnalysis;
 #endif
 

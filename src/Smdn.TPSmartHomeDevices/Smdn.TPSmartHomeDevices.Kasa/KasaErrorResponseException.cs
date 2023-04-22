@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System.Net;
-using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 

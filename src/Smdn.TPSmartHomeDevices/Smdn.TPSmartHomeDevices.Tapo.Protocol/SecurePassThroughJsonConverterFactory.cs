@@ -178,7 +178,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
         cryptographicExceptionThrown = true;
         throw new SecurePassThroughInvalidPaddingException("Invalid padding detected in encrypted JSON", ex);
       }
-      catch (CryptographicException ex) {
+      catch (CryptographicException) {
         cryptographicExceptionThrown = true;
         throw;
       }
