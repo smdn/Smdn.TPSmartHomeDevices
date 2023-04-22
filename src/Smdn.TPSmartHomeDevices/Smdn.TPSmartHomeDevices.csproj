@@ -14,8 +14,12 @@ SPDX-License-Identifier: MIT
       Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
     >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals and the extended nameof scope in C# 11 -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>CA1848;$(NoWarn)</NoWarn><!--CA1848: For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogXxxxx(...)' -->
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>CA1848;$(NoWarn)</NoWarn> <!-- CA1848: For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogXxxxx(...)' -->
+    <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
@@ -41,10 +45,5 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
     <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- XML docs-->
-    <NoWarn>CS8618;SA1027;SA1507;SA1005;$(NoWarn)</NoWarn>
-  </PropertyGroup>
 
 </Project>
