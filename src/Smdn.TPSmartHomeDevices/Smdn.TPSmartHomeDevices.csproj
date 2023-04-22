@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
     <Nullable>enable</Nullable>
     <DefineConstants
       Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
-    >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals in C# 11 -->
+    >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals and the extended nameof scope in C# 11 -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
