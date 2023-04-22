@@ -123,6 +123,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   private readonly ConcurrentDictionary<string, UnauthorizedSession> unauthorizedSessions = new();
   private readonly ConcurrentDictionary<string, AuthorizedSession> authorizedSessions = new();
 
+  public Action<HttpListenerContext> FuncProcessRequest { get; set; }
   public Func<SessionBase, string?>? FuncGenerateToken { get; set; }
   public Func<SessionBase, RSA, HandshakeResponse>? FuncGenerateHandshakeResponse { get; set; }
   public Func<SessionBase, string?>? FuncGenerateCookieValue { get; set; }
@@ -340,6 +341,11 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     try {
       var request = context.Request;
+
+      if (FuncProcessRequest is not null) {
+        FuncProcessRequest(context);
+        return;
+      }
 
       // validate request method
       if (!string.Equals("POST", request.HttpMethod, StringComparison.Ordinal)) {
