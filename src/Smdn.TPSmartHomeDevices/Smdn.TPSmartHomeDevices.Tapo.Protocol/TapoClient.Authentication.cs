@@ -210,7 +210,10 @@ partial class TapoClient {
     }
     catch (TapoErrorResponseException ex) {
       throw new TapoAuthenticationException(
-        message: $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {ex.RawErrorCode})",
+        message: ex.RawErrorCode switch {
+          TapoErrorCodes.InvalidCredentials => $"Failed to initiate authorized session with the device at '{endPointUri}'. Credentials may be invalid, check your username and password.",
+          _ => $"Denied to initiate authorized session with the device at '{endPointUri}'. (error code: {ex.RawErrorCode})",
+        },
         endPoint: endPointUri,
         innerException: ex
       );

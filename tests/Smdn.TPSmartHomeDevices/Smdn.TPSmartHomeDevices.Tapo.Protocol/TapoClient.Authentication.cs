@@ -528,6 +528,42 @@ partial class TapoClientTests {
   }
 
   [Test]
+  public async Task AuthenticateAsync_LoginDevice_ResponseWithErrorCodeMinus1501()
+  {
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
+        ErrorCode = KnownErrorCodes.Minus1501,
+        Result = new() { Token = string.Empty },
+      },
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider
+      )
+    );
+
+    StringAssert.IsMatch("(C|c)redential.*(I|i)nvalid", ex.Message, nameof(ex.Message));
+
+    Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
+
+    var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
+
+    Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
+    Assert.AreEqual("login_device", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
+    Assert.AreEqual(KnownErrorCodes.Minus1501, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
+
+    Assert.IsNull(client.Session);
+    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  [Test]
   public async Task AuthenticateAsync_LoginDevice_SuccessResponseWithoutToken()
   {
     await using var device = new PseudoTapoDevice() {

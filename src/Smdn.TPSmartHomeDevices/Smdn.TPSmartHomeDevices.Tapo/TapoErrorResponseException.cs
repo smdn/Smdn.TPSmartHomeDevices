@@ -25,12 +25,14 @@ public class TapoErrorResponseException : TapoProtocolException {
   )
   {
     var informationalErrorMessage = rawErrorCode switch {
+      // make sure to include a space at the beginning of the informatonal message
       TapoErrorCodes.DeviceBusy => " Device may be busy. Retry after a few moments.",
+      TapoErrorCodes.InvalidCredentials => " Credentials may be invalid. Check your username and password.",
       TapoErrorCodes.RequestParameterError => " It may be an error in the request parameters. It is possible that the value may be out of range, etc.",
       _ => null,
     };
 
-    return $"Request '{requestMethod}' failed with error code {rawErrorCode}. {informationalErrorMessage} (Request URI: {requestEndPoint})";
+    return $"Request '{requestMethod}' failed with error code {rawErrorCode}.{informationalErrorMessage} (Request URI: {requestEndPoint})";
   }
 
   public string RequestMethod { get; }
