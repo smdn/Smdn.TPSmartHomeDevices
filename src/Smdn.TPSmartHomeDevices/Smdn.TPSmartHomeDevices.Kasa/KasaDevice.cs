@@ -308,7 +308,12 @@ public partial class KasaDevice : IDisposable {
 
         if (client is not null && !client.EndPoint.Equals(endPoint)) {
           // endpoint has changed, recreate client with new endpoint
-          client.Logger?.LogInformation($"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+          client.Logger?.LogInformation(
+            "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
+            client.EndPoint,
+            endPoint
+          );
+
           client.Dispose();
           client = null;
         }
@@ -348,7 +353,12 @@ public partial class KasaDevice : IDisposable {
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
-          => logger.LogError($"{{{mod}:{{{meth}:{{{JsonSerializer.Serialize(param)}}}}}}}");
+          => logger.LogError(
+            "{{{Module}:{{{Method}:{{{Param}}}}}}}",
+            mod,
+            meth,
+            JsonSerializer.Serialize(param)
+          );
 
         client.Logger?.LogTrace(
           "Exception handling for {TypeOfException}: {ExceptionHandling}",

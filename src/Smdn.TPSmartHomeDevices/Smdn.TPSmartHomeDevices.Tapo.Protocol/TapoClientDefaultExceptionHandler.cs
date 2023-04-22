@@ -27,19 +27,32 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
           ) {
             if (attempt == 0 /* retry just once */) {
               // The end point may have changed.
-              logger?.LogInformation($"Endpoint may have changed ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
+              logger?.LogInformation(
+                "Endpoint may have changed (SocketError: {SocketErrorCodeNumeric} {SocketErrorCode})",
+                (int)socketErrorCode,
+                socketErrorCode
+              );
 
               return TapoClientExceptionHandling.InvalidateEndPointAndRetry;
             }
             else {
-              logger?.LogError($"Endpoint unreachable ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
+              logger?.LogError(
+                "Endpoint unreachable (SocketError: {SocketErrorCodeNumeric} {SocketErrorCode})",
+                (int)socketErrorCode,
+                socketErrorCode
+              );
 
               return TapoClientExceptionHandling.InvalidateEndPointAndThrow;
             }
           }
 
           // The HTTP client may have been invalid due to an exception at the transport layer.
-          logger?.LogError(innerSocketException, $"Unexpected socket exception ({nameof(SocketError)}: {(int)socketErrorCode} {socketErrorCode})");
+          logger?.LogError(
+            innerSocketException,
+            "Unexpected socket exception (SocketError: {SocketErrorCodeNumeric} {SocketErrorCode})",
+            (int)socketErrorCode,
+            socketErrorCode
+          );
 
           return TapoClientExceptionHandling.Throw;
         }
@@ -48,7 +61,7 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
 
       case SecurePassThroughInvalidPaddingException securePassThroughInvalidPaddingException:
         if (attempt == 0 /* retry just once */) {
-          logger?.LogWarning(securePassThroughInvalidPaddingException.Message);
+          logger?.LogWarning("{Message}", securePassThroughInvalidPaddingException.Message);
 
           // The session might have been in invalid state(?)
           return TapoClientExceptionHandling.RetryAfterReconnect;
@@ -60,7 +73,7 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
         if (attempt == 0 /* retry just once */) {
           switch (errorResponseException.RawErrorCode) {
             case TapoErrorCodes.DeviceBusy:
-              logger?.LogWarning(errorResponseException.Message);
+              logger?.LogWarning("{Message}", errorResponseException.Message);
 
               // The session might have been in invalid state(?)
               return TapoClientExceptionHandling.CreateRetry(
@@ -69,11 +82,14 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
               );
 
             case TapoErrorCodes.RequestParameterError:
-              logger?.LogWarning(errorResponseException.Message);
+              logger?.LogWarning("{Message}", errorResponseException.Message);
               return TapoClientExceptionHandling.Throw;
 
             default:
-              logger?.LogWarning($"Unexpected error ({nameof(errorResponseException.RawErrorCode)}: {errorResponseException.RawErrorCode})");
+              logger?.LogWarning(
+                "Unexpected error (RawErrorCode: {RawErrorCode})",
+                errorResponseException.RawErrorCode
+              );
 
               // The session might have been in invalid state(?)
               return TapoClientExceptionHandling.RetryAfterReconnect;
@@ -97,7 +113,12 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
         return TapoClientExceptionHandling.Throw;
 
       default:
-        logger?.LogError(exception, $"Unhandled exception ({exception.GetType().FullName})");
+        logger?.LogError(
+          exception,
+          "Unhandled exception ({ExceptionTypeFullName})",
+          exception.GetType().FullName
+        );
+
         return TapoClientExceptionHandling.Throw;
     }
   }

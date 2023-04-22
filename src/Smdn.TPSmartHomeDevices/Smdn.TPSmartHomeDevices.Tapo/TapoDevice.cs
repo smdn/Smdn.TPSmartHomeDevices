@@ -297,7 +297,12 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
-      client.Logger?.LogInformation($"Endpoint has changed: {client.EndPoint} -> {endPoint}");
+      client.Logger?.LogInformation(
+        "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
+        client.EndPoint,
+        endPoint
+      );
+
       client.Dispose();
       client = null;
     }
@@ -423,7 +428,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         static void LogRequest(ILogger logger, TRequest req)
-          => logger.LogError(JsonSerializer.Serialize(req));
+          => logger.LogError("{Request}", JsonSerializer.Serialize(req));
 
         client.Logger?.LogTrace(
           "Exception handling for {TypeOfException}: {ExceptionHandling}",
