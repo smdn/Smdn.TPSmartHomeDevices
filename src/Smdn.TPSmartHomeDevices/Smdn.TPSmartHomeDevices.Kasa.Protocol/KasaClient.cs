@@ -133,19 +133,29 @@ public sealed partial class KasaClient : IDisposable {
       throw new ObjectDisposedException(GetType().FullName);
   }
 
+#pragma warning disable SA1112
   private async ValueTask<Socket> ConnectAsync(
+#if SYSTEM_NET_SOCKETS_SOCKET_CONNECTASYNC_REMOTEEP_CANCELLATIONTOKEN
     CancellationToken cancellationToken
+#endif
   )
+#pragma warning restore SA1112
   {
     var s = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
     try {
       logger?.LogDebug("Connecting");
 
+#pragma warning disable SA1114
       await s.ConnectAsync(
+#if SYSTEM_NET_SOCKETS_SOCKET_CONNECTASYNC_REMOTEEP_CANCELLATIONTOKEN
+        remoteEP: endPoint,
+        cancellationToken: cancellationToken
+#else
         remoteEP: endPoint
-        // TODO: cancellationToken
+#endif
       ).ConfigureAwait(false);
+#pragma warning restore SA1114
 
       logger?.LogDebug("Connected");
 
@@ -204,7 +214,12 @@ public sealed partial class KasaClient : IDisposable {
 
     if (socket is null) {
       // ensure socket created and connected
-      socket = await ConnectAsync(cancellationToken);
+      socket =
+#if SYSTEM_NET_SOCKETS_SOCKET_CONNECTASYNC_REMOTEEP_CANCELLATIONTOKEN
+        await ConnectAsync(cancellationToken);
+#else
+        await ConnectAsync();
+#endif
 
       // clear buffer for the initial use
       buffer.Clear();
