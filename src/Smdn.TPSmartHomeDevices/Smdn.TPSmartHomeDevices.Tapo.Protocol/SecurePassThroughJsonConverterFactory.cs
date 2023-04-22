@@ -168,11 +168,15 @@ public sealed class SecurePassThroughJsonConverterFactory :
       using var decryptingStream = CreateDecryptingStream(stream);
 
       try {
-        return (TValue?)JsonSerializer.Deserialize(
+        var ret = JsonSerializer.Deserialize(
           utf8Json: decryptingStream,
           returnType: typeToConvert,
           options: jsonSerializerOptionsForPassThroughMessage
         );
+
+        return ret is null
+          ? throw new InvalidOperationException($"Object {typeToConvert.FullName} was decrypted as null.")
+          : (TValue)ret;
       }
       catch (CryptographicException ex) when (IsInvalidPaddingException(ex)) {
         cryptographicExceptionThrown = true;

@@ -592,4 +592,77 @@ public class SecurePassThroughJsonConverterFactoryTests {
       );
     });
   }
+
+  private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_Null()
+  {
+    yield return new object?[] { @"null", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"null", typeof(LoginDeviceResponse), new NullLogger() };
+    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), new NullLogger() };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_Null))]
+  public void ConverterForITapoPassThroughResponse_Decrypting_Null(
+    string rawJsonExpression,
+    Type returnType,
+    ILogger? logger
+  )
+  {
+    var rng = RandomNumberGenerator.Create();
+    var key = new byte[16];
+    var iv = new byte[16];
+
+    rng.GetBytes(key);
+    rng.GetBytes(iv);
+
+    var aes = Aes.Create();
+
+    aes.Padding = PaddingMode.PKCS7;
+
+    var options = new JsonSerializerOptions();
+
+    options.Converters.Add(
+      CreateFactory(
+        encryptorForPassThroughRequest: new ThrowExceptionTransform(), // encryption must not be performed,
+        decryptorForPassThroughResponse: aes.CreateDecryptor(key, iv),
+        logger: logger
+      )
+    );
+
+    using var inputStream = new MemoryStream();
+
+    inputStream.WriteByte((byte)'"');
+
+    var toBase64Stream = new CryptoStream(
+      inputStream,
+      new ToBase64Transform(),
+      CryptoStreamMode.Write,
+      leaveOpen: true
+    );
+    var encryptingStream = new CryptoStream(
+      toBase64Stream,
+      aes.CreateEncryptor(key, iv),
+      CryptoStreamMode.Write,
+      leaveOpen: true
+    );
+
+    encryptingStream.Write(Encoding.UTF8.GetBytes(rawJsonExpression));
+    encryptingStream.Close();
+    toBase64Stream.Close();
+
+    inputStream.WriteByte((byte)'"');
+    inputStream.Position = 0L;
+
+    // Confirm that at least an exception other than CryptographicException is thrown,
+    // since the case where JsonSerializer returns null cannot be reproduced.
+    var ex = Assert.Catch(
+      () => JsonSerializer.Deserialize(
+        inputStream,
+        returnType,
+        options
+      )
+    );
+
+    Assert.That(ex, Is.Not.InstanceOf<CryptographicException>());
+  }
 }
