@@ -29,6 +29,10 @@ SPDX-License-Identifier: MIT
     <PackageTags>tplink-kasa,tplink-tapo,smarthome,homeautomation,smartdevice</PackageTags>
   </PropertyGroup>
 
+  <PropertyGroup Label="StyleCop code analysis">
+    <StyleCopAnalyzersConfigurationFile>stylecop.json</StyleCopAnalyzersConfigurationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
