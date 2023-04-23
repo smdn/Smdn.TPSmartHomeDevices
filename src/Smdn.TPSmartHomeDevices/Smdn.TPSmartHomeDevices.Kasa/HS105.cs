@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Smdn.TPSmartHomeDevices.Kasa.Json;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
@@ -81,6 +82,18 @@ public class HS105 : KasaDevice {
     )
   {
   }
+
+  public static HS105 Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: KasaDeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      serviceProvider: serviceProvider
+    );
 
   private readonly struct SetRelayStateParameter {
     public static readonly SetRelayStateParameter SetOff = new(false);

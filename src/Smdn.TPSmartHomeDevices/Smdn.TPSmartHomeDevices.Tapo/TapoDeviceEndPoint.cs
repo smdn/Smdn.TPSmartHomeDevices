@@ -25,4 +25,10 @@ public static class TapoDeviceEndPoint {
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
     => DeviceEndPoint.Create(macAddress, TapoClient.DefaultPort, endPointFactory);
+
+  public static IDeviceEndPoint Create<TAddress>(
+    TAddress address,
+    IDeviceEndPointFactory<TAddress> endPointFactory
+  ) where TAddress : notnull
+    => DeviceEndPoint.Create(address, TapoClient.DefaultPort, endPointFactory);
 }

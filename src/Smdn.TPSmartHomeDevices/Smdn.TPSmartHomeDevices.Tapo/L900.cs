@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
@@ -132,6 +133,20 @@ public class L900 : TapoDevice {
     )
   {
   }
+
+  public static L900 Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider,
+    ITapoCredentialProvider? credential = null
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: TapoDeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      credential: credential,
+      serviceProvider: serviceProvider
+    );
 
 #pragma warning disable SA1313, CA1822
   internal readonly record struct LightingEffectParameter(

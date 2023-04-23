@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Smdn.TPSmartHomeDevices.Kasa.Json;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
@@ -88,6 +89,18 @@ public class KL130 : KasaDevice {
     )
   {
   }
+
+  public static KL130 Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: KasaDeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      serviceProvider: serviceProvider
+    );
 
   private static TimeSpan ValidateTransitionPeriod(TimeSpan? value, string paramName)
   {

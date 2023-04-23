@@ -129,4 +129,18 @@ public class P105 : TapoDevice {
     )
   {
   }
+
+  public static P105 Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider,
+    ITapoCredentialProvider? credential = null
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: TapoDeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      credential: credential,
+      serviceProvider: serviceProvider
+    );
 }

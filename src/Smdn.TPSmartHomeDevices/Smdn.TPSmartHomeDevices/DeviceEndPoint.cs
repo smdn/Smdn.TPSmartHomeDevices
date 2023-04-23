@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Smdn.TPSmartHomeDevices;
 
@@ -59,10 +58,9 @@ internal static class DeviceEndPoint {
     IServiceProvider serviceProvider
   )
     => Create(
-      macAddress: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
+      address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
       port: port,
-      endPointFactory: (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider)))
-        .GetRequiredService<IDeviceEndPointFactory<PhysicalAddress>>()
+      endPointFactory: serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
     );
 
   public static IDeviceEndPoint Create(
@@ -70,9 +68,20 @@ internal static class DeviceEndPoint {
     int port,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
+    => Create(
+      address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
+      port: port,
+      endPointFactory: endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory))
+    );
+
+  public static IDeviceEndPoint Create<TAddress>(
+    TAddress address,
+    int port,
+    IDeviceEndPointFactory<TAddress> endPointFactory
+  ) where TAddress : notnull
     => (endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory)))
       .Create(
-        address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
+        address: address ?? throw new ArgumentNullException(nameof(address)),
         port: port
       );
 
