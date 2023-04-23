@@ -2,6 +2,6 @@
 // SPDX-License-Identifier: MIT
 namespace Smdn.TPSmartHomeDevices;
 
-public interface IDeviceEndPointFactory<TAddress> {
+public interface IDeviceEndPointFactory<TAddress> where TAddress : notnull {
   IDeviceEndPoint Create(TAddress address, int port = 0);
 }
