@@ -9,28 +9,6 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 internal static class DeviceEndPoint {
-  internal sealed class StaticDeviceEndPoint : IDeviceEndPoint {
-    private readonly EndPoint endPoint;
-
-    public StaticDeviceEndPoint(EndPoint endPoint)
-    {
-      this.endPoint = endPoint;
-    }
-
-    public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
-      => cancellationToken.IsCancellationRequested
-        ?
-#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-          ValueTask.FromCanceled<EndPoint?>(cancellationToken)
-#else
-          ValueTaskShim.FromCanceled<EndPoint?>(cancellationToken)
-#endif
-        : new(endPoint);
-
-    public override string? ToString()
-      => endPoint.ToString();
-  }
-
   public static IDeviceEndPoint Create(string host, int port)
     => Create(
       new DnsEndPoint(

@@ -32,7 +32,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     }
 
     public override string? ToString()
-      => DeviceEndPoint is DeviceEndPoint.StaticDeviceEndPoint
+      => DeviceEndPoint is StaticDeviceEndPoint
         ? $"{DeviceEndPoint}"
         : $"{CurrentEndPoint} ({DeviceEndPoint})";
   }

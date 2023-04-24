@@ -1,26 +1,59 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
+using NUnit.Framework;
+
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class StaticDeviceEndPoint : IDeviceEndPoint {
-  private readonly ValueTask<EndPoint?> staticEndPointValueTaskResult;
-
-  public StaticDeviceEndPoint(EndPoint endPoint)
+[TestFixture]
+public class StaticDeviceEndPointTests {
+  private static System.Collections.IEnumerable YieldTestCases_EndPoints()
   {
-    staticEndPointValueTaskResult = new ValueTask<EndPoint?>(endPoint);
+    yield return new object[] { new IPEndPoint(IPAddress.Any, 80) };
+    yield return new object[] { new DnsEndPoint("localhost", 80) };
+    yield return new object[] { new CustomEndPoint(80) };
   }
 
-  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
-    => cancellationToken.IsCancellationRequested
-      ?
-#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<EndPoint?>(cancellationToken)
-#else
-        new(Task.FromCanceled<EndPoint?>(cancellationToken))
-#endif
-      : staticEndPointValueTaskResult;
+  [TestCaseSource(nameof(YieldTestCases_EndPoints))]
+  public void Ctor(EndPoint endPoint)
+    => Assert.DoesNotThrow(() => new StaticDeviceEndPoint(endPoint));
+
+  [Test]
+  public void Ctor_EndPointNull()
+    => Assert.Throws<ArgumentNullException>(() => new StaticDeviceEndPoint(endPoint: null!));
+
+  [TestCaseSource(nameof(YieldTestCases_EndPoints))]
+  public async Task ResolveAsync(EndPoint endPoint)
+  {
+    var deviceEndPoint = new StaticDeviceEndPoint(endPoint);
+
+    var resolvedEndPoint = await deviceEndPoint.ResolveAsync();
+
+    Assert.AreSame(endPoint, resolvedEndPoint);
+  }
+
+  [Test]
+  public void ResolveAsync_CancellationRequested()
+  {
+    using var cts = new CancellationTokenSource();
+    var deviceEndPoint = new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Any, 0));
+
+    cts.Cancel();
+
+    Assert.ThrowsAsync<TaskCanceledException>(
+      async () => await deviceEndPoint.ResolveAsync(cts.Token)
+    );
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_EndPoints))]
+  public void ToString(EndPoint endPoint)
+  {
+    var deviceEndPoint = new StaticDeviceEndPoint(endPoint);
+
+    Assert.AreEqual(endPoint.ToString(), deviceEndPoint.ToString());
+  }
 }

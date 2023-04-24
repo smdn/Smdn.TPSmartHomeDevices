@@ -236,7 +236,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   }
 
   public IDeviceEndPoint GetEndPoint()
-    => new StaticDeviceEndPoint(EndPoint);
+    => new StaticDeviceEndPoint(EndPoint ?? throw new InvalidOperationException("not started"));
 
   private async Task ProcessListenerAsync()
   {

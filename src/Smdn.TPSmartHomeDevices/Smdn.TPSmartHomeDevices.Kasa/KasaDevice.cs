@@ -31,7 +31,7 @@ public partial class KasaDevice : IDisposable {
     }
 
     public override string? ToString()
-      => DeviceEndPoint is DeviceEndPoint.StaticDeviceEndPoint
+      => DeviceEndPoint is StaticDeviceEndPoint
         ? $"{DeviceEndPoint}"
         : $"{CurrentEndPoint} ({DeviceEndPoint})";
   }
