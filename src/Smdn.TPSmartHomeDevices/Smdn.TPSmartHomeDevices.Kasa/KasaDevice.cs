@@ -115,7 +115,10 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: KasaDeviceEndPoint.Create(macAddress, serviceProvider),
+      deviceEndPoint: KasaDeviceEndPoint.Create(
+        macAddress,
+        serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
+      ),
       serviceProvider: serviceProvider
     )
   {

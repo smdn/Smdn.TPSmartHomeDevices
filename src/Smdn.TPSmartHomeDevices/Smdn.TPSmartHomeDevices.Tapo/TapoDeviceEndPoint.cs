@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-using System;
 using System.Net;
 using System.Net.NetworkInformation;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -13,12 +12,6 @@ public static class TapoDeviceEndPoint {
 
   public static IDeviceEndPoint Create(IPAddress ipAddress)
     => DeviceEndPoint.Create(ipAddress, TapoClient.DefaultPort);
-
-  public static IDeviceEndPoint Create(
-    PhysicalAddress macAddress,
-    IServiceProvider serviceProvider
-  )
-    => DeviceEndPoint.Create(macAddress, TapoClient.DefaultPort, serviceProvider);
 
   public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,

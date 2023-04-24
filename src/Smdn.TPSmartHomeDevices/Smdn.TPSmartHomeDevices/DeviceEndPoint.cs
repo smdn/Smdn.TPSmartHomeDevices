@@ -55,17 +55,6 @@ internal static class DeviceEndPoint {
   public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
     int port,
-    IServiceProvider serviceProvider
-  )
-    => Create(
-      address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
-      port: port,
-      endPointFactory: serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
-    );
-
-  public static IDeviceEndPoint Create(
-    PhysicalAddress macAddress,
-    int port,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
     => Create(
