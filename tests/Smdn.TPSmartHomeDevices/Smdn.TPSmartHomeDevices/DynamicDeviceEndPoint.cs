@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 internal sealed class DynamicDeviceEndPoint : IDynamicDeviceEndPoint {
-  public EndPoint EndPoint { get; set; }
+  public EndPoint? EndPoint { get; set; }
   public bool HasInvalidated { get; private set; }
-  public event EventHandler Invalidated;
+  public event EventHandler? Invalidated;
 
-  public DynamicDeviceEndPoint(EndPoint endPoint)
+  public DynamicDeviceEndPoint(EndPoint? endPoint)
   {
     EndPoint = endPoint;
   }

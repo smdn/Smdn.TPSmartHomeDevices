@@ -306,17 +306,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   {
     ThrowIfDisposed();
 
-    return cancellationToken.IsCancellationRequested
-      ?
-#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<EndPoint>(cancellationToken)
-#else
-        ValueTaskShim.FromCanceled<EndPoint>(cancellationToken)
-#endif
-      : deviceEndPoint.ResolveOrThrowAsync(
-        defaultPort: TapoClient.DefaultPort,
-        cancellationToken: cancellationToken
-      );
+    return deviceEndPoint.ResolveOrThrowAsync(
+      defaultPort: TapoClient.DefaultPort,
+      cancellationToken: cancellationToken
+    );
   }
 
   protected ValueTask EnsureSessionEstablishedAsync(

@@ -3,8 +3,6 @@
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
@@ -51,30 +49,4 @@ internal static class DeviceEndPoint {
         address: address ?? throw new ArgumentNullException(nameof(address)),
         port: port
       );
-
-  internal static async ValueTask<EndPoint> ResolveOrThrowAsync(
-    this IDeviceEndPoint deviceEndPoint,
-    int defaultPort,
-    CancellationToken cancellationToken
-  )
-  {
-    var endPoint = await deviceEndPoint.ResolveAsync(cancellationToken).ConfigureAwait(false);
-
-    if (endPoint is null && deviceEndPoint is IDynamicDeviceEndPoint dynamicDeviceEndPoint)
-      dynamicDeviceEndPoint.Invalidate();
-
-    return endPoint switch {
-      IPEndPoint ipEndPoint => ipEndPoint.Port == 0
-        ? new IPEndPoint(ipEndPoint.Address, defaultPort)
-        : ipEndPoint,
-
-      DnsEndPoint dnsEndPoint => dnsEndPoint.Port == 0
-        ? new DnsEndPoint(dnsEndPoint.Host, defaultPort)
-        : dnsEndPoint,
-
-      EndPoint ep => ep,
-
-      null => throw new DeviceEndPointResolutionException(deviceEndPoint),
-    };
-  }
 }

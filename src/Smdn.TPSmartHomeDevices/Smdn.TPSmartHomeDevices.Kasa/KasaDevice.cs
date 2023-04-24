@@ -193,17 +193,10 @@ public partial class KasaDevice : IDisposable {
   {
     ThrowIfDisposed();
 
-    return cancellationToken.IsCancellationRequested
-      ?
-#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<EndPoint>(cancellationToken)
-#else
-        ValueTaskShim.FromCanceled<EndPoint>(cancellationToken)
-#endif
-      : deviceEndPoint.ResolveOrThrowAsync(
-        defaultPort: KasaClient.DefaultPort,
-        cancellationToken: cancellationToken
-      );
+    return deviceEndPoint.ResolveOrThrowAsync(
+      defaultPort: KasaClient.DefaultPort,
+      cancellationToken: cancellationToken
+    );
   }
 
   protected ValueTask SendRequestAsync<TMethodParameter>(
