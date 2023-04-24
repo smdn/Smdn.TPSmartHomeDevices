@@ -132,7 +132,7 @@ public partial class KasaDevice : IDisposable {
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(
-        macAddress,
+        macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),
       serviceProvider: serviceProvider

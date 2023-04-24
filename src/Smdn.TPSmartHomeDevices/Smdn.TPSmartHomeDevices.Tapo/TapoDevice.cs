@@ -202,7 +202,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(
-        macAddress,
+        macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
@@ -230,7 +230,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(
-        macAddress,
+        macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),
       credential: null,
