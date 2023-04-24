@@ -140,7 +140,7 @@ public class L530 : TapoDevice {
     ITapoCredentialProvider? credential = null
   ) where TAddress : notnull
     => new(
-      deviceEndPoint: TapoDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         address: deviceAddress,
         serviceProvider.GetDeviceEndPointFactory<TAddress>()
       ),

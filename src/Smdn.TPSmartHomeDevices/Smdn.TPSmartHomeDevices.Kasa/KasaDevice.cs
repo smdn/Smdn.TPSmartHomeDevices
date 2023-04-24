@@ -89,7 +89,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPoint: KasaDeviceEndPoint.Create(host),
+      deviceEndPoint: DeviceEndPoint.Create(host),
       serviceProvider: serviceProvider
     )
   {
@@ -109,7 +109,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPoint: KasaDeviceEndPoint.Create(ipAddress),
+      deviceEndPoint: DeviceEndPoint.Create(ipAddress),
       serviceProvider: serviceProvider
     )
   {
@@ -131,7 +131,7 @@ public partial class KasaDevice : IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: KasaDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         macAddress,
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),

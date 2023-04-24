@@ -88,7 +88,7 @@ public class HS105 : KasaDevice {
     IServiceProvider serviceProvider
   ) where TAddress : notnull
     => new(
-      deviceEndPoint: KasaDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         address: deviceAddress,
         serviceProvider.GetDeviceEndPointFactory<TAddress>()
       ),

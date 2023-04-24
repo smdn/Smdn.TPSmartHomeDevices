@@ -97,7 +97,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(host),
+      deviceEndPoint: DeviceEndPoint.Create(host),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -121,7 +121,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(host),
+      deviceEndPoint: DeviceEndPoint.Create(host),
       credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -151,7 +151,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider? serviceProvider = null
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(ipAddress),
+      deviceEndPoint: DeviceEndPoint.Create(ipAddress),
       credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -169,7 +169,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(ipAddress),
+      deviceEndPoint: DeviceEndPoint.Create(ipAddress),
       credential: null,
       exceptionHandler: null,
       serviceProvider: serviceProvider
@@ -201,7 +201,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         macAddress,
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),
@@ -229,7 +229,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     IServiceProvider serviceProvider
   )
     : this(
-      deviceEndPoint: TapoDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         macAddress,
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),

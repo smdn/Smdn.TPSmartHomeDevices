@@ -2,39 +2,29 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net;
-using System.Net.NetworkInformation;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal static class DeviceEndPoint {
-  public static IDeviceEndPoint Create(string host, int port)
-    => Create(
+public static class DeviceEndPoint {
+  public static IDeviceEndPoint Create(string host)
+    => new StaticDeviceEndPoint(
       new DnsEndPoint(
         host: host ?? throw new ArgumentNullException(nameof(host)),
-        port: port
+        port: 0
       )
     );
 
-  public static IDeviceEndPoint Create(IPAddress ipAddress, int port)
-    => Create(
+  public static IDeviceEndPoint Create(IPAddress ipAddress)
+    => new StaticDeviceEndPoint(
       new IPEndPoint(
         address: ipAddress ?? throw new ArgumentNullException(nameof(ipAddress)),
-        port: port
+        port: 0
       )
     );
 
   public static IDeviceEndPoint Create(EndPoint endPoint)
     => new StaticDeviceEndPoint(
       endPoint ?? throw new ArgumentNullException(nameof(endPoint))
-    );
-
-  public static IDeviceEndPoint Create(
-    PhysicalAddress macAddress,
-    IDeviceEndPointFactory<PhysicalAddress> endPointFactory
-  )
-    => Create(
-      address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
-      endPointFactory: endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory))
     );
 
   public static IDeviceEndPoint Create<TAddress>(

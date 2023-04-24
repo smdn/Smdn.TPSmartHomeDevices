@@ -95,7 +95,7 @@ public class KL130 : KasaDevice {
     IServiceProvider serviceProvider
   ) where TAddress : notnull
     => new(
-      deviceEndPoint: KasaDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         address: deviceAddress,
         serviceProvider.GetDeviceEndPointFactory<TAddress>()
       ),

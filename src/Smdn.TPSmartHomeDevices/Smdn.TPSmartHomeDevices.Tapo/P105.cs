@@ -136,7 +136,7 @@ public class P105 : TapoDevice {
     ITapoCredentialProvider? credential = null
   ) where TAddress : notnull
     => new(
-      deviceEndPoint: TapoDeviceEndPoint.Create(
+      deviceEndPoint: DeviceEndPoint.Create(
         address: deviceAddress,
         serviceProvider.GetDeviceEndPointFactory<TAddress>()
       ),
