@@ -8,7 +8,10 @@ var services = new ServiceCollection();
 services
   .AddLogging(
     static builder => builder
-      .AddSimpleConsole(static options => options.SingleLine = true)
+      .AddSimpleConsole(static options => {
+        options.IncludeScopes = true;
+        options.SingleLine = true;
+      })
       .AddFilter(static level => LogLevel.Trace <= level)
   );
 

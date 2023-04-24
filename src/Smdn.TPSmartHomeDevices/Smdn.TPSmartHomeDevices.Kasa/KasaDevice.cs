@@ -20,6 +20,22 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 public partial class KasaDevice : IDisposable {
+  private readonly struct LoggerScopeEndPointState {
+    public EndPoint CurrentEndPoint { get; }
+    public IDeviceEndPoint DeviceEndPoint { get; }
+
+    public LoggerScopeEndPointState(EndPoint currentEndPoint, IDeviceEndPoint deviceEndPoint)
+    {
+      CurrentEndPoint = currentEndPoint;
+      DeviceEndPoint = deviceEndPoint;
+    }
+
+    public override string? ToString()
+      => DeviceEndPoint is DeviceEndPoint.StaticDeviceEndPoint
+        ? $"{DeviceEndPoint}"
+        : $"{CurrentEndPoint} ({DeviceEndPoint})";
+  }
+
 #pragma warning disable SA1114
   protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
@@ -311,6 +327,8 @@ public partial class KasaDevice : IDisposable {
 
         if (client is not null && !client.EndPoint.Equals(endPoint)) {
           // endpoint has changed, recreate client with new endpoint
+          using var loggerScopeCurrentEndPoint = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
+
           client.Logger?.LogInformation(
             "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
             client.EndPoint,
@@ -324,16 +342,19 @@ public partial class KasaDevice : IDisposable {
 
       cancellationToken.ThrowIfCancellationRequested();
 
-      client ??= new KasaClient(
-        endPoint: endPoint,
-        buffer: buffer,
-        logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger(GenerateLoggerCategoryName())
-      );
+      if (client is null) {
+        var logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>();
 
-      string GenerateLoggerCategoryName()
-        => deviceEndPoint is IDynamicDeviceEndPoint
-          ? $"{nameof(KasaClient)}({endPoint}, {deviceEndPoint})"
-          : $"{nameof(KasaClient)}({endPoint})";
+        using var loggerScopeNewClient = logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
+
+        client ??= new KasaClient(
+          endPoint: endPoint,
+          buffer: buffer,
+          logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>()
+        );
+      }
+
+      using var loggerScopeSend = client.Logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
 
       try {
         return await client.SendAsync(

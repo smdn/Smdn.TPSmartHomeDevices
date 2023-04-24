@@ -21,6 +21,22 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
+  private readonly struct LoggerScopeEndPointState {
+    public EndPoint CurrentEndPoint { get; }
+    public IDeviceEndPoint DeviceEndPoint { get; }
+
+    public LoggerScopeEndPointState(EndPoint currentEndPoint, IDeviceEndPoint deviceEndPoint)
+    {
+      CurrentEndPoint = currentEndPoint;
+      DeviceEndPoint = deviceEndPoint;
+    }
+
+    public override string? ToString()
+      => DeviceEndPoint is DeviceEndPoint.StaticDeviceEndPoint
+        ? $"{DeviceEndPoint}"
+        : $"{CurrentEndPoint} ({DeviceEndPoint})";
+  }
+
   private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
 
 #if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
@@ -324,6 +340,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 
     if (client is not null && !client.EndPoint.Equals(endPoint)) {
       // endpoint has changed, recreate client with new endpoint
+      using var loggerScopeCurrentEndPoint = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
+
       client.Logger?.LogInformation(
         "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
         client.EndPoint,
@@ -334,21 +352,24 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
       client = null;
     }
 
-    client ??= new TapoClient(
-      endPoint: endPoint,
-      httpClientFactory: serviceProvider?.GetService<IHttpClientFactory>(),
-      logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger(GenerateLoggerCategoryName())
-    );
+    if (client is null) {
+      var logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<TapoClient>();
 
-    string GenerateLoggerCategoryName()
-      => deviceEndPoint is IDynamicDeviceEndPoint
-        ? $"{nameof(TapoClient)}({endPoint}, {deviceEndPoint})"
-        : $"{nameof(TapoClient)}({endPoint})";
+      using var loggerScopeNewClient = logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
+
+      client = new TapoClient(
+        endPoint: endPoint,
+        httpClientFactory: serviceProvider?.GetService<IHttpClientFactory>(),
+        logger: logger
+      );
+    }
 
     if (client.Session is not null)
       return;
 
     cancellationToken.ThrowIfCancellationRequested();
+
+    using var loggerScopeAuthentication = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
 
     try {
       await client.AuthenticateAsync(
@@ -434,6 +455,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
       cancellationToken.ThrowIfCancellationRequested();
 
       client!.Timeout = Timeout;
+
+      using var loggerScopeSendRequest = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
 
       try {
         var response = await client.SendRequestAsync<TRequest, TResponse>(

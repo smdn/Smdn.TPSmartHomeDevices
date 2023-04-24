@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 internal static class DeviceEndPoint {
-  private sealed class StaticDeviceEndPoint : IDeviceEndPoint {
+  internal sealed class StaticDeviceEndPoint : IDeviceEndPoint {
     private readonly EndPoint endPoint;
 
     public StaticDeviceEndPoint(EndPoint endPoint)
