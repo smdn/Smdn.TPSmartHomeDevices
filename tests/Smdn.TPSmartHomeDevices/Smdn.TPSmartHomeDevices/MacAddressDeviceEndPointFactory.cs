@@ -64,7 +64,6 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.DoesNotThrow(factory.Dispose, "Dispose #2");
 
     Assert.Throws<ObjectDisposedException>(() => factory.Create(PhysicalAddress.None));
-    Assert.Throws<ObjectDisposedException>(() => factory.Create(PhysicalAddress.None, port: 39999));
   }
 
   [Test]
@@ -78,21 +77,6 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
     Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.ResolveAsync());
-  }
-
-  [TestCase(0)]
-  [TestCase(80)]
-  [TestCase(9999)]
-  public async Task Create_WithPort(int port)
-  {
-    using var factory = new StaticMacAddressDeviceEndPointFactory(TestIPAddress);
-
-    var endPoint = factory.Create(PhysicalAddress.None, port);
-
-    Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
-    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.ResolveAsync());
   }
 
   [Test]
@@ -153,8 +137,6 @@ public class MacAddressDeviceEndPointFactoryTests {
   [Test]
   public async Task CreatedDeviceEndPoint_ResolveAsync_Resolved()
   {
-    const int port = 80;
-
     using var factory = new ConcreteMacAddressDeviceEndPointFactory(
       resolver: new PseudoMacAddressResolver(
         new Dictionary<PhysicalAddress, IPAddress>() {
@@ -163,26 +145,24 @@ public class MacAddressDeviceEndPointFactoryTests {
       )
     );
 
-    var endPoint = factory.Create(address: TestMacAddress, port: port);
+    var endPoint = factory.Create(address: TestMacAddress);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
 
     Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port), await endPoint.ResolveAsync());
+    Assert.AreEqual(new IPEndPoint(TestIPAddress, 0), await endPoint.ResolveAsync());
   }
 
   [Test]
   public async Task CreatedDeviceEndPoint_ResolveAsync_NotResolved()
   {
-    const int port = 80;
-
     using var factory = new ConcreteMacAddressDeviceEndPointFactory(
       resolver: new PseudoMacAddressResolver(
         new Dictionary<PhysicalAddress, IPAddress>() { }
       )
     );
 
-    var endPoint = factory.Create(address: TestMacAddress, port: port);
+    var endPoint = factory.Create(address: TestMacAddress);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
 
@@ -191,10 +171,8 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPoint_Invalidate()
+  public void CreatedDeviceEndPoint_Invalidate()
   {
-    const int port = 80;
-
     using var factory = new ConcreteMacAddressDeviceEndPointFactory(
       resolver: new PseudoMacAddressResolver(
         new Dictionary<PhysicalAddress, IPAddress>() {
@@ -203,7 +181,7 @@ public class MacAddressDeviceEndPointFactoryTests {
       )
     );
 
-    var endPoint = factory.Create(address: TestMacAddress, port: port);
+    var endPoint = factory.Create(address: TestMacAddress);
 
     Assert.IsNotNull(endPoint, nameof(endPoint));
     Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
@@ -214,10 +192,10 @@ public class MacAddressDeviceEndPointFactoryTests {
       async () => resolvedEndPointAddress = await endPoint.ResolveAsync()
     );
     Assert.IsNotNull(resolvedEndPointAddress, nameof(resolvedEndPointAddress));
-    Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, port), nameof(resolvedEndPointAddress));
+    Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, 0), nameof(resolvedEndPointAddress));
 
     // invalidate
-    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint).Invalidate());
+    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint)!.Invalidate());
 
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 

@@ -3,5 +3,5 @@
 namespace Smdn.TPSmartHomeDevices;
 
 public interface IDeviceEndPointFactory<TAddress> where TAddress : notnull {
-  IDeviceEndPoint Create(TAddress address, int port = 0);
+  IDeviceEndPoint Create(TAddress address);
 }

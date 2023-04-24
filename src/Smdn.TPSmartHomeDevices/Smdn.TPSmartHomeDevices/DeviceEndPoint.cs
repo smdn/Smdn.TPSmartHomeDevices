@@ -30,23 +30,17 @@ internal static class DeviceEndPoint {
 
   public static IDeviceEndPoint Create(
     PhysicalAddress macAddress,
-    int port,
     IDeviceEndPointFactory<PhysicalAddress> endPointFactory
   )
     => Create(
       address: macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
-      port: port,
       endPointFactory: endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory))
     );
 
   public static IDeviceEndPoint Create<TAddress>(
     TAddress address,
-    int port,
     IDeviceEndPointFactory<TAddress> endPointFactory
   ) where TAddress : notnull
     => (endPointFactory ?? throw new ArgumentNullException(nameof(endPointFactory)))
-      .Create(
-        address: address ?? throw new ArgumentNullException(nameof(address)),
-        port: port
-      );
+      .Create(address: address ?? throw new ArgumentNullException(nameof(address)));
 }

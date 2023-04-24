@@ -14,17 +14,14 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   protected class MacAddressDeviceEndPoint : IDynamicDeviceEndPoint {
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;
-    private readonly int port;
 
     public MacAddressDeviceEndPoint(
       IAddressResolver<PhysicalAddress, IPAddress> resolver,
-      PhysicalAddress address,
-      int port
+      PhysicalAddress address
     )
     {
       this.resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
       this.address = address ?? throw new ArgumentNullException(nameof(address));
-      this.port = port;
     }
 
     public async ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
@@ -38,7 +35,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
         ? null
         : new IPEndPoint(
             address: resolvedAddress,
-            port: port
+            port: 0
           );
     }
 
@@ -110,17 +107,13 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
       throw new ObjectDisposedException(GetType().FullName);
   }
 
-  public virtual IDeviceEndPoint Create(
-    PhysicalAddress address,
-    int port = 0
-  )
+  public virtual IDeviceEndPoint Create(PhysicalAddress address)
   {
     ThrowIfDisposed();
 
     return new MacAddressDeviceEndPoint(
       resolver: resolver,
-      address: address ?? throw new ArgumentNullException(nameof(address)),
-      port: port
+      address: address ?? throw new ArgumentNullException(nameof(address))
     );
   }
 }
