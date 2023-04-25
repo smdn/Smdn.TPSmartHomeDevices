@@ -12,7 +12,9 @@ using Microsoft.Extensions.Logging;
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 /// <remarks>
-/// This implementation is based on and ported from the following implementation: <see href="https://github.com/plasticrake/tplink-smarthome-api">plasticrake/tplink-smarthome-api</see>.
+/// This implementation is based on and ported from the following
+/// TypeScript implementation by <see href="https://github.com/plasticrake">Donald Patrick Seal</see>:
+/// <see href="https://github.com/plasticrake/tplink-smarthome-crypto">plasticrake/tplink-smarthome-crypto</see>, published under the MIT License.
 /// </remarks>
 public static class KasaJsonSerializer {
   public const byte InitialKey = 0xAB;

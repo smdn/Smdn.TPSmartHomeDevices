@@ -19,3 +19,12 @@ The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https:
   - Supports dependency injection (Microsoft.Extensions.DependencyInjection)
     - Logging (Microsoft.Extensions.Logging)
     - HTTP (Microsoft.Extensions.Http)
+
+# Notice
+## Credit
+This project incorporates implementations partially ported from the following projects. See also [ThirdPartyNotices.md](./ThirdPartyNotices.md) for detail.
+
+- [fishbigger/TapoP100](https://github.com/fishbigger/TapoP100)
+- [europowergenerators/Tapo-plug-controller](https://github.com/europowergenerators/Tapo-plug-controller)
+- [plasticrake/tplink-smarthome-api](https://github.com/plasticrake/tplink-smarthome-api/)
+- [plasticrake/tplink-smarthome-crypto](https://github.com/plasticrake/tplink-smarthome-crypto)

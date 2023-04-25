@@ -9,7 +9,9 @@ using Smdn.Formats;
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 /// <remarks>
-/// This implementation is based on and ported from the following implementation: <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>.
+/// This implementation is based on and ported from the following
+/// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
+/// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
 public static class TapoCredentialUtils {
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHSIZEINBYTES

@@ -8,6 +8,11 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <remarks>
+/// This implementation is based on the following
+/// C# implementation by <see href="https://github.com/europowergenerators">E-Power International</see>:
+/// <see href="https://github.com/europowergenerators/Tapo-plug-controller">europowergenerators/Tapo-plug-controller</see>, published under the MIT License.
+/// </remarks>
 public sealed class TapoSession : IDisposable {
   internal static readonly Uri RequestPath = new("/app", UriKind.Relative);
 

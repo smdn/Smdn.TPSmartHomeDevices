@@ -50,4 +50,14 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Third party notice -->
+    <None
+      Include="$(MSBuildThisFileDirectory)..\..\ThirdPartyNotices.md"
+      Pack="true"
+      PackagePath="ThirdPartyNotices.md"
+      CopyToOutputDirectory="None"
+    />
+  </ItemGroup>
+
 </Project>
