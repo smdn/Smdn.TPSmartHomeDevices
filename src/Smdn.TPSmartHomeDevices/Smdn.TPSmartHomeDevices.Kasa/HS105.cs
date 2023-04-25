@@ -83,7 +83,11 @@ public class HS105 : KasaDevice {
   {
   }
 
-  public static HS105 Create<TAddress>(
+  /// <summary>
+  /// Initializes a new instance of the <see cref="HS105"/> class.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice.Create{TAddress}(TAddress, IServiceProvider)" />
+  public static new HS105 Create<TAddress>(
     TAddress deviceAddress,
     IServiceProvider serviceProvider
   ) where TAddress : notnull

@@ -48,4 +48,34 @@ partial class KasaDevice {
       deviceEndPoint: deviceEndPoint,
       serviceProvider: serviceProvider
     );
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KasaDevice"/> class.
+  /// </summary>
+  /// <typeparam name="TAddress">The type that represents an address of device endpoint.</typeparam>
+  /// <param name="deviceAddress">
+  /// A <typeparamref name="TAddress"/> that provides the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must be registered to create an end point from the <paramref name="deviceAddress"/>.
+  /// </param>
+  /// <exception cref="InvalidOperationException">
+  /// No service for type <see cref="IDeviceEndPointFactory{TAddress}"/> has been registered for <paramref name="serviceProvider"/>.
+  /// </exception>
+  /// <exception cref="ArgumentNullException">
+  /// <paramref name="deviceAddress"/> is <see langword="null"/>.
+  /// Or <paramref name="serviceProvider"/> is <see langword="null"/>.
+  /// </exception>
+  public static KasaDevice Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: DeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      serviceProvider: serviceProvider
+    );
 }

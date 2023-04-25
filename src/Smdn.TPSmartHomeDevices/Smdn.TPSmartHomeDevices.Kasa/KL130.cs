@@ -90,7 +90,11 @@ public class KL130 : KasaDevice {
   {
   }
 
-  public static KL130 Create<TAddress>(
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KL130"/> class.
+  /// </summary>
+  /// <inheritdoc cref="KasaDevice.Create{TAddress}(TAddress, IServiceProvider)" />
+  public static new KL130 Create<TAddress>(
     TAddress deviceAddress,
     IServiceProvider serviceProvider
   ) where TAddress : notnull
