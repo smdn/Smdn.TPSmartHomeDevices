@@ -14,11 +14,25 @@ The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https:
     - L530 multicolor bulb
     - L900 multicolor light strip
     - P105 smart plug
+- Supported device features
+  - Turn on/off
+  - Set color (color temperature)
+  - Set color (hue and saturation)
+  - Set brightness
+  - Get device informations (Tapo)
+  - Get light color/brightness
+  - Get on/off stete
 - Other features
   - Finding the device by MAC address, for DHCP networks
-  - Supports dependency injection (Microsoft.Extensions.DependencyInjection)
-    - Logging (Microsoft.Extensions.Logging)
-    - HTTP (Microsoft.Extensions.Http)
+  - Resilience from errors
+    - Automatic session management, re-authentication and reconnection
+    - Supports recovery processing for major error codes
+      - Customizable error handling
+    - Support for endpoint changes in dynamic IP networks
+  - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
+    - Logging (`Microsoft.Extensions.Logging`)
+    - HTTP (`Microsoft.Extensions.Http`)
+  - Tested with pseudo devices and actual devices
 
 # Notice
 ## License
