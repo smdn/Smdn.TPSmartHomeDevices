@@ -21,6 +21,24 @@ The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https:
     - HTTP (Microsoft.Extensions.Http)
 
 # Notice
+## License
+This project is licensed under the terms of the [MIT License](./LICENSE.txt).
+
+## Disclaimer
+(An English translation for the reference follows the text written in Japanese.)
+
+本プロジェクトは、TP-Linkとは無関係の非公式なものです。
+
+This is an unofficial project that has no affiliation with TP-Link.
+
+本プロジェクトが提供するソフトウェアは、デバイスの設定の取得・変更等、製品仕様の範囲内での操作のみを行うものであり、ファームウェアの改変・修正および製品の改造や製品仕様の変更を引き起こさないものの、**製品使用上の許諾事項に抵触する可能性は否定できないため、使用の際はその点にご留意ください。**
+
+The software provided by this project is intended only for operations within the scope of the product specifications, such as acquiring and changing device settings, and while it does not cause altering the product itself, product's firmware or operating specifications. **Nevertheless, please note that the possibility of violating terms of use of the product cannot be dismissed when using the software provided by this project.**
+
+[Tapo](https://www.tapo.com/)、[Kasa](https://www.kasasmart.com/)、および各製品名の著作権は[TP-Link](https://www.tp-link.com/)に帰属します。
+
+[Tapo](https://www.tapo.com/), [Kasa](https://www.kasasmart.com/) and all respective product names are copyright of [TP-Link](https://www.tp-link.com/).
+
 ## Credit
 This project incorporates implementations partially ported from the following projects. See also [ThirdPartyNotices.md](./ThirdPartyNotices.md) for detail.
 
