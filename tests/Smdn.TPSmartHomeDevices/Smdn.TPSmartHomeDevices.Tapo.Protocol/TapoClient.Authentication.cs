@@ -702,8 +702,8 @@ partial class TapoClientTests {
       "does not contain unmasked password"
     );
 
-    var encodedUsername = TapoCredentialUtils.ToBase64EncodedSHA1DigestString(username);
-    var encodedPassword = TapoCredentialUtils.ToBase64EncodedString(password);
+    var encodedUsername = TapoCredentials.ToBase64EncodedSHA1DigestString(username);
+    var encodedPassword = TapoCredentials.ToBase64EncodedString(password);
 
     Assert.IsTrue(
       logger.Logs.All(line => !line.Contains(encodedUsername)),

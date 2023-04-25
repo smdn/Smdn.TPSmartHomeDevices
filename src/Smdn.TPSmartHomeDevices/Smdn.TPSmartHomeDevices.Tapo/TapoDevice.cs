@@ -98,7 +98,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(host),
-      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentials.CreateProviderFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -152,7 +152,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(ipAddress),
-      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentials.CreateProviderFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )
@@ -205,7 +205,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
         macAddress ?? throw new ArgumentNullException(nameof(macAddress)),
         serviceProvider.GetDeviceEndPointFactory<PhysicalAddress>()
       ),
-      credential: TapoCredentialProviderFactory.CreateFromPlainText(email, password),
+      credential: TapoCredentials.CreateProviderFromPlainText(email, password),
       exceptionHandler: null,
       serviceProvider: serviceProvider
     )

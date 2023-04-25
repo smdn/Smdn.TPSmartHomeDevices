@@ -4,6 +4,7 @@ using System;
 using System.Buffers;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Smdn.Formats;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -13,7 +14,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
-public static class TapoCredentialUtils {
+public static class TapoCredentials {
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHSIZEINBYTES
   private const int SHA1HashSizeInBytes = SHA1.HashSizeInBytes;
 #else
@@ -118,6 +119,72 @@ public static class TapoCredentialUtils {
     finally {
       if (bytes is not null)
         ArrayPool<byte>.Shared.Return(bytes, clearArray: true);
+    }
+  }
+
+  internal static ITapoCredentialProvider CreateProviderFromPlainText(string email, string password)
+    => new SingleIdentityStringCredentialProvider(
+      username: email ?? throw new ArgumentNullException(nameof(email)),
+      password: password ?? throw new ArgumentNullException(nameof(password)),
+      isPlainText: true
+    );
+
+  internal static ITapoCredentialProvider CreateProviderFromBase64EncodedText(
+    string base64UserNameSHA1Digest,
+    string base64Password
+  )
+    => new SingleIdentityStringCredentialProvider(
+      username: base64UserNameSHA1Digest ?? throw new ArgumentNullException(nameof(base64UserNameSHA1Digest)),
+      password: base64Password ?? throw new ArgumentNullException(nameof(base64Password)),
+      isPlainText: false
+    );
+
+  private sealed class SingleIdentityStringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
+    private readonly byte[] utf8Username;
+    private readonly byte[] utf8Password;
+    private readonly bool isPlainText;
+
+    public SingleIdentityStringCredentialProvider(
+      string username,
+      string password,
+      bool isPlainText
+    )
+    {
+      utf8Username = Encoding.UTF8.GetBytes(username);
+      utf8Password = Encoding.UTF8.GetBytes(password);
+      this.isPlainText = isPlainText;
+    }
+
+    ITapoCredential ITapoCredentialProvider.GetCredential(ITapoCredentialIdentity? identity) => this;
+
+    void IDisposable.Dispose() { /* nothing to do */ }
+
+    void ITapoCredential.WritePasswordPropertyValue(Utf8JsonWriter writer)
+    {
+      if (isPlainText)
+        writer.WriteBase64StringValue(utf8Password);
+      else
+        writer.WriteStringValue(utf8Password);
+    }
+
+    void ITapoCredential.WriteUsernamePropertyValue(Utf8JsonWriter writer)
+    {
+      if (isPlainText) {
+        Span<byte> buffer = stackalloc byte[HexSHA1HashSizeInBytes];
+
+        try {
+          if (!TryConvertToHexSHA1Hash(utf8Username, buffer, out _))
+            throw new InvalidOperationException("failed to encode username property");
+
+          writer.WriteBase64StringValue(buffer);
+        }
+        finally {
+          buffer.Clear();
+        }
+      }
+      else {
+        writer.WriteStringValue(utf8Username);
+      }
     }
   }
 }

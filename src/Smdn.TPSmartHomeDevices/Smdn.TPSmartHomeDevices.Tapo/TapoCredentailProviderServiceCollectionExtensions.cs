@@ -20,7 +20,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     services.TryAdd(
       ServiceDescriptor.Singleton(
         typeof(ITapoCredentialProvider),
-        TapoCredentialProviderFactory.CreateFromPlainText(email, password)
+        TapoCredentials.CreateProviderFromPlainText(email, password)
       )
     );
 
@@ -39,7 +39,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     services.TryAdd(
       ServiceDescriptor.Singleton(
         typeof(ITapoCredentialProvider),
-        TapoCredentialProviderFactory.CreateFromBase64EncodedText(base64UserNameSHA1Digest, base64Password)
+        TapoCredentials.CreateProviderFromBase64EncodedText(base64UserNameSHA1Digest, base64Password)
       )
     );
 
