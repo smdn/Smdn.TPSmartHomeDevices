@@ -1,17 +1,26 @@
-﻿using System.Net.NetworkInformation;
-using Smdn.Net.AddressResolution;
+﻿using System;
+using System.Net.NetworkInformation;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using Smdn.Net;
 using Smdn.TPSmartHomeDevices;
 using Smdn.TPSmartHomeDevices.Tapo;
 
-var macAddressEndPointFactory = new MacAddressDeviceEndPointFactory(
-  new MacAddressResolverOptions() {
-    NmapTargetSpecification = "192.0.2.0-255"
-  }
+var services = new ServiceCollection();
+
+services.AddDeviceEndPointFactory(
+  new MacAddressDeviceEndPointFactory(
+    networkProfile: IPNetworkProfile.Create()
+  )
 );
 
-var deviceMacAddress = PhysicalAddress.Parse("00:00:5E:00:53:00");
-
-var bulb = new L530(macAddressEndPointFactory.Create(deviceMacAddress));
+var bulb = new L530(
+  macAddress: PhysicalAddress.Parse("00:00:5E:00:53:00"),
+  email: "user@mail.test",
+  password: "password",
+  serviceProvider: services.BuildServiceProvider()
+);
 
 Console.WriteLine("EndPoint: {0}", await bulb.ResolveEndPointAsync());
 
