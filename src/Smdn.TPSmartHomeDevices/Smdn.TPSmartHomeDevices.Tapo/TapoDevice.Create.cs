@@ -96,4 +96,42 @@ partial class TapoDevice {
       credential: credential,
       serviceProvider: serviceProvider
     );
+
+  /// <inheritdoc
+  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   path="/summary"
+  /// />
+  /// <typeparam name="TAddress">The type that represents an address of device endpoint.</typeparam>
+  /// <param name="deviceAddress">
+  /// A <typeparamref name="TAddress"/> that provides the device end point.
+  /// </param>
+  /// <param name="serviceProvider">
+  /// A <see cref="IServiceProvider"/>.
+  /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must be registered to create an end point from the <paramref name="deviceAddress"/>.
+  /// Also <see cref="ITapoCredentialProvider"/> must be registered if the <paramref name="credential"/> is <see langword="null"/>.
+  /// </param>
+  /// <param name="credential">
+  /// A <see cref="ITapoCredentialProvider"/> that provides the credentials required for authentication.
+  /// </param>
+  /// <exception cref="InvalidOperationException">
+  /// No service for type <see cref="IDeviceEndPointFactory{TAddress}"/> has been registered for <paramref name="serviceProvider"/>.
+  /// <paramref name="credential"/> is <see langword="null"/> and no service for type <see cref="ITapoCredentialProvider"/> has been registered for <paramref name="serviceProvider"/>.
+  /// </exception>
+  /// <exception cref="ArgumentNullException">
+  /// <paramref name="deviceAddress"/> is <see langword="null"/>.
+  /// Or <paramref name="serviceProvider"/> is <see langword="null"/>.
+  /// </exception>
+  public static TapoDevice Create<TAddress>(
+    TAddress deviceAddress,
+    IServiceProvider serviceProvider,
+    ITapoCredentialProvider? credential = null
+  ) where TAddress : notnull
+    => new(
+      deviceEndPoint: DeviceEndPoint.Create(
+        address: deviceAddress,
+        serviceProvider.GetDeviceEndPointFactory<TAddress>()
+      ),
+      credential: credential,
+      serviceProvider: serviceProvider
+    );
 }

@@ -134,7 +134,8 @@ public class L900 : TapoDevice {
   {
   }
 
-  public static L900 Create<TAddress>(
+  /// <inheritdoc cref="TapoDevice.Create{TAddress}(TAddress, IServiceProvider, ITapoCredentialProvider?)" />
+  public static new L900 Create<TAddress>(
     TAddress deviceAddress,
     IServiceProvider serviceProvider,
     ITapoCredentialProvider? credential = null

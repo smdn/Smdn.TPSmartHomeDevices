@@ -130,7 +130,8 @@ public class P105 : TapoDevice {
   {
   }
 
-  public static P105 Create<TAddress>(
+  /// <inheritdoc cref="TapoDevice.Create{TAddress}(TAddress, IServiceProvider, ITapoCredentialProvider?)" />
+  public static new P105 Create<TAddress>(
     TAddress deviceAddress,
     IServiceProvider serviceProvider,
     ITapoCredentialProvider? credential = null
