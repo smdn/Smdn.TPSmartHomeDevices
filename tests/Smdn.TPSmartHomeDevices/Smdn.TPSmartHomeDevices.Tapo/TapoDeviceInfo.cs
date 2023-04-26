@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -31,14 +32,14 @@ public class TapoDeviceInfoTests {
   public void DeserializeCommonProperties()
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>($@"{{
-""device_id"": ""<device_id>"",
+""device_id"": ""0123456789ABCDEF"",
 ""type"": ""<type>"",
 ""model"": ""<model>"",
-""fw_id"": ""<fw_id>"",
+""fw_id"": ""23456789ABCDEF01"",
 ""fw_ver"": ""<fw_ver>"",
-""hw_id"": ""<hw_id>"",
+""hw_id"": ""456789ABCDEF0123"",
 ""hw_ver"": ""<hw_ver>"",
-""oem_id"": ""<oem_id>"",
+""oem_id"": ""6789ABCDEF012345"",
 ""mac"": ""00:00:5E:00:53:00"",
 ""specs"": ""<specs>"",
 ""lang"": ""<lang>"",
@@ -60,14 +61,14 @@ public class TapoDeviceInfoTests {
 
     Assert.IsNotNull(info);
     Assert.AreNotEqual(DateTime.MinValue, info!.TimeStamp, nameof(info.TimeStamp));
-    Assert.AreEqual("<device_id>", info!.Id, nameof(info.Id));
+    CollectionAssert.AreEqual(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }, info!.Id, nameof(info.Id));
     Assert.AreEqual("<type>", info!.TypeName, nameof(info.TypeName));
     Assert.AreEqual("<model>", info!.ModelName, nameof(info.ModelName));
-    Assert.AreEqual("<fw_id>", info!.FirmwareId, nameof(info.FirmwareId));
+    CollectionAssert.AreEqual(new byte[] { 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01 }, info!.FirmwareId, nameof(info.FirmwareId));
     Assert.AreEqual("<fw_ver>", info!.FirmwareVersion, nameof(info.FirmwareVersion));
-    Assert.AreEqual("<hw_id>", info!.HardwareId, nameof(info.HardwareId));
+    CollectionAssert.AreEqual(new byte[] { 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23 }, info!.HardwareId, nameof(info.HardwareId));
     Assert.AreEqual("<hw_ver>", info!.HardwareVersion, nameof(info.HardwareVersion));
-    Assert.AreEqual("<oem_id>", info!.OemId, nameof(info.OemId));
+    CollectionAssert.AreEqual(new byte[] { 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45 }, info!.OemId, nameof(info.OemId));
     Assert.AreEqual(PhysicalAddress.Parse("00:00:5E:00:53:00"), info!.MacAddress, nameof(info.MacAddress));
     Assert.AreEqual("<specs>", info!.HardwareSpecifications, nameof(info.HardwareSpecifications));
     Assert.AreEqual("<lang>", info!.Language, nameof(info.Language));
@@ -85,6 +86,69 @@ public class TapoDeviceInfoTests {
     Assert.AreEqual("<ssid>", info!.NetworkSsid, nameof(info.NetworkSsid));
     Assert.AreEqual(999, info!.NetworkSignalLevel, nameof(info.NetworkSignalLevel));
     Assert.AreEqual(99.999m, info!.NetworkRssi, nameof(info.NetworkRssi));
+  }
+
+  private static System.Collections.Generic.IEnumerable<(string, byte[]?)> YieldTestCases_IdProperties()
+  {
+    yield return ("{}", null);
+    yield return (@"{""<ID>"": ""invalid""}", null);
+    yield return (@"{""<ID>"": ""0""}", null); // invalid
+    yield return (@"{""<ID>"": ""012""}", null); // invalid
+    yield return (@"{""<ID>"": """"}", Array.Empty<byte>());
+    yield return (@"{""<ID>"": ""01""}", new byte[] { 0x01 });
+    yield return (@"{""<ID>"": ""0123456789ABCDEF""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_Id()
+    => YieldTestCases_IdProperties()
+      .Select(static ((string Json, byte[]? Expected) testCase) => new object?[] { testCase.Json.Replace("<ID>", "device_id"), testCase.Expected });
+
+  [TestCaseSource(nameof(YieldTestCases_Id))]
+  public void Id(string json, byte[]? expected)
+  {
+    var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
+
+    Assert.IsNotNull(info);
+    CollectionAssert.AreEqual(expected, info.Id);
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_HardwareId()
+    => YieldTestCases_IdProperties()
+      .Select(static ((string Json, byte[]? Expected) testCase) => new object?[] { testCase.Json.Replace("<ID>", "hw_id"), testCase.Expected });
+
+  [TestCaseSource(nameof(YieldTestCases_HardwareId))]
+  public void HardwareId(string json, byte[]? expected)
+  {
+    var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
+
+    Assert.IsNotNull(info);
+    CollectionAssert.AreEqual(expected, info.HardwareId);
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_FirmwareId()
+    => YieldTestCases_IdProperties()
+      .Select(static ((string Json, byte[]? Expected) testCase) => new object?[] { testCase.Json.Replace("<ID>", "fw_id"), testCase.Expected });
+
+  [TestCaseSource(nameof(YieldTestCases_FirmwareId))]
+  public void FirmwareId(string json, byte[]? expected)
+  {
+    var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
+
+    Assert.IsNotNull(info);
+    CollectionAssert.AreEqual(expected, info.FirmwareId);
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_OemId()
+    => YieldTestCases_IdProperties()
+      .Select(static ((string Json, byte[]? Expected) testCase) => new object?[] { testCase.Json.Replace("<ID>", "oem_id"), testCase.Expected });
+
+  [TestCaseSource(nameof(YieldTestCases_OemId))]
+  public void OemId(string json, byte[]? expected)
+  {
+    var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
+
+    Assert.IsNotNull(info);
+    CollectionAssert.AreEqual(expected, info.OemId);
   }
 
   private static System.Collections.IEnumerable YieldTestCases_MacAddress()

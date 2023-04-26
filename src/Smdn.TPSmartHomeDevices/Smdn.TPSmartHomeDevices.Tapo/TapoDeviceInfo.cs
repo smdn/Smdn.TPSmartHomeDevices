@@ -17,7 +17,8 @@ public class TapoDeviceInfo {
    * properties for the informations common to the devices
    */
   [JsonPropertyName("device_id")]
-  public string? Id { get; init; }
+  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  public byte[]? Id { get; init; }
 
   [JsonPropertyName("type")]
   public string? TypeName { get; init; }
@@ -26,19 +27,22 @@ public class TapoDeviceInfo {
   public string? ModelName { get; init; }
 
   [JsonPropertyName("fw_id")]
-  public string? FirmwareId { get; init; }
+  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  public byte[]? FirmwareId { get; init; }
 
   [JsonPropertyName("fw_ver")]
   public string? FirmwareVersion { get; init; }
 
   [JsonPropertyName("hw_id")]
-  public string? HardwareId { get; init; }
+  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  public byte[]? HardwareId { get; init; }
 
   [JsonPropertyName("hw_ver")]
   public string? HardwareVersion { get; init; }
 
   [JsonPropertyName("oem_id")]
-  public string? OemId { get; init; }
+  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  public byte[]? OemId { get; init; }
 
   [JsonPropertyName("mac")]
   [JsonConverter(typeof(MacAddressJsonConverter))]
