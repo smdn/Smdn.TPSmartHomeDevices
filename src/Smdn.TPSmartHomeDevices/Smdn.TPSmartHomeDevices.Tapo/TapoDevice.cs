@@ -576,14 +576,14 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     );
   }
 
-  public ValueTask SetDeviceInfoAsync<TParameters>(
-    TParameters parameters,
+  public ValueTask SetDeviceInfoAsync<TDeviceInfo>(
+    TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<SetDeviceInfoRequest<TParameters>, SetDeviceInfoResponse>(
+    => SendRequestAsync<SetDeviceInfoRequest<TDeviceInfo>, SetDeviceInfoResponse>(
       request: new(
         terminalUuid: TerminalUuidString,
-        parameters: parameters
+        parameters: deviceInfo
       ),
       cancellationToken: cancellationToken
     );
