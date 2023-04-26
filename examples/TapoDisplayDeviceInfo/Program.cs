@@ -38,8 +38,17 @@ for (;;) {
   (Console.CursorLeft, Console.CursorTop) = position;
 
   Console.WriteLine(format, nameof(info.OnTimeDuration), info.OnTimeDuration);
-  Console.WriteLine(format, nameof(info.NetworkSignalLevel), info.NetworkSignalLevel);
+  Console.WriteLine(format, nameof(info.NetworkSignalLevel), $"{info.NetworkSignalLevel}{GetEmojiForSignalLevel(info.NetworkSignalLevel)}");
   Console.WriteLine(format, nameof(info.NetworkRssi), info.NetworkRssi);
 
   await Task.Delay(3000);
 }
+
+static string GetEmojiForSignalLevel(int? level)
+  => level switch {
+    <= 0 => "🔇",
+    1 => "🔈",
+    2 => "🔉",
+    >= 3 =>"🔊",
+    _ => "?"
+  };
