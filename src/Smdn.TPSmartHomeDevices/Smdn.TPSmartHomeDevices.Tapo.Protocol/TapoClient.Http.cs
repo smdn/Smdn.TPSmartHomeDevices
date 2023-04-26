@@ -15,6 +15,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 #pragma warning disable IDE0040
 partial class TapoClient {
 #pragma warning restore IDE0040
+  public static IHttpClientFactory DefaultHttpClientFactory => new TapoHttpClientFactory(
+    configureClient: null
+  );
+
   private static readonly MediaTypeHeaderValue mediaTypeJson = new(mediaType: "application/json");
 
   public TimeSpan? Timeout { get; set; }

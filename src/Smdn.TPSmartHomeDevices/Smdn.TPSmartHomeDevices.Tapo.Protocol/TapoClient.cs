@@ -23,9 +23,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 public sealed partial class TapoClient : IDisposable {
   public const int DefaultPort = 80; // HTTP
 
-  public static IHttpClientFactory DefaultHttpClientFactory => new TapoHttpClientFactory(
-    configureClient: null
-  );
 
   internal static Uri GetEndPointUri(EndPoint endPoint)
   {
