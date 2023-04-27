@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>securePassthrough</c> JSON request.
+/// </summary>
 public readonly struct SecurePassThroughRequest<TPassThroughRequest> :
   ITapoRequest
   where TPassThroughRequest : ITapoPassThroughRequest

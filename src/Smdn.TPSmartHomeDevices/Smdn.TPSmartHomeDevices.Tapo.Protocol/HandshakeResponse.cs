@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>handshake</c> JSON response.
+/// </summary>
 public readonly struct HandshakeResponse : ITapoResponse {
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; init; }

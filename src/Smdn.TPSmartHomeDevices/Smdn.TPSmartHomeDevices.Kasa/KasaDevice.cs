@@ -19,6 +19,14 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
+/// <summary>
+/// Provides abstract APIs to operate Kasa smarthome devices.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
 public partial class KasaDevice : IDisposable {
   private readonly struct LoggerScopeEndPointState {
     public EndPoint CurrentEndPoint { get; }

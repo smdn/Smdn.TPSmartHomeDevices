@@ -20,6 +20,14 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+/// <summary>
+/// Provides abstract APIs to operate Tapo smarthome devices.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
 public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   private readonly struct LoggerScopeEndPointState {
     public EndPoint CurrentEndPoint { get; }
@@ -255,7 +263,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// </param>
-  /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
+  /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   /// <exception cref="ArgumentNullException">
   /// <paramref name="deviceEndPoint"/> is <see langword="null"/>, or both <paramref name="credential"/> and <paramref name="serviceProvider"/> are <see langword="null"/>.
   /// </exception>
@@ -553,6 +561,22 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
 #endif
   }
 
+  /// <summary>
+  /// Gets the Tapo device information.
+  /// </summary>
+  /// <remarks>
+  /// This overload deserializes the obtained JSON response of device information into the type <typeparamref name="TDeviceInfo"/>.
+  /// See <see cref="TapoDeviceInfo"/> for the information about the property names included in the JSON response.
+  /// </remarks>
+  /// <typeparam name="TDeviceInfo">A type to be deserialized from the obtained JSON response.</typeparam>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  /// <returns>
+  /// A <see cref="ValueTask{TResult}"/> representing the result of method.
+  /// </returns>
+  /// <seealso cref="TapoDeviceInfo"/>
   public ValueTask<TDeviceInfo> GetDeviceInfoAsync<TDeviceInfo>(
     CancellationToken cancellationToken = default
   )
@@ -561,6 +585,28 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
       cancellationToken: cancellationToken
     );
 
+  /// <summary>
+  /// Gets the Tapo device information.
+  /// </summary>
+  /// <remarks>
+  /// This overload deserializes the obtained JSON response of device information into the type <typeparamref name="TDeviceInfo"/>.
+  /// This overload also composes or converts the value of deserialized <typeparamref name="TDeviceInfo"/>
+  /// into <typeparamref name="TResult"/> using the specified <see cref="Func{TDeviceInfo, TResult}"/> delegate.
+  /// See <see cref="TapoDeviceInfo"/> for the information about the property names included in the JSON response.
+  /// </remarks>
+  /// <typeparam name="TDeviceInfo">A type to be deserialized from the obtained JSON response.</typeparam>
+  /// <typeparam name="TResult">A type to be composed or converted from the value of <typeparamref name="TDeviceInfo"/>.</typeparam>
+  /// <param name="composeResult">
+  /// The <see cref="Func{TDeviceInfo, TResult}"/> delegate that composes or converts a deserialized <typeparamref name="TDeviceInfo"/> value into the type <typeparamref name="TResult"/>.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  /// <returns>
+  /// A <see cref="ValueTask{TResult}"/> representing the result of method.
+  /// </returns>
+  /// <seealso cref="TapoDeviceInfo"/>
   public ValueTask<TResult> GetDeviceInfoAsync<TDeviceInfo, TResult>(
     Func<TDeviceInfo, TResult> composeResult,
     CancellationToken cancellationToken = default
@@ -576,6 +622,23 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     );
   }
 
+  /// <summary>
+  /// Sets the Tapo device information.
+  /// </summary>
+  /// <remarks>
+  /// This method serializes the values represented by <typeparamref name="TDeviceInfo"/> and specifies
+  /// them as parameters in a JSON request that sets the device information.
+  /// See <see cref="TapoDeviceInfo"/> for the information about the property names included in the JSON request.
+  /// </remarks>
+  /// <typeparam name="TDeviceInfo">A type to be serialized to the parameters of JSON request.</typeparam>
+  /// <param name="deviceInfo">
+  /// The values to be set to the device.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  /// <seealso cref="TapoDeviceInfo"/>
   public ValueTask SetDeviceInfoAsync<TDeviceInfo>(
     TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default

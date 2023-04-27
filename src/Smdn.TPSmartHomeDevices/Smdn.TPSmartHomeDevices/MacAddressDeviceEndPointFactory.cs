@@ -10,11 +10,23 @@ using Smdn.Net.AddressResolution;
 
 namespace Smdn.TPSmartHomeDevices;
 
+/// <summary>
+/// Provides a mechanism for creating <see cref="IDeviceEndPoint"/> that represents the device endpoint by using the MAC address.
+/// </summary>
+/// <seealso cref="IDeviceEndPointFactory{TAddress}" />
 public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAddress>, IDisposable {
+  /// <summary>
+  /// A concrete implementation of <see cref="IDynamicDeviceEndPoint"/>, which represents a device endpoint by MAC address.
+  /// </summary>
   protected class MacAddressDeviceEndPoint : IDynamicDeviceEndPoint {
     private readonly IAddressResolver<PhysicalAddress, IPAddress> resolver;
     private readonly PhysicalAddress address;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MacAddressDeviceEndPoint"/> class.
+    /// </summary>
+    /// <param name="resolver">An <see cref="IAddressResolver{TAddress, TResolvedAddress}"/> that resolves <see cref="PhysicalAddress"/> to <see cref="IPAddress"/>.</param>
+    /// <param name="address"><see cref="PhysicalAddress"/> that representing the MAC address of the device endpoint.</param>
     public MacAddressDeviceEndPoint(
       IAddressResolver<PhysicalAddress, IPAddress> resolver,
       PhysicalAddress address
@@ -51,6 +63,14 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
    */
   private IAddressResolver<PhysicalAddress, IPAddress> resolver; // if null, it indicates a 'disposed' state.
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
+  /// </summary>
+  /// <param name="networkProfile">
+  /// The <see cref="IPNetworkProfile"/> which specifying the network interface and network scan target addresses.
+  /// This is used as necessary for network scan in address resolution.
+  /// </param>
+  /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
   public MacAddressDeviceEndPointFactory(
     IPNetworkProfile networkProfile,
     IServiceProvider? serviceProvider = null
@@ -65,6 +85,13 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
+  /// </summary>
+  /// <param name="resolver">
+  /// The <see cref="MacAddressResolverBase"/> that resolves from a MAC address to a specific <see cref="IPAddress"/>.
+  /// </param>
+  /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
   public MacAddressDeviceEndPointFactory(
     MacAddressResolverBase resolver,
     IServiceProvider? serviceProvider = null

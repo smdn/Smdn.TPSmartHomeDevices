@@ -6,6 +6,9 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>login_device</c> JSON request.
+/// </summary>
 public readonly partial struct LoginDeviceRequest : ITapoPassThroughRequest {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]

@@ -11,6 +11,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
+/// <summary>
+/// Provides the functionalities to serialize and deserialize the JSON of requests and responses when communicating with Kasa devices.
+/// Also applies the crypto algorithm to the (de)serialized JSON.
+/// </summary>
 /// <remarks>
 /// This implementation is based on and ported from the following
 /// TypeScript implementation by <see href="https://github.com/plasticrake">Donald Patrick Seal</see>:

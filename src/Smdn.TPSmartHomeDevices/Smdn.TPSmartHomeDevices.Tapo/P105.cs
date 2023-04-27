@@ -7,6 +7,16 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+/// <summary>
+/// Provides APIs to operate Tapo P105, Mini Smart Wi-Fi Plug.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
+/// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-p105/">Tapo P105 product information (ja)</seealso>
+/// <seealso href="https://www.tapo.com/en/product/smart-plug/tapo-p105/">Tapo P105 product information (en)</seealso>
 public class P105 : TapoDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by host name.

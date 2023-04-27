@@ -21,12 +21,26 @@ partial class TapoDevice {
   }
 #pragma warning restore CA1822
 
+  /// <summary>
+  /// Turns on the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOnAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
       default(TurnOnParameter),
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns off the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOffAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
       default(TurnOffParameter),

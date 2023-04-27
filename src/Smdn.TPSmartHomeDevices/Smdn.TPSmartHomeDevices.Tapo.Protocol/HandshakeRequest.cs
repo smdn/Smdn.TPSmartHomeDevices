@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>handshake</c> JSON request.
+/// </summary>
 public readonly struct HandshakeRequest : ITapoRequest {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]

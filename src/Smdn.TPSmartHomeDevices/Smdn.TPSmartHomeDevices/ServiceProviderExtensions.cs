@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Smdn.TPSmartHomeDevices;
 
-// public interface IDeviceEndPointFactory<TAddress> where TAddress : notnull {
-//
 internal static class ServiceProviderExtensions {
   public static IDeviceEndPointFactory<TAddress> GetDeviceEndPointFactory<TAddress>(
     this IServiceProvider serviceProvider

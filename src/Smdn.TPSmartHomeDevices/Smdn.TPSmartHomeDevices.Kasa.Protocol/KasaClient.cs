@@ -15,6 +15,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
+/// <summary>
+/// Provides a client implementation that sends requests and receives responses according to the protocol used in the Kasa's communication.
+/// </summary>
 /// <remarks>
 /// This implementation is based on and ported from the following
 /// TypeScript implementation by <see href="https://github.com/plasticrake">Donald Patrick Seal</see>:

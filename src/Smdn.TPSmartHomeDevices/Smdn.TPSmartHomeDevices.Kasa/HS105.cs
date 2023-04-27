@@ -12,6 +12,16 @@ using Smdn.TPSmartHomeDevices.Kasa.Json;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
+/// <summary>
+/// Provides APIs to operate Kasa HS105, Smart Wi-Fi Plug Mini.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
+/// <seealso href="https://www.tp-link.com/jp/home-networking/smart-plug/hs105/">Kasa HS105 product information (ja)</seealso>
+/// <seealso href="https://www.kasasmart.com/us/products/smart-plugs/kasa-smart-wifi-plug-mini">Kasa HS105 product information (en)</seealso>
 public class HS105 : KasaDevice {
 #pragma warning disable SA1114
   private static readonly JsonEncodedText MethodTextSetRelayState = JsonEncodedText.Encode(
@@ -113,6 +123,13 @@ public class HS105 : KasaDevice {
     }
   }
 
+  /// <summary>
+  /// Turns on the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOnAsync(CancellationToken cancellationToken = default)
     => SendRequestAsync(
       module: ModuleTextSystem,
@@ -121,6 +138,13 @@ public class HS105 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
+  /// <summary>
+  /// Turns off the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOffAsync(CancellationToken cancellationToken = default)
     => SendRequestAsync(
       module: ModuleTextSystem,
@@ -156,6 +180,13 @@ public class HS105 : KasaDevice {
     public bool RelayState { get; init; }
   }
 
+  /// <summary>
+  /// Gets the on/off state of the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken = default
   )

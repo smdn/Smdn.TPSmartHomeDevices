@@ -15,6 +15,9 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 #pragma warning disable IDE0040
 partial class TapoClient {
 #pragma warning restore IDE0040
+  /// <summary>
+  /// Gets a default implementation of <see cref="IHttpClientFactory"/> that creates an <see cref="HttpClient"/> configured for the <see cref="TapoClient"/>.
+  /// </summary>
   public static IHttpClientFactory DefaultHttpClientFactory => new TapoHttpClientFactory(
     configureClient: null
   );

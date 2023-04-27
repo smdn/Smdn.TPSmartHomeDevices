@@ -15,6 +15,9 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// Provides a client implementation that authenticates, sends requests, and receives responses according to the protocol used in the Tapo's communication.
+/// </summary>
 /// <remarks>
 /// This implementation is based on and ported from the following
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
@@ -22,7 +25,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// </remarks>
 public sealed partial class TapoClient : IDisposable {
   public const int DefaultPort = 80; // HTTP
-
 
   internal static Uri GetEndPointUri(EndPoint endPoint)
   {

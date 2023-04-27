@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>set_device_info</c> JSON request.
+/// </summary>
 public readonly struct SetDeviceInfoRequest<TParameters> : ITapoPassThroughRequest {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]

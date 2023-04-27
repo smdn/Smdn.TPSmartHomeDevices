@@ -9,6 +9,9 @@ using Smdn.Formats;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
+/// <summary>
+/// Provides functionalities related to the credentials used for authentication in Tapo's communication protocol.
+/// </summary>
 /// <remarks>
 /// This implementation is based on and ported from the following
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:

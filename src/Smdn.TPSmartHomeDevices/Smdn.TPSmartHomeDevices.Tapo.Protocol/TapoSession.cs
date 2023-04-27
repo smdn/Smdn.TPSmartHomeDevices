@@ -8,6 +8,9 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// Maintains authenticated Tapo session information, including access token, exchanged key and session ID.
+/// </summary>
 /// <remarks>
 /// This implementation is based on the following
 /// C# implementation by <see href="https://github.com/europowergenerators">E-Power International</see>:

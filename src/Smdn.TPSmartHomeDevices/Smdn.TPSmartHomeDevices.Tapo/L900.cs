@@ -11,6 +11,18 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+/// <summary>
+/// Provides APIs to operate Tapo L900, Smart Wi-Fi Light Strip.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
+/// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-l900-5/">Tapo L900-5 product information (ja)</seealso>
+/// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-l900-10/">Tapo L900-10 product information (ja)</seealso>
+/// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l900-5/">Tapo Tapo L900-5 product information (en)</seealso>
+/// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l900-10/">Tapo Tapo L900-10 product information (en)</seealso>
 public class L900 : TapoDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="L900"/> class with specifying the device endpoint by host name.
@@ -179,6 +191,9 @@ public class L900 : TapoDevice {
   }
 #pragma warning restore SA1313, CA1822
 
+  /// <summary>
+  /// Turns the light on and sets the light brightness.
+  /// </summary>
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%].
   /// </param>
@@ -197,6 +212,9 @@ public class L900 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color represented by hue and satulation.
+  /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
   /// </param>
@@ -225,6 +243,9 @@ public class L900 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified hue.
+  /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
   /// </param>
@@ -249,6 +270,9 @@ public class L900 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified saturation.
+  /// </summary>
   /// <param name="saturation">
   /// The saturation of the color in percent value, in range of 0~100[%].
   /// </param>

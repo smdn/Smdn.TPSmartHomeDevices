@@ -14,6 +14,10 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// Provides a JsonConverter implementation to (de)serialize the 'request' and 'response' properties of the
+/// 'securePassthrough' method, according to the crypto method used in Tapo's communication protocol.
+/// </summary>
 /// <remarks>
 /// This implementation is based on and ported from the following
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:

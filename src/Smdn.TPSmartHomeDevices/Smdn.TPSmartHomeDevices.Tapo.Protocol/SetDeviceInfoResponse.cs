@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+/// <summary>
+/// The type that reflects <c>set_device_info</c> JSON response.
+/// </summary>
 public readonly struct SetDeviceInfoResponse : ITapoPassThroughResponse {
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; init; }

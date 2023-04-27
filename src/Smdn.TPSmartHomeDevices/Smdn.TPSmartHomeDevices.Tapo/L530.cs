@@ -11,6 +11,16 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+/// <summary>
+/// Provides APIs to operate Tapo L530, Smart Wi-Fi Light Bulb, Multicolor.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
+/// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-l530e/">Tapo L530 product information (ja)</seealso>
+/// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l530e/">Tapo L530 product information (en)</seealso>
 public class L530 : TapoDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by host name.
@@ -175,6 +185,9 @@ public class L530 : TapoDevice {
   }
 #pragma warning restore SA1313, CA1822
 
+  /// <summary>
+  /// Turns the light on and sets the light brightness.
+  /// </summary>
   /// <param name="brightness">
   /// The brightness in percent value, in range of 1~100[%].
   /// </param>
@@ -198,6 +211,9 @@ public class L530 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color temperature.
+  /// </summary>
   /// <param name="colorTemperature">
   /// The color temperature in kelvin, in range of 2500~6500[K].
   /// </param>
@@ -221,6 +237,9 @@ public class L530 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color represented by hue and satulation.
+  /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
   /// </param>
@@ -249,6 +268,9 @@ public class L530 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified hue.
+  /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
   /// </param>
@@ -273,6 +295,9 @@ public class L530 : TapoDevice {
       cancellationToken
     );
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified saturation.
+  /// </summary>
   /// <param name="saturation">
   /// The saturation of the color in percent value, in range of 0~100[%].
   /// </param>

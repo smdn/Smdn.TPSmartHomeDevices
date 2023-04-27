@@ -8,6 +8,13 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 public static class TapoCredentailProviderServiceCollectionExtensions {
+  /// <summary>
+  /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
+  /// This overload creates <see cref="ITapoCredentialProvider"/> that holds email address and password in plaintext.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="email">A plaintext email address used for authentication to the Tapo device.</param>
+  /// <param name="password">A plaintext password used for authentication to the Tapo device.</param>
   public static IServiceCollection AddTapoCredential(
     this IServiceCollection services,
     string email,
@@ -27,6 +34,15 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     return services;
   }
 
+  /// <summary>
+  /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
+  /// This overload creates <see cref="ITapoCredentialProvider"/> that holds user name (email address) and password in base64 encoded text.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="base64UserNameSHA1Digest">A base64 encoded SHA1 digest of user name (email address) text, used for authentication to the Tapo device.</param>
+  /// <param name="base64Password">A base64 encoded password text, used for authentication to the Tapo device.</param>
+  /// <seealso cref="TapoCredentials.ToBase64EncodedSHA1DigestString(ReadOnlySpan{char})"/>
+  /// <seealso cref="TapoCredentials.ToBase64EncodedString(ReadOnlySpan{char})"/>
   public static IServiceCollection AddTapoBase64EncodedCredential(
     this IServiceCollection services,
     string base64UserNameSHA1Digest,
@@ -46,6 +62,12 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
     return services;
   }
 
+  /// <summary>
+  /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="credentialProvider">A <see cref="ITapoCredentialProvider"/> used for authentication to the Tapo device.</param>
+  /// <seealso cref="ITapoCredentialProvider"/>
   public static IServiceCollection AddTapoCredentialProvider(
     this IServiceCollection services,
     ITapoCredentialProvider credentialProvider

@@ -12,6 +12,16 @@ using Smdn.TPSmartHomeDevices.Kasa.Json;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
+/// <summary>
+/// Provides APIs to operate Kasa KL130, Smart Light Bulb, Multicolor.
+/// </summary>
+/// <remarks>
+/// This is an unofficial API that has no affiliation with TP-Link.
+/// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
+/// there is no warranty for the results of using this API and no responsibility is taken for those results.
+/// </remarks>
+/// <seealso href="https://www.tp-link.com/jp/home-networking/smart-bulb/kl130/">Kasa KL130 product information (ja)</seealso>
+/// <seealso href="https://www.kasasmart.com/us/products/smart-lighting/kasa-smart-light-bulb-multicolor-kl130">Kasa KL130 product information (en)</seealso>
 public class KL130 : KasaDevice {
 #pragma warning disable SA1114
   private static readonly JsonEncodedText ModuleTextLightingService = JsonEncodedText.Encode(
@@ -132,6 +142,17 @@ public class KL130 : KasaDevice {
 #pragma warning restore CA1822
   }
 
+  /// <summary>
+  /// Turns on the device.
+  /// </summary>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOnAsync(
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
@@ -146,6 +167,17 @@ public class KL130 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
+  /// <summary>
+  /// Turns off the device.
+  /// </summary>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask TurnOffAsync(
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
@@ -194,6 +226,13 @@ public class KL130 : KasaDevice {
     public KL130LightState LightState { get; init; }
   }
 
+  /// <summary>
+  /// Gets the current light state of the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask<KL130LightState> GetLightStateAsync(
     CancellationToken cancellationToken = default
   )
@@ -204,6 +243,13 @@ public class KL130 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
+  /// <summary>
+  /// Gets the on/off state of the device.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
   public ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken = default
   )
@@ -234,6 +280,9 @@ public class KL130 : KasaDevice {
 #pragma warning restore CA1822
   }
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color temperature.
+  /// </summary>
   /// <param name="colorTemperature">
   /// The color temperature in kelvin, in range of 2500~9000[K].
   /// </param>
@@ -290,6 +339,9 @@ public class KL130 : KasaDevice {
 #pragma warning restore CA1822
   }
 
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color represented by hue and satulation.
+  /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
   /// </param>

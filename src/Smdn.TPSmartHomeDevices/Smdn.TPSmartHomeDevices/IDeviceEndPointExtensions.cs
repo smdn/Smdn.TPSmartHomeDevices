@@ -7,7 +7,27 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
+/// <summary>
+/// Provides extension methods for <see cref="IDeviceEndPoint"/>.
+/// </summary>
+/// <seealso cref="IDeviceEndPoint" />
 public static class IDeviceEndPointExtensions {
+  /// <summary>
+  /// Resolves this endpoint to its corresponding <see cref="EndPoint"/>.
+  /// If the endpoint could not resolve to the specific <see cref="EndPoint"/>, throw <see cref="DeviceEndPointResolutionException"/>.
+  /// </summary>
+  /// <remarks>
+  /// This method calls the <see cref="IDynamicDeviceEndPoint.Invalidate" /> if the <paramref name="deviceEndPoint"/> is an <see cref="IDynamicDeviceEndPoint"/> and the endpoint cannot be resolved.
+  /// </remarks>
+  /// <param name="deviceEndPoint">The <see cref="IDeviceEndPoint" />.</param>
+  /// <param name="defaultPort">The default port number. If the resolved <see cref="EndPoint"/> does not specify a specific port, set this port number to the resolved <see cref="EndPoint"/>.</param>
+  /// <param name="cancellationToken">The <see cref="CancellationToken" /> to monitor for cancellation requests.</param>
+  /// <returns>
+  /// A <see cref="ValueTask{EndPoint}"/> representing the result of endpoint resolution.
+  /// </returns>
+  /// <exception cref="DeviceEndPointResolutionException">The endpoint could not resolve to the specific <see cref="EndPoint"/>.</exception>
+  /// <seealso cref="IDeviceEndPoint.ResolveAsync(CancellationToken)" />
+  /// <seealso cref="IDynamicDeviceEndPoint.Invalidate" />
   public static ValueTask<EndPoint> ResolveOrThrowAsync(
     this IDeviceEndPoint deviceEndPoint,
     int defaultPort,

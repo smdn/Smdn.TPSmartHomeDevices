@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
+/// <summary>
+/// A concrete implementation of <see cref="IDeviceEndPoint"/>, which represents a device endpoint by <see cref="EndPoint"/>.
+/// </summary>
 public sealed class StaticDeviceEndPoint : IDeviceEndPoint {
   private readonly EndPoint endPoint;
 
