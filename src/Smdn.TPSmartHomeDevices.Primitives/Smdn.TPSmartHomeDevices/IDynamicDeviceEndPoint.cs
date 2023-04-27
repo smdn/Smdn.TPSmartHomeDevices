@@ -6,7 +6,9 @@ namespace Smdn.TPSmartHomeDevices;
 /// Provides a mechanism for abstracting device endpoints and resolving to specific <seealso cref="System.Net.EndPoint" />.
 /// This interface represents a 'dynamic' endpoint, such as when the actual IP address is assigned by DHCP.
 /// </summary>
-/// <see cref="MacAddressDeviceEndPointFactory.MacAddressDeviceEndPoint" />
+/// <remarks>
+/// <c>MacAddressDeviceEndPointFactory+MacAddressDeviceEndPoint</c> class from the package <c>Smdn.TPSmartHomeDevices.MacAddressEndPoint</c> is one concrete implementation of this interface.
+/// </remarks>
 public interface IDynamicDeviceEndPoint : IDeviceEndPoint {
   /// <summary>
   /// Marks the device endpoint as 'invalidated', for example,
