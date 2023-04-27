@@ -4,10 +4,10 @@ using System;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 
-namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
+namespace Smdn.TPSmartHomeDevices.Kasa;
 
-internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHandler {
-  public override KasaClientExceptionHandling DetermineHandling(
+internal sealed class KasaDeviceDefaultExceptionHandler : KasaDeviceExceptionHandler {
+  public override KasaDeviceExceptionHandling DetermineHandling(
     KasaDevice device,
     Exception exception,
     int attempt,
@@ -32,7 +32,7 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
               socketErrorCode
             );
 
-            return KasaClientExceptionHandling.InvalidateEndPointAndRetry;
+            return KasaDeviceExceptionHandling.InvalidateEndPointAndRetry;
           }
           else {
             logger?.LogError(
@@ -41,7 +41,7 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
               socketErrorCode
             );
 
-            return KasaClientExceptionHandling.InvalidateEndPointAndThrow;
+            return KasaDeviceExceptionHandling.InvalidateEndPointAndThrow;
           }
         }
 
@@ -53,7 +53,7 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
           socketErrorCode
         );
 
-        return KasaClientExceptionHandling.Throw;
+        return KasaDeviceExceptionHandling.Throw;
       }
 
       case KasaDisconnectedException disconnectedException:
@@ -73,10 +73,10 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
             );
           }
 
-          return KasaClientExceptionHandling.RetryAfterReconnect;
+          return KasaDeviceExceptionHandling.RetryAfterReconnect;
         }
 
-        return KasaClientExceptionHandling.Throw;
+        return KasaDeviceExceptionHandling.Throw;
 
       case KasaIncompleteResponseException ex:
         // The peer has been in invalid state(?) and returnd incomplete response.
@@ -85,13 +85,13 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
 
         if (nextAttempt < maxRetryIncompleteResponse) { // retry up to max attempts
           logger?.LogWarning("{Message}", ex.Message);
-          return KasaClientExceptionHandling.CreateRetry(
+          return KasaDeviceExceptionHandling.CreateRetry(
             retryAfter: TimeSpan.FromSeconds(2.0),
             shouldReconnect: true
           );
         }
 
-        return KasaClientExceptionHandling.Throw;
+        return KasaDeviceExceptionHandling.Throw;
 
       default:
         logger?.LogError(
@@ -100,7 +100,7 @@ internal sealed class KasaClientDefaultExceptionHandler : KasaClientExceptionHan
           exception.GetType().FullName
         );
 
-        return KasaClientExceptionHandling.Throw;
+        return KasaDeviceExceptionHandling.Throw;
     }
   }
 }

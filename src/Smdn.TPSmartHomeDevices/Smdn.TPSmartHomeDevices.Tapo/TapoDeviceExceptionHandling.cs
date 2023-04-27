@@ -2,54 +2,54 @@
 // SPDX-License-Identifier: MIT
 using System;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
+namespace Smdn.TPSmartHomeDevices.Tapo;
 
 /// <summary>
 /// The type that defines the action of handling exceptions that occur during communication with Tapo devices.
 /// </summary>
-public readonly struct TapoClientExceptionHandling {
+public readonly struct TapoDeviceExceptionHandling {
   /// <summary>
   /// Throws the exception as it is occured without any other actions.
   /// </summary>
-  public static readonly TapoClientExceptionHandling Throw = default;
+  public static readonly TapoDeviceExceptionHandling Throw = default;
 
   /// <summary>
   /// Wraps the occured exception into <see cref="TapoProtocolException"/> and throw it.
   /// </summary>
   /// <seealso cref="TapoProtocolException"/>
-  public static readonly TapoClientExceptionHandling ThrowAsTapoProtocolException = new() { ShouldWrapIntoTapoProtocolException = true };
+  public static readonly TapoDeviceExceptionHandling ThrowAsTapoProtocolException = new() { ShouldWrapIntoTapoProtocolException = true };
 
   /// <summary>
   /// Invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and throws the occured exception.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
-  public static readonly TapoClientExceptionHandling InvalidateEndPointAndThrow = new() { ShouldInvalidateEndPoint = true };
+  public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndThrow = new() { ShouldInvalidateEndPoint = true };
 
   /// <summary>
   /// Ignores the occured exception and try again immediately.
   /// </summary>
-  public static readonly TapoClientExceptionHandling Retry = new() { ShouldRetry = true };
+  public static readonly TapoDeviceExceptionHandling Retry = new() { ShouldRetry = true };
 
   /// <summary>
   /// Ignores the occured exception and try again after reconnect immediately.
   /// </summary>
-  public static readonly TapoClientExceptionHandling RetryAfterReconnect = new() { ShouldRetry = true, ShouldReconnect = true };
+  public static readonly TapoDeviceExceptionHandling RetryAfterReconnect = new() { ShouldRetry = true, ShouldReconnect = true };
 
   /// <summary>
   /// Ignores the occured exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
-  public static readonly TapoClientExceptionHandling InvalidateEndPointAndRetry = new() { ShouldRetry = true, ShouldInvalidateEndPoint = true, };
+  public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndRetry = new() { ShouldRetry = true, ShouldInvalidateEndPoint = true, };
 
   /// <summary>
-  /// Creates a <see cref="TapoClientExceptionHandling"/> that ignores the occured exception and try again after the specified period of time.
+  /// Creates a <see cref="TapoDeviceExceptionHandling"/> that ignores the occured exception and try again after the specified period of time.
   /// </summary>
   /// <param name="retryAfter">The <see cref="TimeSpan"/> that specifies the amount of time to wait before retry.</param>
   /// <param name="shouldReconnect">
   /// The <see cref="bool"/> value that specifies whether the
   /// <see cref="IDynamicDeviceEndPoint.Invalidate"/> should be invoked before retry or not.
   /// </param>
-  public static TapoClientExceptionHandling CreateRetry(
+  public static TapoDeviceExceptionHandling CreateRetry(
     TimeSpan retryAfter,
     bool shouldReconnect = false
   )

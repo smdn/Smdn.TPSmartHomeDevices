@@ -124,7 +124,7 @@ public class P105 : TapoDevice {
   /// Initializes a new instance of the <see cref="P105"/> class.
   /// </summary>
   /// <inheritdoc
-  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, TapoDeviceExceptionHandler?, IServiceProvider?)"
   ///   path="/exception | /param[@name='deviceEndPoint' or @name='credential' or @name='serviceProvider']"
   /// />
   public P105(

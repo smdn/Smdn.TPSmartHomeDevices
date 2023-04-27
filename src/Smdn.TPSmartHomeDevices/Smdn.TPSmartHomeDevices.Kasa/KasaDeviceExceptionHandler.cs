@@ -3,17 +3,17 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
+namespace Smdn.TPSmartHomeDevices.Kasa;
 
 /// <summary>
 /// Provides a mechanism for determining the action of handling exceptions that occur during communication with Kasa devices.
 /// </summary>
-/// <seealso cref="KasaClientExceptionHandling"/>
-public abstract class KasaClientExceptionHandler {
+/// <seealso cref="KasaDeviceExceptionHandling"/>
+public abstract class KasaDeviceExceptionHandler {
   /// <summary>
-  /// A <see cref="KasaClientExceptionHandler"/> defining the default exception handling.
+  /// A <see cref="KasaDeviceExceptionHandler"/> defining the default exception handling.
   /// </summary>
-  protected internal static readonly KasaClientExceptionHandler Default = new KasaClientDefaultExceptionHandler();
+  protected internal static readonly KasaDeviceExceptionHandler Default = new KasaDeviceDefaultExceptionHandler();
 
   /// <summary>
   /// Determines the action of handling exceptions that occur when communicating with Kasa devices.
@@ -29,10 +29,10 @@ public abstract class KasaClientExceptionHandler {
   /// </param>
   /// <param name="logger">The <see cref="ILogger"/> to report the situation.</param>
   /// <returns>
-  /// The <see cref="KasaClientExceptionHandling"/> that defines the action to handle the <paramref name="exception"/>, determined by <paramref name="exception"/> and <paramref name="attempt"/>.
+  /// The <see cref="KasaDeviceExceptionHandling"/> that defines the action to handle the <paramref name="exception"/>, determined by <paramref name="exception"/> and <paramref name="attempt"/>.
   /// </returns>
-  /// <seealso cref="KasaClientExceptionHandling"/>
-  public abstract KasaClientExceptionHandling DetermineHandling(
+  /// <seealso cref="KasaDeviceExceptionHandling"/>
+  public abstract KasaDeviceExceptionHandling DetermineHandling(
     KasaDevice device,
     Exception exception,
     int attempt,

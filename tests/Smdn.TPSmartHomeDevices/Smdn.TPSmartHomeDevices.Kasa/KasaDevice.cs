@@ -405,8 +405,8 @@ public class KasaDeviceTests {
     Assert.IsFalse(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
   }
 
-  private class HandleAsEndPointUnreachableExceptionHandler : KasaClientExceptionHandler {
-    public override KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
+  private class HandleAsEndPointUnreachableExceptionHandler : KasaDeviceExceptionHandler {
+    public override KasaDeviceExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
       => Default.DetermineHandling(
         device: device,
         // reproduces the case of unreachable condition
@@ -445,7 +445,7 @@ public class KasaDeviceTests {
 
     var services = new ServiceCollection();
 
-    services.AddSingleton<KasaClientExceptionHandler>(
+    services.AddSingleton<KasaDeviceExceptionHandler>(
       new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
     );
 
@@ -524,7 +524,7 @@ public class KasaDeviceTests {
     var endPoint = new DynamicDeviceEndPoint(pseudoDeviceEndPoint1.EndPoint);
     var services = new ServiceCollection();
 
-    services.AddSingleton<KasaClientExceptionHandler>(
+    services.AddSingleton<KasaDeviceExceptionHandler>(
       new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
     );
 
@@ -684,8 +684,8 @@ public class KasaDeviceTests {
     Assert.IsFalse(device.IsConnected, "inner client must be disposed");
   }
 
-  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : KasaClientExceptionHandler {
-    public override KasaClientExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
+  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : KasaDeviceExceptionHandler {
+    public override KasaDeviceExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger)
     {
       Assert.IsNotAssignableFrom<OperationCanceledException>(exception);
 
@@ -714,7 +714,7 @@ public class KasaDeviceTests {
 
     var services = new ServiceCollection();
 
-    services.AddSingleton<KasaClientExceptionHandler>(
+    services.AddSingleton<KasaDeviceExceptionHandler>(
       // asserts that the OperationCanceledException must not be handled
       new AssertOperationCanceledMustNotBeHandledExceptionHandler()
     );

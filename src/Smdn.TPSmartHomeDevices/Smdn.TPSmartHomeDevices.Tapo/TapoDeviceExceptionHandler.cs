@@ -3,17 +3,17 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
+namespace Smdn.TPSmartHomeDevices.Tapo;
 
 /// <summary>
 /// Provides a mechanism for determining the action of handling exceptions that occur during communication with Tapo devices.
 /// </summary>
-/// <seealso cref="TapoClientExceptionHandling"/>
-public abstract class TapoClientExceptionHandler {
+/// <seealso cref="TapoDeviceExceptionHandling"/>
+public abstract class TapoDeviceExceptionHandler {
   /// <summary>
-  /// A <see cref="TapoClientExceptionHandler"/> defining the default exception handling.
+  /// A <see cref="TapoDeviceExceptionHandler"/> defining the default exception handling.
   /// </summary>
-  protected internal static readonly TapoClientExceptionHandler Default = new TapoClientDefaultExceptionHandler();
+  protected internal static readonly TapoDeviceExceptionHandler Default = new TapoDeviceDefaultExceptionHandler();
 
   /// <summary>
   /// Determines the action of handling exceptions that occur when communicating with Tapo devices.
@@ -29,10 +29,10 @@ public abstract class TapoClientExceptionHandler {
   /// </param>
   /// <param name="logger">The <see cref="ILogger"/> to report the situation.</param>
   /// <returns>
-  /// The <see cref="TapoClientExceptionHandling"/> that defines the action to handle the <paramref name="exception"/>, determined by <paramref name="exception"/> and <paramref name="attempt"/>.
+  /// The <see cref="TapoDeviceExceptionHandling"/> that defines the action to handle the <paramref name="exception"/>, determined by <paramref name="exception"/> and <paramref name="attempt"/>.
   /// </returns>
-  /// <seealso cref="TapoClientExceptionHandling"/>
-  public abstract TapoClientExceptionHandling DetermineHandling(
+  /// <seealso cref="TapoDeviceExceptionHandling"/>
+  public abstract TapoDeviceExceptionHandling DetermineHandling(
     TapoDevice device,
     Exception exception,
     int attempt,

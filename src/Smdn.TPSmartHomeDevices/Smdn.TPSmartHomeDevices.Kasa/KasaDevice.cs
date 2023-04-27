@@ -70,7 +70,7 @@ public partial class KasaDevice : IDisposable {
 #endif
   protected bool IsDisposed => deviceEndPoint is null;
 
-  private readonly KasaClientExceptionHandler exceptionHandler;
+  private readonly KasaDeviceExceptionHandler exceptionHandler;
   private readonly ArrayBufferWriter<byte> buffer = new(initialCapacity: KasaClient.DefaultBufferCapacity);
   private readonly IServiceProvider? serviceProvider;
 
@@ -169,7 +169,7 @@ public partial class KasaDevice : IDisposable {
     this.deviceEndPoint = deviceEndPoint ?? throw new ArgumentNullException(nameof(deviceEndPoint));
     this.serviceProvider = serviceProvider;
 
-    exceptionHandler = serviceProvider?.GetService<KasaClientExceptionHandler>() ?? KasaClientExceptionHandler.Default;
+    exceptionHandler = serviceProvider?.GetService<KasaDeviceExceptionHandler>() ?? KasaDeviceExceptionHandler.Default;
   }
 
   public void Dispose()
@@ -374,7 +374,7 @@ public partial class KasaDevice : IDisposable {
           ex is OperationCanceledException exOperationCanceled &&
           exOperationCanceled.CancellationToken.Equals(cancellationToken)
         )
-          ? KasaClientExceptionHandling.Throw
+          ? KasaDeviceExceptionHandling.Throw
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)

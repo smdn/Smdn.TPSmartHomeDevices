@@ -128,7 +128,7 @@ public class L530 : TapoDevice {
   /// Initializes a new instance of the <see cref="L530"/> class.
   /// </summary>
   /// <inheritdoc
-  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, TapoDeviceExceptionHandler?, IServiceProvider?)"
   ///   path="/exception | /param[@name='deviceEndPoint' or @name='credential' or @name='serviceProvider']"
   /// />
   public L530(

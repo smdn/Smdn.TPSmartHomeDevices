@@ -53,7 +53,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   protected bool IsDisposed => deviceEndPoint is null;
 
   private readonly ITapoCredentialProvider credential;
-  private readonly TapoClientExceptionHandler exceptionHandler;
+  private readonly TapoDeviceExceptionHandler exceptionHandler;
   private readonly IServiceProvider? serviceProvider;
   public string TerminalUuidString { get; } // must be in the format of 00000000-0000-0000-0000-000000000000
 
@@ -258,7 +258,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// A <see cref="ITapoCredentialProvider"/> that provides the credentials required for authentication.
   /// </param>
   /// <param name="exceptionHandler">
-  /// A <see cref="TapoClientExceptionHandler"/> that determines the handling of the exception thrown by the <see cref="TapoClient"/>.
+  /// A <see cref="TapoDeviceExceptionHandler"/> that determines the handling of the exception thrown by the <see cref="TapoClient"/>.
   /// </param>
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
@@ -270,7 +270,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   protected TapoDevice(
     IDeviceEndPoint deviceEndPoint,
     ITapoCredentialProvider? credential = null,
-    TapoClientExceptionHandler? exceptionHandler = null,
+    TapoDeviceExceptionHandler? exceptionHandler = null,
     IServiceProvider? serviceProvider = null
   )
   {
@@ -278,8 +278,8 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     this.credential = credential
       ?? (serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider))).GetRequiredService<ITapoCredentialProvider>();
     this.exceptionHandler = exceptionHandler
-      ?? serviceProvider?.GetService<TapoClientExceptionHandler>()
-      ?? TapoClientExceptionHandler.Default;
+      ?? serviceProvider?.GetService<TapoDeviceExceptionHandler>()
+      ?? TapoDeviceExceptionHandler.Default;
     this.serviceProvider = serviceProvider;
 
     TerminalUuidString = Guid.NewGuid().ToString("D", provider: null); // TODO: support DI
@@ -475,7 +475,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
           ex is OperationCanceledException exOperationCanceled &&
           exOperationCanceled.CancellationToken.Equals(cancellationToken)
         )
-          ? TapoClientExceptionHandling.Throw
+          ? TapoDeviceExceptionHandling.Throw
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 
         static void LogRequest(ILogger logger, TRequest req)

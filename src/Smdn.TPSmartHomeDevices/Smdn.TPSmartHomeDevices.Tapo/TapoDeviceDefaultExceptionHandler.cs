@@ -4,12 +4,15 @@ using System;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
+using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHandler {
-  public override TapoClientExceptionHandling DetermineHandling(
+namespace Smdn.TPSmartHomeDevices.Tapo;
+
+internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHandler {
+  public override TapoDeviceExceptionHandling DetermineHandling(
     TapoDevice device,
     Exception exception,
     int attempt,
@@ -35,7 +38,7 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
                 socketErrorCode
               );
 
-              return TapoClientExceptionHandling.InvalidateEndPointAndRetry;
+              return TapoDeviceExceptionHandling.InvalidateEndPointAndRetry;
             }
             else {
               logger?.LogError(
@@ -44,7 +47,7 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
                 socketErrorCode
               );
 
-              return TapoClientExceptionHandling.InvalidateEndPointAndThrow;
+              return TapoDeviceExceptionHandling.InvalidateEndPointAndThrow;
             }
           }
 
@@ -56,20 +59,20 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
             socketErrorCode
           );
 
-          return TapoClientExceptionHandling.Throw;
+          return TapoDeviceExceptionHandling.Throw;
         }
 
-        return TapoClientExceptionHandling.Throw;
+        return TapoDeviceExceptionHandling.Throw;
 
       case SecurePassThroughInvalidPaddingException securePassThroughInvalidPaddingException:
         if (attempt == 0 /* retry just once */) {
           logger?.LogWarning("{Message}", securePassThroughInvalidPaddingException.Message);
 
           // The session might have been in invalid state(?)
-          return TapoClientExceptionHandling.RetryAfterReconnect;
+          return TapoDeviceExceptionHandling.RetryAfterReconnect;
         }
 
-        return TapoClientExceptionHandling.ThrowAsTapoProtocolException;
+        return TapoDeviceExceptionHandling.ThrowAsTapoProtocolException;
 
       case TapoErrorResponseException errorResponseException:
         if (attempt == 0 /* retry just once */) {
@@ -78,14 +81,14 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
               logger?.LogWarning("{Message}", errorResponseException.Message);
 
               // The session might have been in invalid state(?)
-              return TapoClientExceptionHandling.CreateRetry(
+              return TapoDeviceExceptionHandling.CreateRetry(
                 retryAfter: TimeSpan.FromSeconds(2.0),
                 shouldReconnect: true
               );
 
             case TapoErrorCodes.RequestParameterError:
               logger?.LogWarning("{Message}", errorResponseException.Message);
-              return TapoClientExceptionHandling.Throw;
+              return TapoDeviceExceptionHandling.Throw;
 
             default:
               logger?.LogWarning(
@@ -94,25 +97,25 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
               );
 
               // The session might have been in invalid state(?)
-              return TapoClientExceptionHandling.RetryAfterReconnect;
+              return TapoDeviceExceptionHandling.RetryAfterReconnect;
           }
         }
 
-        return TapoClientExceptionHandling.Throw;
+        return TapoDeviceExceptionHandling.Throw;
 
       case TaskCanceledException taskCanceledException:
         if (taskCanceledException.InnerException is TimeoutException) {
           if (attempt < 2 /* retry up to 3 times */) {
             logger?.LogWarning("Request timed out; {ExceptionMessage}", taskCanceledException.Message);
-            return TapoClientExceptionHandling.Retry;
+            return TapoDeviceExceptionHandling.Retry;
           }
 
           logger?.LogError(taskCanceledException, "Request timed out");
 
-          return TapoClientExceptionHandling.ThrowAsTapoProtocolException;
+          return TapoDeviceExceptionHandling.ThrowAsTapoProtocolException;
         }
 
-        return TapoClientExceptionHandling.Throw;
+        return TapoDeviceExceptionHandling.Throw;
 
       default:
         logger?.LogError(
@@ -121,7 +124,7 @@ internal sealed class TapoClientDefaultExceptionHandler : TapoClientExceptionHan
           exception.GetType().FullName
         );
 
-        return TapoClientExceptionHandling.Throw;
+        return TapoDeviceExceptionHandling.Throw;
     }
   }
 }

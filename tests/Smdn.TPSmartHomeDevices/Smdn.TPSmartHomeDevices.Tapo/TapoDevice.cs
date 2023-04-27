@@ -486,8 +486,8 @@ public partial class TapoDeviceTests {
     Assert.IsNull(device.Session, nameof(device.Session)); // session must be disposed
   }
 
-  private class HandleAsEndPointUnreachableExceptionHandler : TapoClientExceptionHandler {
-    public override TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
+  private class HandleAsEndPointUnreachableExceptionHandler : TapoDeviceExceptionHandler {
+    public override TapoDeviceExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
       => Default.DetermineHandling(
         device: device,
         exception: new HttpRequestException(
@@ -528,7 +528,7 @@ public partial class TapoDeviceTests {
       base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
-    serviceCollection.AddSingleton<TapoClientExceptionHandler>(
+    serviceCollection.AddSingleton<TapoDeviceExceptionHandler>(
       new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
     );
 
@@ -601,7 +601,7 @@ public partial class TapoDeviceTests {
       base64UserNameSHA1Digest: Convert.ToBase64String(Encoding.UTF8.GetBytes("user")),
       base64Password: Convert.ToBase64String(Encoding.UTF8.GetBytes("pass"))
     );
-    serviceCollection.AddSingleton<TapoClientExceptionHandler>(
+    serviceCollection.AddSingleton<TapoDeviceExceptionHandler>(
       new HandleAsEndPointUnreachableExceptionHandler() // handle any exception as 'unreachable' event
     );
 
@@ -983,8 +983,8 @@ public partial class TapoDeviceTests {
     }
   }
 
-  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : TapoClientExceptionHandler {
-    public override TapoClientExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
+  private class AssertOperationCanceledMustNotBeHandledExceptionHandler : TapoDeviceExceptionHandler {
+    public override TapoDeviceExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
     {
       Assert.IsNotAssignableFrom<OperationCanceledException>(exception);
 
@@ -1019,7 +1019,7 @@ public partial class TapoDeviceTests {
 
     pseudoDevice.Start();
 
-    services.AddSingleton<TapoClientExceptionHandler>(
+    services.AddSingleton<TapoDeviceExceptionHandler>(
       // asserts that the OperationCanceledException must not be handled
       new AssertOperationCanceledMustNotBeHandledExceptionHandler()
     );

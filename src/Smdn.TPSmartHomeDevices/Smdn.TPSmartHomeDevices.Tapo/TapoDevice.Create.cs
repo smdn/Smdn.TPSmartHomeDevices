@@ -83,7 +83,7 @@ partial class TapoDevice {
     );
 
   /// <inheritdoc
-  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, TapoDeviceExceptionHandler?, IServiceProvider?)"
   ///   path="/summary | /exception | /param[@name='deviceEndPoint' or @name='credential' or @name='serviceProvider']"
   /// />
   public static TapoDevice Create(
@@ -98,7 +98,7 @@ partial class TapoDevice {
     );
 
   /// <inheritdoc
-  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, Protocol.TapoClientExceptionHandler?, IServiceProvider?)"
+  ///   cref="TapoDevice(IDeviceEndPoint, ITapoCredentialProvider?, TapoDeviceExceptionHandler?, IServiceProvider?)"
   ///   path="/summary"
   /// />
   /// <typeparam name="TAddress">The type that represents an address of device endpoint.</typeparam>
