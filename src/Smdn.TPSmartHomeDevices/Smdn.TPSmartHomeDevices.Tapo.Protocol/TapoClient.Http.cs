@@ -31,7 +31,7 @@ partial class TapoClient {
     JsonSerializerOptions jsonSerializerOptions,
     CancellationToken cancellationToken
   )
-    where TRequest : ITapoPassThroughRequest
+    where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
     cancellationToken.ThrowIfCancellationRequested();

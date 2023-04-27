@@ -164,7 +164,7 @@ public sealed partial class TapoClient : IDisposable {
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )
-    where TRequest : ITapoPassThroughRequest, new()
+    where TRequest : notnull, ITapoPassThroughRequest, new()
     where TResponse : ITapoPassThroughResponse
     => SendRequestAsync<TRequest, TResponse>(
       request: new(),
@@ -175,7 +175,7 @@ public sealed partial class TapoClient : IDisposable {
     TRequest request,
     CancellationToken cancellationToken = default
   )
-    where TRequest : ITapoPassThroughRequest
+    where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
     if (request is null)

@@ -391,7 +391,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     TRequest request,
     CancellationToken cancellationToken = default
   )
-    where TRequest : ITapoPassThroughRequest
+    where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
     if (request is null)
@@ -414,7 +414,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     Func<TResponse, TResult> composeResult,
     CancellationToken cancellationToken = default
   )
-    where TRequest : ITapoPassThroughRequest
+    where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
     if (request is null)
@@ -436,7 +436,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     Func<TResponse, TResult> composeResult,
     CancellationToken cancellationToken = default
   )
-    where TRequest : ITapoPassThroughRequest
+    where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
     const int maxAttempts = 5;

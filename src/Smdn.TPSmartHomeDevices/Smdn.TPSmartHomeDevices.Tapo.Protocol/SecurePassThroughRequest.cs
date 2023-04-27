@@ -9,7 +9,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// </summary>
 public readonly struct SecurePassThroughRequest<TPassThroughRequest> :
   ITapoRequest
-  where TPassThroughRequest : ITapoPassThroughRequest
+  where TPassThroughRequest : notnull, ITapoPassThroughRequest
 {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]
