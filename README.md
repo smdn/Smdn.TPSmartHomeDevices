@@ -33,6 +33,7 @@ The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https:
     - Logging (`Microsoft.Extensions.Logging`)
     - HTTP (`Microsoft.Extensions.Http`)
   - Tested with pseudo devices and actual devices
+  - Confirmed to work on Windows, Ubuntu, Raspberry Pi 3 Model B+
 
 # Notice
 ## License
