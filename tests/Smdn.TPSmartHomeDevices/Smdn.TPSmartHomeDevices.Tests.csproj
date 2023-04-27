@@ -15,7 +15,7 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="$(SmdnTestTargetProjectDirectory)System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
+    <Compile Include="$(SmdnTestTargetProjectDirectory)..\Common\System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
   </ItemGroup>
 
   <ItemGroup>

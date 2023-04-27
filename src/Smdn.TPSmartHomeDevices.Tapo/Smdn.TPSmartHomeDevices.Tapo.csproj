@@ -1,0 +1,68 @@
+<!--
+SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))">net7.0;$(TargetFrameworks)</TargetFrameworks>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>rc1</VersionSuffix>
+    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
+    <Nullable>enable</Nullable>
+    <DefineConstants
+      Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
+    >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals and the extended nameof scope in C# 11 -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>CA1848;$(NoWarn)</NoWarn> <!-- CA1848: For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogXxxxx(...)' -->
+    <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
+  </PropertyGroup>
+
+  <PropertyGroup Label="assembly attributes">
+    <Description>
+<![CDATA[Provides APIs for operating Tapo devices, the TP-Link smart home devices.
+]]></Description>
+    <CopyrightYear>2023</CopyrightYear>
+  </PropertyGroup>
+
+  <PropertyGroup Label="package properties">
+    <PackageTags>tplink-tapo,tapo,L530,L900,P105,$(PackageCommonTags)</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Label="StyleCop code analysis">
+    <StyleCopAnalyzersConfigurationFile>..\stylecop.json</StyleCopAnalyzersConfigurationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <GlobalAnalyzerConfigFiles Include="..\CodeAnalysis.globalconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
+    <ProjectOrPackageReference ReferencePackageVersion="[1.0.0,2.0.0)" Include="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\None.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ServiceProviderExtensions.cs" />
+    <Compile Include="..\Common\System.Runtime.CompilerServices\IsExternalInit.cs" />
+    <Compile Include="..\Common\System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Third party notice -->
+    <None
+      Include="$(MSBuildThisFileDirectory)..\..\ThirdPartyNotices.md"
+      Pack="true"
+      PackagePath="ThirdPartyNotices.md"
+      CopyToOutputDirectory="None"
+    />
+  </ItemGroup>
+
+</Project>

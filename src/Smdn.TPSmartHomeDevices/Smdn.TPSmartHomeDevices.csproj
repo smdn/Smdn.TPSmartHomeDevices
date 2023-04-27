@@ -3,51 +3,32 @@ SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))">net7.0;$(TargetFrameworks)</TargetFrameworks>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>preview3</VersionSuffix>
-    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
-    <Nullable>enable</Nullable>
-    <DefineConstants
-      Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
-    >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals and the extended nameof scope in C# 11 -->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
-  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\ProjectSettings.NoAssemblies.props" />
 
   <PropertyGroup>
-    <NoWarn>CA1848;$(NoWarn)</NoWarn> <!-- CA1848: For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogXxxxx(...)' -->
-    <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>preview3</VersionSuffix>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
     <Description>
-<![CDATA[.NET implementations for Kasa and Tapo, the TP-Link smart home devices.
+<![CDATA[A meta package that addes the dependency of Smdn.TPSmartHomeDevices.Kasa, Smdn.TPSmartHomeDevices.Tapo and Smdn.TPSmartHomeDevices.MacAddressEndPoint.
+This package is deprecated, use the individual packages instead.
 ]]>
     </Description>
     <CopyrightYear>2022</CopyrightYear>
   </PropertyGroup>
 
   <PropertyGroup Label="package properties">
-    <PackageTags>tplink-kasa,tplink-tapo,smarthome,homeautomation,smartdevice</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup Label="StyleCop code analysis">
-    <StyleCopAnalyzersConfigurationFile>stylecop.json</StyleCopAnalyzersConfigurationFile>
+    <PackageTags>metapackage,tplink-kasa,tplink-tapo,$(PackageCommonTags)</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <GlobalAnalyzerConfigFiles Include="CodeAnalysis.globalconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
-    <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0" />
+    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.Kasa\Smdn.TPSmartHomeDevices.Kasa.csproj" />
+    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.Tapo\Smdn.TPSmartHomeDevices.Tapo.csproj" />
+    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.MacAddressEndPoint\Smdn.TPSmartHomeDevices.MacAddressEndPoint.csproj" />
   </ItemGroup>
 
   <ItemGroup>

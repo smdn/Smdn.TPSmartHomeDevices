@@ -1,0 +1,17 @@
+<!--
+SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup>
+    <!-- exclude build output assembly from packing -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- supress warning NU5128 (ref: https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128#scenario-2) -->
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <!-- disable package validation -->
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <!-- supress copying output files -->
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+  </PropertyGroup>
+</Project>
