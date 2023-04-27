@@ -40,19 +40,19 @@ internal class ConcreteKasaDeviceCommonTests {
     /*
      * (PhysicalAddress macAddress, IServiceProvider serviceProvider)
      */
-    yield return new object[] {
+    yield return new object?[] {
       new Type[] { typeof(PhysicalAddress), typeof(IServiceProvider) },
       new object?[] { null, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "macAddress"
     };
-    yield return new object[] {
+    yield return new object?[] {
       new Type[] { typeof(PhysicalAddress), typeof(IServiceProvider) },
       new object?[] { PhysicalAddress.None, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
-    yield return new object[] {
+    yield return new object?[] {
       new Type[] { typeof(PhysicalAddress), typeof(IServiceProvider) },
       new object?[] { PhysicalAddress.None, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
@@ -73,8 +73,10 @@ internal class ConcreteKasaDeviceCommonTests {
       types: ctorParameterTypes
     );
 
-    if (ctor is null)
+    if (ctor is null) {
       Assert.Fail("Constructor for test case was not found.");
+      return;
+    }
 
     TestCreate_ArgumentException(
       ctor,
@@ -99,8 +101,10 @@ internal class ConcreteKasaDeviceCommonTests {
       types: methodParameterTypes
     );
 
-    if (method is null)
+    if (method is null) {
       Assert.Fail("Method for test case was not found.");
+      return;
+    }
 
     TestCreate_ArgumentException(
       method,
@@ -136,7 +140,8 @@ internal class ConcreteKasaDeviceCommonTests {
             method.Invoke(null, methodParameters);
         }
       );
-      var actualException = ex.InnerException;
+
+      var actualException = ex!.InnerException!;
 
       Assert.IsInstanceOf(expectedExceptionType, actualException);
 

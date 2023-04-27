@@ -244,7 +244,7 @@ public class KasaJsonSerializerTests {
       )
     );
 
-    Assert.AreEqual(bodyLengthIndicatedInHeader, ex.IndicatedLength, nameof(ex.IndicatedLength));
+    Assert.AreEqual(bodyLengthIndicatedInHeader, ex!.IndicatedLength, nameof(ex.IndicatedLength));
     Assert.AreEqual(buffer.WrittenCount - 4, ex.ActualLength, nameof(ex.ActualLength));
   }
 

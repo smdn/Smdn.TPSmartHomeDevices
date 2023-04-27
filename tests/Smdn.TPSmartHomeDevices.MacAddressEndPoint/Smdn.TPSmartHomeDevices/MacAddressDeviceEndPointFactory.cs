@@ -126,7 +126,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
   [Test]
-  public async Task CreatedDeviceEndPoint_ToString()
+  public void CreatedDeviceEndPoint_ToString()
   {
     using var factory = new MacAddressDeviceEndPointFactory(resolver: MacAddressResolver.Null);
     var endPoint = factory.Create(address: TestMacAddress);

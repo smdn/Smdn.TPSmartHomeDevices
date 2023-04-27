@@ -24,7 +24,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
   public IPEndPoint? EndPoint { get; private set; }
   private Socket? listener;
   private Task? taskProcessListener;
-  private CancellationTokenSource? listenerCancellationTokenSource = new();
+  private CancellationTokenSource? listenerCancellationTokenSource;
 
   public Func<EndPoint, JsonDocument, JsonDocument>? FuncGenerateResponse { get; set; }
   public Func<JsonDocument, byte[]>? FuncEncryptResponse { get; set; }
@@ -108,6 +108,8 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
       exceptPort: port => port == exceptPort,
       isPortInUseException: ex => ex is SocketException
     );
+
+    listenerCancellationTokenSource = new();
 
     taskProcessListener = Task.Run(() => ProcessListenerAsync(listenerCancellationTokenSource.Token));
 
@@ -225,7 +227,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
         buffer.Clear(); // clear buffer state for next use
       }
 
-      var response = FuncGenerateResponse?.Invoke(socket.RemoteEndPoint, receivedJsonDocument);
+      var response = FuncGenerateResponse?.Invoke(socket.RemoteEndPoint!, receivedJsonDocument);
 
       if (response is null)
         return;

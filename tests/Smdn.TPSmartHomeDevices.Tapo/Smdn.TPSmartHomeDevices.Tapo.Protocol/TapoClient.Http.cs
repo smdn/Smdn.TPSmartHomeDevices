@@ -48,7 +48,7 @@ partial class TapoClientTests {
     var ex = Assert.CatchAsync(
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
 
@@ -87,7 +87,7 @@ partial class TapoClientTests {
     var ex = Assert.ThrowsAsync<HttpRequestException>(
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
 
@@ -134,7 +134,7 @@ partial class TapoClientTests {
       // This will cause a cancellation request to be made before the request is sent.
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider,
+        credential: defaultCredentialProvider!,
         cancellationToken: cts.Token
       )
     );

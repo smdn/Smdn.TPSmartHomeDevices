@@ -159,7 +159,7 @@ public partial class TapoDeviceTests {
       macAddress: PhysicalAddress.None,
       "user@mail.test",
       "password",
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.AreEqual(
@@ -178,7 +178,7 @@ public partial class TapoDeviceTests {
         macAddress: PhysicalAddress.None,
       "user@mail.test",
       "password",
-        serviceProvider: services.BuildServiceProvider()
+        serviceProvider: services!.BuildServiceProvider()
       )
     );
   }
@@ -245,6 +245,7 @@ public partial class TapoDeviceTests {
 
     Assert.IsNull(device.Session, nameof(device.Session));
 
+#pragma warning disable CA2012
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
     Assert.Throws<ObjectDisposedException>(() => device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
 
@@ -259,6 +260,7 @@ public partial class TapoDeviceTests {
 
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.GetOnOffStateAsync(), nameof(device.GetOnOffStateAsync));
     Assert.Throws<ObjectDisposedException>(() => device.GetOnOffStateAsync(), nameof(device.GetOnOffStateAsync));
+#pragma warning restore CA2012
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
@@ -381,7 +383,7 @@ public partial class TapoDeviceTests {
         cancellationTokenSource: cts,
         endPoint: new IPEndPoint(IPAddress.Loopback, 0)
       ),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.ThrowsAsync<OperationCanceledException>(
@@ -409,7 +411,7 @@ public partial class TapoDeviceTests {
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: endPoint,
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.EnsureSessionEstablishedAsync();
@@ -417,14 +419,14 @@ public partial class TapoDeviceTests {
     Assert.IsNotNull(device.Session, nameof(device.Session));
     Assert.AreEqual(
       returnTokenFromEndPoint1,
-      device.Session.Token,
+      device.Session!.Token,
       nameof(device.Session.Token)
     );
 
     var prevSession = device.Session;
 
     // endpoint changed
-    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
+    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint!.Port);
 
     endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint;
 
@@ -461,7 +463,7 @@ public partial class TapoDeviceTests {
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.EnsureSessionEstablishedAsync();
@@ -471,7 +473,7 @@ public partial class TapoDeviceTests {
 
     await pseudoDevice.DisposeAsync();
 
-    using var listener = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+    using var listener = new Socket(endPoint!.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
     listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
     listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -617,10 +619,10 @@ public partial class TapoDeviceTests {
     var invalidatedEndPoints = new List<EndPoint>();
 
     // endpoint changed
-    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
+    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint!.Port);
 
     endPoint.Invalidated += (_, _) => {
-      invalidatedEndPoints.Add(endPoint.EndPoint);
+      invalidatedEndPoints.Add(endPoint.EndPoint!);
       endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
     };
 
@@ -672,7 +674,7 @@ public partial class TapoDeviceTests {
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -709,7 +711,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -718,7 +720,7 @@ public partial class TapoDeviceTests {
 
     Assert.AreEqual(2, request, nameof(request));
     Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session.Token));
+    Assert.AreEqual("token-request1", device.Session!.Token, nameof(device.Session.Token));
   }
 
   [Test]
@@ -746,7 +748,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -754,7 +756,7 @@ public partial class TapoDeviceTests {
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
 
     Assert.AreEqual(2, request, nameof(request));
-    StringAssert.Contains("token=token-request1", ex.EndPoint.Query, nameof(ex.EndPoint.Query));
+    StringAssert.Contains("token=token-request1", ex!.EndPoint!.Query, nameof(ex.EndPoint.Query));
     Assert.IsNull(device.Session, nameof(device.Session));
   }
 
@@ -778,7 +780,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -787,7 +789,7 @@ public partial class TapoDeviceTests {
 
     Assert.AreEqual(2, request, nameof(request));
     Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session.Token, nameof(device.Session.Token));
+    Assert.AreEqual("token-request1", device.Session!.Token, nameof(device.Session.Token));
   }
 
   [Test]
@@ -814,7 +816,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -822,8 +824,8 @@ public partial class TapoDeviceTests {
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
 
     Assert.AreEqual(2, request, nameof(request));
-    Assert.AreEqual(KnownErrorCodes.Minus1301, ex.RawErrorCode, nameof(ex.RawErrorCode));
-    StringAssert.Contains("token=token-request1", ex.EndPoint.Query, nameof(ex.EndPoint.Query));
+    Assert.AreEqual(KnownErrorCodes.Minus1301, ex!.RawErrorCode, nameof(ex.RawErrorCode));
+    StringAssert.Contains("token=token-request1", ex.EndPoint!.Query, nameof(ex.EndPoint.Query));
     Assert.IsNull(device.Session, nameof(device.Session));
   }
 
@@ -857,10 +859,10 @@ public partial class TapoDeviceTests {
 
       pseudoDevices.Add(
         new(state: state) {
-          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
+          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>)!.Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
+            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>)!.Item1, cts.Token);
 
             return (
               KnownErrorCodes.Success,
@@ -882,16 +884,16 @@ public partial class TapoDeviceTests {
         : TimeSpan.FromMilliseconds(200);
 
     if (setTimeoutViaIHttpClientFactory) {
-      services.AddTapoHttpClient(
+      services!.AddTapoHttpClient(
         configureClient: static client => client.Timeout = GetTimeout()
       );
     }
 
     using var device = TapoDevice.Create(
       deviceEndPoint: new TransitionalDeviceEndPoint(
-        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
+        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint!)
       ),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     if (!setTimeoutViaIHttpClientFactory)
@@ -903,7 +905,7 @@ public partial class TapoDeviceTests {
       Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
 
       Assert.IsNotNull(device.Session, nameof(device.Session));
-      Assert.AreEqual("token-request2", device.Session.Token, nameof(device.Session.Token));
+      Assert.AreEqual("token-request2", device.Session!.Token, nameof(device.Session.Token));
     }
     finally {
       cts.Cancel();
@@ -935,10 +937,10 @@ public partial class TapoDeviceTests {
 
       pseudoDevices.Add(
         new(state: state) {
-          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>).Item2,
+          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>)!.Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
-            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>).Item1, cts.Token);
+            DelayUtils.Delay((session.State as Tuple<TimeSpan, string>)!.Item1, cts.Token);
 
             return (
               KnownErrorCodes.Success,
@@ -956,9 +958,9 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: new TransitionalDeviceEndPoint(
-        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint)
+        pseudoDevices.Select(pseudoDevice => pseudoDevice.EndPoint!)
       ),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     device.Timeout = TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
@@ -970,7 +972,7 @@ public partial class TapoDeviceTests {
 
       var ex = Assert.ThrowsAsync<TapoProtocolException>(async () => await device.GetDeviceInfoAsync());
 
-      Assert.IsInstanceOf<TimeoutException>(ex.InnerException, nameof(ex.InnerException));
+      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
 
       Assert.IsNull(device.Session, nameof(device.Session));
     }
@@ -1019,14 +1021,14 @@ public partial class TapoDeviceTests {
 
     pseudoDevice.Start();
 
-    services.AddSingleton<TapoDeviceExceptionHandler>(
+    services!.AddSingleton<TapoDeviceExceptionHandler>(
       // asserts that the OperationCanceledException must not be handled
       new AssertOperationCanceledMustNotBeHandledExceptionHandler()
     );
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -1075,7 +1077,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -1123,7 +1125,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     var (resultIsOn, resultId) = await device.GetDeviceInfoAsync<GetDeviceInfoResult, (bool, string?)>(
@@ -1145,7 +1147,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, nameof(device.Session));
@@ -1185,7 +1187,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     var deviceInfo = await device.GetDeviceInfoAsync<GetDeviceInfoOnOffStateResult>();
@@ -1213,7 +1215,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, $"{nameof(device.Session)} before GetDeviceInfoAsync");
@@ -1263,7 +1265,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, $"{nameof(device.Session)} before SetDeviceInfoAsync");
@@ -1304,7 +1306,7 @@ public partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.IsNull(device.Session, $"{nameof(device.Session)} before SetDeviceInfoAsync");

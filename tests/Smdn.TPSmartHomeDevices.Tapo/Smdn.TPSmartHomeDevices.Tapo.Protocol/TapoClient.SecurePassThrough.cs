@@ -32,7 +32,7 @@ partial class TapoClientTests {
     Assert.DoesNotThrowAsync(
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
 
@@ -61,9 +61,11 @@ partial class TapoClientTests {
     Assert.ThrowsAsync<InvalidOperationException>(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
+#pragma warning disable CA2012
     Assert.Throws<InvalidOperationException>(
       () => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
+#pragma warning restore CA2012
   }
 
   [Test]
@@ -91,7 +93,7 @@ partial class TapoClientTests {
     Assert.DoesNotThrowAsync(
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
 
@@ -101,7 +103,7 @@ partial class TapoClientTests {
 
     Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual(new GetDeviceInfoRequest().Method, ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session!.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
   }
 
   [Test]
@@ -129,7 +131,7 @@ partial class TapoClientTests {
     Assert.DoesNotThrowAsync(
       async () => await client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
 
@@ -139,6 +141,6 @@ partial class TapoClientTests {
 
     Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual("securePassthrough", ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session!.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
   }
 }

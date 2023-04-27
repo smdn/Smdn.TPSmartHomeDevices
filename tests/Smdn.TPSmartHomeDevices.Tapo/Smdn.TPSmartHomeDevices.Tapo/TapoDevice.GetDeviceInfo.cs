@@ -63,7 +63,7 @@ partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     var info = await device.GetDeviceInfoAsync();
@@ -103,7 +103,7 @@ partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     Assert.AreEqual(

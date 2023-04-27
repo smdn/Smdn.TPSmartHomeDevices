@@ -45,7 +45,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
     );
     Assert.IsNotNull(factory, nameof(factory));
 
-    using var client = factory.CreateClient(name: string.Empty);
+    using var client = factory!.CreateClient(name: string.Empty);
 
     Assert.IsNotNull(client, nameof(client));
     Assert.AreEqual(timeout, client.Timeout, nameof(client.Timeout));
@@ -76,7 +76,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
     );
     Assert.IsNotNull(factory, nameof(factory));
 
-    using var client = factory.CreateClient(name: string.Empty);
+    using var client = factory!.CreateClient(name: string.Empty);
 
     Assert.IsNotNull(client, nameof(client));
     Assert.AreEqual(timeout, client.Timeout, nameof(client.Timeout));

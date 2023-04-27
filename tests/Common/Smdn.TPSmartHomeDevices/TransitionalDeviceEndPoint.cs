@@ -18,11 +18,11 @@ internal sealed class TransitionalDeviceEndPoint : IDeviceEndPoint {
     this.endPoints = endPoints.ToArray();
   }
 
-  public async ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
+  public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken)
   {
     if (endPoints.Length <= current)
       throw new InvalidOperationException("transitioned to the maximum value");
 
-    return endPoints[current++];
+    return new(endPoints[current++]);
   }
 }

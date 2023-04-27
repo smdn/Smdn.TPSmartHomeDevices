@@ -24,19 +24,19 @@ internal class ConcreteTapoDeviceCommonTests {
      */
     var parameterTypes = new[] { typeof(string), typeof(string), typeof(string), typeof(IServiceProvider) };
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, email, password, null },
       typeof(ArgumentNullException),
       "host"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { host, null, password, null },
       typeof(ArgumentNullException),
       "email"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { host, email, null, null },
       typeof(ArgumentNullException),
@@ -48,19 +48,19 @@ internal class ConcreteTapoDeviceCommonTests {
      */
     parameterTypes = new[] { typeof(string), typeof(IServiceProvider) };
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "host"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { host, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { host, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
@@ -72,19 +72,19 @@ internal class ConcreteTapoDeviceCommonTests {
      */
     parameterTypes = new[] { typeof(IPAddress), typeof(string), typeof(string), typeof(IServiceProvider) };
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, email, password, null },
       typeof(ArgumentNullException),
       "ipAddress"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { IPAddress.Loopback, null, password, null },
       typeof(ArgumentNullException),
       "email"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { IPAddress.Loopback, email, null, null },
       typeof(ArgumentNullException),
@@ -96,19 +96,19 @@ internal class ConcreteTapoDeviceCommonTests {
      */
     parameterTypes = new[] { typeof(IPAddress), typeof(IServiceProvider) };
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, null },
       typeof(ArgumentNullException),
       "ipAddress"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { IPAddress.Loopback, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { IPAddress.Loopback, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
@@ -125,31 +125,31 @@ internal class ConcreteTapoDeviceCommonTests {
     services = new ServiceCollection();
     services.AddDeviceEndPointFactory(endPointFactory);
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, email, password, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "macAddress"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, null, password, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "email"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, email, null, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "password"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, email, password, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, email, password, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
@@ -161,19 +161,19 @@ internal class ConcreteTapoDeviceCommonTests {
      */
     parameterTypes = new[] { typeof(PhysicalAddress), typeof(IServiceProvider) };
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "macAddress"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, null },
       typeof(ArgumentNullException),
       "serviceProvider"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { PhysicalAddress.None, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
@@ -191,19 +191,19 @@ internal class ConcreteTapoDeviceCommonTests {
 
     var credential = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { null, credential, services.BuildServiceProvider() },
       typeof(ArgumentNullException),
       "deviceEndPoint"
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { new ThrowExceptionDeviceEndPoint(), null, new ServiceCollection().BuildServiceProvider() },
       typeof(InvalidOperationException),
       null
     };
-    yield return new object[] {
+    yield return new object?[] {
       parameterTypes,
       new object?[] { new ThrowExceptionDeviceEndPoint(), null, null },
       typeof(ArgumentNullException),
@@ -224,8 +224,10 @@ internal class ConcreteTapoDeviceCommonTests {
       types: ctorParameterTypes
     );
 
-    if (ctor is null)
+    if (ctor is null) {
       Assert.Fail("Constructor for test case was not found.");
+      return;
+    }
 
     TestCreate_ArgumentException(
       ctor,
@@ -250,8 +252,10 @@ internal class ConcreteTapoDeviceCommonTests {
       types: methodParameterTypes
     );
 
-    if (method is null)
+    if (method is null) {
       Assert.Fail("Method for test case was not found.");
+      return;
+    }
 
     TestCreate_ArgumentException(
       method,
@@ -287,7 +291,7 @@ internal class ConcreteTapoDeviceCommonTests {
             method.Invoke(null, methodParameters);
         }
       );
-      var actualException = ex.InnerException;
+      var actualException = ex!.InnerException;
 
       Assert.IsInstanceOf(expectedExceptionType, actualException);
 

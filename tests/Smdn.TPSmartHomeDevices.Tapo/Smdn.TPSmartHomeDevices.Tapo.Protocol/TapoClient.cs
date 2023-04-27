@@ -106,12 +106,21 @@ public partial class TapoClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
+
+    Assert.ThrowsAsync<ObjectDisposedException>(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      )
+    );
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
+#pragma warning restore CA2012
   }
 
   [Test]
@@ -128,7 +137,7 @@ public partial class TapoClientTests {
 
     await client.AuthenticateAsync(
       identity: null,
-      credential: defaultCredentialProvider
+      credential: defaultCredentialProvider!
     );
 
     Assert.IsNotNull(client.Session, "Session before dispose");
@@ -137,12 +146,23 @@ public partial class TapoClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
+
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());
+    Assert.ThrowsAsync<ObjectDisposedException>(async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());
+
     Assert.Throws<ObjectDisposedException>(
       () => client.AuthenticateAsync(
         identity: null,
-        credential: defaultCredentialProvider
+        credential: defaultCredentialProvider!
       )
     );
+    Assert.ThrowsAsync<ObjectDisposedException>(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      )
+    );
+#pragma warning restore CA2012
   }
 }

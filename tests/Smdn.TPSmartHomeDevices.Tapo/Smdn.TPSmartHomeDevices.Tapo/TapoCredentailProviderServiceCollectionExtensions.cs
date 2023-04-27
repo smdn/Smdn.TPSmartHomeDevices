@@ -171,7 +171,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   }
 
   private class ConcreteTapoCredentialProvider : ITapoCredentialProvider {
-    public ITapoCredential GetCredential(ITapoCredentialIdentity identity)
+    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
       => throw new NotSupportedException();
   }
 
@@ -219,7 +219,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.Throws<ArgumentNullException>(
       () => services.AddTapoCredentialProvider(
-        credentialProvider: null
+        credentialProvider: null!
       )
     );
   }

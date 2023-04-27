@@ -33,7 +33,7 @@ partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.TurnOnAsync();
@@ -61,7 +61,7 @@ partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.TurnOffAsync();
@@ -90,7 +90,7 @@ partial class TapoDeviceTests {
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.SetOnOffStateAsync(newState);

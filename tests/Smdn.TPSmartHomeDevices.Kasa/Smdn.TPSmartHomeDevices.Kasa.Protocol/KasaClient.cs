@@ -41,8 +41,19 @@ public class KasaClientTests {
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsFalse(client.IsConnected), nameof(client.IsConnected));
     Assert.Throws<ObjectDisposedException>(() => Assert.AreEqual(client.EndPoint, endPoint, nameof(client.EndPoint)));
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: new { },
+        composeResult: static _ => _
+      ),
+      nameof(client.SendAsync)
+    );
+#pragma warning restore CA2012
+    Assert.ThrowsAsync<ObjectDisposedException>(
+      async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
@@ -79,8 +90,19 @@ public class KasaClientTests {
 
     Assert.Throws<ObjectDisposedException>(() => Assert.IsFalse(client.IsConnected), nameof(client.IsConnected));
     Assert.Throws<ObjectDisposedException>(() => Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint)));
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: new { },
+        composeResult: static _ => _
+      ),
+      nameof(client.SendAsync)
+    );
+#pragma warning restore CA2012
+    Assert.ThrowsAsync<ObjectDisposedException>(
+      async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },

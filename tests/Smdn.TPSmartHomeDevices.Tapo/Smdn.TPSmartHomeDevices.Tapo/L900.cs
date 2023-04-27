@@ -37,12 +37,14 @@ public class L900Tests {
   {
     using var device = new L900(
       deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
+#pragma warning disable CA2012
     var ex = Assert.Throws<ArgumentOutOfRangeException>(
       () => device.SetBrightnessAsync(brightness: newBrightness)
     )!;
+#pragma warning restore CA2012
 
     Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
     Assert.AreEqual(newBrightness, ex.ActualValue, nameof(ex.ActualValue));
@@ -74,7 +76,7 @@ public class L900Tests {
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.SetBrightnessAsync(brightness: newBrightness);
@@ -96,12 +98,14 @@ public class L900Tests {
   {
     using var device = new L900(
       deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
+#pragma warning disable CA2012
     var ex = Assert.Throws<ArgumentOutOfRangeException>(
       () => device.SetColorAsync(hue: newHue, saturation: newSaturation, brightness: newBrightness)
     )!;
+#pragma warning restore CA2012
 
     Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
     Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
@@ -145,7 +149,7 @@ public class L900Tests {
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.SetColorAsync(hue: newHue, saturation: newSaturation, brightness: newBrightness);
@@ -164,12 +168,14 @@ public class L900Tests {
   {
     using var device = new L900(
       deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
+#pragma warning disable CA2012
     var ex = Assert.Throws<ArgumentOutOfRangeException>(
       () => device.SetColorHueAsync(hue: newHue, brightness: newBrightness)
     )!;
+#pragma warning restore CA2012
 
     Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
     Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
@@ -209,7 +215,7 @@ public class L900Tests {
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.SetColorHueAsync(hue: newHue, brightness: newBrightness);
@@ -228,12 +234,14 @@ public class L900Tests {
   {
     using var device = new L900(
       deviceEndPoint: new ThrowExceptionDeviceEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
+#pragma warning disable CA2012
     var ex = Assert.Throws<ArgumentOutOfRangeException>(
       () => device.SetColorSaturationAsync(saturation: newSaturation, brightness: newBrightness)
     )!;
+#pragma warning restore CA2012
 
     Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
     Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
@@ -273,7 +281,7 @@ public class L900Tests {
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
-      serviceProvider: services.BuildServiceProvider()
+      serviceProvider: services!.BuildServiceProvider()
     );
 
     await device.SetColorSaturationAsync(saturation: newSaturation, brightness: newBrightness);

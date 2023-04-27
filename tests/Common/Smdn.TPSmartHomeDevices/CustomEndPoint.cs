@@ -18,7 +18,7 @@ public class CustomEndPoint : EndPoint, IEquatable<CustomEndPoint> {
   public override bool Equals(object? obj)
     => obj switch {
       CustomEndPoint ep => Equals(ep),
-      null => false,
+      _ => false,
     };
 
   public bool Equals(CustomEndPoint? other)

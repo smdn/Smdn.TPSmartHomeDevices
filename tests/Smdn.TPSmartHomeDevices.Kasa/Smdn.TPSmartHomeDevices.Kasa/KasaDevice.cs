@@ -123,7 +123,9 @@ public class KasaDeviceTests {
     Assert.Throws<ObjectDisposedException>(() => Assert.IsFalse(device.IsConnected), nameof(device.IsConnected));
 
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(() => device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
+#pragma warning restore CA2012
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
@@ -179,7 +181,7 @@ public class KasaDeviceTests {
   private class ConcreteKasaDevice : KasaDevice {
     public ConcreteKasaDevice(
       IDeviceEndPoint deviceEndPoint,
-      IServiceProvider serviceProvider = null
+      IServiceProvider? serviceProvider = null
     )
       : base(
         deviceEndPoint: deviceEndPoint,
@@ -257,12 +259,14 @@ public class KasaDeviceTests {
 
     device.Dispose();
 
+#pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
       )
     );
+#pragma warning restore CA2012
     Assert.ThrowsAsync<ObjectDisposedException>(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
@@ -382,7 +386,7 @@ public class KasaDeviceTests {
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
     // endpoint changed
-    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
+    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint!.Port);
 
     endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint;
 
@@ -544,12 +548,12 @@ public class KasaDeviceTests {
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
     // endpoint changed
-    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint.Port);
+    pseudoDeviceEndPoint2.Start(exceptPort: pseudoDeviceEndPoint1.EndPoint!.Port);
 
     var invalidatedEndPoints = new List<EndPoint>();
 
     endPoint.Invalidated += (_, _) => {
-      invalidatedEndPoints.Add(endPoint.EndPoint);
+      invalidatedEndPoints.Add(endPoint.EndPoint!);
       endPoint.EndPoint = pseudoDeviceEndPoint2.EndPoint; // change end point since end point invalidated
     };
 

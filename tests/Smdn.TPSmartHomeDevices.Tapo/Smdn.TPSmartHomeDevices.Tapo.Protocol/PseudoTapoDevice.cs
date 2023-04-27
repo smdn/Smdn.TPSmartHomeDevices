@@ -112,7 +112,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       ? $"http://[{endPoint.Address}]:{endPoint.Port}/"
       : $"http://{endPoint.Address}:{endPoint.Port}/";
 
-  public object State { get; }
+  public object? State { get; }
   public IPEndPoint? EndPoint { get; private set; }
   public Uri? EndPointUri => EndPoint is null ? null : new Uri(CreateEndPointHttpUrl(EndPoint));
   private HttpListener? listener;
@@ -123,7 +123,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   private readonly ConcurrentDictionary<string, UnauthorizedSession> unauthorizedSessions = new();
   private readonly ConcurrentDictionary<string, AuthorizedSession> authorizedSessions = new();
 
-  public Action<HttpListenerContext> FuncProcessRequest { get; set; }
+  public Action<HttpListenerContext>? FuncProcessRequest { get; set; }
   public Func<SessionBase, string?>? FuncGenerateToken { get; set; }
   public Func<SessionBase, RSA, HandshakeResponse>? FuncGenerateHandshakeResponse { get; set; }
   public Func<SessionBase, string?>? FuncGenerateCookieValue { get; set; }
@@ -447,6 +447,11 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
         var passThroughMethod = passThroughMethodProperty.GetString();
 
+        if (passThroughMethod is null) {
+          await WriteBadRequestPlainTextContentAsync(context.Response, "pass through method is null or undefined").ConfigureAwait(false);
+          return;
+        }
+
         switch (passThroughMethod) {
           case "login_device": {
             if (session is UnauthorizedSession unauthorizedSession) {
@@ -614,7 +619,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     SessionBase? session = string.IsNullOrEmpty(token)
       ? TapoSessionCookieUtils.TryGetCookie(context.Request.Headers.GetValues("Cookie"), out var sessionId, out _)
-        ? unauthorizedSessions.TryGetValue(sessionId, out var unauthorizedSession)
+        ? unauthorizedSessions.TryGetValue(sessionId!, out var unauthorizedSession)
           ? unauthorizedSession
           : null
         : unauthorizedSessions.FirstOrDefault(pair => pair.Value.RemoteEndPoint.Equals(context.Request.RemoteEndPoint)).Value // find session by requested remote end point

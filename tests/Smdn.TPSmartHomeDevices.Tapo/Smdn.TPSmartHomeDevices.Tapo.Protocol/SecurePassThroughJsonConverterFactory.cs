@@ -210,7 +210,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
       password: "pass"
     );
 
-    var credentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
+    var credentialProvider = services.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
 
     yield return new object[] {
       new LoginDeviceRequest(credentialProvider),
@@ -488,7 +488,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   private class NullLogger : ILogger {
-    public IDisposable? BeginScope<TState>(TState state) => null; // do nothing
+    public IDisposable BeginScope<TState>(TState state) => NullLoggerScope.Instance; // do nothing
     public bool IsEnabled(LogLevel logLevel) => true; // enable all log level
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { } // do nothing
   }
