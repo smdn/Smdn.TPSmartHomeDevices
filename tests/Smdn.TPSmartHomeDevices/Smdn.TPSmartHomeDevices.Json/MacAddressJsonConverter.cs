@@ -19,6 +19,7 @@ public class MacAddressJsonConverterTests {
     yield return new object?[] { @"{""mac"": ""invalid""}", null }; // invalid
     yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:XX""}", null }; // invalid
     yield return new object?[] { @"{""mac"": ""0x00005E005300""}", null }; // invalid
+    yield return new object?[] { @"{""mac"": ""00005E005300""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
     yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
     yield return new object?[] { @"{""mac"": ""00-00-5E-00-53-00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
     yield return new object?[] { @"{""mac"": ""00:00:00:00:00:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }) };
