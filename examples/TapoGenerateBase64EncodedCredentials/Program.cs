@@ -1,4 +1,6 @@
-﻿using Smdn.TPSmartHomeDevices.Tapo.Credentials;
+﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+// SPDX-License-Identifier: MIT
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 const string email = "user@mail.test";
 const string password = "password";

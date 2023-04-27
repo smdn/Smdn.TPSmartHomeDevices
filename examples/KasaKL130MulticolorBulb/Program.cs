@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+// SPDX-License-Identifier: MIT
+using System.Net;
 using Smdn.TPSmartHomeDevices.Kasa;
 
 using var bulb = new KL130(IPAddress.Parse("192.0.2.255"));

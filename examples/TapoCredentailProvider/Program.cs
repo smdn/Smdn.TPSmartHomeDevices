@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+// SPDX-License-Identifier: MIT
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Smdn.TPSmartHomeDevices.Tapo;
 
