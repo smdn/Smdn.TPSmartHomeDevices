@@ -1,0 +1,37 @@
+<!--
+SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet)' == 'true' ">net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet)' == 'true' and $([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))">net7.0;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetCoreApp)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetFx)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Smdn.Fundamental.Stream" Version="3.*" />
+    <PackageReference Include="Smdn.Fundamental.PortNumber" Version="3.*" />
+    <PackageReference Include="Smdn.Test.NUnit.Constraints" Version="1.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SmdnTestTargetProjectDirectory)..\Common\System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\CustomEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\DynamicDeviceEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\NullMacAddressDeviceEndPointFactory.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\RequestCancellationAfterReturnDeviceEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\StaticMacAddressDeviceEndPointFactory.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ThrowExceptionDeviceEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\TransitionalDeviceEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\UnresolvedDeviceEndPoint.cs" />
+  </ItemGroup>
+</Project>
