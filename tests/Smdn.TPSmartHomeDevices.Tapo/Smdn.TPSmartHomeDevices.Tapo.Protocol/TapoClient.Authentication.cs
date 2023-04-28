@@ -495,6 +495,97 @@ partial class TapoClientTests {
     );
   }
 
+  private class DisposableCredential : ITapoCredential {
+    private string username;
+    private string password;
+
+    public bool IsDisposed => username is null && password is null;
+
+    public DisposableCredential(string username, string password)
+    {
+      this.username = username;
+      this.password = password;
+    }
+
+    public void WritePasswordPropertyValue(Utf8JsonWriter writer)
+    {
+      if (IsDisposed)
+        throw new InvalidOperationException();
+
+      writer.WriteStringValue(TapoCredentials.ToBase64EncodedString(password));
+    }
+
+    public void WriteUsernamePropertyValue(Utf8JsonWriter writer)
+    {
+      if (IsDisposed)
+        throw new InvalidOperationException();
+
+      writer.WriteStringValue(TapoCredentials.ToBase64EncodedSHA1DigestString(username));
+    }
+
+    public void Dispose()
+    {
+      username = null!;
+      password = null!;
+    }
+  }
+
+  private class DisposableCredentialProvider : ITapoCredentialProvider {
+    private readonly ITapoCredential credential;
+
+    public DisposableCredentialProvider(DisposableCredential credential)
+    {
+      this.credential = credential;
+    }
+
+    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+      => credential;
+  }
+
+  [Test]
+  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten()
+  {
+    const string username = "user";
+    const string password = "pass";
+    const string expectedUsernamePropertyValue = "MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ=="; // "user"
+    const string expectedPasswordPropertyValue = "cGFzcw=="; // "pass"
+    const string token = "token";
+
+    var credential = new DisposableCredential(username, password);
+    var credentialProvider = new DisposableCredentialProvider(credential);
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateLoginDeviceResponse = (session, param) => {
+        Assert.IsTrue(credential.IsDisposed, "ITapoCredential.Dispose must be called up to this point");
+
+        Assert.IsTrue(param.TryGetProperty("username", out var propUsername), $"{nameof(param)} must have 'username' property");
+        Assert.IsTrue(param.TryGetProperty("password", out var propPassword), $"{nameof(param)} must have 'password' property");
+
+        Assert.AreEqual(expectedUsernamePropertyValue, propUsername.GetString(), nameof(propUsername));
+        Assert.AreEqual(expectedPasswordPropertyValue, propPassword.GetString(), nameof(propPassword));
+
+        return new LoginDeviceResponse() {
+          ErrorCode = KnownErrorCodes.Minus1501,
+          Result = new() { Token = token },
+        };
+      },
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+    Assert.ThrowsAsync<TapoAuthenticationException>(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: credentialProvider
+      )
+    );
+
+    Assert.IsTrue(credential.IsDisposed, "ITapoCredential.Dispose must be called");
+  }
+
   [Test]
   public async Task AuthenticateAsync_LoginDevice_ErrorResponse()
   {
