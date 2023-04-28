@@ -770,17 +770,10 @@ partial class TapoClientTests {
     };
 
     var endPoint = device.Start();
-
-    var services = new ServiceCollection();
     var logger = new Logger();
 
     const string username = "<username>";
     const string password = "<password>";
-
-    services.AddTapoCredential("username", "password");
-    services.TryAdd(
-      ServiceDescriptor.Singleton(typeof(ILogger), logger)
-    );
 
     using var client = new TapoClient(
       endPoint: endPoint,

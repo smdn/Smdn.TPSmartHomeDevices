@@ -211,9 +211,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     Assert.AreSame(firstCredentialProvider, registeredCredentialProvider);
   }
 
-  [TestCase(Base64UserNameSHA1Digest, null)]
-  [TestCase(null, Base64Password)]
-  public void AddTapoCredentialProvider_ArgumentNull(string base64UserNameSHA1Digest, string base64Password)
+  [Test]
+  public void AddTapoCredentialProvider_ArgumentNull()
   {
     var services = new ServiceCollection();
 
