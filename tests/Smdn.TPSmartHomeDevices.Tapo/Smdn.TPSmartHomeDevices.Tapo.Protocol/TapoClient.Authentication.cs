@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -542,8 +543,14 @@ partial class TapoClientTests {
       => credential;
   }
 
-  [Test]
-  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten()
+  private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten()
+  {
+    yield return new object?[] { null };
+    yield return new object?[] { NullLogger.Instance };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten))]
+  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten(ILogger? logger)
   {
     const string username = "user";
     const string password = "pass";
@@ -573,7 +580,8 @@ partial class TapoClientTests {
     var endPoint = device.Start();
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: endPoint,
+      logger: logger // ILogger should not affect the operation
     );
 
     Assert.ThrowsAsync<TapoAuthenticationException>(
