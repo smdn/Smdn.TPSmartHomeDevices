@@ -4,7 +4,14 @@ using System;
 
 namespace Smdn.TPSmartHomeDevices;
 
+/// <summary>
+/// The exception that is thrown when the device endpoint resolution by <see cref="IDeviceEndPoint.ResolveAsync"/> fails.
+/// </summary>
+/// <seealso cref="IDeviceEndPointExtensions.ResolveOrThrowAsync(IDeviceEndPoint, int, System.Threading.CancellationToken)"/>
 public class DeviceEndPointResolutionException : Exception {
+  /// <summary>
+  /// Gets the <see cref="IDeviceEndPoint"/> that caused the exception.
+  /// </summary>
   public IDeviceEndPoint DeviceEndPoint { get; }
 
   public DeviceEndPointResolutionException(

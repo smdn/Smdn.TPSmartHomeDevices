@@ -23,6 +23,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
+/// <seealso cref="SecurePassThroughInvalidPaddingException"/>
 public sealed class SecurePassThroughJsonConverterFactory :
   JsonConverterFactory,
   IDisposable,

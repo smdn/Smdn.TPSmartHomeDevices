@@ -5,6 +5,9 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+/// <summary>
+/// The exception that is thrown when the Tapo device responds a response with an error code.
+/// </summary>
 public class TapoErrorResponseException : TapoProtocolException {
   internal static void ThrowIfError(Uri requestUri, string requestMethod, int errorCode)
   {
@@ -35,7 +38,14 @@ public class TapoErrorResponseException : TapoProtocolException {
     return $"Request '{requestMethod}' failed with error code {rawErrorCode}.{informationalErrorMessage} (Request URI: {requestEndPoint})";
   }
 
+  /// <summary>
+  /// Gets the <c>method</c> of the request that caused the exception.
+  /// </summary>
   public string RequestMethod { get; }
+
+  /// <summary>
+  /// Gets the <c>error_code</c> of the response that caused the exception.
+  /// </summary>
   public int RawErrorCode { get; }
 
   public TapoErrorResponseException(

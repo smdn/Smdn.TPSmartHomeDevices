@@ -7,6 +7,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// <summary>
 /// The type that reflects <c>securePassthrough</c> JSON response.
 /// </summary>
+/// <typeparam name="TPassThroughResponse">A type that will be deserialized from the value of the encapsulated <c>response</c> JSON property.</typeparam>
 public readonly struct SecurePassThroughResponse<TPassThroughResponse> :
   ITapoResponse
   where TPassThroughResponse : ITapoPassThroughResponse

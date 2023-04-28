@@ -5,7 +5,13 @@ using System.Net;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
+/// <summary>
+/// The exception that is thrown when the communication with the Kasa device encounters an unrecoverable condition.
+/// </summary>
 public abstract class KasaProtocolException : InvalidOperationException {
+  /// <summary>
+  /// Gets the <see cref="EndPoint"/> of the Kasa device that caused the exception.
+  /// </summary>
   public EndPoint DeviceEndPoint { get; }
 
   protected KasaProtocolException(

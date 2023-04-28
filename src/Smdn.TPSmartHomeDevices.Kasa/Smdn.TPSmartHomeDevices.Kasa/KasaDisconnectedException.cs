@@ -5,6 +5,9 @@ using System.Net;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
+/// <summary>
+/// The exception that is thrown when the Kasa device disconnects the connection.
+/// </summary>
 public class KasaDisconnectedException : KasaProtocolException {
   public KasaDisconnectedException(
     string message,

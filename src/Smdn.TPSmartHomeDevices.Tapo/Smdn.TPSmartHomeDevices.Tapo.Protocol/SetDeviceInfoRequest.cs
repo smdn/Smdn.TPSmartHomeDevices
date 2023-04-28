@@ -7,6 +7,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// <summary>
 /// The type that reflects <c>set_device_info</c> JSON request.
 /// </summary>
+/// <typeparam name="TParameters">A type that will be serialized to the value of the <c>params</c> JSON property.</typeparam>
 public readonly struct SetDeviceInfoRequest<TParameters> : ITapoPassThroughRequest {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]

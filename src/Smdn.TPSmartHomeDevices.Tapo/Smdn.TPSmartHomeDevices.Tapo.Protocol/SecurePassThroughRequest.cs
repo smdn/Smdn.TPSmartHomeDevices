@@ -7,6 +7,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// <summary>
 /// The type that reflects <c>securePassthrough</c> JSON request.
 /// </summary>
+/// <typeparam name="TPassThroughRequest">A type that will be serialized to the value of the encapsulated <c>request</c> JSON property.</typeparam>
 public readonly struct SecurePassThroughRequest<TPassThroughRequest> :
   ITapoRequest
   where TPassThroughRequest : notnull, ITapoPassThroughRequest
