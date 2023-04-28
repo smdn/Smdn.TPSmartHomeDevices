@@ -3,7 +3,7 @@
 using System.Net;
 using Smdn.TPSmartHomeDevices.Tapo;
 
-var lightstrip = new L900(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
+using var lightstrip = new L900(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
 
 for (var hue = 0; hue <= 360; hue += 30) {
   await lightstrip.SetColorAsync(hue: hue, saturation: 30);

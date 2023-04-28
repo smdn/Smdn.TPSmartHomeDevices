@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Smdn.TPSmartHomeDevices.Tapo;
 
-var device = TapoDevice.Create(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
+using var device = TapoDevice.Create(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
 
 var info = await device.GetDeviceInfoAsync();
 

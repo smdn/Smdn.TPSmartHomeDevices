@@ -17,7 +17,7 @@ services.AddDeviceEndPointFactory(
   )
 );
 
-var bulb = new L530(
+using var bulb = new L530(
   macAddress: PhysicalAddress.Parse("00:00:5E:00:53:00"),
   email: "user@mail.test",
   password: "password",

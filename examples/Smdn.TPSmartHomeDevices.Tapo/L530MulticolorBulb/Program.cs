@@ -3,7 +3,7 @@
 using System.Net;
 using Smdn.TPSmartHomeDevices.Tapo;
 
-var bulb = new L530(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
+using var bulb = new L530(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
 
 for (var temp = 2500; temp <= 6500; temp += 500) {
   await bulb.SetColorTemperatureAsync(colorTemperature: temp, brightness: 15);
