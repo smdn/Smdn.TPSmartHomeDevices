@@ -50,12 +50,12 @@ The following devices and features are currently supported.
 
 - Supported devices (as of version 1.0.0)
   - Tapo
-    - L530 multicolor bulb
-    - L900 multicolor light strip
-    - P105 smart plug
+    - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
+    - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
+    - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
   - Kasa
-    - HS105 smart plug
-    - KL130 multicolor bulb
+    - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
+    - KL130 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)
 - Supported device features (as of version 1.0.0)
   - Turn on/off
   - Set color (color temperature)
@@ -68,6 +68,8 @@ The following devices and features are currently supported.
   - Customizable error handling
   - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
     - Logging (`Microsoft.Extensions.Logging`)
+      - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/)
+      - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
     - HTTP (`Microsoft.Extensions.Http`)
 - Testing
   - Tested with pseudo devices and actual devices
