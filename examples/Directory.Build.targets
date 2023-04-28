@@ -1,0 +1,27 @@
+<!--
+SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project InitialTargets="ReplaceSmdnTPSmartHomeDevicesPackageReferencesToProjectReferences">
+  <!-- Replace PackageReference to ProjectReference of the local project -->
+  <Target
+    Name="ReplaceSmdnTPSmartHomeDevicesPackageReferencesToProjectReferences"
+    Condition=" '$(UseLocalProjectInsteadOfPublishedPackage)' == 'true' "
+  >
+    <ItemGroup>
+      <_SmdnTPSmartHomeDevicesReference
+        Include="@(PackageReference)"
+        Condition="$([System.String]::new('%(Identity)').StartsWith('Smdn.TPSmartHomeDevices'))"
+        ProjectPath="$(MSBuildThisFileDirectory)..\src\%(Identity)\%(Identity).csproj"
+      />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Remove package references to Smdn.TPSmartHomeDevices.* -->
+      <PackageReference Remove="@(_SmdnTPSmartHomeDevicesReference)" />
+
+      <!-- Include project reference to Smdn.TPSmartHomeDevices.* -->
+      <ProjectReference Include="%(_SmdnTPSmartHomeDevicesReference.ProjectPath)" />
+    </ItemGroup>
+  </Target>
+</Project>

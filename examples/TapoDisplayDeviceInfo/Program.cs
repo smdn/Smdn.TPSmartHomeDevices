@@ -1,7 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System.Net;
-using Smdn.Net;
+using System.Net.NetworkInformation;
 using Smdn.TPSmartHomeDevices.Tapo;
 
 var device = TapoDevice.Create(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
@@ -10,7 +10,7 @@ var info = await device.GetDeviceInfoAsync();
 
 const string format = "|{0,25} | {1,-40}|";
 
-Console.WriteLine(format, nameof(info.MacAddress), info.MacAddress?.ToMacAddressString(':'));
+Console.WriteLine(format, nameof(info.MacAddress), ToMacAddressString(info.MacAddress));
 Console.WriteLine(format, nameof(info.IPAddress), info.IPAddress);
 Console.WriteLine(format, nameof(info.ModelName), info.ModelName);
 Console.WriteLine(format, nameof(info.TypeName), info.TypeName);
@@ -45,6 +45,12 @@ for (;;) {
 
   await Task.Delay(3000);
 }
+
+static string ToMacAddressString(PhysicalAddress? macAddress)
+  => string.Join(
+    ':',
+    (macAddress?.GetAddressBytes() ?? Array.Empty<byte>()).Select(static b => b.ToString("X2", provider: null))
+  );
 
 static string GetEmojiForSignalLevel(int? level)
   => level switch {

@@ -1,0 +1,13 @@
+<!--
+SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup>
+    <!--
+      Set this property to `true` if you want to build and run the examples using the local projects
+      instead of published NuGet packages.
+    -->
+    <UseLocalProjectInsteadOfPublishedPackage>false</UseLocalProjectInsteadOfPublishedPackage>
+  </PropertyGroup>
+</Project>
