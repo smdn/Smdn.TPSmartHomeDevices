@@ -3,13 +3,14 @@ SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\ProjectSettings.NoAssemblies.props" />
-
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
     <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix>preview3</VersionSuffix>
-    <DevelopmentDependency>true</DevelopmentDependency>
+    <!-- exclude build output assembly from packing -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- ignore warning NU5128 -->
+    <NoWarn>NU5128;$(NoWarn)</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
@@ -26,9 +27,9 @@ This package is deprecated, use the individual packages instead.
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.Kasa\Smdn.TPSmartHomeDevices.Kasa.csproj" />
-    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.Tapo\Smdn.TPSmartHomeDevices.Tapo.csproj" />
-    <ProjectOrPackageReference ReferencePackageVersion="*-*" Include="..\Smdn.TPSmartHomeDevices.MacAddressEndPoint\Smdn.TPSmartHomeDevices.MacAddressEndPoint.csproj" />
+    <PackageReference Version="[1.0.0-*,1.0.0)" Include="Smdn.TPSmartHomeDevices.Kasa" />
+    <PackageReference Version="[1.0.0-*,1.0.0)" Include="Smdn.TPSmartHomeDevices.Tapo" />
+    <PackageReference Version="[1.0.0-*,1.0.0)" Include="Smdn.TPSmartHomeDevices.MacAddressEndPoint" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,5 +41,4 @@ This package is deprecated, use the individual packages instead.
       CopyToOutputDirectory="None"
     />
   </ItemGroup>
-
 </Project>
