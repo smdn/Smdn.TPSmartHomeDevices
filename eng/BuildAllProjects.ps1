@@ -17,7 +17,9 @@ dotnet new sln
 # add build target projects to the solution
 $ProjectFiles = Get-ChildItem -Path $([System.IO.Path]::Join($RepositoryRootDirectory, 'src', 'Smdn.*', '*')) -Filter '*.csproj'
 
-dotnet sln add $($ProjectFiles -join ' ')
+foreach ($ProjectFile in $ProjectFiles) {
+  dotnet sln add $ProjectFile
+}
 
 # restore dependencies
 dotnet restore
