@@ -91,6 +91,42 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
   private readonly struct NullResult { }
 
   [Test]
+  public async Task AddTapoHttpClient_ConfigureClient_BaseAddressMustBeOverwriten()
+  {
+    var services = new ServiceCollection();
+
+    services.AddTapoCredential(
+      "user",
+      "pass"
+    );
+    services.AddTapoHttpClient(
+      configureClient: client => {
+        client.BaseAddress = new Uri("http://test.invalid/");
+      }
+    );
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = static (_, _, _) => new(
+        KnownErrorCodes.Success,
+        new GetDeviceInfoResponse<NullResult>() {
+          ErrorCode = KnownErrorCodes.Success,
+          Result = new(),
+        }
+      ),
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services.BuildServiceProvider()
+    );
+
+    Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
+  }
+
+  [Test]
   public async Task AddTapoHttpClient_ConfigureClient_ExceptionMustBeWrappedIntoInvalidOperationException()
   {
     const string exceptionMessage = "configuring HTTP client is not implemented";
