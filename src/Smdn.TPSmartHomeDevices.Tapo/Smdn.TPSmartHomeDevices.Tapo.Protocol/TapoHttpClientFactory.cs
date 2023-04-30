@@ -44,7 +44,12 @@ internal sealed class TapoHttpClientFactory : IHttpClientFactory {
       Timeout = TimeSpan.FromSeconds(20),
     };
 
-    configureClient?.Invoke(client);
+    try {
+      configureClient?.Invoke(client);
+    }
+    catch (Exception ex) {
+      throw new InvalidOperationException($"An unhandled exception was thrown by {nameof(configureClient)}.", innerException: ex);
+    }
 
     return client;
   }
