@@ -46,17 +46,17 @@ await bulb.SetColorTemperatureAsync(colorTemperature: 4000, brightness: 40);
 //    resolve it again. (requires Smdn.TPSmartHomeDevices.MacAddressEndPoint)
 ```
 
-The following devices and features are currently supported.
+### Supported devices and functions
+The following devices and functions are currently supported. (as of version 1.0.0)
 
-- Supported devices (as of version 1.0.0)
-  - Tapo
-    - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
-    - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
-    - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
-  - Kasa
-    - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
-    - KL130 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)
-- Supported device features (as of version 1.0.0)
+- Tapo devices
+  - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
+  - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
+  - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
+- Kasa devices
+  - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
+  - KL130 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)
+- Functions
   - Turn on/off
   - Set color (color temperature)
   - Set color (hue and saturation)
@@ -64,26 +64,29 @@ The following devices and features are currently supported.
   - Get device informations (Tapo)
   - Get light color/brightness
   - Get on/off stete
-- Other features
-  - Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)
-  - Built-in and customizable error handling
-      - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/)
-      - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/)
-  - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
-    - Logging (`Microsoft.Extensions.Logging`)
-      - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/)
-      - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
-    - HTTP (`Microsoft.Extensions.Http`)
-  - Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
-  - Configuring timeout and cancellation
-    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
-    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
-- Testing
-  - Tested with pseudo devices and actual devices
-  - Confirmed to work on:
-    - Windows 10
-    - Ubuntu 22.04 LTS
-    - Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
+
+### Library features
+- Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)
+- Built-in and customizable error handling
+    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/)
+    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/)
+- Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
+  - Logging (`Microsoft.Extensions.Logging`)
+    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/)
+    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
+  - HTTP (`Microsoft.Extensions.Http`) - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
+- Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
+- Configuring timeout and cancellation
+  - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
+  - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
+
+### Testing
+- Tested with pseudo devices and actual devices
+- Confirmed to work on:
+  - Windows 10
+  - Ubuntu 22.04 LTS
+  - Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
+
 
 ## Smdn.TPSmartHomeDevices.MacAddressEndPoint <a id="Smdn.TPSmartHomeDevices.MacAddressEndPoint"></a>
 |NuGet package|View code|
