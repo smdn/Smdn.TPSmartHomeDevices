@@ -7,12 +7,10 @@ using var plug = new P105(IPAddress.Parse("192.0.2.255"), "user@mail.test", "pas
 
 await plug.TurnOnAsync();
 
-var deviceInfo = await plug.GetDeviceInfoAsync();
-
-Console.WriteLine(deviceInfo.IsOn);
+Console.WriteLine("Is on? {0}", await plug.GetOnOffStateAsync());
 
 await Task.Delay(5000);
 
 await plug.TurnOffAsync();
 
-Console.WriteLine(deviceInfo.IsOn);
+Console.WriteLine("Is on? {0}", await plug.GetOnOffStateAsync());

@@ -17,7 +17,7 @@ These class libraries provide classes such as [L530](./examples/Smdn.TPSmartHome
 
 - Automatic connection/authentication/session management, including reconnection and re-authentication.
 - Handling of typical errors and retries (like device busy, session expired, request timeout).
-- Using MAC address and following IP address change in DHCP networks (requires `Smdn.TPSmartHomeDevices.MacAddressEndPoint`).
+- Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)).
 - `async` operation and cancellation.
 
 The following is an example of code to operate L530. This example illustrates the basic API usage as well as what happens in the background of a method.
@@ -65,12 +65,19 @@ The following devices and features are currently supported.
   - Get light color/brightness
   - Get on/off stete
 - Other features
-  - Customizable error handling
+  - Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)
+  - Built-in and customizable error handling
+      - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/)
+      - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/)
   - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
     - Logging (`Microsoft.Extensions.Logging`)
       - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/)
       - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
     - HTTP (`Microsoft.Extensions.Http`)
+  - Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
+  - Configuring timeout and cancellation
+    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
+    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
 - Testing
   - Tested with pseudo devices and actual devices
   - Confirmed to work on:
@@ -78,16 +85,16 @@ The following devices and features are currently supported.
     - Ubuntu 22.04 LTS
     - Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
 
-## Smdn.TPSmartHomeDevices.MacAddressEndPoint
+## Smdn.TPSmartHomeDevices.MacAddressEndPoint <a id="Smdn.TPSmartHomeDevices.MacAddressEndPoint"></a>
 |NuGet package|View code|
 |-|-|
 |[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.MacAddressEndPoint.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|[Smdn.TPSmartHomeDevices.MacAddressEndPoint](./src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|
 
-`Smdn.TPSmartHomeDevices.MacAddressEndPoint` is an extension library that allows MAC addresses to be used to specify device endpoints, instead of IP address or host name. This library also enables to support following the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+`Smdn.TPSmartHomeDevices.MacAddressEndPoint` is an extension library that allows MAC addresses to be used to specify device endpoints, instead of IP addresses or host names. This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+
+See [this example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/) for using MAC addresses to identify the Tapo and Kasa devices.
 
 This library relies on [Smdn.Net.AddressResolution](https://www.nuget.org/packages/Smdn.Net.AddressResolution) [![Smdn.Net.AddressResolution](https://img.shields.io/nuget/v/Smdn.Net.AddressResolution.svg)](https://www.nuget.org/packages/Smdn.Net.AddressResolution/) for MAC address resolution. For further details such as functions and supported platforms, refer [smdn/Smdn.Net.AddressResolution](https://github.com/smdn/Smdn.Net.AddressResolution) repository.
-
-More description to be added.
 
 ## Smdn.TPSmartHomeDevices.Primitives
 |NuGet package|View code|
