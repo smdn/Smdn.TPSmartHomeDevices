@@ -31,9 +31,9 @@ public readonly struct TapoDeviceExceptionHandling {
   public static readonly TapoDeviceExceptionHandling Retry = new() { ShouldRetry = true };
 
   /// <summary>
-  /// Ignores the occured exception and try again after reconnect immediately.
+  /// Ignores the occured exception and try again after re-establishing session immediately.
   /// </summary>
-  public static readonly TapoDeviceExceptionHandling RetryAfterReconnect = new() { ShouldRetry = true, ShouldReconnect = true };
+  public static readonly TapoDeviceExceptionHandling RetryAfterReestablishSession = new() { ShouldRetry = true, ShouldReestablishSession = true };
 
   /// <summary>
   /// Ignores the occured exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
@@ -45,24 +45,24 @@ public readonly struct TapoDeviceExceptionHandling {
   /// Creates a <see cref="TapoDeviceExceptionHandling"/> that ignores the occured exception and try again after the specified period of time.
   /// </summary>
   /// <param name="retryAfter">The <see cref="TimeSpan"/> that specifies the amount of time to wait before retry.</param>
-  /// <param name="shouldReconnect">
-  /// The <see cref="bool"/> value that specifies whether the connection should be re-connected before retry or not.
+  /// <param name="shouldReestablishSession">
+  /// The <see cref="bool"/> value that specifies whether the session should be re-established before retry or not.
   /// </param>
   public static TapoDeviceExceptionHandling CreateRetry(
     TimeSpan retryAfter,
-    bool shouldReconnect = false
+    bool shouldReestablishSession = false
   )
     => new() {
       ShouldRetry = true,
       RetryAfter = retryAfter,
-      ShouldReconnect = shouldReconnect,
+      ShouldReestablishSession = shouldReestablishSession,
     };
 
   public bool ShouldRetry { get; init; }
   public TimeSpan RetryAfter { get; init; }
-  public bool ShouldReconnect { get; init; }
+  public bool ShouldReestablishSession { get; init; }
   public bool ShouldWrapIntoTapoProtocolException { get; init; }
   public bool ShouldInvalidateEndPoint { get; init; }
 
-  public override string ToString() => $"{{{nameof(ShouldRetry)}={ShouldRetry}, {nameof(RetryAfter)}={RetryAfter}, {nameof(ShouldReconnect)}={ShouldReconnect}, {nameof(ShouldWrapIntoTapoProtocolException)}={ShouldWrapIntoTapoProtocolException}, {nameof(ShouldInvalidateEndPoint)}={ShouldInvalidateEndPoint}}}";
+  public override string ToString() => $"{{{nameof(ShouldRetry)}={ShouldRetry}, {nameof(RetryAfter)}={RetryAfter}, {nameof(ShouldReestablishSession)}={ShouldReestablishSession}, {nameof(ShouldWrapIntoTapoProtocolException)}={ShouldWrapIntoTapoProtocolException}, {nameof(ShouldInvalidateEndPoint)}={ShouldInvalidateEndPoint}}}";
 }

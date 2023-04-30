@@ -69,7 +69,7 @@ internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHan
           logger?.LogWarning("{Message}", securePassThroughInvalidPaddingException.Message);
 
           // The session might have been in invalid state(?)
-          return TapoDeviceExceptionHandling.RetryAfterReconnect;
+          return TapoDeviceExceptionHandling.RetryAfterReestablishSession;
         }
 
         return TapoDeviceExceptionHandling.ThrowAsTapoProtocolException;
@@ -83,7 +83,7 @@ internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHan
               // The session might have been in invalid state(?)
               return TapoDeviceExceptionHandling.CreateRetry(
                 retryAfter: TimeSpan.FromSeconds(2.0),
-                shouldReconnect: true
+                shouldReestablishSession: true
               );
 
             case TapoErrorCodes.RequestParameterError:
@@ -97,7 +97,7 @@ internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHan
               );
 
               // The session might have been in invalid state(?)
-              return TapoDeviceExceptionHandling.RetryAfterReconnect;
+              return TapoDeviceExceptionHandling.RetryAfterReestablishSession;
           }
         }
 

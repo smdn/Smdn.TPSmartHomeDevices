@@ -509,7 +509,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
            */
           delay = handling.RetryAfter;
 
-          if (handling.ShouldReconnect) {
+          if (handling.ShouldReestablishSession) {
             client.Logger?.LogInformation("Closing the current session and will retry after {DelayMilliseconds} ms.", delay.TotalMilliseconds);
 
             client.Dispose();
