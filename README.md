@@ -87,6 +87,16 @@ The following devices and functions are currently supported. (as of version 1.0.
   - Ubuntu 22.04 LTS
   - Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
 
+### Feature Request
+(See also [Contribution guidelines](#contributing))
+
+If you have a request that you would like library to add API for the device functions to devices currently supported, please send it as a [Feature Request](/../../issues/new?template=02_feature-request.yml) or Pull Request.
+
+If you would like to request support for a device that is not currently supported, please send a Pull Request. Alternatively, please consider [supporting this project](https://github.com/sponsors/smdn?frequency=one-time) through GitHub Sponsors.
+
+<iframe src="https://github.com/sponsors/smdn/button" title="Sponsor this project" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+
+When adding support for a new device, I would like to purchase and perform testing with the actual device as much as possible, if it is available in Japan.
 
 ## Smdn.TPSmartHomeDevices.MacAddressEndPoint <a id="Smdn.TPSmartHomeDevices.MacAddressEndPoint"></a>
 |NuGet package|View code|
@@ -107,6 +117,13 @@ This library relies on [Smdn.Net.AddressResolution](https://www.nuget.org/packag
 `Smdn.TPSmartHomeDevices.Primitives` provides common types for `Smdn.TPSmartHomeDevices.*`. This library includes abstraction interfaces, extension methods and custom `JsonConverter`s. This library does not provide any specific implementations to operate Kasa and Tapo devices.
 
 More description to be added.
+
+# For contributers <a id="contributing"></a>
+Contributions are appreciated!
+
+If there's a feature you would like to add or a bug you would like to fix, please read [Contribution guidelines](./CONTRIBUTING.md) and create an Issue or Pull Request.
+
+IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.md)をご覧頂ください。　可能なら英語が望ましいですが、日本語で構いません。　
 
 # Notice
 ## License
