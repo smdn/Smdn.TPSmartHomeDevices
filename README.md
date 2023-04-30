@@ -94,7 +94,7 @@ If you have a request that you would like library to add API for the device func
 
 If you would like to request support for a device that is not currently supported, please send a Pull Request. Alternatively, please consider [supporting this project](https://github.com/sponsors/smdn?frequency=one-time) through GitHub Sponsors.
 
-<iframe src="https://github.com/sponsors/smdn/button" title="Sponsor this project" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/smdn?frequency=one-time)
 
 When adding support for a new device, I would like to purchase and perform testing with the actual device as much as possible, if it is available in Japan.
 
