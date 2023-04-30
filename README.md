@@ -17,7 +17,7 @@ These class libraries provide classes such as [L530](./examples/Smdn.TPSmartHome
 
 - Automatic connection/authentication/session management, including reconnection and re-authentication.
 - Handling of typical errors and retries (like device busy, session expired, request timeout).
-- Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)).
+- Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn-TPSmartHomeDevices-MacAddressEndPoint)).
 - `async` operation and cancellation.
 
 The following is an example of code to operate L530. This example illustrates the basic API usage as well as what happens in the background of a method.
@@ -66,7 +66,7 @@ The following devices and functions are currently supported. (as of version 1.0.
   - Get on/off stete
 
 ### Library features
-- Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn.TPSmartHomeDevices.MacAddressEndPoint)
+- Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#Smdn-TPSmartHomeDevices-MacAddressEndPoint)
 - Built-in and customizable error handling
     - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/)
     - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/)
@@ -98,7 +98,7 @@ If you would like to request support for a device that is not currently supporte
 
 When adding support for a new device, I would like to purchase and perform testing with the actual device as much as possible, if it is available in Japan.
 
-## Smdn.TPSmartHomeDevices.MacAddressEndPoint <a id="Smdn.TPSmartHomeDevices.MacAddressEndPoint"></a>
+## Smdn.TPSmartHomeDevices.MacAddressEndPoint <a id="Smdn-TPSmartHomeDevices-MacAddressEndPoint"></a>
 |NuGet package|View code|
 |-|-|
 |[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.MacAddressEndPoint.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|[Smdn.TPSmartHomeDevices.MacAddressEndPoint](./src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|
