@@ -46,8 +46,7 @@ public readonly struct TapoDeviceExceptionHandling {
   /// </summary>
   /// <param name="retryAfter">The <see cref="TimeSpan"/> that specifies the amount of time to wait before retry.</param>
   /// <param name="shouldReconnect">
-  /// The <see cref="bool"/> value that specifies whether the
-  /// <see cref="IDynamicDeviceEndPoint.Invalidate"/> should be invoked before retry or not.
+  /// The <see cref="bool"/> value that specifies whether the connection should be re-connected before retry or not.
   /// </param>
   public static TapoDeviceExceptionHandling CreateRetry(
     TimeSpan retryAfter,
