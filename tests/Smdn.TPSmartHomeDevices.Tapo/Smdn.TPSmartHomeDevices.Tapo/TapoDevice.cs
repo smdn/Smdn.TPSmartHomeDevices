@@ -1258,9 +1258,9 @@ public partial class TapoDeviceTests {
 
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
-            Result = new(),
+            Result = default,
           }
         );
       }
@@ -1299,9 +1299,9 @@ public partial class TapoDeviceTests {
         Assert.AreEqual("set_device_info", method, "received request method");
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = setDeviceInfoErrorCode,
-            Result = new(),
+            Result = default,
           }
         );
       },

@@ -666,7 +666,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<SetDeviceInfoRequest<TDeviceInfo>, SetDeviceInfoResponse>(
+    => SendRequestAsync<SetDeviceInfoRequest<TDeviceInfo>, SetDeviceInfoResponse<None>>(
       request: new(
         terminalUuid: TerminalUuidString,
         parameters: deviceInfo

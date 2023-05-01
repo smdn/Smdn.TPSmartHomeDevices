@@ -68,9 +68,9 @@ public class L900Tests {
         Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
-            Result = new(),
+            Result = default,
           }
         );
       }
@@ -141,9 +141,9 @@ public class L900Tests {
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
-            Result = new(),
+            Result = default,
           }
         );
       }
@@ -207,9 +207,9 @@ public class L900Tests {
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
-            Result = new(),
+            Result = default,
           }
         );
       }
@@ -273,9 +273,9 @@ public class L900Tests {
           Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse() {
+          new SetDeviceInfoResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
-            Result = new(),
+            Result = default,
           }
         );
       }

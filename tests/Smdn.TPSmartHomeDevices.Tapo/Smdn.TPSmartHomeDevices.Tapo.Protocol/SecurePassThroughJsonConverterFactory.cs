@@ -348,6 +348,11 @@ public class SecurePassThroughJsonConverterFactoryTests {
     Assert.Throws<ThrowExceptionJsonConverterException>(() => JsonSerializer.Serialize(request, request.GetType(), options));
   }
 
+  private readonly struct SetDeviceInfoResponseResult {
+    [JsonPropertyName("foo")] public int Foo { get; init; }
+    [JsonPropertyName("bar")] public string? Bar { get; init; }
+  }
+
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse()
   {
     yield return new object[] {
@@ -382,18 +387,18 @@ public class SecurePassThroughJsonConverterFactoryTests {
     };
 
     yield return new object[] {
-      typeof(SetDeviceInfoResponse),
-      @"{""error_code"":1,""result"":{""foo"":0,""bar"":""baz""}}",
+      typeof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>),
+      @"{""error_code"":1,""result"":{""foo"":0,""bar"":""baz"",""qux"":""extra property""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.IsInstanceOf<SetDeviceInfoResponse>(deserialized);
+          Assert.IsInstanceOf<SetDeviceInfoResponse<SetDeviceInfoResponseResult>>(deserialized);
 
-          var resp = (SetDeviceInfoResponse)deserialized;
-          Assert.AreEqual(1, resp.ErrorCode, nameof(SetDeviceInfoResponse.ErrorCode));
-          Assert.IsNotNull(resp.Result.ExtraData, nameof(SetDeviceInfoResponse.ResponseResult.ExtraData));
-          Assert.AreEqual(2, resp.Result.ExtraData!.Count, nameof(SetDeviceInfoResponse.ResponseResult.ExtraData.Count));
-          Assert.AreEqual(0, ((JsonElement)resp.Result.ExtraData["foo"]).GetInt32(), nameof(SetDeviceInfoResponse.ResponseResult.ExtraData));
-          Assert.AreEqual("baz", ((JsonElement)resp.Result.ExtraData["bar"]).GetString(), nameof(SetDeviceInfoResponse.ResponseResult.ExtraData));
+          var resp = (SetDeviceInfoResponse<SetDeviceInfoResponseResult>)deserialized;
+
+          Assert.AreEqual(1, resp.ErrorCode, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.ErrorCode));
+          Assert.IsNotNull(resp.Result, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result));
+          Assert.AreEqual(0, resp.Result.Foo, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Foo));
+          Assert.AreEqual("baz", resp.Result.Bar, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Bar));
         }
       )
     };
