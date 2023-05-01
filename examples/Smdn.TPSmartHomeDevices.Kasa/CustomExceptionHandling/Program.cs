@@ -9,7 +9,7 @@ var services = new ServiceCollection();
 
 // Adds CustomKasaExceptionHandler as a class for customized exception handling.
 // (By default, the built-in exception handler class is used.)
-services.AddSingleton<KasaDeviceExceptionHandler>(new CustomKasaExceptionHandler());
+services.AddKasaDeviceExceptionHandler(new CustomKasaExceptionHandler());
 
 using var plug = new HS105(IPAddress.Parse("192.0.2.255"), services.BuildServiceProvider());
 

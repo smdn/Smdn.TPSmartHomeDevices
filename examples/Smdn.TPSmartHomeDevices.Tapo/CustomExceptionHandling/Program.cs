@@ -14,7 +14,7 @@ services.AddTapoCredential(
 
 // Adds CustomTapoExceptionHandler as a class for customized exception handling.
 // (By default, the built-in exception handler class is used.)
-services.AddSingleton<TapoDeviceExceptionHandler>(new CustomTapoExceptionHandler());
+services.AddTapoDeviceExceptionHandler(new CustomTapoExceptionHandler());
 
 using var plug = new P105(IPAddress.Parse("192.0.2.255"), services.BuildServiceProvider());
 
