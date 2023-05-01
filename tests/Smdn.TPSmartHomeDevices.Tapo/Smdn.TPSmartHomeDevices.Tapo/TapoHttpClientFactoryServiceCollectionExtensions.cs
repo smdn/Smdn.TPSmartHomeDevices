@@ -160,7 +160,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
 
     var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.IsNotNull(ex.InnerException, nameof(ex.InnerException));
+    Assert.IsNotNull(ex!.InnerException, nameof(ex.InnerException));
     Assert.IsInstanceOf<NotImplementedException>(ex.InnerException, nameof(ex.InnerException));
     Assert.AreEqual(exceptionMessage, ex.InnerException!.Message);
   }
