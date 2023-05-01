@@ -3,6 +3,7 @@
 using System;
 using System.Buffers.Binary;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -210,6 +211,42 @@ public class KasaClientTests {
     Assert.AreEqual(JsonValueKind.Object, result.RootElement.ValueKind, nameof(result.RootElement.ValueKind));
     Assert.AreEqual(1, result.RootElement.GetProperty("on_off").GetInt32(), "on_off");
     Assert.AreEqual(50, result.RootElement.GetProperty("brightness").GetInt32(), "on_off");
+  }
+
+  [Test]
+  public async Task SendAsync_UseInterNetworkAddressTypeIfDnsEndPointWithUnspecifiedAddressType()
+  {
+    await using var device = new PseudoKasaDevice() {
+      FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => {
+        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument));
+
+        return JsonDocument.Parse(json: @"{
+  ""smartlife.iot.smartbulb.lightingservice"": {
+    ""get_light_state"": { }
+  }
+}")!;
+      },
+    };
+
+    device.Start();
+
+    using var client = new KasaClient(
+      endPoint: new DnsEndPoint(device.EndPoint!.Address.ToString(), device.EndPoint!.Port, AddressFamily.Unspecified)
+    );
+
+    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
+    Assert.AreEqual(AddressFamily.Unspecified, client.EndPoint.AddressFamily, nameof(client.EndPoint.AddressFamily));
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.SendAsync(
+        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+        method: JsonEncodedText.Encode("get_light_state"),
+        parameter: new { },
+        composeResult: static _ => true
+      )
+    );
+
+    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
   }
 
   [Test]

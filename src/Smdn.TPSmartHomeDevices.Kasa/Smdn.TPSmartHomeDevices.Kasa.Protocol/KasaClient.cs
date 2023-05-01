@@ -146,7 +146,10 @@ public sealed partial class KasaClient : IDisposable {
   )
 #pragma warning restore SA1112
   {
-    var s = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+    var addressFamily = endPoint.AddressFamily == AddressFamily.Unspecified
+      ? Socket.OSSupportsIPv6 ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork
+      : endPoint.AddressFamily;
+    var s = new Socket(addressFamily, SocketType.Stream, ProtocolType.Tcp);
 
     try {
       logger?.LogDebug("Connecting");
