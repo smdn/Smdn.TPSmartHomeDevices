@@ -16,7 +16,7 @@ The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https:
 These class libraries provide classes such as [L530](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/) and [KL130](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/), which have the same name as the device's product name. These classes do not simply provide methods to wrap the sending of requests to the device, but also provide following features:
 
 - Automatic connection/authentication/session management, including reconnection and re-authentication.
-- Handling of typical errors and retries (like device busy, session expired, request timeout).
+- Built-in/customizable error handling for typical errors and retries (like device busy, session expired, request timeout)
 - Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#smdntpsmarthomedevicesmacaddressendpoint)).
 - `async` operation and cancellation.
 
@@ -103,7 +103,7 @@ When adding support for a new device, I would like to purchase and perform testi
 |-|-|
 |[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.MacAddressEndPoint.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|[Smdn.TPSmartHomeDevices.MacAddressEndPoint](./src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|
 
-`Smdn.TPSmartHomeDevices.MacAddressEndPoint` is an extension library that allows MAC addresses to be used to specify device endpoints, instead of IP addresses or host names. This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+`Smdn.TPSmartHomeDevices.MacAddressEndPoint` is an extension library that enables to use MAC addresses to specify the device endpoints, instead of IP addresses or host names. This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
 
 See [this example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/) for using MAC addresses to identify the Tapo and Kasa devices.
 
@@ -123,7 +123,7 @@ Contributions are appreciated!
 
 If there's a feature you would like to add or a bug you would like to fix, please read [Contribution guidelines](./CONTRIBUTING.md) and create an Issue or Pull Request.
 
-IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.md)をご覧頂ください。　可能なら英語が望ましいですが、日本語で構いません。　
+IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.md)をご覧頂ください。　可能なら英語が望ましいですが、日本語で構いません。
 
 # Notice
 ## License
