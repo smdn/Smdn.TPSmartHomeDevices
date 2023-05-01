@@ -46,6 +46,10 @@ public partial class TapoDeviceTests {
     }
   }
 
+  [Test]
+  public new void ToString()
+    => ConcreteTapoDeviceCommonTests.TestToString<TapoDevice>();
+
   [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
   public void Create_ArgumentException(
     Type[] methodParameterTypes,

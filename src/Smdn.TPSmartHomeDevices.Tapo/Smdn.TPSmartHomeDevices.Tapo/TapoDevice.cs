@@ -680,4 +680,9 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
       ),
       cancellationToken: cancellationToken
     );
+
+  /// <summary>Returns a string that represents the current object.</summary>
+  /// <returns>A string that represents the device type name and end point.</returns>
+  public override string? ToString()
+    => $"{GetType().Name} ({deviceEndPoint?.ToString() ?? "disposed"})";
 }

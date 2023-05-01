@@ -10,6 +10,29 @@ using NUnit.Framework;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 internal class ConcreteKasaDeviceCommonTests {
+  internal static void TestToString<TKasaDevice>()
+    where TKasaDevice : KasaDevice
+  {
+    var deviceEndPoint = new StringifiableNullDeviceEndPoint("<endpoint>");
+
+    using var device = (KasaDevice)Activator.CreateInstance(
+      type: typeof(TKasaDevice),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+      args: new object?[] {
+        deviceEndPoint,
+        default(IServiceProvider)
+      },
+      binder: default,
+      culture: default
+    )!;
+
+    Assert.AreEqual($"{typeof(TKasaDevice).Name} ({deviceEndPoint.StringRepresentation})", device.ToString());
+
+    device.Dispose();
+
+    Assert.AreEqual($"{typeof(TKasaDevice).Name} (disposed)", device.ToString());
+  }
+
   internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
   {
     /*

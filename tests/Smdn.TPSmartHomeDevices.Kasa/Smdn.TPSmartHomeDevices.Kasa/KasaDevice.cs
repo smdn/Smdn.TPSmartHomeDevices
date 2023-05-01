@@ -39,6 +39,10 @@ public class KasaDeviceTests {
     );
 
   [Test]
+  public new void ToString()
+    => ConcreteKasaDeviceCommonTests.TestToString<KasaDevice>();
+
+  [Test]
   public async Task Create_WithIPAddress()
   {
     using var device = KasaDevice.Create(

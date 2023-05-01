@@ -299,4 +299,33 @@ internal class ConcreteTapoDeviceCommonTests {
         Assert.AreEqual(expectedParamName, argumentException.ParamName, nameof(argumentException.ParamName));
     }
   }
+
+  private sealed class NullCredentialProvider : ITapoCredentialProvider {
+    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+      => throw new NotImplementedException();
+  }
+
+  internal static void TestToString<TTapoDevice>()
+    where TTapoDevice : TapoDevice
+  {
+    var deviceEndPoint = new StringifiableNullDeviceEndPoint("<endpoint>");
+
+    using var device = (TapoDevice)Activator.CreateInstance(
+      type: typeof(TTapoDevice),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+      args: new object?[] {
+        deviceEndPoint,
+        new NullCredentialProvider(),
+        new ServiceCollection().BuildServiceProvider()
+      },
+      binder: default,
+      culture: default
+    )!;
+
+    Assert.AreEqual($"{typeof(TTapoDevice).Name} ({deviceEndPoint.StringRepresentation})", device.ToString());
+
+    device.Dispose();
+
+    Assert.AreEqual($"{typeof(TTapoDevice).Name} (disposed)", device.ToString());
+  }
 }

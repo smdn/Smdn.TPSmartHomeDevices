@@ -444,4 +444,9 @@ public partial class KasaDevice : IDisposable {
     throw new NotImplementedException("unreachable");
 #endif
   }
+
+  /// <summary>Returns a string that represents the current object.</summary>
+  /// <returns>A string that represents the device type name and end point.</returns>
+  public override string? ToString()
+    => $"{GetType().Name} ({deviceEndPoint?.ToString() ?? "disposed"})";
 }

@@ -10,6 +10,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
 public class KL130Tests {
+  [Test]
+  public new void ToString()
+    => ConcreteKasaDeviceCommonTests.TestToString<KL130>();
+
   [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<KL130>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);

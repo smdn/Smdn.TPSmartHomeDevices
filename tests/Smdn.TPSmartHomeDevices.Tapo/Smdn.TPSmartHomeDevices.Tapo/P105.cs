@@ -7,6 +7,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
 public class P105Tests {
+  [Test]
+  public new void ToString()
+    => ConcreteTapoDeviceCommonTests.TestToString<P105>();
+
   [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<P105>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);

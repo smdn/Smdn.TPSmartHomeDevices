@@ -24,6 +24,10 @@ public class L900Tests {
     );
   }
 
+  [Test]
+  public new void ToString()
+    => ConcreteTapoDeviceCommonTests.TestToString<L900>();
+
   [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<L900>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
