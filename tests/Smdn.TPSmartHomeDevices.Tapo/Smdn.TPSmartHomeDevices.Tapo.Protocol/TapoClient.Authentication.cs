@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -108,6 +110,43 @@ partial class TapoClientTests {
 
     Assert.IsNull(client.Session);
     Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+  }
+
+  [Test]
+  public async Task AuthenticateAsync_DnsEndPointWithUnspecifiedAddressType()
+  {
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => token,
+    };
+
+    device.Start();
+
+    using var client = new TapoClient(
+      endPoint: new DnsEndPoint(device.EndPoint!.Address.ToString(), device.EndPoint!.Port, AddressFamily.Unspecified)
+    );
+
+    Assert.AreEqual(device.EndPointUri, client.EndPointUri, nameof(client.EndPointUri));
+
+    Assert.DoesNotThrowAsync(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      )
+    );
+
+    Assert.IsNotNull(client.Session);
+    Assert.IsNotNull(client.Session!.Token);
+    Assert.AreEqual(token, client.Session.Token);
+    Assert.IsNotNull(client.Session!.SessionId);
+    Assert.IsNotEmpty(client.Session.SessionId);
+    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
+    Assert.IsFalse(client.Session.HasExpired);
+    Assert.AreEqual(
+      new Uri($"/app?token={token}", UriKind.Relative),
+      client.Session.RequestPathAndQuery
+    );
   }
 
   private class TapoCredentialNotFoundException : Exception { }
