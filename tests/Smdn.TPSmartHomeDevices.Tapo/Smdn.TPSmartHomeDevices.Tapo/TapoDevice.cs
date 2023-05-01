@@ -323,6 +323,7 @@ public partial class TapoDeviceTests {
     )
       : base(
         deviceEndPoint: deviceEndPoint,
+        credential: null,
         serviceProvider: serviceProvider
       )
     {

@@ -94,7 +94,7 @@ public partial class KasaDevice : IDisposable {
   /// </param>
   protected KasaDevice(
     string host,
-    IServiceProvider? serviceProvider = null
+    IServiceProvider? serviceProvider
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(host),
@@ -114,7 +114,7 @@ public partial class KasaDevice : IDisposable {
   /// </param>
   protected KasaDevice(
     IPAddress ipAddress,
-    IServiceProvider? serviceProvider = null
+    IServiceProvider? serviceProvider
   )
     : this(
       deviceEndPoint: DeviceEndPoint.Create(ipAddress),
@@ -163,7 +163,7 @@ public partial class KasaDevice : IDisposable {
   /// </exception>
   protected KasaDevice(
     IDeviceEndPoint deviceEndPoint,
-    IServiceProvider? serviceProvider = null
+    IServiceProvider? serviceProvider
   )
   {
     this.deviceEndPoint = deviceEndPoint ?? throw new ArgumentNullException(nameof(deviceEndPoint));
