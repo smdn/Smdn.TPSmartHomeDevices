@@ -6,7 +6,4 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 /// Provides a mechanism for abstracting identities corresponding to credentials used for authentication in Tapo's communication protocol.
 /// </summary>
 /// <seealso cref="Protocol.SecurePassThroughJsonConverterFactory"/>
-public interface ITapoCredentialIdentity {
-  /// <summary>Gets the name for this identity.</summary>
-  string Name { get; }
-}
+public interface ITapoCredentialIdentity { }

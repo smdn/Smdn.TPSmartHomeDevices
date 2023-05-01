@@ -67,13 +67,6 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
   /// </value>
   public TapoSession? Session => client?.Session;
 
-  string ITapoCredentialIdentity.Name {
-    get {
-      ThrowIfDisposed();
-      return $"{GetType().FullName} ({deviceEndPoint})";
-    }
-  }
-
   /// <summary>
   /// Gets or sets the timeout value for HTTP requests.
   /// </summary>
