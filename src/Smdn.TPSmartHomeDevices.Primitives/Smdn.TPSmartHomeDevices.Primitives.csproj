@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
     <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
     <VersionPrefix>1.0.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
+    <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
