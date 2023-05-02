@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.MacAddressEndPoint.dll (Smdn.TPSmartHomeDevices.MacAddressEndPoint-1.0.0-rc1)
+// Smdn.TPSmartHomeDevices.MacAddressEndPoint.dll (Smdn.TPSmartHomeDevices.MacAddressEndPoint-1.0.0)
 //   Name: Smdn.TPSmartHomeDevices.MacAddressEndPoint
 //   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0-rc1+00727d1f82dcb2b9dd9c6e586f6c54110349bf48
+//   InformationalVersion: 1.0.0+4dd7eda1e01a411bacbd6593ca050a45b3c57c37
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
