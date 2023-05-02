@@ -282,6 +282,8 @@ public sealed partial class KasaClient : IDisposable {
       /*
        * decrypt and parse
        */
+      cancellationToken.ThrowIfCancellationRequested();
+
       JsonElement result = default;
 
       try {
