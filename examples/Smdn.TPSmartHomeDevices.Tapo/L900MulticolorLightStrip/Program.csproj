@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Smdn.TPSmartHomeDevices.Tapo" Version="*-*" />
+    <PackageReference Include="Smdn.TPSmartHomeDevices.Tapo" Version="*" />
   </ItemGroup>
 
 </Project>
