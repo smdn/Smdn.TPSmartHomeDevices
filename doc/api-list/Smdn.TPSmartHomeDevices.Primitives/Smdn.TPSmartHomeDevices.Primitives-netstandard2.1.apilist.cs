@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.0.0)
+// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.0.1)
 //   Name: Smdn.TPSmartHomeDevices.Primitives
-//   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0+2f8665ad485a16dee6305868cbf80f3089f4d60d
+//   AssemblyVersion: 1.0.1.0
+//   InformationalVersion: 1.0.1+934aee650dc331b389f51ddc76cb1f8042d47bf5
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
