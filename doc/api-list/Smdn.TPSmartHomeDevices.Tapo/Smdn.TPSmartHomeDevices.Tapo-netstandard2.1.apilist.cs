@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-1.0.0-rc1)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-1.0.0)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
 //   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0-rc1+00727d1f82dcb2b9dd9c6e586f6c54110349bf48
+//   InformationalVersion: 1.0.0+4dd7eda1e01a411bacbd6593ca050a45b3c57c37
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -104,17 +104,17 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public static TapoDevice Create(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
     public static TapoDevice Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
 
-    protected TapoDevice(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, TapoDeviceExceptionHandler? exceptionHandler = null, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential, IServiceProvider? serviceProvider) {}
+    protected TapoDevice(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential, TapoDeviceExceptionHandler? exceptionHandler, IServiceProvider? serviceProvider) {}
     protected TapoDevice(IPAddress ipAddress, IServiceProvider serviceProvider) {}
-    protected TapoDevice(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider) {}
     protected TapoDevice(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
     protected TapoDevice(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
     protected TapoDevice(string host, IServiceProvider serviceProvider) {}
-    protected TapoDevice(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
+    protected TapoDevice(string host, string email, string password, IServiceProvider? serviceProvider) {}
 
     protected bool IsDisposed { get; }
     public TapoSession? Session { get; }
-    string ITapoCredentialIdentity.Name { get; }
     public string TerminalUuidString { get; }
     public TimeSpan? Timeout { get; set; }
 
@@ -130,6 +130,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(TRequest request, Func<TResponse, TResult> composeResult, CancellationToken cancellationToken = default) where TRequest : notnull, ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
     public ValueTask SetDeviceInfoAsync<TDeviceInfo>(TDeviceInfo deviceInfo, CancellationToken cancellationToken = default) {}
     public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
+    public override string? ToString() {}
     public ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
     public ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
   }
@@ -140,6 +141,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     protected TapoDeviceExceptionHandler() {}
 
     public abstract TapoDeviceExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger);
+  }
+
+  public static class TapoDeviceExceptionHandlerServiceCollectionExtensions {
+    public static IServiceCollection AddTapoDeviceExceptionHandler(this IServiceCollection services, TapoDeviceExceptionHandler exceptionHandler) {}
   }
 
   public class TapoDeviceInfo {
@@ -229,18 +234,18 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
   }
 
   public readonly struct TapoDeviceExceptionHandling {
-    public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndRetry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
-    public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndThrow; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
-    public static readonly TapoDeviceExceptionHandling Retry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
-    public static readonly TapoDeviceExceptionHandling RetryAfterReconnect; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReconnect=True, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
-    public static readonly TapoDeviceExceptionHandling Throw; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
-    public static readonly TapoDeviceExceptionHandling ThrowAsTapoProtocolException; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReconnect=False, ShouldWrapIntoTapoProtocolException=True, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndRetry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
+    public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndThrow; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
+    public static readonly TapoDeviceExceptionHandling Retry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoDeviceExceptionHandling RetryAfterReestablishSession; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReestablishSession=True, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoDeviceExceptionHandling Throw; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=False}"
+    public static readonly TapoDeviceExceptionHandling ThrowAsTapoProtocolException; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=True, ShouldInvalidateEndPoint=False}"
 
-    public static TapoDeviceExceptionHandling CreateRetry(TimeSpan retryAfter, bool shouldReconnect = false) {}
+    public static TapoDeviceExceptionHandling CreateRetry(TimeSpan retryAfter, bool shouldReestablishSession = false) {}
 
     public TimeSpan RetryAfter { get; init; }
     public bool ShouldInvalidateEndPoint { get; init; }
-    public bool ShouldReconnect { get; init; }
+    public bool ShouldReestablishSession { get; init; }
     public bool ShouldRetry { get; init; }
     public bool ShouldWrapIntoTapoProtocolException { get; init; }
 
@@ -255,7 +260,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
   }
 
   public interface ITapoCredentialIdentity {
-    string Name { get; }
   }
 
   public interface ITapoCredentialProvider {
@@ -468,16 +472,11 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public string TerminalUuid { get; }
   }
 
-  public readonly struct SetDeviceInfoResponse : ITapoPassThroughResponse {
-    public readonly struct ResponseResult {
-      [JsonExtensionData]
-      public IDictionary<string, object>? ExtraData { get; init; }
-    }
-
+  public readonly struct SetDeviceInfoResponse<TResult> : ITapoPassThroughResponse {
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; init; }
     [JsonPropertyName("result")]
-    public SetDeviceInfoResponse.ResponseResult Result { get; init; }
+    public TResult Result { get; init; }
   }
 }
 // API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.2.2.0.
