@@ -1,6 +1,5 @@
 ﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-using System;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -25,15 +24,14 @@ services.AddDeviceEndPointFactory(
 
 // The IPNetworkProfile class can be used to specify the network
 // to be used for address resolution.
-#if false
-var wlanNetworkProfile = IPNetworkProfile.Create(
-  // select and use the network of the interface with ID 'wlan0'
-  predicateForNetworkInterface: static iface => iface.Id == "wlan0"
-);
-#endif
 
+// You can create an IPNetworkProfile that uses a specific network interface as follows
+var networkProfileUnix = IPNetworkProfile.CreateFromNetworkInterface("wlan0"); // for Unix-like OS
+var networkProfileWin = IPNetworkProfile.CreateFromNetworkInterface(Guid.Parse("00000000-0000-0000-0000-000000000000")); // for Windows OS
+
+// Or you can create an IPNetworkProfile that targets the specific address range.
 var dhcpNetworkProfile = IPNetworkProfile.Create(
-  // use the address range of 192.168.2.100-192.168.2.119
+  // Use the address range of 192.168.2.100-192.168.2.119
   addressRangeGenerator: () => Enumerable.Range(100, 20).Select(b => new IPAddress(new byte[] { 192, 168, 2, (byte)b }))
 );
 
@@ -43,6 +41,8 @@ var dhcpNetworkProfile = IPNetworkProfile.Create(
 var servicesForDhcpNetwork = new ServiceCollection();
 
 servicesForDhcpNetwork.AddDeviceEndPointFactory(
+  // When a MacAddressDeviceEndPointFactory is created with an IPNetworkProfile,
+  // address resolution will be performed for the network that IPNetworkProfile describes.
   new MacAddressDeviceEndPointFactory(dhcpNetworkProfile)
 );
 
