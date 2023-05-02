@@ -57,7 +57,7 @@ that provides types such as abstraction interfaces, extension methods and custom
 This library provides no specific implementations to operate Tapo and Kasa devices.
 
 ## Contributing
-This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)issues/new/choose) or [Pull Requests]($(RepositoryUrl)pulls/) on the [GitHub repository]($(RepositoryUrl)).
+This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)/issues/new/choose) or [Pull Requests]($(RepositoryUrl)/pulls/) on the [GitHub repository]($(RepositoryUrl)).
 
 ## Notice
 $(ReadmeFileNoticeSectionContent)
