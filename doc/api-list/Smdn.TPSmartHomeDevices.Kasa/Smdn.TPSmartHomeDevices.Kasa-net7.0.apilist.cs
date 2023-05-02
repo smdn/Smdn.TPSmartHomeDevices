@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-1.0.0-rc1)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-1.0.0)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
 //   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0-rc1+00727d1f82dcb2b9dd9c6e586f6c54110349bf48
+//   InformationalVersion: 1.0.0+4dd7eda1e01a411bacbd6593ca050a45b3c57c37
 //   TargetFramework: .NETCoreApp,Version=v7.0
 //   Configuration: Release
 //   Referenced assemblies:
@@ -29,6 +29,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Smdn.TPSmartHomeDevices;
 using Smdn.TPSmartHomeDevices.Kasa;
@@ -79,10 +80,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     public static KasaDevice Create(string host, IServiceProvider? serviceProvider = null) {}
     public static KasaDevice Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider) where TAddress : notnull {}
 
-    protected KasaDevice(IDeviceEndPoint deviceEndPoint, IServiceProvider? serviceProvider = null) {}
-    protected KasaDevice(IPAddress ipAddress, IServiceProvider? serviceProvider = null) {}
+    protected KasaDevice(IDeviceEndPoint deviceEndPoint, IServiceProvider? serviceProvider) {}
+    protected KasaDevice(IPAddress ipAddress, IServiceProvider? serviceProvider) {}
     protected KasaDevice(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
-    protected KasaDevice(string host, IServiceProvider? serviceProvider = null) {}
+    protected KasaDevice(string host, IServiceProvider? serviceProvider) {}
 
     public bool IsConnected { get; }
     [MemberNotNullWhen(false, "deviceEndPoint")]
@@ -94,6 +95,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     protected ValueTask SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, CancellationToken cancellationToken) {}
     protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
     protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(JsonEncodedText module, JsonEncodedText method, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
+    public override string? ToString() {}
   }
 
   public abstract class KasaDeviceExceptionHandler {
@@ -102,6 +104,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     protected KasaDeviceExceptionHandler() {}
 
     public abstract KasaDeviceExceptionHandling DetermineHandling(KasaDevice device, Exception exception, int attempt, ILogger? logger);
+  }
+
+  public static class KasaDeviceExceptionHandlerServiceCollectionExtensions {
+    public static IServiceCollection AddKasaDeviceExceptionHandler(this IServiceCollection services, KasaDeviceExceptionHandler exceptionHandler) {}
   }
 
   public class KasaDisconnectedException : KasaProtocolException {
