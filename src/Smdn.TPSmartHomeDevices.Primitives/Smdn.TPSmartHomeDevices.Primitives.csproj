@@ -19,7 +19,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup Label="assembly attributes">
     <Description>
-<![CDATA[Provides common types for Smdn.TPSmartHomeDevices.Kasa and Smdn.TPSmartHomeDevices.Tapo, including abstraction interfaces, extension methods and custom JsonConverter's.
+<![CDATA[Provides common types for Smdn.TPSmartHomeDevices.Tapo and Smdn.TPSmartHomeDevices.Kasa, including abstraction interfaces, extension methods and custom JsonConverter's.
 This library does not provide any specific implementations to operate Kasa and Tapo devices.
 ]]>
     </Description>
@@ -28,6 +28,7 @@ This library does not provide any specific implementations to operate Kasa and T
 
   <PropertyGroup Label="package properties">
     <PackageTags>tplink-kasa,kasa,tplink-tapo,tapo,common,$(PackageCommonTags)</PackageTags>
+    <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
   <PropertyGroup Label="StyleCop code analysis">
@@ -46,5 +47,22 @@ This library does not provide any specific implementations to operate Kasa and T
   <ItemGroup>
     <Compile Include="..\Common\System.Threading.Tasks\ValueTaskShim.cs" />
   </ItemGroup>
+
+  <Target Name="GenerateReadmeFileContent" DependsOnTargets="ReadReadmeFileNoticeSectionContent">
+    <PropertyGroup>
+      <PackageReadmeFileContent><![CDATA[# $(PackageId) $(PackageVersion)
+`$(PackageId)` is a library common to the [Smdn.TPSmartHomeDevices.Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/) and [Smdn.TPSmartHomeDevices.Kasa](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/)
+that provides types such as abstraction interfaces, extension methods and custom `JsonConverter`s.
+
+This library provides no specific implementations to operate Tapo and Kasa devices.
+
+## Contributing
+This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)issues/new/choose) or [Pull Requests]($(RepositoryUrl)pulls/) on the [GitHub repository]($(RepositoryUrl)).
+
+## Notice
+$(ReadmeFileNoticeSectionContent)
+]]></PackageReadmeFileContent>
+    </PropertyGroup>
+  </Target>
 
 </Project>

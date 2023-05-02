@@ -23,14 +23,13 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
-    <Description>
-<![CDATA[Provides APIs for operating Tapo devices, the TP-Link smart home devices.
-]]></Description>
+    <Description>Provides APIs for operating Tapo devices, the TP-Link smart home devices.</Description>
     <CopyrightYear>2023</CopyrightYear>
   </PropertyGroup>
 
   <PropertyGroup Label="package properties">
     <PackageTags>tplink-tapo,tapo,L530,L900,P105,$(PackageCommonTags)</PackageTags>
+    <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
   <PropertyGroup Label="StyleCop code analysis">
@@ -64,5 +63,42 @@ SPDX-License-Identifier: MIT
       CopyToOutputDirectory="None"
     />
   </ItemGroup>
+
+  <Target Name="GenerateReadmeFileContent" DependsOnTargets="ReadReadmeFileNoticeSectionContent">
+    <PropertyGroup>
+      <PackageReadmeFileContent><![CDATA[# $(PackageId) $(PackageVersion)
+`$(PackageId)` is a library that provides APIs for operating Tapo, the TP-Link smart home devices.
+This library performs operations by communicating directly with Tapo devices in the same network.
+
+This library also provides following features:
+
+- Automatic connection/authentication/session management, including reconnection and re-authentication.
+- Built-in/customizable error handling for typical errors and retries (like device busy, session expired, request timeout).
+- Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)).
+- `async` operation and cancellation.
+
+## Getting started
+First, add package `$(PackageId)` to the project file.
+
+```
+dotnet add package $(PackageId)
+```
+
+To operate the Tapo device, write code like the following. Replace the Tapo device's IP address and Tapo account information with yours.
+
+```cs
+$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\..\examples\$(PackageId)\GettingStarted\Program.cs').TrimEnd())
+```
+
+More examples can be found on the [GitHub repository]($(RepositoryUrl)tree/main/examples/$(PackageId)/), including examples of using other Tapo devices and their functionalities, and examples of using library features.
+
+## Contributing
+This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)issues/new/choose) or [Pull Requests]($(RepositoryUrl)pulls/) on the [GitHub repository]($(RepositoryUrl)).
+
+## Notice
+$(ReadmeFileNoticeSectionContent)
+]]></PackageReadmeFileContent>
+    </PropertyGroup>
+  </Target>
 
 </Project>

@@ -20,13 +20,14 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup Label="assembly attributes">
     <Description>
-<![CDATA[An extension library to add a service to Smdn.TPSmartHomeDevices.Kasa and Smdn.TPSmartHomeDevices.Tapo that enables the resolution of devices' endpoints by MAC address.
+<![CDATA[An extension library to add a service to Smdn.TPSmartHomeDevices.Tapo and Smdn.TPSmartHomeDevices.Kasa that enables the resolution of devices' endpoints by MAC address.
 ]]></Description>
     <CopyrightYear>2023</CopyrightYear>
   </PropertyGroup>
 
   <PropertyGroup Label="package properties">
     <PackageTags>tplink-kasa,kasa,tplink-tapo,tapo,mac-address,address-resolution,$(PackageCommonTags)</PackageTags>
+    <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,5 +48,31 @@ SPDX-License-Identifier: MIT
       CopyToOutputDirectory="None"
     />
   </ItemGroup>
+
+  <Target Name="GenerateReadmeFileContent" DependsOnTargets="ReadReadmeFileNoticeSectionContent">
+    <PropertyGroup>
+      <PackageReadmeFileContent><![CDATA[# $(PackageId) $(PackageVersion)
+`$(PackageId)` is an extension library for the [Smdn.TPSmartHomeDevices.Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/) and [Smdn.TPSmartHomeDevices.Kasa](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/)
+that enables to use MAC addresses to specify the device endpoints, instead of IP addresses or host names.
+
+This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+
+## Usage
+Add `MacAddressDeviceEndPointFactory` to the `ServiceCollection` and pass it as an `IServiceProvider` to the constructor of the [Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/) or [Kasa](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/) device class.
+
+```cs
+$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\..\examples\$(PackageId)\GettingStarted\Program.cs').TrimEnd())
+```
+
+More examples can be found on the [GitHub repository]($(RepositoryUrl)tree/main/examples/$(PackageId)/).
+
+## Contributing
+This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)issues/new/choose) or [Pull Requests]($(RepositoryUrl)pulls/) on the [GitHub repository]($(RepositoryUrl)).
+
+## Notice
+$(ReadmeFileNoticeSectionContent)
+]]></PackageReadmeFileContent>
+    </PropertyGroup>
+  </Target>
 
 </Project>
