@@ -26,8 +26,30 @@ using var bulb = new L530(
   serviceProvider   // IServiceProvider that has a MacAddressDeviceEndPointFactory added
 );
 
-// Turns on the bulb, and set the color temperature and brightness.
-await bulb.SetColorTemperatureAsync(colorTemperature: 5500, brightness: 80);
+try {
+  // Turns on the bulb, and set the color temperature and brightness.
+  await bulb.SetColorTemperatureAsync(colorTemperature: 5500, brightness: 80);
 
-// Turns off the bulb
-await bulb.TurnOffAsync();
+  // Turns off the bulb
+  await bulb.TurnOffAsync();
+}
+catch (DeviceEndPointResolutionException ex) {
+  // If the endpoint cannot be resolved, a DeviceEndPointResolutionException is thrown.
+  Console.Error.WriteLine(ex);
+
+  // In this example, address resolution is based on information cached in the
+  // system's address table (ARP table).
+  // If there is no IP address corresponding to the MAC address in the cache,
+  // address resolution will fail.
+
+  // The MacAddressResolver that MacAddressDeviceEndPointFactory uses internally
+  // supports network scanning to perform address table updates prior to address resolution.
+
+  // Documents for enabling network scanning with the MacAddressDeviceEndPointFactory
+  // will be added in the future.
+
+  // In MacAddressResolver, network scanning can be enabled by setting the
+  // properties NetworkScanInterval and NetworkScanMinInterval.
+  // See the MacAddressResolver documentation for detail.
+  // https://github.com/smdn/Smdn.Net.AddressResolution/blob/main/examples/network-scanning/Program.cs
+}
