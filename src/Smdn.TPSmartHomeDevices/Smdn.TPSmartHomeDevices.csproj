@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>rc1</VersionSuffix>
+    <VersionSuffix></VersionSuffix>
     <!-- exclude build output assembly from packing -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!-- ignore warning NU5128 -->
