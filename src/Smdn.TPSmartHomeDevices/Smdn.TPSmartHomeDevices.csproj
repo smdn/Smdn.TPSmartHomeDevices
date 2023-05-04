@@ -14,16 +14,13 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
-    <Description>
-<![CDATA[A meta package that addes the dependency of Smdn.TPSmartHomeDevices.Kasa, Smdn.TPSmartHomeDevices.Tapo and Smdn.TPSmartHomeDevices.MacAddressEndPoint.
-This package is deprecated, use the individual packages instead.
-]]>
-    </Description>
+    <Description>A meta package that addes the dependency of Smdn.TPSmartHomeDevices.Kasa, Smdn.TPSmartHomeDevices.Tapo and Smdn.TPSmartHomeDevices.MacAddressEndPoint.</Description>
     <CopyrightYear>2022</CopyrightYear>
   </PropertyGroup>
 
   <PropertyGroup Label="package properties">
     <PackageTags>metapackage,tplink-kasa,tplink-tapo,$(PackageCommonTags)</PackageTags>
+    <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,4 +38,23 @@ This package is deprecated, use the individual packages instead.
       CopyToOutputDirectory="None"
     />
   </ItemGroup>
+
+  <Target Name="GenerateReadmeFileContent" DependsOnTargets="ReadReadmeFileNoticeSectionContent">
+    <PropertyGroup>
+      <PackageReadmeFileContent><![CDATA[# $(PackageId) $(PackageVersion)
+`$(PackageId)` is a meta package that addes the dependency of [Smdn.TPSmartHomeDevices.Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo),
+[Smdn.TPSmartHomeDevices.Kasa](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa),
+and [Smdn.TPSmartHomeDevices.MacAddressEndPoint](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint).
+
+This package is deprecated and will not be updated, use the individual packages instead.
+
+## Contributing
+This project welcomes contributions, feedbacks and suggestions. You can contribute to this project by submitting [Issues]($(RepositoryUrl)/issues/new/choose) or [Pull Requests]($(RepositoryUrl)/pulls/) on the [GitHub repository]($(RepositoryUrl)).
+
+## Notice
+$(ReadmeFileNoticeSectionContent)
+]]></PackageReadmeFileContent>
+    </PropertyGroup>
+  </Target>
+
 </Project>
