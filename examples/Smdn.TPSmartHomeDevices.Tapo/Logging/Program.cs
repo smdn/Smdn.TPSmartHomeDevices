@@ -11,6 +11,8 @@ services
   .AddLogging(
     static builder => builder
       .AddSimpleConsole(static options => {
+        // By setting IncludeScopes to true enables the current endpoint information
+        // to be output as a operation scope (see ILogger.BeginScope).
         options.IncludeScopes = true;
         options.SingleLine = true;
       })
