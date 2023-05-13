@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
     <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+    <RootNamespace/> <!-- empty the root namespace so that the namespace is determined only by the directory name, for code style rule IDE0030 -->
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
@@ -29,10 +30,6 @@ SPDX-License-Identifier: MIT
     <PackageTags>tplink-kasa,kasa,tplink-tapo,tapo,mac-address,address-resolution,$(PackageCommonTags)</PackageTags>
     <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
-
-  <ItemGroup>
-    <GlobalAnalyzerConfigFiles Include="..\CodeAnalysis.globalconfig" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.0" />

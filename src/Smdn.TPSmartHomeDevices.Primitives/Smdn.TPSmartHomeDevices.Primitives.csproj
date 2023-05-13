@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
     <VersionPrefix>1.0.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+    <RootNamespace/> <!-- empty the root namespace so that the namespace is determined only by the directory name, for code style rule IDE0030 -->
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
@@ -34,10 +35,6 @@ This library does not provide any specific implementations to operate Kasa and T
   <PropertyGroup Label="StyleCop code analysis">
     <StyleCopAnalyzersConfigurationFile>..\stylecop.json</StyleCopAnalyzersConfigurationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <GlobalAnalyzerConfigFiles Include="..\CodeAnalysis.globalconfig" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
