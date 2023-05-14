@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+using System.Net.Http;
+
 using NUnit.Framework;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -48,7 +50,7 @@ public class TapoSessionCookieUtilsTests {
     Assert.AreEqual(expectedSessionTimeout, sessionTimeout, nameof(sessionTimeout));
   }
 
-  private static System.Collections.IEnumerable YieldTestCases_TryGetCookie()
+  private static System.Collections.IEnumerable YieldTestCases_TryGetCookie_OfStringArray()
   {
     yield return new object?[] {
       new string[] { "TP_SESSIONID=XXXX;TIMEOUT=1440" },
@@ -76,8 +78,8 @@ public class TapoSessionCookieUtilsTests {
     };
   }
 
-  [TestCaseSource(nameof(YieldTestCases_TryGetCookie))]
-  public void TryGetCookie(
+  [TestCaseSource(nameof(YieldTestCases_TryGetCookie_OfStringArray))]
+  public void TryGetCookie_OfStringArray(
     string[]? inputs,
     bool expectedResult,
     string? expectedSessionId,
@@ -85,6 +87,64 @@ public class TapoSessionCookieUtilsTests {
   )
   {
     var result = TapoSessionCookieUtils.TryGetCookie(inputs, out var sessionId, out var sessionTimeout);
+
+    Assert.AreEqual(expectedResult, result, nameof(result));
+    Assert.AreEqual(expectedSessionId, sessionId, nameof(sessionId));
+    Assert.AreEqual(expectedSessionTimeout, sessionTimeout, nameof(sessionTimeout));
+  }
+
+  private static System.Collections.IEnumerable YieldTestCases_TryGetCookie_OfHttpResponseMessage()
+  {
+    var response1 = new HttpResponseMessage();
+
+    response1.Headers.Add("Set-Cookie", "TP_SESSIONID=XXXX;TIMEOUT=1440");
+
+    yield return new object?[] {
+      response1,
+      true,
+      "XXXX",
+      1440
+    };
+
+    var response2 = new HttpResponseMessage();
+
+    response2.Headers.Add("Set-Cookie", "SESSIONID=123456; Domain=example.com");
+
+    yield return new object?[] {
+      response2,
+      false,
+      null,
+      null
+    };
+
+    var response3 = new HttpResponseMessage();
+
+    yield return new object?[] {
+      response3,
+      false,
+      null,
+      null
+    };
+
+    HttpResponseMessage? response4 = null;
+
+    yield return new object?[] {
+      response4,
+      false,
+      null,
+      null
+    };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_TryGetCookie_OfHttpResponseMessage))]
+  public void TryGetCookie_OfHttpResponseMessage(
+    HttpResponseMessage? response,
+    bool expectedResult,
+    string? expectedSessionId,
+    int? expectedSessionTimeout
+  )
+  {
+    var result = TapoSessionCookieUtils.TryGetCookie(response!, out var sessionId, out var sessionTimeout);
 
     Assert.AreEqual(expectedResult, result, nameof(result));
     Assert.AreEqual(expectedSessionId, sessionId, nameof(sessionId));

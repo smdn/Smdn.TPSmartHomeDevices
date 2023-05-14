@@ -25,6 +25,9 @@ public static class TapoSessionCookieUtils {
     sessionId = default;
     sessionTimeout = default;
 
+    if (response is null)
+      return false;
+
     return
       response.Headers.TryGetValues(HeaderNameSetCookie, out var setCookieValues) &&
       TryGetCookie(setCookieValues, out sessionId, out sessionTimeout);
