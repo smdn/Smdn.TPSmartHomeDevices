@@ -93,6 +93,47 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /// <summary>
   /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
   /// </summary>
+  /// <param name="networkProfile">
+  /// The <see cref="IPNetworkProfile"/> which specifying the network interface and target addresses for address resolution.
+  /// This is used as necessary for address resolution and network scan.
+  /// </param>
+  /// <param name="networkScanInterval">
+  /// The <see cref="TimeSpan"/> which represents the interval to perform a network scan.
+  /// See <see cref="MacAddressResolver.NetworkScanInterval"/> for detail.
+  /// </param>
+  /// <param name="networkScanMinInterval">
+  /// The <see cref="TimeSpan"/> which represents the minimum interval to perform a network scan.
+  /// See <see cref="MacAddressResolver.NetworkScanMinInterval"/> for detail.
+  /// </param>
+  /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+  /// <seealso cref="MacAddressResolver"/>
+  /// <seealso cref="MacAddressResolver.NetworkScanInterval"/>
+  /// <seealso cref="MacAddressResolver.NetworkScanMinInterval"/>
+  public MacAddressDeviceEndPointFactory(
+    IPNetworkProfile networkProfile,
+    TimeSpan networkScanInterval,
+    TimeSpan networkScanMinInterval,
+    IServiceProvider? serviceProvider = null
+  )
+    : this(
+#pragma warning disable CA2000
+      resolver: (IAddressResolver<PhysicalAddress, IPAddress>)new MacAddressResolver(
+        networkProfile: networkProfile,
+        serviceProvider: serviceProvider
+      ) {
+        NetworkScanInterval = networkScanInterval,
+        NetworkScanMinInterval = networkScanMinInterval,
+      },
+#pragma warning restore CA2000
+      shouldDisposeResolver: true,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
+  /// </summary>
   /// <param name="resolver">
   /// The <see cref="MacAddressResolverBase"/> that resolves from a MAC address to a specific <see cref="IPAddress"/>.
   /// </param>
