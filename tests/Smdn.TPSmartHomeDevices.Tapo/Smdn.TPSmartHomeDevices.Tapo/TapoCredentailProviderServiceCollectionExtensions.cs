@@ -42,10 +42,10 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     var quotedUsername = Encoding.UTF8.GetString(usernameStream.ToArray());
     var quotedPassword = Encoding.UTF8.GetString(passwordStream.ToArray());
 
-    if (!(quotedUsername.StartsWith("\"") && quotedUsername.StartsWith("\"")))
+    if (!(quotedUsername.StartsWith("\"", StringComparison.Ordinal) && quotedUsername.EndsWith("\"", StringComparison.Ordinal)))
       throw new InvalidOperationException($"unexpected username: {quotedUsername}");
 
-    if (!(quotedPassword.StartsWith("\"") && quotedPassword.StartsWith("\"")))
+    if (!(quotedPassword.StartsWith("\"", StringComparison.Ordinal) && quotedPassword.EndsWith("\"", StringComparison.Ordinal)))
       throw new InvalidOperationException($"unexpected password: {quotedPassword}");
 
     var username = quotedUsername.Substring(1, quotedUsername.Length - 2);
