@@ -348,7 +348,7 @@ public partial class KasaDevice : IDisposable {
 
         using var loggerScopeNewClient = logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
 
-        client ??= new KasaClient(
+        client = new KasaClient(
           endPoint: endPoint,
           buffer: buffer,
           logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>()
