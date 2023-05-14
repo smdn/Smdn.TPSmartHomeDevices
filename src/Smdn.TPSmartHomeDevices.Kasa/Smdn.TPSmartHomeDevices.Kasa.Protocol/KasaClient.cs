@@ -107,7 +107,7 @@ public sealed partial class KasaClient : IDisposable {
           port: DefaultPort
         )
         : ipEndPoint,
-      EndPoint ep => ep, // TODO: should throw exception?
+      _ => endPoint, // TODO: should throw exception?
     };
 
     this.buffer = buffer;
