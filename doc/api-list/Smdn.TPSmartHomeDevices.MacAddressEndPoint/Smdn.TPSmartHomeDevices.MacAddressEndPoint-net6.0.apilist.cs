@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.MacAddressEndPoint.dll (Smdn.TPSmartHomeDevices.MacAddressEndPoint-1.0.0)
+// Smdn.TPSmartHomeDevices.MacAddressEndPoint.dll (Smdn.TPSmartHomeDevices.MacAddressEndPoint-1.1.0)
 //   Name: Smdn.TPSmartHomeDevices.MacAddressEndPoint
-//   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0+4dd7eda1e01a411bacbd6593ca050a45b3c57c37
+//   AssemblyVersion: 1.1.0.0
+//   InformationalVersion: 1.1.0+26b3994b9e663ddd0b4c39b0a86948a876d03dad
 //   TargetFramework: .NETCoreApp,Version=v6.0
 //   Configuration: Release
 //   Referenced assemblies:
@@ -35,9 +35,14 @@ namespace Smdn.TPSmartHomeDevices {
       public override string ToString() {}
     }
 
+    [Obsolete("Use an overload that specifies the parameter `shouldDisposeResolver`.")]
     protected MacAddressDeviceEndPointFactory(IAddressResolver<PhysicalAddress, IPAddress> resolver, IServiceProvider? serviceProvider = null) {}
+    protected MacAddressDeviceEndPointFactory(IAddressResolver<PhysicalAddress, IPAddress> resolver, bool shouldDisposeResolver, IServiceProvider? serviceProvider) {}
     public MacAddressDeviceEndPointFactory(IPNetworkProfile networkProfile, IServiceProvider? serviceProvider = null) {}
+    public MacAddressDeviceEndPointFactory(IPNetworkProfile networkProfile, TimeSpan networkScanInterval, TimeSpan networkScanMinInterval, IServiceProvider? serviceProvider = null) {}
+    [Obsolete("Use an overload that specifies the parameter `shouldDisposeResolver`.")]
     public MacAddressDeviceEndPointFactory(MacAddressResolverBase resolver, IServiceProvider? serviceProvider = null) {}
+    public MacAddressDeviceEndPointFactory(MacAddressResolverBase resolver, bool shouldDisposeResolver, IServiceProvider? serviceProvider = null) {}
 
     public virtual IDeviceEndPoint Create(PhysicalAddress address) {}
     protected virtual void Dispose(bool disposing) {}
