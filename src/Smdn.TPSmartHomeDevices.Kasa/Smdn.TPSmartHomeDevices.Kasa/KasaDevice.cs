@@ -5,7 +5,7 @@ using System.Buffers;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
-#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Net;
@@ -307,6 +307,30 @@ public partial class KasaDevice : IDisposable {
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+  [MemberNotNull(nameof(client))]
+#endif
+  private void EnsureClientCreated(
+    EndPoint endPoint,
+    CancellationToken cancellationToken
+  )
+  {
+    if (client is not null)
+      return;
+
+    cancellationToken.ThrowIfCancellationRequested();
+
+    var logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>();
+
+    using var loggerScope = logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
+
+    client = new KasaClient(
+      endPoint: endPoint,
+      buffer: buffer,
+      logger: logger
+    );
+  }
+
   private async ValueTask<TMethodResult> SendRequestAsyncCore<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -315,6 +339,26 @@ public partial class KasaDevice : IDisposable {
     CancellationToken cancellationToken
   )
   {
+    void DisposeClientIfEndPointHasChanged(EndPoint newEndPoint)
+    {
+      if (client is null)
+        return; // client not created yet
+      if (client.EndPoint.Equals(newEndPoint))
+        return; // end point has not changed
+
+      // endpoint has changed, recreate client with new endpoint
+      using var loggerScope = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
+
+      client.Logger?.LogInformation(
+        "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
+        client.EndPoint,
+        newEndPoint
+      );
+
+      client.Dispose();
+      client = null;
+    }
+
     const int maxAttempts = 5;
     var delay = TimeSpan.Zero;
     EndPoint? endPoint = null;
@@ -326,36 +370,22 @@ public partial class KasaDevice : IDisposable {
       if (endPoint is null) {
         endPoint = await ResolveEndPointAsync(cancellationToken).ConfigureAwait(false);
 
-        if (client is not null && !client.EndPoint.Equals(endPoint)) {
-          // endpoint has changed, recreate client with new endpoint
-          using var loggerScopeCurrentEndPoint = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
-
-          client.Logger?.LogInformation(
-            "Endpoint has changed: {CurrentEndPoint} -> {NewEndPoint}",
-            client.EndPoint,
-            endPoint
-          );
-
-          client.Dispose();
-          client = null;
-        }
+        DisposeClientIfEndPointHasChanged(endPoint);
       }
 
-      cancellationToken.ThrowIfCancellationRequested();
+      EnsureClientCreated(
+        endPoint: endPoint,
+        cancellationToken: cancellationToken
+      );
 
-      if (client is null) {
-        var logger = serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>();
-
-        using var loggerScopeNewClient = logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
-
-        client = new KasaClient(
-          endPoint: endPoint,
-          buffer: buffer,
-          logger: serviceProvider?.GetService<ILoggerFactory>()?.CreateLogger<KasaClient>()
-        );
-      }
-
-      using var loggerScopeSend = client.Logger?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
+      using var loggerScope =
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+        client
+#else
+        client!
+#endif
+        .Logger
+        ?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
 
       try {
         return await client.SendAsync(
