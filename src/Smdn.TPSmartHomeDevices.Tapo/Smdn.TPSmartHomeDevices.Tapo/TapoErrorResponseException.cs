@@ -3,6 +3,7 @@
 #pragma warning disable CA1032
 
 using System;
+
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;

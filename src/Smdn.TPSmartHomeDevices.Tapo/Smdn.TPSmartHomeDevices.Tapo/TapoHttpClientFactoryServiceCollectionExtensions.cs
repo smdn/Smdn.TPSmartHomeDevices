@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net.Http;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;

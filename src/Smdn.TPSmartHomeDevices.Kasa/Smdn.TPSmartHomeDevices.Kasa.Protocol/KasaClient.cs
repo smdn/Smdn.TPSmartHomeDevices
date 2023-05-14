@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
@@ -358,7 +359,7 @@ public sealed partial class KasaClient : IDisposable {
       const int receiveBlockSize = 0x400;
       int expectedBodyLength = default;
 
-      for (; ;) {
+      for (; ; ) {
         var buf = buffer.GetMemory(receiveBlockSize);
         int len = default;
 

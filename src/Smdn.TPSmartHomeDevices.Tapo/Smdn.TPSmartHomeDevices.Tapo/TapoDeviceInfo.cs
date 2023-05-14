@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json.Serialization;
+
 using Smdn.TPSmartHomeDevices.Json;
 using Smdn.TPSmartHomeDevices.Tapo.Json;
 

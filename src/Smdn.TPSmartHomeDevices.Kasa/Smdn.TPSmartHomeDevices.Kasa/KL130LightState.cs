@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Text.Json.Serialization;
+
 using Smdn.TPSmartHomeDevices.Kasa.Json;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;

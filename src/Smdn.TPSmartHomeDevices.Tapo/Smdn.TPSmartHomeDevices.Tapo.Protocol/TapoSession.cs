@@ -3,7 +3,9 @@
 using System;
 using System.Security.Cryptography;
 using System.Text.Json;
+
 using Microsoft.Extensions.Logging;
+
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;

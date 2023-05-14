@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net.Sockets;
+
 using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
