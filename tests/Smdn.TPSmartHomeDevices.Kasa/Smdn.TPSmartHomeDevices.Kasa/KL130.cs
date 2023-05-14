@@ -215,12 +215,12 @@ public class KL130Tests {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
         Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""color_temp"":" + colorTemperature.ToString() + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""on_off"":1,""ignore_default"":1}}}",
+          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""color_temp"":" + colorTemperature.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""on_off"":1,""ignore_default"":1}}}",
           JsonSerializer.Serialize(request),
           nameof(request)
         );
 
-        return JsonDocument.Parse(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""mode"":""normal"",""hue"":180,""saturation"":100,""color_temp"":" + colorTemperature.ToString() + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""err_code"":0}}}");
+        return JsonDocument.Parse(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""mode"":""normal"",""hue"":180,""saturation"":100,""color_temp"":" + colorTemperature.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""err_code"":0}}}");
       }
     };
 
@@ -263,12 +263,12 @@ public class KL130Tests {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
         Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""hue"":" + hue.ToString() + @",""saturation"":" + saturation.ToString() + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""color_temp"":0,""on_off"":1,""ignore_default"":1}}}",
+          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""hue"":" + hue.ToString(provider: null) + @",""saturation"":" + saturation.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""color_temp"":0,""on_off"":1,""ignore_default"":1}}}",
           JsonSerializer.Serialize(request),
           nameof(request)
         );
 
-        return JsonDocument.Parse(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""mode"":""normal"",""hue"":" + hue.ToString() + @",""saturation"":" + saturation.ToString() + @",""color_temp"":0" + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""err_code"":0}}}");
+        return JsonDocument.Parse(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""mode"":""normal"",""hue"":" + hue.ToString(provider: null) + @",""saturation"":" + saturation.ToString(provider: null) + @",""color_temp"":0" + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""err_code"":0}}}");
       }
     };
 
