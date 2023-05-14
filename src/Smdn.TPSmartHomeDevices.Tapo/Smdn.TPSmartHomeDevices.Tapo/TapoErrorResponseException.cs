@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#pragma warning disable CA1032
+
 using System;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
