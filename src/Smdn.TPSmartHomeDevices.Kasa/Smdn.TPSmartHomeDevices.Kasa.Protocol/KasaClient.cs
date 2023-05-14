@@ -376,8 +376,10 @@ public sealed partial class KasaClient : IDisposable {
           throw new KasaDisconnectedException(ex.Message, endPoint, ex);
         }
         catch (OperationCanceledException) when (
+#pragma warning disable CA1508
           cancellationTokenSourceForReceiveRestOfBody is not null &&
           cancellationTokenSourceForReceiveRestOfBody.IsCancellationRequested
+#pragma warning restore CA1508
         ) {
           logger?.LogWarning(
             "Timed out receiving up to expected message size. ({ReceivedBodyLength}/{ExpectedBodyLength} bytes)",
