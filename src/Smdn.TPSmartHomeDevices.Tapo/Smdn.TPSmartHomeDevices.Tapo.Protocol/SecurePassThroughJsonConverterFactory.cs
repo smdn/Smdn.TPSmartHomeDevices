@@ -216,10 +216,12 @@ public sealed class SecurePassThroughJsonConverterFactory :
     }
   }
 
+#pragma warning disable CA1812
   private sealed class PassThroughObjectJsonConverter<TPassThroughObject>
     : JsonConverter<TPassThroughObject>
     // where TPassThroughObject : ITapoPassThroughRequest or ITapoPassThroughResponse
   {
+#pragma warning restore CA1812
     private readonly IPassThroughObjectJsonConverter converter;
 
     public PassThroughObjectJsonConverter(IPassThroughObjectJsonConverter converter)
