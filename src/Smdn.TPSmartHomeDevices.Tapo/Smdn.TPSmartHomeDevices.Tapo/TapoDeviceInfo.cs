@@ -24,11 +24,13 @@ public class TapoDeviceInfo {
    * properties for the informations common to the devices
    */
 
+#pragma warning disable CA1819
   /// <summary>Gets the Tapo device's ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("device_id")]
   [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
   public byte[]? Id { get; init; }
+#pragma warning restore CA1819
 
   /// <summary>Gets the Tapo device's type name.</summary>
   /// <remarks>The value would be like <c>SMART.TAPOBULB</c> for Tapo L530, as an example.</remarks>
@@ -40,33 +42,39 @@ public class TapoDeviceInfo {
   [JsonPropertyName("model")]
   public string? ModelName { get; init; }
 
+#pragma warning disable CA1819
   /// <summary>Gets the Tapo device's current firmware ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("fw_id")]
   [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
   public byte[]? FirmwareId { get; init; }
+#pragma warning restore CA1819
 
   /// <summary>Gets the Tapo device's current firmware version string.</summary>
   /// <remarks>The value would be like <c>x.y.z Build yyyyMMdd Rel. XXXXX</c>, as an example.</remarks>
   [JsonPropertyName("fw_ver")]
   public string? FirmwareVersion { get; init; }
 
+#pragma warning disable CA1819
   /// <summary>Gets the Tapo device's hardware ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("hw_id")]
   [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
   public byte[]? HardwareId { get; init; }
+#pragma warning restore CA1819
 
   /// <summary>Gets the Tapo device's hardware version string.</summary>
   /// <remarks>The value would be like <c>x.y.z</c>, as an example.</remarks>
   [JsonPropertyName("hw_ver")]
   public string? HardwareVersion { get; init; }
 
+#pragma warning disable CA1819
   /// <summary>Gets the Tapo device's OEM ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("oem_id")]
   [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
   public byte[]? OemId { get; init; }
+#pragma warning restore CA1819
 
   /// <summary>Gets the <see cref="PhysicalAddress"/> that represents the Tapo device's MAC address.</summary>
   [JsonPropertyName("mac")]
