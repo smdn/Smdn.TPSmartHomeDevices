@@ -22,5 +22,5 @@ public sealed class KasaNumericalBooleanJsonConverter : JsonConverter<bool> {
     bool value,
     JsonSerializerOptions options
   )
-    => writer.WriteNumberValue(value ? 1 : 0);
+    => (writer ?? throw new ArgumentNullException(nameof(writer))).WriteNumberValue(value ? 1 : 0);
 }
