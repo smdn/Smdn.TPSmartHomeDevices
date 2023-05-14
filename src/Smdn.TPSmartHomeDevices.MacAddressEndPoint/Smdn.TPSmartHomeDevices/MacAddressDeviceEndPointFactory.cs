@@ -62,6 +62,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
    * instance members
    */
   private IAddressResolver<PhysicalAddress, IPAddress> resolver; // if null, it indicates a 'disposed' state.
+  private readonly bool shouldDisposeResolver;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
@@ -76,10 +77,13 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
     IServiceProvider? serviceProvider = null
   )
     : this(
+#pragma warning disable CA2000
       resolver: (IAddressResolver<PhysicalAddress, IPAddress>)new MacAddressResolver(
         networkProfile: networkProfile,
         serviceProvider: serviceProvider
       ),
+#pragma warning restore CA2000
+      shouldDisposeResolver: true,
       serviceProvider: serviceProvider
     )
   {
@@ -92,25 +96,79 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /// The <see cref="MacAddressResolverBase"/> that resolves from a MAC address to a specific <see cref="IPAddress"/>.
   /// </param>
   /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+  [Obsolete("Use an overload that specifies the parameter `shouldDisposeResolver`.")]
   public MacAddressDeviceEndPointFactory(
     MacAddressResolverBase resolver,
     IServiceProvider? serviceProvider = null
   )
     : this(
-      resolver: (IAddressResolver<PhysicalAddress, IPAddress>)(resolver ?? throw new ArgumentNullException(nameof(resolver))),
+      resolver: resolver ?? throw new ArgumentNullException(nameof(resolver)),
+      shouldDisposeResolver: false,
       serviceProvider: serviceProvider
     )
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
+  /// </summary>
+  /// <param name="resolver">
+  /// The <see cref="MacAddressResolverBase"/> that resolves from a MAC address to a specific <see cref="IPAddress"/>.
+  /// </param>
+  /// <param name="shouldDisposeResolver">
+  /// A value that indicates whether the <see cref="MacAddressResolverBase"/> passed from the <paramref name="resolver"/> should also be disposed when the instance is disposed.
+  /// </param>
+  /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+  public MacAddressDeviceEndPointFactory(
+    MacAddressResolverBase resolver,
+    bool shouldDisposeResolver,
+    IServiceProvider? serviceProvider = null
+  )
+    : this(
+      resolver: (IAddressResolver<PhysicalAddress, IPAddress>)(resolver ?? throw new ArgumentNullException(nameof(resolver))),
+      shouldDisposeResolver: shouldDisposeResolver,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  [Obsolete("Use an overload that specifies the parameter `shouldDisposeResolver`.")]
 #pragma warning disable IDE0060
   protected MacAddressDeviceEndPointFactory(
     IAddressResolver<PhysicalAddress, IPAddress> resolver,
     IServiceProvider? serviceProvider = null
   )
 #pragma warning restore IDE0060
+    : this(
+      resolver: resolver,
+      shouldDisposeResolver: false,
+      serviceProvider: serviceProvider
+    )
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
+  /// </summary>
+  /// <param name="resolver">
+  /// The <see cref="IAddressResolver{PhysicalAddress,IPAddress}"/> that resolves from a MAC address to a specific <see cref="IPAddress"/>.
+  /// </param>
+  /// <param name="shouldDisposeResolver">
+  /// A value that indicates whether the <see cref="IAddressResolver{PhysicalAddress,IPAddress}"/> passed
+  /// from the <paramref name="resolver"/> should also be disposed when the instance is disposed
+  /// and <paramref name="resolver"/> is disposable.
+  /// </param>
+  /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+#pragma warning disable IDE0060
+  protected MacAddressDeviceEndPointFactory(
+    IAddressResolver<PhysicalAddress, IPAddress> resolver,
+    bool shouldDisposeResolver,
+    IServiceProvider? serviceProvider
+  )
+#pragma warning restore IDE0060
   {
     this.resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+    this.shouldDisposeResolver = shouldDisposeResolver;
   }
 
   public void Dispose()
@@ -124,7 +182,9 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
     if (!disposing)
       return;
 
-    (resolver as IDisposable)?.Dispose();
+    if (shouldDisposeResolver && resolver is IDisposable disposableResolver)
+      disposableResolver.Dispose();
+
     resolver = null!; // mark as disposed
   }
 
