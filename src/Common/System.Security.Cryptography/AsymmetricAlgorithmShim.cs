@@ -26,9 +26,10 @@ internal static class AsymmetricAlgorithmShim {
     writer.WriteLine(header);
     writer.Flush();
 
+    using var toBase64Transform = new ToBase64Transform();
     using var base64Stream = new CryptoStream(
       stream,
-      new ToBase64Transform(),
+      toBase64Transform,
       CryptoStreamMode.Write,
       leaveOpen: true
     );
