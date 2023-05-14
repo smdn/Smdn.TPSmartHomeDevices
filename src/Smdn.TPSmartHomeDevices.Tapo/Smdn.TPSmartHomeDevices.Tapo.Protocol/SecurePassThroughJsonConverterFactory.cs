@@ -206,10 +206,11 @@ public sealed class SecurePassThroughJsonConverterFactory :
       if (!cryptographicExceptionThrown && logger is not null) {
         using var stream = new MemoryStream(base64, writable: false);
         using var decryptingStream = CreateDecryptingStream(stream);
+        using var decryptingReader = new StreamReader(decryptingStream, Encoding.UTF8);
 
         logger.LogTrace(
           "PassThroughResponse: {RawJson} ({TypeFullName})",
-          new StreamReader(decryptingStream, Encoding.UTF8).ReadToEnd(),
+          decryptingReader.ReadToEnd(),
           typeof(TValue).FullName
         );
       }
