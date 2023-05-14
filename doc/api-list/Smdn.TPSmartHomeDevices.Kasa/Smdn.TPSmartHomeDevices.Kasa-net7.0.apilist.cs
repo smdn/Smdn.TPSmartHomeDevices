@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-1.0.0)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-1.0.1)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
-//   AssemblyVersion: 1.0.0.0
-//   InformationalVersion: 1.0.0+4dd7eda1e01a411bacbd6593ca050a45b3c57c37
+//   AssemblyVersion: 1.0.1.0
+//   InformationalVersion: 1.0.1+26b3994b9e663ddd0b4c39b0a86948a876d03dad
 //   TargetFramework: .NETCoreApp,Version=v7.0
 //   Configuration: Release
 //   Referenced assemblies:
