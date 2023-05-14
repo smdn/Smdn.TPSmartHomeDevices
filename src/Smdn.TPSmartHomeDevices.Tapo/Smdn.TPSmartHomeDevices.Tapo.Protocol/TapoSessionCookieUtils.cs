@@ -13,8 +13,8 @@ public static class TapoSessionCookieUtils {
 
   // Format and example of Set-Cookie header sent back by the Tapo HTTP server.
   //   Set-Cookie: TP_SESSIONID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX;TIMEOUT=1440
-  internal static readonly string HttpCookiePrefixForSessionId = "TP_SESSIONID="; // TP_SESSIONID=XXXXXX
-  internal static readonly string HttpCookieAttributePrefixForTimeout = "TIMEOUT="; // TIMEOUT=xxxx
+  internal const string HttpCookiePrefixForSessionId = "TP_SESSIONID="; // TP_SESSIONID=XXXXXX
+  internal const string HttpCookieAttributePrefixForTimeout = "TIMEOUT="; // TIMEOUT=xxxx
 
   public static bool TryGetCookie(
     HttpResponseMessage response,
