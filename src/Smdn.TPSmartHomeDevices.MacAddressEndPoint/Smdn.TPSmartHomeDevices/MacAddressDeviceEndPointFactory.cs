@@ -68,8 +68,8 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /// Initializes a new instance of the <see cref="MacAddressDeviceEndPointFactory"/> class.
   /// </summary>
   /// <param name="networkProfile">
-  /// The <see cref="IPNetworkProfile"/> which specifying the network interface and network scan target addresses.
-  /// This is used as necessary for network scan in address resolution.
+  /// The <see cref="IPNetworkProfile"/> which specifying the network interface and target addresses for address resolution.
+  /// This is used as necessary for address resolution.
   /// </param>
   /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
   /// <seealso cref="MacAddressResolver"/>
