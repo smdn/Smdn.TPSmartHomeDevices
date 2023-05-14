@@ -72,6 +72,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /// This is used as necessary for network scan in address resolution.
   /// </param>
   /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+  /// <seealso cref="MacAddressResolver"/>
   public MacAddressDeviceEndPointFactory(
     IPNetworkProfile networkProfile,
     IServiceProvider? serviceProvider = null
@@ -119,6 +120,7 @@ public class MacAddressDeviceEndPointFactory : IDeviceEndPointFactory<PhysicalAd
   /// A value that indicates whether the <see cref="MacAddressResolverBase"/> passed from the <paramref name="resolver"/> should also be disposed when the instance is disposed.
   /// </param>
   /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+  /// <seealso cref="MacAddressResolverBase"/>
   public MacAddressDeviceEndPointFactory(
     MacAddressResolverBase resolver,
     bool shouldDisposeResolver,
