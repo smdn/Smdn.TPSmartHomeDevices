@@ -56,6 +56,34 @@ partial class TapoClientTests {
   }
 
   [Test]
+  public async Task AuthenticateAsync_InvalidProtocol()
+  {
+    const TapoSessionProtocol invalidProtocol = (TapoSessionProtocol)(-9999);
+    const string token = "token";
+
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => token,
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+#pragma warning disable CA2012
+    Assert.Throws<ArgumentException>(
+      () => client.AuthenticateAsync(
+        protocol: invalidProtocol,
+        identity: null,
+        credential: defaultCredentialProvider!
+      )
+    );
+#pragma warning restore CA2012
+
+    Assert.IsNull(client.Session);
+  }
+
+  [Test]
   public async Task AuthenticateAsync()
   {
     const string token = "token";
@@ -178,6 +206,12 @@ partial class TapoClientTests {
 
     public void WritePasswordPropertyValue(Utf8JsonWriter writer)
       => writer.WriteStringValue(Password); // write non-encoded string
+
+    public int HashPassword(HashAlgorithm algorithm, Span<byte> destination)
+      => throw new NotImplementedException();
+
+    public int HashUsername(HashAlgorithm algorithm, Span<byte> destination)
+      => throw new NotImplementedException();
   }
 
   [Test]
@@ -550,6 +584,12 @@ partial class TapoClientTests {
 
       writer.WriteStringValue(TapoCredentials.ToBase64EncodedSHA1DigestString(username));
     }
+
+    public int HashPassword(HashAlgorithm algorithm, Span<byte> destination)
+      => throw new NotImplementedException();
+
+    public int HashUsername(HashAlgorithm algorithm, Span<byte> destination)
+      => throw new NotImplementedException();
 
     public void Dispose()
     {

@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/github/license/smdn/Smdn.TPSmartHomeDevices)](https://github.com/smdn/Smdn.TPSmartHomeDevices/blob/main/LICENSE.txt)
+[![GitHub license](https://img.shields.io/github/license/smdn/Smdn.TPSmartHomeDevices)](https://github.com/smdn/Smdn.TPSmartHomeDevices/blob/main/LICENSE.md)
 [![tests/main](https://img.shields.io/github/actions/workflow/status/smdn/Smdn.TPSmartHomeDevices/test.yml?branch=main&label=tests%2Fmain)](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/test.yml)
 [![CodeQL](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml)
 
@@ -128,7 +128,7 @@ IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.m
 # Notice
 <!-- #pragma section-start NupkgReadmeFile_Notice -->
 ## License
-This project is licensed under the terms of the [MIT License](./LICENSE.txt).
+See [LICENSE.md](./LICENSE.md) for detail.
 
 ## Disclaimer
 (An English translation for the reference follows the text written in Japanese.)
@@ -150,6 +150,8 @@ This project incorporates implementations partially ported from the following pr
 
 - [fishbigger/TapoP100](https://github.com/fishbigger/TapoP100)
 - [europowergenerators/Tapo-plug-controller](https://github.com/europowergenerators/Tapo-plug-controller)
+- [petretiandrea/plugp100](https://github.com/petretiandrea/plugp100)
 - [plasticrake/tplink-smarthome-api](https://github.com/plasticrake/tplink-smarthome-api/)
 - [plasticrake/tplink-smarthome-crypto](https://github.com/plasticrake/tplink-smarthome-crypto)
+
 <!-- #pragma section-end NupkgReadmeFile_Notice -->

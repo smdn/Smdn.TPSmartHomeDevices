@@ -145,6 +145,11 @@ public sealed partial class TapoClient : IDisposable {
       throw new ObjectDisposedException(GetType().FullName);
   }
 
+  /// <remarks>
+  /// This method first attempts to authenticate with the protocol that
+  /// use the 'securePassthrough' request method. And if that fails,
+  /// falls back to KLAP protocol to continue.
+  /// </remarks>
   public ValueTask AuthenticateAsync(
     ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credential,
@@ -157,9 +162,34 @@ public sealed partial class TapoClient : IDisposable {
     ThrowIfDisposed();
 
     return AuthenticateAsyncCore(
-      identity,
-      credential,
-      cancellationToken
+      protocol: null,
+      identity: identity,
+      credential: credential,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  public ValueTask AuthenticateAsync(
+    TapoSessionProtocol protocol,
+    ITapoCredentialIdentity? identity,
+    ITapoCredentialProvider credential,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (credential is null)
+      throw new ArgumentNullException(nameof(credential));
+
+    ThrowIfDisposed();
+
+    return AuthenticateAsyncCore(
+      protocol: protocol switch {
+        TapoSessionProtocol.Klap or
+        TapoSessionProtocol.SecurePassThrough => protocol,
+        _ => throw new ArgumentException($"invalid value of ${nameof(TapoSessionProtocol)}", paramName: nameof(protocol)),
+      },
+      identity: identity,
+      credential: credential,
+      cancellationToken: cancellationToken
     );
   }
 
@@ -193,6 +223,12 @@ public sealed partial class TapoClient : IDisposable {
         securePassThroughSession: securePassThroughSession,
         request: request,
         jsonSerializerOptions: securePassThroughSession.SecurePassThroughJsonSerializerOptions,
+        cancellationToken: cancellationToken
+      ),
+      TapoKlapSession klapSession => PostKlapRequestAsync<TRequest, TResponse>(
+        klapSession: klapSession,
+        request: request,
+        jsonSerializerOptions: CommonJsonSerializerOptions,
         cancellationToken: cancellationToken
       ),
       _ => throw new InvalidOperationException($"Invalid type of session: {session.GetType().FullName}"),

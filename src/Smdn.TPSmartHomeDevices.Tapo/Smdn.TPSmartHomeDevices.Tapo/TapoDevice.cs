@@ -393,16 +393,37 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     if (client.Session is not null)
       return;
 
+    // select TapoSessionProtocol for this device
+    var protocol = (
+      serviceProvider?.GetService<TapoSessionProtocolSelector>() ??
+      TapoSessionProtocolSelector.Default
+    ).SelectProtocol(this);
+
     cancellationToken.ThrowIfCancellationRequested();
 
     using var loggerScopeAuthentication = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
 
     try {
-      await client.AuthenticateAsync(
-        identity: this,
-        credential: credential,
-        cancellationToken: cancellationToken
-      ).ConfigureAwait(false);
+      client.Logger?.LogTrace(
+        "Initiate authentication with protocol '{Protocol}'",
+        protocol
+      );
+
+      if (protocol == null) {
+        await client.AuthenticateAsync(
+          identity: this,
+          credential: credential,
+          cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+      }
+      else {
+        await client.AuthenticateAsync(
+          protocol: protocol.Value,
+          identity: this,
+          credential: credential,
+          cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+      }
     }
     catch {
       client.Dispose();

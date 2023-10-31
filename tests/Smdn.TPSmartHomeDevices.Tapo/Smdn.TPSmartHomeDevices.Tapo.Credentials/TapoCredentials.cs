@@ -8,7 +8,7 @@ using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 [TestFixture]
-public class TapoCredentialsTests {
+public partial class TapoCredentialsTests {
   [TestCase("user", TapoCredentials.HexSHA1HashSizeInBytes, "MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ==")]
   [TestCase("user", TapoCredentials.HexSHA1HashSizeInBytes + 1, "MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ==")]
   [TestCase("user@mail.test", TapoCredentials.HexSHA1HashSizeInBytes, "YjhlY2VjNWIzNjk0ZTVlNzE0YTYxMmNhZTZlZTJiNmExMjQ5ZmZmZQ==")]

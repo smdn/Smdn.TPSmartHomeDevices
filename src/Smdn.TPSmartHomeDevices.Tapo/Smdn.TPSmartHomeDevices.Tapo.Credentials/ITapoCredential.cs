@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -32,4 +33,14 @@ public interface ITapoCredential : IDisposable {
   /// <seealso cref="Protocol.LoginDeviceRequest"/>
   /// <seealso cref="TapoCredentials.ToBase64EncodedSHA1DigestString(ReadOnlySpan{char})"/>
   void WriteUsernamePropertyValue(Utf8JsonWriter writer);
+
+  /// <summary>
+  /// Computes the hash of the password corresponding to this credential with the specific hash algorithm.
+  /// </summary>
+  int HashPassword(HashAlgorithm algorithm, Span<byte> destination);
+
+  /// <summary>
+  /// Computes the hash of the user name corresponding to this credential with the specific hash algorithm.
+  /// </summary>
+  int HashUsername(HashAlgorithm algorithm, Span<byte> destination);
 }
