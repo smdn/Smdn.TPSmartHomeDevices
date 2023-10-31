@@ -47,13 +47,14 @@ await bulb.SetColorTemperatureAsync(colorTemperature: 4000, brightness: 40);
 ```
 
 ### Supported devices and functions
-The following devices and functions are currently supported. (as of version 1.0.0)
+The following devices and functions are currently supported.
 
-- Tapo devices
+- Tapo devices (as of version 2.0.0)
   - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
   - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
   - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
-- Kasa devices
+  - Supports default (`securePassthrough`) and new (`KLAP`) protocol - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/)
+- Kasa devices (as of version 1.0.0)
   - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
   - KL130 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)
 - Functions
@@ -76,6 +77,7 @@ The following devices and functions are currently supported. (as of version 1.0.
     - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
   - HTTP (`Microsoft.Extensions.Http`) - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
 - Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
+- Customizable Tapo protocol selection - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/)
 - Configuring timeout and cancellation
   - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
   - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
