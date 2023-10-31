@@ -83,10 +83,6 @@ partial class TapoClientTests {
     Assert.IsNotEmpty(client.Session.SessionId);
     Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
     Assert.IsFalse(client.Session.HasExpired);
-    Assert.AreEqual(
-      new Uri($"/app?token={token}", UriKind.Relative),
-      client.Session.RequestPathAndQuery
-    );
   }
 
   [Test]
@@ -143,10 +139,6 @@ partial class TapoClientTests {
     Assert.IsNotEmpty(client.Session.SessionId);
     Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
     Assert.IsFalse(client.Session.HasExpired);
-    Assert.AreEqual(
-      new Uri($"/app?token={token}", UriKind.Relative),
-      client.Session.RequestPathAndQuery
-    );
   }
 
   private class TapoCredentialNotFoundException : Exception { }
@@ -529,10 +521,6 @@ partial class TapoClientTests {
     Assert.IsNotEmpty(client.Session.SessionId);
     Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
     Assert.IsFalse(client.Session.HasExpired);
-    Assert.AreEqual(
-      new Uri($"/app?token={token}", UriKind.Relative),
-      client.Session.RequestPathAndQuery
-    );
   }
 
   private class DisposableCredential : ITapoCredential {

@@ -103,7 +103,7 @@ partial class TapoClientTests {
 
     Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual(new GetDeviceInfoRequest().Method, ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session!.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.AreEqual(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"), ex.EndPoint, nameof(ex.EndPoint));
   }
 
   [Test]
@@ -141,6 +141,6 @@ partial class TapoClientTests {
 
     Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
     Assert.AreEqual("securePassthrough", ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, client.Session!.RequestPathAndQuery), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.AreEqual(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"), ex.EndPoint, nameof(ex.EndPoint));
   }
 }

@@ -1,89 +1,46 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
-using System.Security.Cryptography;
-using System.Text.Json;
-
-using Microsoft.Extensions.Logging;
-
-using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 /// <summary>
-/// Maintains authenticated Tapo session information, including access token, exchanged key and session ID.
+/// Maintains authenticated Tapo session information, including access token and session ID.
 /// </summary>
-/// <remarks>
-/// This implementation is based on the following
-/// C# implementation by <see href="https://github.com/europowergenerators">E-Power International</see>:
-/// <see href="https://github.com/europowergenerators/Tapo-plug-controller">europowergenerators/Tapo-plug-controller</see>, published under the MIT License.
-/// </remarks>
-public sealed class TapoSession : IDisposable {
-  internal static readonly Uri RequestPath = new("/app", UriKind.Relative);
+public abstract class TapoSession : IDisposable {
+  private bool disposed;
 
-  public Uri RequestPathAndQuery { get; private set; } = RequestPath;
-  public string? Token { get; private set; }
   public string? SessionId { get; }
   public DateTime ExpiresOn { get; }
   public bool HasExpired => ExpiresOn <= DateTime.Now;
+  public abstract string? Token { get; }
 
-  private Aes? aes;
-  private SecurePassThroughJsonConverterFactory? securePassThroughJsonConverterFactory;
-
-  internal JsonSerializerOptions SecurePassThroughJsonSerializerOptions { get; }
-
-  internal TapoSession(
-    ITapoCredentialIdentity? identity,
+  private protected TapoSession(
     string? sessionId,
-    DateTime expiresOn,
-    ReadOnlySpan<byte> key,
-    ReadOnlySpan<byte> iv,
-    JsonSerializerOptions baseJsonSerializerOptions,
-    ILogger? logger
+    DateTime expiresOn
   )
   {
     SessionId = sessionId;
     ExpiresOn = expiresOn;
+  }
 
-    aes = Aes.Create();
-    aes.Mode = CipherMode.CBC;
-    aes.Padding = PaddingMode.PKCS7;
-    aes.Key = key.ToArray();
-    aes.IV = iv.ToArray();
+  protected virtual void Dispose(bool disposing)
+  {
+    if (!disposing)
+      return;
 
-    securePassThroughJsonConverterFactory = new(
-      identity: identity,
-      encryptorForPassThroughRequest: aes.CreateEncryptor(),
-      decryptorForPassThroughResponse: aes.CreateDecryptor(),
-      baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,
-      logger: logger
-    );
-
-    SecurePassThroughJsonSerializerOptions = new(baseJsonSerializerOptions);
-    SecurePassThroughJsonSerializerOptions.Converters.Add(securePassThroughJsonConverterFactory);
+    disposed = true;
   }
 
   public void Dispose()
   {
-    securePassThroughJsonConverterFactory?.Dispose();
-    securePassThroughJsonConverterFactory = null;
-
-    aes?.Dispose();
-    aes = null;
+    Dispose(true);
+    GC.SuppressFinalize(this);
   }
 
-  internal void SetToken(string token)
+  private protected void ThrowIfDisposed()
   {
-    Token = token;
-
-    // append issued token to the request path query
-    RequestPathAndQuery = new Uri(
-      string.Concat(
-        RequestPath.ToString(), // only path
-        "?token=",
-        token
-      ),
-      UriKind.Relative
-    );
+    if (disposed)
+      throw new ObjectDisposedException(GetType().FullName);
   }
 }

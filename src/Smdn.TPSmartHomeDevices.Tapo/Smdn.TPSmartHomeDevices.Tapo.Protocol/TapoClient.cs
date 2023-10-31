@@ -188,10 +188,14 @@ public sealed partial class TapoClient : IDisposable {
     if (session is null)
       throw new InvalidOperationException("The session for this instance has not been established.");
 
-    return PostSecurePassThroughRequestAsync<TRequest, TResponse>(
-      request: request,
-      jsonSerializerOptions: session.SecurePassThroughJsonSerializerOptions,
-      cancellationToken: cancellationToken
-    );
+    return session switch {
+      TapoSecurePassThroughSession securePassThroughSession => PostSecurePassThroughRequestAsync<TRequest, TResponse>(
+        securePassThroughSession: securePassThroughSession,
+        request: request,
+        jsonSerializerOptions: securePassThroughSession.SecurePassThroughJsonSerializerOptions,
+        cancellationToken: cancellationToken
+      ),
+      _ => throw new InvalidOperationException($"Invalid type of session: {session.GetType().FullName}"),
+    };
   }
 }

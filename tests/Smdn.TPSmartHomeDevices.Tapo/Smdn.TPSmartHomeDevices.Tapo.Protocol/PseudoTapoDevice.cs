@@ -22,26 +22,42 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     public object? State { get; }
     public string SessionId { get; }
     public DateTime ExpiresOn { get; }
+
+    protected SessionBase(
+      object? state,
+      string sessionId,
+      DateTime expiresOn
+    )
+    {
+      State = state;
+      SessionId = sessionId;
+      ExpiresOn = expiresOn;
+    }
+  }
+
+  private class SecurePassThroughSessionBase : SessionBase {
     internal ICryptoTransform Encryptor { get; }
     internal ICryptoTransform Decryptor { get; }
 
-    protected SessionBase(
+    protected SecurePassThroughSessionBase(
       object? state,
       string sessionId,
       DateTime expiresOn,
       ICryptoTransform encryptor,
       ICryptoTransform decryptor
     )
+      : base(
+        state,
+        sessionId,
+        expiresOn
+      )
     {
-      State = state;
-      SessionId = sessionId;
-      ExpiresOn = expiresOn;
       Encryptor = encryptor;
       Decryptor = decryptor;
     }
   }
 
-  private class UnauthorizedSession : SessionBase {
+  private class UnauthorizedSession : SecurePassThroughSessionBase {
     public static UnauthorizedSession Create(
       object? state,
       IPEndPoint remoteEndPoint,
@@ -89,7 +105,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
   }
 
-  private class AuthorizedSession : SessionBase {
+  private class AuthorizedSession : SecurePassThroughSessionBase {
     public string Token { get; }
 
     public AuthorizedSession(string token, UnauthorizedSession session)
@@ -347,10 +363,10 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         return;
       }
 
+      var response = context.Response;
+
       // validate request method
       if (!string.Equals("POST", request.HttpMethod, StringComparison.Ordinal)) {
-        var response = context.Response;
-
         response.KeepAlive = false;
 
         await WriteBadRequestPlainTextContentAsync(
@@ -361,24 +377,27 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         return;
       }
 
-      // validate request content type
-      if (
-        !string.Equals("application/json", request.ContentType, StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals("text/json", request.ContentType, StringComparison.OrdinalIgnoreCase)
-      ) {
-        var response = context.Response;
+      // validate request URL
+      switch (request.Url!.LocalPath) {
+        case "/app":
+          // validate request content type
+          if (
+            string.Equals("application/json", request.ContentType, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals("text/json", request.ContentType, StringComparison.OrdinalIgnoreCase)
+          ) {
+            await ProcessPostJsonRequestAsync(context).ConfigureAwait(false);
+            return;
+          }
 
-        response.KeepAlive = false;
-
-        await WriteBadRequestPlainTextContentAsync(
-          response,
-          "invalid content type"
-        ).ConfigureAwait(false);
-
-        return;
+          break;
       }
 
-      await ProcessPostJsonRequestAsync(context).ConfigureAwait(false);
+      response.KeepAlive = false;
+
+      await WriteBadRequestPlainTextContentAsync(
+        response,
+        $"invalid request path or content type ({request.Url}, '{request.ContentType}')"
+      ).ConfigureAwait(false);
     }
     finally {
       try {
@@ -617,7 +636,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     var token = context.Request.QueryString["token"];
 
-    SessionBase? session = string.IsNullOrEmpty(token)
+    SecurePassThroughSessionBase? session = string.IsNullOrEmpty(token)
       ? TapoSessionCookieUtils.TryGetCookie(context.Request.Headers.GetValues("Cookie"), out var sessionId, out _)
         ? unauthorizedSessions.TryGetValue(sessionId!, out var unauthorizedSession)
           ? unauthorizedSession
@@ -654,7 +673,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   private async Task WriteSecurePassThroughJsonContentAsync(
     HttpListenerResponse response,
-    SessionBase session,
+    SecurePassThroughSessionBase session,
     int errorCode,
     ITapoPassThroughResponse passThroughResponse
   )
@@ -747,7 +766,7 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     await WriteSecurePassThroughJsonContentAsync(
       context.Response,
-      (SessionBase?)authorizedSession ?? unauthorizedSession,
+      (SecurePassThroughSessionBase?)authorizedSession ?? unauthorizedSession,
       KnownErrorCodes.Success,
       loginDeviceResponse
     ).ConfigureAwait(false);

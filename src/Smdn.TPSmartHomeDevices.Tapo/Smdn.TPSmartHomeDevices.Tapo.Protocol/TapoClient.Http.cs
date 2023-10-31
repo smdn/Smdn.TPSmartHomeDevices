@@ -4,8 +4,6 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,84 +25,14 @@ partial class TapoClient {
 
   public TimeSpan? Timeout { get; set; }
 
-  private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
-    TRequest request,
-    JsonSerializerOptions jsonSerializerOptions,
+  private async ValueTask<(Uri RequestAbsoluteUri, THttpResult? Result)> PostAsync<THttpResult>(
+    Uri requestUri,
+    HttpContent requestContent,
+    Func<HttpResponseMessage, ValueTask<THttpResult?>> processHttpResponseAsync,
     CancellationToken cancellationToken
   )
-    where TRequest : notnull, ITapoPassThroughRequest
-    where TResponse : ITapoPassThroughResponse
   {
     cancellationToken.ThrowIfCancellationRequested();
-
-    logger?.LogDebug("Request method: {RequestMethod}", request.Method);
-
-    var (requestUri, securePassThroughResponse, _) = await PostPlainTextRequestAsync<
-      SecurePassThroughRequest<TRequest>,
-      SecurePassThroughResponse<TResponse>,
-      None
-    >(
-      request: new(passThroughRequest: request),
-      jsonSerializerOptions: jsonSerializerOptions,
-      processHttpResponse: static _ => default,
-      cancellationToken: cancellationToken
-    ).ConfigureAwait(false);
-
-    var response = securePassThroughResponse.Result.PassThroughResponse;
-
-    logger?.LogDebug("Respose error code: {ErrorCode} ({RequestMethod})", response.ErrorCode, request.Method);
-
-    TapoErrorResponseException.ThrowIfError(
-      requestUri,
-      request.Method,
-      response.ErrorCode
-    );
-
-    return response;
-  }
-
-  private async ValueTask<(
-    Uri RequestUri,
-    TResponse Response,
-    THttpResult? HttpResult
-  )>
-  PostPlainTextRequestAsync<TRequest, TResponse, THttpResult>(
-    TRequest request,
-    JsonSerializerOptions jsonSerializerOptions,
-    Func<HttpResponseMessage, THttpResult?> processHttpResponse,
-    CancellationToken cancellationToken
-  )
-    where TRequest : ITapoRequest
-    where TResponse : ITapoResponse
-  {
-    cancellationToken.ThrowIfCancellationRequested();
-
-    logger?.LogDebug("HTTP Transaction: Session={SessionId}, Token={Token}", session?.SessionId, session?.Token);
-
-    using var requestContent = JsonContent.Create(
-      inputValue: request,
-      mediaType: mediaTypeJson,
-      options: jsonSerializerOptions
-    );
-
-    if (session?.SessionId is not null) {
-      requestContent.Headers.Add(
-        "Cookie",
-        string.Concat(TapoSessionCookieUtils.HttpCookiePrefixForSessionId, session.SessionId)
-      );
-    }
-
-    // Disables 'chunked' transfer encoding
-    //   The HTTP server inside of the Tapo devices does not seem to support 'chunked' transfer encoding.
-    //   To prevent content from being transferred by 'chunked', serialize the content onto a memory buffer
-    //   and ensure the HttpClient to calculate Content-Length before transferring.
-    //
-    // ref:
-    //   https://github.com/dotnet/runtime/issues/49357
-    //   https://github.com/dotnet/runtime/issues/70793
-    await requestContent.LoadIntoBufferAsync().ConfigureAwait(false);
-
-    var requestUri = session is null ? TapoSession.RequestPath : session.RequestPathAndQuery;
 
     logger?.LogTrace("HTTP Request URI: {RequestUri}", requestUri);
     logger?.LogTrace(
@@ -136,8 +64,6 @@ partial class TapoClient {
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
-    var httpResult = processHttpResponse(httpResponse);
-
     logger?.LogTrace(
       "HTTP Response status: {ResponseStatusCode} {ResponseReasonPhrase}",
       (int)httpResponse.StatusCode,
@@ -158,28 +84,9 @@ partial class TapoClient {
 
     httpResponse.EnsureSuccessStatusCode();
 
-    var requestAbsoluteUri = new Uri(httpClient.BaseAddress, requestUri);
-
-    var response = await httpResponse.Content.ReadFromJsonAsync<TResponse>(
-      cancellationToken: cancellationToken,
-      options: jsonSerializerOptions
-    ).ConfigureAwait(false)
-      ?? throw new TapoProtocolException(
-        message: "Unexpected null response.",
-        endPoint: requestAbsoluteUri,
-        innerException: null
-      );
-
-    TapoErrorResponseException.ThrowIfError(
-      requestAbsoluteUri,
-      request.Method,
-      response.ErrorCode
-    );
-
     return (
-      requestAbsoluteUri,
-      response,
-      httpResult
+      new Uri(httpClient.BaseAddress, requestUri),
+      await processHttpResponseAsync(httpResponse).ConfigureAwait(false)
     );
   }
 }

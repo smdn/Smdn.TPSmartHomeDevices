@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Smdn.TPSmartHomeDevices.Tapo.Protocol.TapoSession.get_RequestPathAndQuery</Target>
+    <Left>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Smdn.TPSmartHomeDevices.Tapo.Protocol.TapoSession.get_RequestPathAndQuery</Target>
+    <Left>lib/net7.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Smdn.TPSmartHomeDevices.Tapo.Protocol.TapoSession.get_RequestPathAndQuery</Target>
+    <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>
