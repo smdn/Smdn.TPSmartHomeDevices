@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-1.0.1)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview1)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
-//   AssemblyVersion: 1.0.1.0
-//   InformationalVersion: 1.0.1+26b3994b9e663ddd0b4c39b0a86948a876d03dad
+//   AssemblyVersion: 2.0.0.0
+//   InformationalVersion: 2.0.0-preview1+c3a27521d2fb833f09bc65614d55bca81303f12b
 //   TargetFramework: .NETCoreApp,Version=v6.0
 //   Configuration: Release
 //   Referenced assemblies:
@@ -27,6 +27,7 @@
 #nullable enable annotations
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -245,6 +246,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public Uri EndPoint { get; }
   }
 
+  public static class TapoSessionProtocolSelectorServiceCollectionExtensions {
+    public static IServiceCollection AddTapoProtocolSelector(this IServiceCollection services, Func<TapoDevice, TapoSessionProtocol?> selectProtocol) {}
+  }
+
   public readonly struct TapoDeviceExceptionHandling {
     public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndRetry; // = "{ShouldRetry=True, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
     public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndThrow; // = "{ShouldRetry=False, RetryAfter=00:00:00, ShouldReestablishSession=False, ShouldWrapIntoTapoProtocolException=False, ShouldInvalidateEndPoint=True}"
@@ -267,6 +272,8 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
   public interface ITapoCredential : IDisposable {
+    int HashPassword(HashAlgorithm algorithm, Span<byte> destination);
+    int HashUsername(HashAlgorithm algorithm, Span<byte> destination);
     void WritePasswordPropertyValue(Utf8JsonWriter writer);
     void WriteUsernamePropertyValue(Utf8JsonWriter writer);
   }
@@ -283,6 +290,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
 
     public static string ToBase64EncodedSHA1DigestString(ReadOnlySpan<char> str) {}
     public static string ToBase64EncodedString(ReadOnlySpan<char> str) {}
+    public static bool TryComputeKlapAuthHash(ITapoCredential credential, Span<byte> destination, out int bytesWritten) {}
     public static bool TryConvertToHexSHA1Hash(ReadOnlySpan<byte> input, Span<byte> destination, out int bytesWritten) {}
   }
 }
@@ -325,6 +333,29 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     int ErrorCode { get; }
   }
 
+  public enum TapoSessionProtocol : int {
+    Klap = 1,
+    SecurePassThrough = 0,
+  }
+
+  public static class HashAlgorithmExtensions {
+    public static bool TryComputeHash(this HashAlgorithm algorithm, Span<byte> destination, ReadOnlySpan<byte> source0, ReadOnlySpan<byte> source1, ReadOnlySpan<byte> source2, ReadOnlySpan<byte> source3, out int bytesWritten) {}
+    public static bool TryComputeHash(this HashAlgorithm algorithm, Span<byte> destination, ReadOnlySpan<byte> source0, ReadOnlySpan<byte> source1, ReadOnlySpan<byte> source2, out int bytesWritten) {}
+  }
+
+  public class KlapEncryptionAlgorithm {
+    public KlapEncryptionAlgorithm(ReadOnlySpan<byte> localSeed, ReadOnlySpan<byte> remoteSeed, ReadOnlySpan<byte> userHash) {}
+
+    public ReadOnlySpan<byte> IV { get; }
+    public ReadOnlySpan<byte> Key { get; }
+    public int SequenceNumber { get; }
+    public ReadOnlySpan<byte> Signature { get; }
+
+    public void Decrypt(ReadOnlySpan<byte> encryptedText, int sequenceNumber, IBufferWriter<byte> destination) {}
+    public int Encrypt(ReadOnlySpan<byte> rawText, IBufferWriter<byte> destination) {}
+    public void Encrypt(ReadOnlySpan<byte> rawText, int sequenceNumber, IBufferWriter<byte> destination) {}
+  }
+
   public class SecurePassThroughInvalidPaddingException : SystemException {
     public SecurePassThroughInvalidPaddingException(string message, Exception? innerException) {}
   }
@@ -352,18 +383,19 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public TimeSpan? Timeout { get; set; }
 
     public ValueTask AuthenticateAsync(ITapoCredentialIdentity? identity, ITapoCredentialProvider credential, CancellationToken cancellationToken = default) {}
+    public ValueTask AuthenticateAsync(TapoSessionProtocol protocol, ITapoCredentialIdentity? identity, ITapoCredentialProvider credential, CancellationToken cancellationToken = default) {}
     public void Dispose() {}
     public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(CancellationToken cancellationToken = default) where TRequest : ITapoPassThroughRequest, new() where TResponse : ITapoPassThroughResponse {}
     public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : notnull, ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
   }
 
-  public sealed class TapoSession : IDisposable {
+  public abstract class TapoSession : IDisposable {
     public DateTime ExpiresOn { get; }
     public bool HasExpired { get; }
-    public Uri RequestPathAndQuery { get; }
     public string? SessionId { get; }
-    public string? Token { get; }
+    public abstract string? Token { get; }
 
+    protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
   }
 
@@ -371,6 +403,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public static bool TryGetCookie(HttpResponseMessage response, out string? sessionId, out int? sessionTimeout) {}
     public static bool TryGetCookie(IEnumerable<string>? cookieValues, out string? sessionId, out int? sessionTimeout) {}
     public static bool TryParseCookie(ReadOnlySpan<char> cookie, out string? id, out int? timeout) {}
+  }
+
+  public abstract class TapoSessionProtocolSelector {
+    protected TapoSessionProtocolSelector() {}
+
+    public abstract TapoSessionProtocol? SelectProtocol(TapoDevice device);
   }
 
   public readonly struct GetDeviceInfoRequest : ITapoPassThroughRequest {
