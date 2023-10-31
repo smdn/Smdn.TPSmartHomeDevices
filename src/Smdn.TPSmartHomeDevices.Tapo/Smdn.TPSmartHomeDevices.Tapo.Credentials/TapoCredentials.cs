@@ -18,7 +18,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
-public static class TapoCredentials {
+public static partial class TapoCredentials {
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_HASHSIZEINBYTES
   private const int SHA1HashSizeInBytes = SHA1.HashSizeInBytes;
 #else
@@ -190,5 +190,15 @@ public static class TapoCredentials {
         writer.WriteStringValue(utf8Username);
       }
     }
+
+    int ITapoCredential.HashPassword(HashAlgorithm algorithm, Span<byte> destination)
+      => algorithm.TryComputeHash(utf8Password, destination, out var bytesWritten)
+        ? bytesWritten
+        : 0;
+
+    int ITapoCredential.HashUsername(HashAlgorithm algorithm, Span<byte> destination)
+      => algorithm.TryComputeHash(utf8Username, destination, out var bytesWritten)
+        ? bytesWritten
+        : 0;
   }
 }

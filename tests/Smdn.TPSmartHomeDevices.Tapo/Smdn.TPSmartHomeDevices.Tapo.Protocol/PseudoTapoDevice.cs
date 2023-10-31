@@ -17,7 +17,7 @@ using Smdn.Net;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
+public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public abstract class SessionBase {
     public object? State { get; }
     public string SessionId { get; }
@@ -353,6 +353,37 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
   }
 
+  private static async Task WriteApplicationOctetStreamContentAsync(
+    HttpListenerResponse response,
+    HttpStatusCode statusCode,
+    ReadOnlyMemory<byte> content
+  )
+  {
+    const string contentType = "application/octet-stream";
+
+    try {
+      response.StatusCode = (int)statusCode;
+      response.ContentType = contentType;
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
+
+    try {
+      try {
+        response.ContentLength64 = content.Length;
+      }
+      catch (InvalidOperationException) {
+        throw new ClientDisconnectedException();
+      }
+
+      await response.OutputStream.WriteAsync(content).ConfigureAwait(false);
+    }
+    catch (ObjectDisposedException) {
+      throw new ClientDisconnectedException();
+    }
+  }
+
   private async Task ProcessRequestAsync(HttpListenerContext context)
   {
     try {
@@ -379,6 +410,18 @@ public sealed class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
       // validate request URL
       switch (request.Url!.LocalPath) {
+        case "/app/handshake1":
+          await ProcessKlapHandshake1RequestAsync(context).ConfigureAwait(false);
+          return;
+
+        case "/app/handshake2":
+          await ProcessKlapHandshake2RequestAsync(context).ConfigureAwait(false);
+          return;
+
+        case "/app/request":
+          await ProcessKlapRequestAsync(context).ConfigureAwait(false);
+          return;
+
         case "/app":
           // validate request content type
           if (

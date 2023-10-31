@@ -12,11 +12,11 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 ///     that is attempting to authenticate to the device, is used as the <see cref="ITapoCredentialIdentity"/>.
 ///   </para>
 ///   <para>
-///     If the method <see cref="Protocol.TapoClient.AuthenticateAsync"/> is called directly,
+///     If the method <see cref="Protocol.TapoClient.AuthenticateAsync(ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/> is called directly,
 ///     the <see cref="ITapoCredentialIdentity"/> specified with its parameter is used.
 ///   </para>
 /// </remarks>
-/// <seealso cref="Protocol.TapoClient.AuthenticateAsync"/>
+/// <seealso cref="Protocol.TapoClient.AuthenticateAsync(ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/>
 public interface ITapoCredentialProvider {
   /// <summary>
   /// Gets the credential corresponding to the specified identity.
@@ -31,7 +31,8 @@ public interface ITapoCredentialProvider {
   /// The <see cref="ITapoCredentialIdentity"/> that is requesting to obtain the
   /// corresponding <see cref="ITapoCredential"/> from this <see cref="ITapoCredentialProvider"/>.
   /// </param>
-  /// <seealso cref="Protocol.TapoClient.AuthenticateAsync"/>
+  /// <seealso cref="Protocol.TapoClient.AuthenticateAsync(ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/>
+  /// <seealso cref="Protocol.TapoClient.AuthenticateAsync(Protocol.TapoSessionProtocol, ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/>
   /// <seealso cref="Protocol.LoginDeviceRequest"/>
   /// <seealso cref="Protocol.SecurePassThroughJsonConverterFactory"/>
   /// <seealso cref="TapoDevice"/>
