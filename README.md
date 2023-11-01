@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/github/license/smdn/Smdn.TPSmartHomeDevices)](https://github.com/smdn/Smdn.TPSmartHomeDevices/blob/main/LICENSE.md)
+[![GitHub license](https://img.shields.io/github/license/smdn/Smdn.TPSmartHomeDevices)](https://github.com/smdn/Smdn.TPSmartHomeDevices/blob/main/COPYING.txt)
 [![tests/main](https://img.shields.io/github/actions/workflow/status/smdn/Smdn.TPSmartHomeDevices/test.yml?branch=main&label=tests%2Fmain)](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/test.yml)
 [![CodeQL](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml)
 
@@ -130,7 +130,19 @@ IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.m
 # Notice
 <!-- #pragma section-start NupkgReadmeFile_Notice -->
 ## License
-See [LICENSE.md](./LICENSE.md) for detail.
+This project is licensed under the [GNU GPL version 3 or later](./COPYING.txt).
+
+This project includes source code licensed under MIT or GPLv3 as described below and produces artifacts licensed in accordance therewith.
+
+### Smdn.TPSmartHomeDevices.Tapo (GPLv3)
+The some source files in the directory under the [src/Smdn.TPSmartHomeDevices.Tapo/](./src/Smdn.TPSmartHomeDevices.Tapo/) include codes that has been ported from codes which licensed under the GPLv3, and are licensed under the [GNU GPL version 3 or later](./src/Smdn.TPSmartHomeDevices.Tapo/COPYING.txt).
+
+Therefore, artifacts from this directory, including NuGet package [Smdn.TPSmartHomeDevices.Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/), are released under the [GNU GPL version 3 or later](./src/Smdn.TPSmartHomeDevices.Tapo/COPYING.txt).
+
+For the license of individual files, refer to `SPDX-License-Identifier` at the top of each file header.
+
+### Smdn.TPSmartHomeDevices.Kasa, Smdn.TPSmartHomeDevices.MacAddressEndPoint, Smdn.TPSmartHomeDevices.Primitives (MIT)
+The source files and generated artifacts from the directory under the [src/](./src/), excluding Smdn.TPSmartHomeDevices.Tapo, are licensed and released under the terms of the [MIT License](./src/LICENSE.txt).
 
 ## Disclaimer
 (An English translation for the reference follows the text written in Japanese.)
