@@ -170,6 +170,131 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     );
   }
 
+  [Test]
+  public void AddTapoCredentialFromEnvironmentVariable()
+  {
+    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoCredentialFromEnvironmentVariable(
+        envVarUsername: envVarUsername,
+        envVarPassword: envVarPassword
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(envVarUsername, EMail);
+      Environment.SetEnvironmentVariable(envVarPassword, Password);
+
+      var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
+
+      Assert.AreEqual(Base64UserNameSHA1Digest, username);
+      Assert.AreEqual(Base64Password, password);
+    }
+    finally {
+      Environment.SetEnvironmentVariable(envVarUsername, null);
+      Environment.SetEnvironmentVariable(envVarPassword, null);
+    }
+  }
+
+  [TestCase(EMail, null)]
+  [TestCase(null, Password)]
+  public void AddTapoCredentialFromEnvironmentVariable_EnvVarNotSet(string? username, string? password)
+  {
+    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoCredentialFromEnvironmentVariable(
+        envVarUsername: envVarUsername,
+        envVarPassword: envVarPassword
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(envVarUsername, username);
+      Environment.SetEnvironmentVariable(envVarPassword, password);
+
+      Assert.Throws<InvalidOperationException>(
+        () => GetEncodedCredential(credentialProvider, identity: null)
+      );
+    }
+    finally {
+      Environment.SetEnvironmentVariable(envVarUsername, null);
+      Environment.SetEnvironmentVariable(envVarPassword, null);
+    }
+  }
+
+  [Test]
+  public void AddTapoCredentialFromEnvironmentVariable_TryAddMultiple()
+  {
+    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoCredentialFromEnvironmentVariable(
+        envVarUsername: envVarUsername,
+        envVarPassword: envVarPassword
+      )
+    );
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoCredentialFromEnvironmentVariable(
+        envVarUsername: "this_must_not_be_selected",
+        envVarPassword: "this_must_not_be_selected"
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(envVarUsername, EMail);
+      Environment.SetEnvironmentVariable(envVarPassword, Password);
+
+      var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
+
+      Assert.AreEqual(Base64UserNameSHA1Digest, username);
+      Assert.AreEqual(Base64Password, password);
+    }
+    finally {
+      Environment.SetEnvironmentVariable(envVarUsername, null);
+      Environment.SetEnvironmentVariable(envVarPassword, null);
+    }
+  }
+
+  [TestCase("SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL", null)]
+  [TestCase("SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL", "")]
+  [TestCase(null, "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD")]
+  [TestCase("", "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD")]
+  public void AddTapoCredentialFromEnvironmentVariable_ArgumentNullOrEmpty(string envVarUsername, string envVarPassword)
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<ArgumentException>(
+      () => services.AddTapoCredentialFromEnvironmentVariable(
+        envVarUsername: envVarUsername,
+        envVarPassword: envVarPassword
+      )
+    );
+  }
+
   private class ConcreteTapoCredentialProvider : ITapoCredentialProvider {
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
       => throw new NotSupportedException();

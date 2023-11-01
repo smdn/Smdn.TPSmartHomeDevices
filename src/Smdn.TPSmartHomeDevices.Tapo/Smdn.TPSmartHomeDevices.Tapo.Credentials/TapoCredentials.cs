@@ -143,6 +143,23 @@ public static partial class TapoCredentials {
       isPlainText: false
     );
 
+  internal static ITapoCredentialProvider CreateProviderFromEnvironmentVariables(
+    string envVarUsername,
+    string envVarPassword
+  )
+  {
+    if (string.IsNullOrEmpty(envVarUsername))
+      throw new ArgumentException(message: "must be non-empty string", paramName: nameof(envVarUsername));
+
+    if (string.IsNullOrEmpty(envVarPassword))
+      throw new ArgumentException(message: "must be non-empty string", paramName: nameof(envVarPassword));
+
+    return new SingleIdentityEnvVarCredentialProvider(
+      envVarUsername: envVarUsername,
+      envVarPassword: envVarPassword
+    );
+  }
+
   private sealed class SingleIdentityStringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
     private readonly byte[] utf8Username;
     private readonly byte[] utf8Password;
@@ -200,5 +217,100 @@ public static partial class TapoCredentials {
       => algorithm.TryComputeHash(utf8Username, destination, out var bytesWritten)
         ? bytesWritten
         : 0;
+  }
+
+  private sealed class SingleIdentityEnvVarCredentialProvider : ITapoCredentialProvider, ITapoCredential {
+    private readonly string envVarUsername;
+    private readonly string envVarPassword;
+
+    public SingleIdentityEnvVarCredentialProvider(
+      string envVarUsername,
+      string envVarPassword
+    )
+    {
+      this.envVarUsername = envVarUsername;
+      this.envVarPassword = envVarPassword;
+    }
+
+    ITapoCredential ITapoCredentialProvider.GetCredential(ITapoCredentialIdentity? identity) => this;
+
+    void IDisposable.Dispose() { /* nothing to do */ }
+
+    void ITapoCredential.WritePasswordPropertyValue(Utf8JsonWriter writer)
+      => ReadEnvVar(
+        envVarPassword,
+        output: Span<None>.Empty,
+        (utf8Password, output) => {
+          writer.WriteBase64StringValue(utf8Password);
+          return default(None);
+        }
+      );
+
+    void ITapoCredential.WriteUsernamePropertyValue(Utf8JsonWriter writer)
+      => ReadEnvVar(
+        envVarUsername,
+        output: Span<None>.Empty,
+        (utf8Username, output) => {
+          Span<byte> buffer = stackalloc byte[HexSHA1HashSizeInBytes];
+
+          try {
+            if (!TryConvertToHexSHA1Hash(utf8Username, buffer, out _))
+              throw new InvalidOperationException("failed to encode username property");
+
+            writer.WriteBase64StringValue(buffer);
+
+            return default(None);
+          }
+          finally {
+            buffer.Clear();
+          }
+        }
+      );
+
+    int ITapoCredential.HashPassword(HashAlgorithm algorithm, Span<byte> destination)
+      => ReadEnvVar(
+        envVarPassword,
+        destination,
+        (utf8Password, dest) => algorithm.TryComputeHash(utf8Password, dest, out var bytesWritten)
+          ? bytesWritten
+          : 0
+      );
+
+    int ITapoCredential.HashUsername(HashAlgorithm algorithm, Span<byte> destination)
+      => ReadEnvVar(
+        envVarUsername,
+        destination,
+        (utf8Username, dest) => algorithm.TryComputeHash(utf8Username, dest, out var bytesWritten)
+          ? bytesWritten
+          : 0
+      );
+
+    private delegate TResult ReadEnvVarFunc<T, TOut, TResult>(ReadOnlySpan<T> span, Span<TOut> output);
+
+    private static TResult ReadEnvVar<TOut, TResult>(
+      string envVar,
+      Span<TOut> output,
+      ReadEnvVarFunc<byte, TOut, TResult> func
+    )
+    {
+      byte[]? utf8EncodedEnvVarValue = null;
+
+      try {
+        var envVarValue = Environment.GetEnvironmentVariable(envVar);
+
+        if (string.IsNullOrEmpty(envVarValue))
+          throw new InvalidOperationException($"envvar '{envVar}' not set");
+
+        utf8EncodedEnvVarValue = ArrayPool<byte>.Shared.Rent(Encoding.UTF8.GetByteCount(envVarValue));
+
+        var len = Encoding.UTF8.GetBytes(envVarValue, utf8EncodedEnvVarValue);
+
+        return func(utf8EncodedEnvVarValue.AsSpan(0, len), output);
+      }
+      finally {
+        if (utf8EncodedEnvVarValue is not null)
+          ArrayPool<byte>.Shared.Return(utf8EncodedEnvVarValue, clearArray: true);
+      }
+    }
   }
 }

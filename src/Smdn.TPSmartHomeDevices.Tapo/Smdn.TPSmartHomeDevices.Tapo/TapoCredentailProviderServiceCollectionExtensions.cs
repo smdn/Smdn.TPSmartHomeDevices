@@ -66,6 +66,35 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
 
   /// <summary>
   /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
+  /// This overload creates <see cref="ITapoCredentialProvider"/> that retrieve user name (email address) and password from environment variables.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="envVarUsername">The name of environment variable that holds the user name (email address) for authentication to the Tapo device.</param>
+  /// <param name="envVarPassword">The name of environment variable that holds the password for authentication to the Tapo device.</param>
+  public static IServiceCollection AddTapoCredentialFromEnvironmentVariable(
+    this IServiceCollection services,
+    string envVarUsername,
+    string envVarPassword
+  )
+  {
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+
+    services.TryAdd(
+      ServiceDescriptor.Singleton(
+        typeof(ITapoCredentialProvider),
+        TapoCredentials.CreateProviderFromEnvironmentVariables(
+          envVarUsername: envVarUsername,
+          envVarPassword: envVarPassword
+        )
+      )
+    );
+
+    return services;
+  }
+
+  /// <summary>
+  /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
   /// </summary>
   /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
   /// <param name="credentialProvider">A <see cref="ITapoCredentialProvider"/> used for authentication to the Tapo device.</param>
