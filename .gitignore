@@ -1,7 +1,9 @@
+/*.sln
 bin/
 obj/
 *.userprefs
 .vs/
+.vscode/
 TestResult.xml
 TestResults/
 mono_crash.mem.*.blob
