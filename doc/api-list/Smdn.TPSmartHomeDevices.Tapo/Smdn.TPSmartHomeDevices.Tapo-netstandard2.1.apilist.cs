@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview1)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview2)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview1+c3a27521d2fb833f09bc65614d55bca81303f12b
+//   InformationalVersion: 2.0.0-preview2+297c36b69acac89037a580a95eda0233f9529f71
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -89,6 +89,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
   public static class TapoCredentailProviderServiceCollectionExtensions {
     public static IServiceCollection AddTapoBase64EncodedCredential(this IServiceCollection services, string base64UserNameSHA1Digest, string base64Password) {}
     public static IServiceCollection AddTapoCredential(this IServiceCollection services, string email, string password) {}
+    public static IServiceCollection AddTapoCredentialFromEnvironmentVariable(this IServiceCollection services, string envVarUsername, string envVarPassword) {}
     public static IServiceCollection AddTapoCredentialProvider(this IServiceCollection services, ITapoCredentialProvider credentialProvider) {}
   }
 
