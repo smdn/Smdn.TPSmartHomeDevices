@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
   <Import Project="$(MSBuildThisFileDirectory)TestReleasedPackage.targets" Condition=" '$(IsTestProject)' == 'true' " />
 
   <ItemGroup>
-    <PackageReference Update="Smdn.Test.NUnit.Constraints" Version="1.0.0" />
-    <PackageReference Update="Smdn.Test.NUnit.Utils" Version="1.0.0" />
+    <PackageReference Update="Smdn.Test.NUnit.Constraints" Version="4.0.0" />
+    <PackageReference Update="Smdn.Test.NUnit.Utils" Version="4.0.0" />
   </ItemGroup>
 
   <ImportGroup>
