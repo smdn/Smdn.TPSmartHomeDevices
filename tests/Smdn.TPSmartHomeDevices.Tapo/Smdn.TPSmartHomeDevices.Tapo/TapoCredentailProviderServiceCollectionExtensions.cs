@@ -100,14 +100,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
   [TestCase(EMail, null)]
   [TestCase(null, Password)]
-  public void AddTapoCredential_ArgumentNull(string email, string password)
+  public void AddTapoCredential_ArgumentNull(string? email, string? password)
   {
     var services = new ServiceCollection();
 
     Assert.Throws<ArgumentNullException>(
       () => services.AddTapoCredential(
-        email: email,
-        password: password
+        email: email!,
+        password: password!
       )
     );
   }
@@ -158,14 +158,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
   [TestCase(Base64UserNameSHA1Digest, null)]
   [TestCase(null, Base64Password)]
-  public void AddTapoBase64EncodedCredential_ArgumentNull(string base64UserNameSHA1Digest, string base64Password)
+  public void AddTapoBase64EncodedCredential_ArgumentNull(string? base64UserNameSHA1Digest, string? base64Password)
   {
     var services = new ServiceCollection();
 
     Assert.Throws<ArgumentNullException>(
       () => services.AddTapoBase64EncodedCredential(
-        base64UserNameSHA1Digest: base64UserNameSHA1Digest,
-        base64Password: base64Password
+        base64UserNameSHA1Digest: base64UserNameSHA1Digest!,
+        base64Password: base64Password!
       )
     );
   }
@@ -283,14 +283,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   [TestCase("SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL", "")]
   [TestCase(null, "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD")]
   [TestCase("", "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD")]
-  public void AddTapoCredentialFromEnvironmentVariable_ArgumentNullOrEmpty(string envVarUsername, string envVarPassword)
+  public void AddTapoCredentialFromEnvironmentVariable_ArgumentNullOrEmpty(string? envVarUsername, string? envVarPassword)
   {
     var services = new ServiceCollection();
 
     Assert.Throws<ArgumentException>(
       () => services.AddTapoCredentialFromEnvironmentVariable(
-        envVarUsername: envVarUsername,
-        envVarPassword: envVarPassword
+        envVarUsername: envVarUsername!,
+        envVarPassword: envVarPassword!
       )
     );
   }
