@@ -36,7 +36,7 @@ public class MacAddressJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<EndPoint>(json)!;
 
-    Assert.AreEqual(expected, deserialized.MacAddress);
+    Assert.That(deserialized.MacAddress, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -53,7 +53,7 @@ public class MacAddressJsonConverterTests {
     var obj = new EndPoint() { MacAddress = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

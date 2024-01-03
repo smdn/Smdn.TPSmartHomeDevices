@@ -34,7 +34,7 @@ public class TapoBase64StringJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<NetworkInfo>(json)!;
 
-    Assert.AreEqual(expected, deserialized.NetworkSsid);
+    Assert.That(deserialized.NetworkSsid, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -52,7 +52,7 @@ public class TapoBase64StringJsonConverterTests {
     var obj = new NetworkInfo() { NetworkSsid = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

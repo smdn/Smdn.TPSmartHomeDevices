@@ -32,14 +32,14 @@ public class KasaNumericalBooleanJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<OnOffState>(json)!;
 
-    Assert.AreEqual(expected, deserialized.IsOn);
+    Assert.That(deserialized.IsOn, Is.EqualTo(expected));
   }
 
   [TestCase(true, @"{""on_off"":1}")]
   [TestCase(false, @"{""on_off"":0}")]
   public void Write(bool isOn, string expected)
-    => Assert.AreEqual(
-      expected,
-      JsonSerializer.Serialize(new OnOffState() { IsOn = isOn } )
+    => Assert.That(
+      JsonSerializer.Serialize(new OnOffState() { IsOn = isOn }),
+      Is.EqualTo(expected)
     );
 }

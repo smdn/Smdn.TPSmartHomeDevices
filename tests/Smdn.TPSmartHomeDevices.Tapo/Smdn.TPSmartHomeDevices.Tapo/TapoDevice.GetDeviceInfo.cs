@@ -68,13 +68,13 @@ partial class TapoDeviceTests {
 
     var info = await device.GetDeviceInfoAsync();
 
-    Assert.AreEqual(deviceModelName, info.ModelName, nameof(info.ModelName));
-    Assert.AreEqual(PhysicalAddress.Parse(deviceMacAddress), info.MacAddress, nameof(info.MacAddress));
-    Assert.AreEqual(TimeSpan.FromMinutes(deviceTimeZoneOffsetInMinutes), info.TimeZoneOffset, nameof(info.TimeZoneOffset));
-    Assert.AreEqual("マサラタウンにさよならWi-Fi", info.NetworkSsid, nameof(info.NetworkSsid));
-    Assert.AreEqual(deviceGeolocationScaledLongitude / 10000.0m, info.GeolocationLongitude, nameof(info.GeolocationLongitude));
-    Assert.IsNull(info.Id, nameof(info.Id));
-    Assert.IsNull(info.IPAddress, nameof(info.IPAddress));
+    Assert.That(info.ModelName, Is.EqualTo(deviceModelName), nameof(info.ModelName));
+    Assert.That(info.MacAddress, Is.EqualTo(PhysicalAddress.Parse(deviceMacAddress)), nameof(info.MacAddress));
+    Assert.That(info.TimeZoneOffset, Is.EqualTo(TimeSpan.FromMinutes(deviceTimeZoneOffsetInMinutes)), nameof(info.TimeZoneOffset));
+    Assert.That(info.NetworkSsid, Is.EqualTo("マサラタウンにさよならWi-Fi"), nameof(info.NetworkSsid));
+    Assert.That(info.GeolocationLongitude, Is.EqualTo(deviceGeolocationScaledLongitude / 10000.0m), nameof(info.GeolocationLongitude));
+    Assert.That(info.Id, Is.Null, nameof(info.Id));
+    Assert.That(info.IPAddress, Is.Null, nameof(info.IPAddress));
   }
 
   private readonly struct GetDeviceInfoResponseGetOnOffStateResult {
@@ -106,9 +106,9 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.AreEqual(
-      currentState,
-      await device.GetOnOffStateAsync()
+    Assert.That(
+      await device.GetOnOffStateAsync(),
+      Is.EqualTo(currentState)
     );
   }
 }

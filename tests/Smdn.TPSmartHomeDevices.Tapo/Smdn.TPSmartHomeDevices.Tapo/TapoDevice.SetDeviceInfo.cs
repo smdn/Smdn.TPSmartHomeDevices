@@ -17,8 +17,8 @@ partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -45,8 +45,8 @@ partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsFalse(requestParams.GetProperty("device_on")!.GetBoolean());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.False);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -74,8 +74,8 @@ partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.AreEqual(newState, requestParams.GetProperty("device_on")!.GetBoolean());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.EqualTo(newState));
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {

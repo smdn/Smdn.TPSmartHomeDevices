@@ -45,9 +45,9 @@ public class TapoSessionCookieUtilsTests {
   {
     var result = TapoSessionCookieUtils.TryParseCookie(input, out var sessionId, out var sessionTimeout);
 
-    Assert.AreEqual(expectedResult, result, nameof(result));
-    Assert.AreEqual(expectedSessionId, sessionId, nameof(sessionId));
-    Assert.AreEqual(expectedSessionTimeout, sessionTimeout, nameof(sessionTimeout));
+    Assert.That(result, Is.EqualTo(expectedResult), nameof(result));
+    Assert.That(sessionId, Is.EqualTo(expectedSessionId), nameof(sessionId));
+    Assert.That(sessionTimeout, Is.EqualTo(expectedSessionTimeout), nameof(sessionTimeout));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TryGetCookie_OfStringArray()
@@ -88,9 +88,9 @@ public class TapoSessionCookieUtilsTests {
   {
     var result = TapoSessionCookieUtils.TryGetCookie(inputs, out var sessionId, out var sessionTimeout);
 
-    Assert.AreEqual(expectedResult, result, nameof(result));
-    Assert.AreEqual(expectedSessionId, sessionId, nameof(sessionId));
-    Assert.AreEqual(expectedSessionTimeout, sessionTimeout, nameof(sessionTimeout));
+    Assert.That(result, Is.EqualTo(expectedResult), nameof(result));
+    Assert.That(sessionId, Is.EqualTo(expectedSessionId), nameof(sessionId));
+    Assert.That(sessionTimeout, Is.EqualTo(expectedSessionTimeout), nameof(sessionTimeout));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TryGetCookie_OfHttpResponseMessage()
@@ -146,8 +146,8 @@ public class TapoSessionCookieUtilsTests {
   {
     var result = TapoSessionCookieUtils.TryGetCookie(response!, out var sessionId, out var sessionTimeout);
 
-    Assert.AreEqual(expectedResult, result, nameof(result));
-    Assert.AreEqual(expectedSessionId, sessionId, nameof(sessionId));
-    Assert.AreEqual(expectedSessionTimeout, sessionTimeout, nameof(sessionTimeout));
+    Assert.That(result, Is.EqualTo(expectedResult), nameof(result));
+    Assert.That(sessionId, Is.EqualTo(expectedSessionId), nameof(sessionId));
+    Assert.That(sessionTimeout, Is.EqualTo(expectedSessionTimeout), nameof(sessionTimeout));
   }
 }

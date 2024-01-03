@@ -35,7 +35,7 @@ partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
 
 #pragma warning disable CA2012
     Assert.Throws<ArgumentNullException>(
@@ -52,7 +52,7 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
   }
 
   [Test]
@@ -80,7 +80,7 @@ partial class TapoClientTests {
     );
 #pragma warning restore CA2012
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
   }
 
   [Test]
@@ -104,13 +104,13 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNotNull(client.Session!.Token);
-    Assert.AreEqual(token, client.Session.Token);
-    Assert.IsNotNull(client.Session!.SessionId);
-    Assert.IsNotEmpty(client.Session.SessionId);
-    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(token));
+    Assert.That(client.Session!.SessionId, Is.Not.Null);
+    Assert.That(client.Session.SessionId, Is.Not.Empty);
+    Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   [Test]
@@ -132,8 +132,8 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -151,7 +151,7 @@ partial class TapoClientTests {
       endPoint: new DnsEndPoint(device.EndPoint!.Address.ToString(), device.EndPoint!.Port, AddressFamily.Unspecified)
     );
 
-    Assert.AreEqual(device.EndPointUri, client.EndPointUri, nameof(client.EndPointUri));
+    Assert.That(client.EndPointUri, Is.EqualTo(device.EndPointUri), nameof(client.EndPointUri));
 
     Assert.DoesNotThrowAsync(
       async () => await client.AuthenticateAsync(
@@ -160,13 +160,13 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNotNull(client.Session!.Token);
-    Assert.AreEqual(token, client.Session.Token);
-    Assert.IsNotNull(client.Session!.SessionId);
-    Assert.IsNotEmpty(client.Session.SessionId);
-    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(token));
+    Assert.That(client.Session!.SessionId, Is.Not.Null);
+    Assert.That(client.Session.SessionId, Is.Not.Empty);
+    Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   private class TapoCredentialNotFoundException : Exception { }
@@ -229,7 +229,7 @@ partial class TapoClientTests {
       FuncGenerateLoginDeviceResponse = (_, param) => {
         var username = param.GetProperty("username").GetString();
 
-        Assert.IsNotNull(username, nameof(username));
+        Assert.That(username, Is.Not.Null, nameof(username));
 
         return new LoginDeviceResponse() {
           ErrorCode = KnownErrorCodes.Success,
@@ -253,8 +253,8 @@ partial class TapoClientTests {
       $"select identity {nameof(user1)}"
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.AreEqual(user1.Username, client.Session!.Token);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.EqualTo(user1.Username));
 
     Assert.DoesNotThrowAsync(
       async () => await client.AuthenticateAsync(
@@ -264,8 +264,8 @@ partial class TapoClientTests {
       $"select identity {nameof(user1)}"
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.AreEqual(user2.Username, client.Session.Token);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(user2.Username));
 
     Assert.ThrowsAsync<TapoCredentialNotFoundException>(
       async () => await client.AuthenticateAsync(
@@ -300,16 +300,16 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
+    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
 
     var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
 
-    Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
-    Assert.AreEqual("handshake", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
-    Assert.AreEqual(handshakeErrorCode, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
+    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
+    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("handshake"), nameof(innerErrorResponseException.RequestMethod));
+    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(handshakeErrorCode), nameof(innerErrorResponseException.RawErrorCode));
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -334,8 +334,8 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -362,8 +362,8 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [TestCase("")]
@@ -393,12 +393,12 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNotNull(client.Session!.Token);
-    Assert.AreEqual(token, client.Session.Token);
-    Assert.IsNull(client.Session!.SessionId);
-    Assert.AreEqual(DateTime.MaxValue, client.Session!.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(token));
+    Assert.That(client.Session!.SessionId, Is.Null);
+    Assert.That(client.Session!.ExpiresOn, Is.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   [TestCase("")]
@@ -428,11 +428,11 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNotNull(client.Session!.Token);
-    Assert.AreEqual(token, client.Session.Token);
-    Assert.AreEqual(DateTime.MaxValue, client.Session!.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(token));
+    Assert.That(client.Session!.ExpiresOn, Is.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   [Test]
@@ -476,10 +476,10 @@ partial class TapoClientTests {
         )
       );
 
-      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+      Assert.That(ex!.InnerException, Is.InstanceOf<TimeoutException>(), nameof(ex.InnerException));
 
-      Assert.IsNull(client.Session);
-      Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+      Assert.That(client.Session, Is.Null);
+      Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
     }
     finally {
       cts.Cancel();
@@ -523,11 +523,11 @@ partial class TapoClientTests {
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateLoginDeviceResponse = (session, param) => {
-        Assert.IsTrue(param.TryGetProperty("username", out var propUsername), $"{nameof(param)} must have 'username' property");
-        Assert.IsTrue(param.TryGetProperty("password", out var propPassword), $"{nameof(param)} must have 'password' property");
+        Assert.That(param.TryGetProperty("username", out var propUsername), Is.True, $"{nameof(param)} must have 'username' property");
+        Assert.That(param.TryGetProperty("password", out var propPassword), Is.True, $"{nameof(param)} must have 'password' property");
 
-        Assert.AreEqual(expectedUsernamePropertyValue, propUsername.GetString(), nameof(propUsername));
-        Assert.AreEqual(expectedPasswordPropertyValue, propPassword.GetString(), nameof(propPassword));
+        Assert.That(propUsername.GetString(), Is.EqualTo(expectedUsernamePropertyValue), nameof(propUsername));
+        Assert.That(propPassword.GetString(), Is.EqualTo(expectedPasswordPropertyValue), nameof(propPassword));
 
         return new LoginDeviceResponse() {
           ErrorCode = KnownErrorCodes.Success,
@@ -548,13 +548,13 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNotNull(client.Session!.Token);
-    Assert.AreEqual(token, client.Session.Token);
-    Assert.IsNotNull(client.Session!.SessionId);
-    Assert.IsNotEmpty(client.Session.SessionId);
-    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Not.Null);
+    Assert.That(client.Session.Token, Is.EqualTo(token));
+    Assert.That(client.Session!.SessionId, Is.Not.Null);
+    Assert.That(client.Session.SessionId, Is.Not.Empty);
+    Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   private class DisposableCredential : ITapoCredential {
@@ -630,13 +630,13 @@ partial class TapoClientTests {
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateLoginDeviceResponse = (session, param) => {
-        Assert.IsTrue(credential.IsDisposed, "ITapoCredential.Dispose must be called up to this point");
+        Assert.That(credential.IsDisposed, Is.True, "ITapoCredential.Dispose must be called up to this point");
 
-        Assert.IsTrue(param.TryGetProperty("username", out var propUsername), $"{nameof(param)} must have 'username' property");
-        Assert.IsTrue(param.TryGetProperty("password", out var propPassword), $"{nameof(param)} must have 'password' property");
+        Assert.That(param.TryGetProperty("username", out var propUsername), Is.True, $"{nameof(param)} must have 'username' property");
+        Assert.That(param.TryGetProperty("password", out var propPassword), Is.True, $"{nameof(param)} must have 'password' property");
 
-        Assert.AreEqual(expectedUsernamePropertyValue, propUsername.GetString(), nameof(propUsername));
-        Assert.AreEqual(expectedPasswordPropertyValue, propPassword.GetString(), nameof(propPassword));
+        Assert.That(propUsername.GetString(), Is.EqualTo(expectedUsernamePropertyValue), nameof(propUsername));
+        Assert.That(propPassword.GetString(), Is.EqualTo(expectedPasswordPropertyValue), nameof(propPassword));
 
         return new LoginDeviceResponse() {
           ErrorCode = KnownErrorCodes.Minus1501,
@@ -658,7 +658,7 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsTrue(credential.IsDisposed, "ITapoCredential.Dispose must be called");
+    Assert.That(credential.IsDisposed, Is.True, "ITapoCredential.Dispose must be called");
   }
 
   [Test]
@@ -685,16 +685,16 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
+    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
 
     var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
 
-    Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
-    Assert.AreEqual("login_device", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
-    Assert.AreEqual(loginDeviceErrorCode, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
+    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
+    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("login_device"), nameof(innerErrorResponseException.RequestMethod));
+    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(loginDeviceErrorCode), nameof(innerErrorResponseException.RawErrorCode));
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -719,18 +719,18 @@ partial class TapoClientTests {
       )
     );
 
-    StringAssert.IsMatch("(C|c)redential.*(I|i)nvalid", ex!.Message, nameof(ex.Message));
+    Assert.That(ex!.Message, Does.Match("(C|c)redential.*(I|i)nvalid"), nameof(ex.Message));
 
-    Assert.IsInstanceOf<TapoErrorResponseException>(ex!.InnerException, nameof(ex.InnerException));
+    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
 
     var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
 
-    Assert.AreEqual(new Uri(device.EndPointUri!, "/app"), innerErrorResponseException.EndPoint, nameof(innerErrorResponseException.EndPoint));
-    Assert.AreEqual("login_device", innerErrorResponseException.RequestMethod, nameof(innerErrorResponseException.RequestMethod));
-    Assert.AreEqual(KnownErrorCodes.Minus1501, innerErrorResponseException.RawErrorCode, nameof(innerErrorResponseException.RawErrorCode));
+    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
+    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("login_device"), nameof(innerErrorResponseException.RequestMethod));
+    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(KnownErrorCodes.Minus1501), nameof(innerErrorResponseException.RawErrorCode));
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -752,8 +752,8 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNull(client.Session);
-    Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+    Assert.That(client.Session, Is.Null);
+    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
@@ -799,10 +799,10 @@ partial class TapoClientTests {
         )
       );
 
-      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+      Assert.That(ex!.InnerException, Is.InstanceOf<TimeoutException>(), nameof(ex.InnerException));
 
-      Assert.IsNull(client.Session);
-      Assert.AreEqual(ex!.EndPoint, device.EndPointUri);
+      Assert.That(client.Session, Is.Null);
+      Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
     }
     finally {
       cts.Cancel();
@@ -854,25 +854,29 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsTrue(logger.Logs.Any(static line => line.Contains("\"username\":\"****\"")), "contains masked username");
-    Assert.IsTrue(logger.Logs.Any(static line => line.Contains("\"password\":\"****\"")), "contains masked password");
+    Assert.That(logger.Logs.Any(static line => line.Contains("\"username\":\"****\"")), Is.True, "contains masked username");
+    Assert.That(logger.Logs.Any(static line => line.Contains("\"password\":\"****\"")), Is.True, "contains masked password");
 
-    Assert.IsTrue(
+    Assert.That(
       logger.Logs.All(static line => !line.Contains(username)),
+      Is.True,
       "does not contain unmasked username");
-    Assert.IsTrue(
+    Assert.That(
       logger.Logs.All(static line => !line.Contains(password)),
+      Is.True,
       "does not contain unmasked password"
     );
 
     var encodedUsername = TapoCredentials.ToBase64EncodedSHA1DigestString(username);
     var encodedPassword = TapoCredentials.ToBase64EncodedString(password);
 
-    Assert.IsTrue(
+    Assert.That(
       logger.Logs.All(line => !line.Contains(encodedUsername)),
+      Is.True,
       "does not contain unmasked-encoded username");
-    Assert.IsTrue(
+    Assert.That(
       logger.Logs.All(line => !line.Contains(encodedPassword)),
+      Is.True,
       "does not contain unmasked-encoded password"
     );
   }

@@ -79,7 +79,7 @@ public partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.AreEqual(expectedEndPointUri, client.EndPointUri);
+    Assert.That(client.EndPointUri, Is.EqualTo(expectedEndPointUri));
   }
 
   [Test]
@@ -89,10 +89,7 @@ public partial class TapoClientTests {
       endPoint: new DnsEndPoint("localhost", 8080)
     );
 
-    Assert.AreEqual(
-      new Uri("http://localhost:8080/"),
-      client.EndPointUri
-    );
+    Assert.That(client.EndPointUri, Is.EqualTo(new Uri("http://localhost:8080/")));
   }
 
   [Test]
@@ -105,7 +102,7 @@ public partial class TapoClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.Session, Is.Null));
 
     Assert.ThrowsAsync<ObjectDisposedException>(
       async () => await client.AuthenticateAsync(
@@ -140,12 +137,12 @@ public partial class TapoClientTests {
       credential: defaultCredentialProvider!
     );
 
-    Assert.IsNotNull(client.Session, "Session before dispose");
+    Assert.That(client.Session, Is.Not.Null, "Session before dispose");
 
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.IsNull(client.Session));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.Session, Is.Null));
 
 #pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());

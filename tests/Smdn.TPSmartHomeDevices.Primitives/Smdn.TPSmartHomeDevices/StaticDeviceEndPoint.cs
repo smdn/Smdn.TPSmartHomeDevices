@@ -33,7 +33,7 @@ public class StaticDeviceEndPointTests {
 
     var resolvedEndPoint = await deviceEndPoint.ResolveAsync();
 
-    Assert.AreSame(endPoint, resolvedEndPoint);
+    Assert.That(resolvedEndPoint, Is.SameAs(endPoint));
   }
 
   [Test]
@@ -54,6 +54,6 @@ public class StaticDeviceEndPointTests {
   {
     var deviceEndPoint = new StaticDeviceEndPoint(endPoint);
 
-    Assert.AreEqual(endPoint.ToString(), deviceEndPoint.ToString());
+    Assert.That(deviceEndPoint.ToString(), Is.EqualTo(endPoint.ToString()));
   }
 }

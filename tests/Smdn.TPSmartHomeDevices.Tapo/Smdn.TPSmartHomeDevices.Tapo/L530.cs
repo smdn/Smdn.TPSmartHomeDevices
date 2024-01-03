@@ -50,8 +50,8 @@ public class L530Tests {
     )!;
 #pragma warning restore CA2012
 
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-    Assert.AreEqual(newBrightness, ex.ActualValue, nameof(ex.ActualValue));
+    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
+    Assert.That(ex.ActualValue, Is.EqualTo(newBrightness), nameof(ex.ActualValue));
   }
 
   [Test]
@@ -62,9 +62,9 @@ public class L530Tests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
-        Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
+        Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -106,8 +106,8 @@ public class L530Tests {
     )!;
 #pragma warning restore CA2012
 
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-    Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
+    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
+    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
   }
 
   [Test]
@@ -119,13 +119,13 @@ public class L530Tests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
-        Assert.AreEqual(newTemperature, requestParams.GetProperty("color_temp")!.GetInt32());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
+        Assert.That(requestParams.GetProperty("color_temp")!.GetInt32(), Is.EqualTo(newTemperature));
         if (newBrightness.HasValue)
-          Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
+          Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         else
-          Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
+          Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -171,8 +171,8 @@ public class L530Tests {
     )!;
 #pragma warning restore CA2012
 
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-    Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
+    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
+    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
   }
 
   [TestCase(0, 0, null)]
@@ -190,14 +190,14 @@ public class L530Tests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
-        Assert.AreEqual(newHue, requestParams.GetProperty("hue")!.GetInt32());
-        Assert.AreEqual(newSaturation, requestParams.GetProperty("saturation")!.GetInt32());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
+        Assert.That(requestParams.GetProperty("hue")!.GetInt32(), Is.EqualTo(newHue));
+        Assert.That(requestParams.GetProperty("saturation")!.GetInt32(), Is.EqualTo(newSaturation));
         if (newBrightness.HasValue)
-          Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
+          Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         else
-          Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
+          Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -240,8 +240,8 @@ public class L530Tests {
     )!;
 #pragma warning restore CA2012
 
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-    Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
+    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
+    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
   }
 
   [TestCase(0, null)]
@@ -256,13 +256,13 @@ public class L530Tests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
-        Assert.AreEqual(newHue, requestParams.GetProperty("hue")!.GetInt32());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
+        Assert.That(requestParams.GetProperty("hue")!.GetInt32(), Is.EqualTo(newHue));
         if (newBrightness.HasValue)
-          Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
+          Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         else
-          Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
+          Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -305,8 +305,8 @@ public class L530Tests {
     )!;
 #pragma warning restore CA2012
 
-    Assert.AreEqual(expectedParamName, ex.ParamName, nameof(ex.ParamName));
-    Assert.AreEqual(expectedActualValue, ex.ActualValue, nameof(ex.ActualValue));
+    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
+    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
   }
 
   [TestCase(0, null)]
@@ -321,13 +321,13 @@ public class L530Tests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
-        Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
-        Assert.AreEqual(newSaturation, requestParams.GetProperty("saturation")!.GetInt32());
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
+        Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
+        Assert.That(requestParams.GetProperty("saturation")!.GetInt32(), Is.EqualTo(newSaturation));
         if (newBrightness.HasValue)
-          Assert.AreEqual(newBrightness, requestParams.GetProperty("brightness")!.GetInt32());
+          Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         else
-          Assert.IsFalse(requestParams.TryGetProperty("brightness", out var discard));
+          Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {

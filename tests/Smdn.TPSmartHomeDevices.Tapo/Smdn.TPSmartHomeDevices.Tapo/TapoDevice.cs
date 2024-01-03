@@ -129,9 +129,9 @@ public partial class TapoDeviceTests {
       "password"
     );
 
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
-      await device.ResolveEndPointAsync()
+    Assert.That(
+      await device.ResolveEndPointAsync(),
+      Is.EqualTo(new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort))
     );
   }
 
@@ -144,9 +144,9 @@ public partial class TapoDeviceTests {
       "password"
     );
 
-    Assert.AreEqual(
-      new DnsEndPoint("localhost", TapoClient.DefaultPort),
-      await device.ResolveEndPointAsync()
+    Assert.That(
+      await device.ResolveEndPointAsync(),
+      Is.EqualTo(new DnsEndPoint("localhost", TapoClient.DefaultPort))
     );
   }
 
@@ -166,9 +166,9 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort),
-      await device.ResolveEndPointAsync()
+    Assert.That(
+      await device.ResolveEndPointAsync(),
+      Is.EqualTo(new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort))
     );
   }
 
@@ -195,9 +195,9 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.AreEqual(
-      new DnsEndPoint("localhost", TapoClient.DefaultPort),
-      await device.ResolveEndPointAsync()
+    Assert.That(
+      await device.ResolveEndPointAsync(),
+      Is.EqualTo(new DnsEndPoint("localhost", TapoClient.DefaultPort))
     );
   }
 
@@ -228,8 +228,8 @@ public partial class TapoDeviceTests {
       "password"
     );
 
-    Assert.IsNotEmpty(device.TerminalUuidString, nameof(device.TerminalUuidString));
-    StringAssert.IsMatch(ExpectedTerminalUuidRegexPattern, device.TerminalUuidString, nameof(device.TerminalUuidString));
+    Assert.That(device.TerminalUuidString, Is.Not.Empty, nameof(device.TerminalUuidString));
+    Assert.That(device.TerminalUuidString, Does.Match(ExpectedTerminalUuidRegexPattern), nameof(device.TerminalUuidString));
   }
 
   private readonly struct NullParameters { }
@@ -247,7 +247,7 @@ public partial class TapoDeviceTests {
     Assert.DoesNotThrow(device.Dispose, "dispose");
     Assert.DoesNotThrow(device.Dispose, "dispose again");
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
 #pragma warning disable CA2012
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
@@ -282,9 +282,9 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.AreEqual(
-      expectedEndPoint,
-      await device.ResolveEndPointAsync()
+    Assert.That(
+      await device.ResolveEndPointAsync(),
+      Is.EqualTo(expectedEndPoint)
     );
   }
 
@@ -300,8 +300,8 @@ public partial class TapoDeviceTests {
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.ResolveEndPointAsync());
 
-    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
-    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
+    Assert.That(ex.DeviceEndPoint, Is.SameAs(endPoint), nameof(ex.DeviceEndPoint));
   }
 
   [Test]
@@ -358,7 +358,7 @@ public partial class TapoDeviceTests {
 
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.EnsureSessionEstablishedAsync());
 
-    Assert.IsNull(device.Session);
+    Assert.That(device.Session, Is.Null);
   }
 
   [Test]
@@ -373,10 +373,10 @@ public partial class TapoDeviceTests {
 
     var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.EnsureSessionEstablishedAsync());
 
-    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
-    Assert.AreSame(endPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
+    Assert.That(ex.DeviceEndPoint, Is.SameAs(endPoint), nameof(ex.DeviceEndPoint));
 
-    Assert.IsNull(device.Session);
+    Assert.That(device.Session, Is.Null);
   }
 
   [Test]
@@ -394,7 +394,7 @@ public partial class TapoDeviceTests {
     Assert.ThrowsAsync<OperationCanceledException>(
       async () => await device.EnsureSessionEstablishedAsync(cts.Token)
     );
-    Assert.IsNull(device.Session);
+    Assert.That(device.Session, Is.Null);
   }
 
   [Test]
@@ -421,10 +421,9 @@ public partial class TapoDeviceTests {
 
     await device.EnsureSessionEstablishedAsync();
 
-    Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual(
-      returnTokenFromEndPoint1,
-      device.Session!.Token,
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+    Assert.That(
+      device.Session!.Token, Is.EqualTo(returnTokenFromEndPoint1),
       nameof(device.Session.Token)
     );
 
@@ -440,16 +439,15 @@ public partial class TapoDeviceTests {
 
     await device.EnsureSessionEstablishedAsync();
 
-    Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
-    Assert.AreEqual(
-      returnTokenFromEndPoint2,
-      device.Session.Token,
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+    Assert.That(prevSession, Is.Not.SameAs(device.Session), nameof(device.Session));
+    Assert.That(
+      device.Session.Token, Is.EqualTo(returnTokenFromEndPoint2),
       nameof(device.Session.Token)
     );
 
     // end point should not be marked as invalidated in this scenario
-    Assert.IsFalse(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
+    Assert.That(endPoint.HasInvalidated, Is.False, nameof(endPoint.HasInvalidated));
   }
 
   [Test]
@@ -488,9 +486,9 @@ public partial class TapoDeviceTests {
     // send request
     var ex = Assert.ThrowsAsync<HttpRequestException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.IsInstanceOf<SocketException>(ex!.InnerException);
+    Assert.That(ex!.InnerException, Is.InstanceOf<SocketException>());
 
-    Assert.IsNull(device.Session, nameof(device.Session)); // session must be disposed
+    Assert.That(device.Session, Is.Null, nameof(device.Session)); // session must be disposed
   }
 
   private class HandleAsEndPointUnreachableExceptionHandler : TapoDeviceExceptionHandler {
@@ -514,7 +512,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("get_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<NullResult>()
@@ -545,7 +543,7 @@ public partial class TapoDeviceTests {
     );
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
-    Assert.IsNotNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
 
     // dispose endpoint
     // this causes an exception to be raised in the request to the pseudo device,
@@ -554,9 +552,9 @@ public partial class TapoDeviceTests {
 
     var ex = Assert.ThrowsAsync<HttpRequestException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.IsInstanceOf<SocketException>(ex!.InnerException);
+    Assert.That(ex!.InnerException, Is.InstanceOf<SocketException>());
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   [Test]
@@ -575,7 +573,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDeviceEndPoint1 = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => returnTokenFromEndPoint1,
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("get_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<NullResult>()
@@ -585,7 +583,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDeviceEndPoint2 = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => returnTokenFromEndPoint2,
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("get_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<NullResult>() {
@@ -618,7 +616,7 @@ public partial class TapoDeviceTests {
     );
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #1");
-    Assert.IsNotNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
 
     var prevSession = device.Session;
     var invalidatedEndPoints = new List<EndPoint>();
@@ -639,26 +637,26 @@ public partial class TapoDeviceTests {
     if (caseWhenRetrySuccess) {
       Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
 
-      Assert.IsNotNull(device.Session, nameof(device.Session));
-      Assert.AreNotSame(device.Session, prevSession, nameof(device.Session));
+      Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+      Assert.That(prevSession, Is.Not.SameAs(device.Session), nameof(device.Session));
 
       // only first endpoint must have been invalidated
-      Assert.AreEqual(1, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
-      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
+      Assert.That(invalidatedEndPoints.Count, Is.EqualTo(1), nameof(invalidatedEndPoints.Count));
+      Assert.That(invalidatedEndPoints[0], Is.EqualTo(pseudoDeviceEndPoint1.EndPoint), nameof(invalidatedEndPoints) + "[0]");
     }
     else {
       Assert.CatchAsync(async () => await device.GetDeviceInfoAsync(), "request #2");
 
-      Assert.IsNull(device.Session, nameof(device.Session));
+      Assert.That(device.Session, Is.Null, nameof(device.Session));
 
       // both of two endpoint must have been invalidated
-      Assert.AreEqual(2, invalidatedEndPoints.Count, nameof(invalidatedEndPoints.Count));
+      Assert.That(invalidatedEndPoints.Count, Is.EqualTo(2), nameof(invalidatedEndPoints.Count));
 
-      Assert.AreEqual(pseudoDeviceEndPoint1.EndPoint, invalidatedEndPoints[0], nameof(invalidatedEndPoints) + "[0]");
-      Assert.AreEqual(pseudoDeviceEndPoint2.EndPoint, invalidatedEndPoints[1], nameof(invalidatedEndPoints) + "[1]");
+      Assert.That(invalidatedEndPoints[0], Is.EqualTo(pseudoDeviceEndPoint1.EndPoint), nameof(invalidatedEndPoints) + "[0]");
+      Assert.That(invalidatedEndPoints[1], Is.EqualTo(pseudoDeviceEndPoint2.EndPoint), nameof(invalidatedEndPoints) + "[1]");
     }
 
-    Assert.IsTrue(endPoint.HasInvalidated, nameof(endPoint.HasInvalidated));
+    Assert.That(endPoint.HasInvalidated, Is.True, nameof(endPoint.HasInvalidated));
   }
 
   [Test]
@@ -682,7 +680,7 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.ThrowsAsync<NotSupportedException>(
       async () => await device.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>, int>(
@@ -692,7 +690,7 @@ public partial class TapoDeviceTests {
       )
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   [Test]
@@ -719,13 +717,13 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
 
-    Assert.AreEqual(2, request, nameof(request));
-    Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session!.Token, nameof(device.Session.Token));
+    Assert.That(request, Is.EqualTo(2), nameof(request));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+    Assert.That(device.Session!.Token, Is.EqualTo("token-request1"), nameof(device.Session.Token));
   }
 
   [Test]
@@ -756,13 +754,13 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.AreEqual(2, request, nameof(request));
-    StringAssert.Contains("token=token-request1", ex!.EndPoint!.Query, nameof(ex.EndPoint.Query));
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(request, Is.EqualTo(2), nameof(request));
+    Assert.That(ex!.EndPoint!.Query, Does.Contain("token=token-request1"), nameof(ex.EndPoint.Query));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   [Test]
@@ -788,13 +786,13 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
 
-    Assert.AreEqual(2, request, nameof(request));
-    Assert.IsNotNull(device.Session, nameof(device.Session));
-    Assert.AreEqual("token-request1", device.Session!.Token, nameof(device.Session.Token));
+    Assert.That(request, Is.EqualTo(2), nameof(request));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+    Assert.That(device.Session!.Token, Is.EqualTo("token-request1"), nameof(device.Session.Token));
   }
 
   [Test]
@@ -824,14 +822,14 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.AreEqual(2, request, nameof(request));
-    Assert.AreEqual(KnownErrorCodes.Minus1301, ex!.RawErrorCode, nameof(ex.RawErrorCode));
-    StringAssert.Contains("token=token-request1", ex.EndPoint!.Query, nameof(ex.EndPoint.Query));
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(request, Is.EqualTo(2), nameof(request));
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(KnownErrorCodes.Minus1301), nameof(ex.RawErrorCode));
+    Assert.That(ex.EndPoint!.Query, Does.Contain("token=token-request1"), nameof(ex.EndPoint.Query));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   [Test]
@@ -905,12 +903,12 @@ public partial class TapoDeviceTests {
       device.Timeout = GetTimeout();
 
     try {
-      Assert.IsNull(device.Session, nameof(device.Session));
+      Assert.That(device.Session, Is.Null, nameof(device.Session));
 
       Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
 
-      Assert.IsNotNull(device.Session, nameof(device.Session));
-      Assert.AreEqual("token-request2", device.Session!.Token, nameof(device.Session.Token));
+      Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+      Assert.That(device.Session!.Token, Is.EqualTo("token-request2"), nameof(device.Session.Token));
     }
     finally {
       cts.Cancel();
@@ -973,13 +971,13 @@ public partial class TapoDeviceTests {
       : TimeSpan.FromMilliseconds(200);
 
     try {
-      Assert.IsNull(device.Session, nameof(device.Session));
+      Assert.That(device.Session, Is.Null, nameof(device.Session));
 
       var ex = Assert.ThrowsAsync<TapoProtocolException>(async () => await device.GetDeviceInfoAsync());
 
-      Assert.IsInstanceOf<TimeoutException>(ex!.InnerException, nameof(ex.InnerException));
+      Assert.That(ex!.InnerException, Is.InstanceOf<TimeoutException>(), nameof(ex.InnerException));
 
-      Assert.IsNull(device.Session, nameof(device.Session));
+      Assert.That(device.Session, Is.Null, nameof(device.Session));
     }
     finally {
       cts.Cancel();
@@ -993,7 +991,7 @@ public partial class TapoDeviceTests {
   private class AssertOperationCanceledMustNotBeHandledExceptionHandler : TapoDeviceExceptionHandler {
     public override TapoDeviceExceptionHandling DetermineHandling(TapoDevice device, Exception exception, int attempt, ILogger? logger)
     {
-      Assert.IsNotAssignableFrom<OperationCanceledException>(exception);
+      Assert.That(exception, Is.Not.AssignableFrom<OperationCanceledException>());
 
       return Default.DetermineHandling(
         device: device,
@@ -1036,7 +1034,7 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     var ex = Assert.CatchAsync(
       async () => await device.GetDeviceInfoAsync(cancellationToken: ctsRequest.Token)
@@ -1044,7 +1042,7 @@ public partial class TapoDeviceTests {
 
     Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   private readonly struct GetDeviceInfoResult {
@@ -1063,7 +1061,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("get_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<GetDeviceInfoResult>() {
@@ -1085,21 +1083,19 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     // call GetDeviceInfoAsync in the state that the session has not been established
     var deviceInfo0 = await device.GetDeviceInfoAsync<GetDeviceInfoResult>();
 
-    Assert.IsNotNull(deviceInfo0, nameof(deviceInfo0));
-    Assert.IsTrue(deviceInfo0.IsOn, nameof(deviceInfo0.IsOn));
-    Assert.IsNotNull(device.Session, nameof(device.Session));
+    Assert.That(deviceInfo0.IsOn, Is.True, nameof(deviceInfo0.IsOn));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
 
     // call GetDeviceInfoAsync in the state that the session has been established
     var deviceInfo1 = await device.GetDeviceInfoAsync<GetDeviceInfoResult>();
 
-    Assert.IsNotNull(deviceInfo1, nameof(deviceInfo1));
-    Assert.IsFalse(deviceInfo1.IsOn, nameof(deviceInfo1.IsOn));
-    Assert.IsNotNull(device.Session, nameof(device.Session));
+    Assert.That(deviceInfo1.IsOn, Is.False, nameof(deviceInfo1.IsOn));
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
   }
 
   [Test]
@@ -1111,7 +1107,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("get_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<GetDeviceInfoResult>() {
@@ -1136,8 +1132,8 @@ public partial class TapoDeviceTests {
       composeResult: result => (result.IsOn, result.Id)
     );
 
-    Assert.AreEqual(isOn, resultIsOn, nameof(resultIsOn));
-    Assert.AreEqual(deviceId, resultId, nameof(resultId));
+    Assert.That(resultIsOn, Is.EqualTo(isOn), nameof(resultIsOn));
+    Assert.That(resultId, Is.EqualTo(deviceId), nameof(resultId));
   }
 
   [Test]
@@ -1154,13 +1150,13 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.ThrowsAsync<ArgumentNullException>(
       async () => await device.GetDeviceInfoAsync<GetDeviceInfoResult, bool>(composeResult: null!)
     );
 
-    Assert.IsNull(device.Session, nameof(device.Session));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
   private readonly struct GetDeviceInfoOnOffStateResult {
@@ -1194,9 +1190,7 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var deviceInfo = await device.GetDeviceInfoAsync<GetDeviceInfoOnOffStateResult>();
-
-    Assert.IsNotNull(deviceInfo, nameof(deviceInfo));
+    Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync<GetDeviceInfoOnOffStateResult>());
   }
 
   [Test]
@@ -1222,14 +1216,14 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, $"{nameof(device.Session)} before GetDeviceInfoAsync");
+    Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} before GetDeviceInfoAsync");
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await device.GetDeviceInfoAsync()
     );
-    Assert.AreEqual("get_device_info", ex!.RequestMethod);
-    Assert.AreEqual(getDeviceInfoErrorCode, ex.RawErrorCode);
-    Assert.IsNull(device.Session, $"{nameof(device.Session)} after GetDeviceInfoAsync");
+    Assert.That(ex!.RequestMethod, Is.EqualTo("get_device_info"));
+    Assert.That(ex.RawErrorCode, Is.EqualTo(getDeviceInfoErrorCode));
+    Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} after GetDeviceInfoAsync");
   }
 
   [Test]
@@ -1240,15 +1234,15 @@ public partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
 
         switch (requestSequenceNumber++) {
           case 0:
-            Assert.IsTrue(requestParams.GetProperty("device_on")!.GetBoolean());
+            Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
             break;
 
           case 1:
-            Assert.IsFalse(requestParams.GetProperty("device_on")!.GetBoolean());
+            Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.False);
             break;
 
           default:
@@ -1272,19 +1266,19 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, $"{nameof(device.Session)} before SetDeviceInfoAsync");
+    Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} before SetDeviceInfoAsync");
 
     // call SetDeviceInfoAsync in the state that the session has not been established
     await device.SetDeviceInfoAsync(new { device_on = true });
 
-    Assert.IsNotNull(device.Session, $"{nameof(device.Session)} after SetDeviceInfoAsync #1");
+    Assert.That(device.Session, Is.Not.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync #1");
 
     // call SetDeviceInfoAsync in the state that the session has been established
     await device.SetDeviceInfoAsync(new { device_on = false });
 
-    Assert.IsNotNull(device.Session, $"{nameof(device.Session)} after SetDeviceInfoAsync #2");
+    Assert.That(device.Session, Is.Not.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync #2");
 
-    Assert.AreEqual(2, requestSequenceNumber, nameof(requestSequenceNumber));
+    Assert.That(requestSequenceNumber, Is.EqualTo(2), nameof(requestSequenceNumber));
   }
 
   [Test]
@@ -1295,7 +1289,7 @@ public partial class TapoDeviceTests {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, method, _) => {
-        Assert.AreEqual("set_device_info", method, "received request method");
+        Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
@@ -1313,14 +1307,14 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    Assert.IsNull(device.Session, $"{nameof(device.Session)} before SetDeviceInfoAsync");
+    Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} before SetDeviceInfoAsync");
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
       async () => await device.SetDeviceInfoAsync(new { device_on = true })
     );
-    Assert.AreEqual("set_device_info", ex!.RequestMethod);
-    Assert.AreEqual(setDeviceInfoErrorCode, ex.RawErrorCode);
+    Assert.That(ex!.RequestMethod, Is.EqualTo("set_device_info"));
+    Assert.That(ex.RawErrorCode, Is.EqualTo(setDeviceInfoErrorCode));
 
-    Assert.IsNull(device.Session, $"{nameof(device.Session)} after SetDeviceInfoAsync");
+    Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync");
   }
 }

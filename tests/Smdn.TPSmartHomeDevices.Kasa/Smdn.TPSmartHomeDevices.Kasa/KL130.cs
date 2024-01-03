@@ -31,9 +31,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":0,""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":0,""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -58,9 +58,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":" + expectedTransitionPeriod + @",""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":" + expectedTransitionPeriod + @",""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -82,9 +82,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":0,""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":0,""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -109,9 +109,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":" + expectedTransitionPeriod + @",""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":" + expectedTransitionPeriod + @",""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -134,9 +134,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":" + (newState ? "1" : "0") + @",""transition_period"":0,""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":" + (newState ? "1" : "0") + @",""transition_period"":0,""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -172,9 +172,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":" + (newState ? "1" : "0") + @",""transition_period"":"+ expectedTransitionPeriod + @",""ignore_default"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":" + (newState ? "1" : "0") + @",""transition_period"":"+ expectedTransitionPeriod + @",""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -214,9 +214,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""color_temp"":" + colorTemperature.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""on_off"":1,""ignore_default"":1}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""color_temp"":" + colorTemperature.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""on_off"":1,""ignore_default"":1}}}"),
           nameof(request)
         );
 
@@ -262,9 +262,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""hue"":" + hue.ToString(provider: null) + @",""saturation"":" + saturation.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""color_temp"":0,""on_off"":1,""ignore_default"":1}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""hue"":" + hue.ToString(provider: null) + @",""saturation"":" + saturation.ToString(provider: null) + (expectedBrightness is null ? string.Empty : @",""brightness"":" + expectedBrightness) + @",""transition_period"":"+ expectedTransitionPeriod + @",""color_temp"":0,""on_off"":1,""ignore_default"":1}}}"),
           nameof(request)
         );
 
@@ -293,45 +293,45 @@ public class KL130Tests {
     yield return new object[] {
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":1,""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
-        Assert.IsTrue(lightState.IsOn, nameof(lightState.IsOn));
-        Assert.IsNotNull(lightState.Hue, nameof(lightState.Hue));
-        Assert.AreEqual(180, lightState.Hue!.Value, nameof(lightState.Hue));
-        Assert.IsNotNull(lightState.Saturation, nameof(lightState.Saturation));
-        Assert.AreEqual(100, lightState.Saturation!.Value, nameof(lightState.Saturation));
-        Assert.IsNotNull(lightState.ColorTemperature, nameof(lightState.ColorTemperature));
-        Assert.AreEqual(5000, lightState.ColorTemperature!.Value, nameof(lightState.ColorTemperature));
-        Assert.IsNotNull(lightState.Brightness, nameof(lightState.Brightness));
-        Assert.AreEqual(50, lightState.Brightness!.Value, nameof(lightState.Brightness));
+        Assert.That(lightState.IsOn, Is.True, nameof(lightState.IsOn));
+        Assert.That(lightState.Hue, Is.Not.Null, nameof(lightState.Hue));
+        Assert.That(lightState.Hue!.Value, Is.EqualTo(180), nameof(lightState.Hue));
+        Assert.That(lightState.Saturation, Is.Not.Null, nameof(lightState.Saturation));
+        Assert.That(lightState.Saturation!.Value, Is.EqualTo(100), nameof(lightState.Saturation));
+        Assert.That(lightState.ColorTemperature, Is.Not.Null, nameof(lightState.ColorTemperature));
+        Assert.That(lightState.ColorTemperature!.Value, Is.EqualTo(5000), nameof(lightState.ColorTemperature));
+        Assert.That(lightState.Brightness, Is.Not.Null, nameof(lightState.Brightness));
+        Assert.That(lightState.Brightness!.Value, Is.EqualTo(50), nameof(lightState.Brightness));
       }),
     };
     yield return new object[] {
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":0,""dft_on_state"":{""mode"":""normal"",""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50}},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
-        Assert.IsFalse(lightState.IsOn, nameof(lightState.IsOn));
-        Assert.IsNull(lightState.Hue, nameof(lightState.Hue));
-        Assert.IsNull(lightState.Saturation, nameof(lightState.Saturation));
-        Assert.IsNull(lightState.ColorTemperature, nameof(lightState.ColorTemperature));
-        Assert.IsNull(lightState.Brightness, nameof(lightState.Brightness));
+        Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
+        Assert.That(lightState.Hue, Is.Null, nameof(lightState.Hue));
+        Assert.That(lightState.Saturation, Is.Null, nameof(lightState.Saturation));
+        Assert.That(lightState.ColorTemperature, Is.Null, nameof(lightState.ColorTemperature));
+        Assert.That(lightState.Brightness, Is.Null, nameof(lightState.Brightness));
       }),
     };
     yield return new object[] {
       @"{""system"":{""get_sysinfo"":{""light_state"":{},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
-        Assert.IsFalse(lightState.IsOn, nameof(lightState.IsOn));
-        Assert.IsNull(lightState.Hue, nameof(lightState.Hue));
-        Assert.IsNull(lightState.Saturation, nameof(lightState.Saturation));
-        Assert.IsNull(lightState.ColorTemperature, nameof(lightState.ColorTemperature));
-        Assert.IsNull(lightState.Brightness, nameof(lightState.Brightness));
+        Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
+        Assert.That(lightState.Hue, Is.Null, nameof(lightState.Hue));
+        Assert.That(lightState.Saturation, Is.Null, nameof(lightState.Saturation));
+        Assert.That(lightState.ColorTemperature, Is.Null, nameof(lightState.ColorTemperature));
+        Assert.That(lightState.Brightness, Is.Null, nameof(lightState.Brightness));
       }),
     };
     yield return new object[] {
       @"{""system"":{""get_sysinfo"":{""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
-        Assert.IsFalse(lightState.IsOn, nameof(lightState.IsOn));
-        Assert.IsNull(lightState.Hue, nameof(lightState.Hue));
-        Assert.IsNull(lightState.Saturation, nameof(lightState.Saturation));
-        Assert.IsNull(lightState.ColorTemperature, nameof(lightState.ColorTemperature));
-        Assert.IsNull(lightState.Brightness, nameof(lightState.Brightness));
+        Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
+        Assert.That(lightState.Hue, Is.Null, nameof(lightState.Hue));
+        Assert.That(lightState.Saturation, Is.Null, nameof(lightState.Saturation));
+        Assert.That(lightState.ColorTemperature, Is.Null, nameof(lightState.ColorTemperature));
+        Assert.That(lightState.Brightness, Is.Null, nameof(lightState.Brightness));
       }),
     };
   }
@@ -341,9 +341,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""get_sysinfo"":{}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 
@@ -389,9 +389,9 @@ public class KL130Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""get_sysinfo"":{}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 
@@ -408,6 +408,6 @@ public class KL130Tests {
     bool? state = null;
 
     Assert.DoesNotThrowAsync(async () => state = await device.GetOnOffStateAsync());
-    Assert.AreEqual(expectedState, state, nameof(expectedState));
+    Assert.That(state, Is.EqualTo(expectedState), nameof(expectedState));
   }
 }

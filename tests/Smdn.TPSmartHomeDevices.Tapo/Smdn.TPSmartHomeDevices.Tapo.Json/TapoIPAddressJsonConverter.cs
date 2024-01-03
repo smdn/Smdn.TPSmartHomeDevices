@@ -35,7 +35,7 @@ public class TapoIPAddressJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<NetworkInfo>(json)!;
 
-    Assert.AreEqual(expected, deserialized.IPAddress);
+    Assert.That(deserialized.IPAddress, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -51,7 +51,7 @@ public class TapoIPAddressJsonConverterTests {
     var obj = new NetworkInfo() { IPAddress = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

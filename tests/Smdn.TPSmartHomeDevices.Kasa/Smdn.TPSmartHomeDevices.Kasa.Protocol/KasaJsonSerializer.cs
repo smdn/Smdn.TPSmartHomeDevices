@@ -64,7 +64,7 @@ public class KasaJsonSerializerTests {
 
     var length = BinaryPrimitives.ReadInt32BigEndian(buffer.WrittenSpan.Slice(0, 4));
 
-    Assert.AreEqual(expectedJsonExpression.Length, length, nameof(length));
+    Assert.That(length, Is.EqualTo(expectedJsonExpression.Length), nameof(length));
 
     var body = new byte[length];
 
@@ -72,9 +72,9 @@ public class KasaJsonSerializerTests {
 
     KasaJsonSerializer.DecryptInPlace(body);
 
-    Assert.AreEqual(
-      expectedJsonExpression,
+    Assert.That(
       Encoding.UTF8.GetString(body),
+      Is.EqualTo(expectedJsonExpression),
       nameof(body)
     );
   }
@@ -98,7 +98,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(JsonValueKind.Object, result.ValueKind);
+          Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Object));
         })
       },
       new {
@@ -106,7 +106,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual("Bar", result.GetProperty("Foo").GetString());
+          Assert.That(result.GetProperty("Foo").GetString(), Is.EqualTo("Bar"));
         })
       },
       new {
@@ -114,7 +114,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(42, result.GetProperty("Foo").GetInt32());
+          Assert.That(result.GetProperty("Foo").GetInt32(), Is.EqualTo(42));
         })
       },
       new {
@@ -124,8 +124,8 @@ public class KasaJsonSerializerTests {
         Assersion = new Action<JsonElement>(static result => {
           var foo = result.GetProperty("Foo");
 
-          Assert.AreEqual(JsonValueKind.Object, foo.ValueKind);
-          Assert.AreEqual("Baz", foo.GetProperty("Bar").GetString());
+          Assert.That(foo.ValueKind, Is.EqualTo(JsonValueKind.Object));
+          Assert.That(foo.GetProperty("Bar").GetString(), Is.EqualTo("Baz"));
         })
       },
       new {
@@ -133,7 +133,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(JsonValueKind.Null, result.ValueKind);
+          Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Null));
         })
       },
       new {
@@ -141,7 +141,7 @@ public class KasaJsonSerializerTests {
         Module = "",
         Method = "",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(JsonValueKind.Object, result.ValueKind);
+          Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Object));
         })
       },
     }) {
@@ -244,8 +244,8 @@ public class KasaJsonSerializerTests {
       )
     );
 
-    Assert.AreEqual(bodyLengthIndicatedInHeader, ex!.IndicatedLength, nameof(ex.IndicatedLength));
-    Assert.AreEqual(buffer.WrittenCount - 4, ex.ActualLength, nameof(ex.ActualLength));
+    Assert.That(ex!.IndicatedLength, Is.EqualTo(bodyLengthIndicatedInHeader), nameof(ex.IndicatedLength));
+    Assert.That(ex.ActualLength, Is.EqualTo(buffer.WrittenCount - 4), nameof(ex.ActualLength));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageModuleUnmatch()

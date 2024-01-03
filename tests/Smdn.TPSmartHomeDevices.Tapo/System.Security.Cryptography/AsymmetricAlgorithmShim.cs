@@ -60,17 +60,16 @@ public class AsymmetricAlgorithmShimTests {
     );
 
 #if !SYSTEM_SECURITY_CRYPTOGRAPHY_ASYMMETRICALGORITHM_EXPORTSUBJECTPUBLICKEYINFOPEM
-    Assert.AreEqual(
-      expected,
-      AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm),
+    Assert.That(
+      AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm), Is.EqualTo(expected),
       $"{nameof(AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem)} ({label})"
     );
 #endif
 
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_ASYMMETRICALGORITHM_EXPORTSUBJECTPUBLICKEYINFOPEM
-    Assert.AreEqual(
-      RemoveLF(expected),
+    Assert.That(
       RemoveLF(algorithm.ExportSubjectPublicKeyInfoPem()),
+      Is.EqualTo(RemoveLF(expected)),
       $"compare with runtime library implementation's output ({label})"
     );
 

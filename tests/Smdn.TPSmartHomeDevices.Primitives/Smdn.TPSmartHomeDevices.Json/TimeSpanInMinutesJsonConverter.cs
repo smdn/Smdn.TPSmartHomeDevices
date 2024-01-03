@@ -34,7 +34,7 @@ public class TimeSpanInMinutesJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<TimeZone>(json)!;
 
-    Assert.AreEqual(expected, deserialized.TimeZoneOffset);
+    Assert.That(deserialized.TimeZoneOffset, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -51,7 +51,7 @@ public class TimeSpanInMinutesJsonConverterTests {
     var obj = new TimeZone() { TimeZoneOffset = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

@@ -54,7 +54,7 @@ partial class TapoClientTests {
 
     Assert.That(ex, Is.Not.InstanceOf<NullReferenceException>());
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
   }
 
   [Test]
@@ -91,9 +91,9 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.AreEqual(ex!.StatusCode, statusCode, nameof(ex.StatusCode));
+    Assert.That(statusCode, Is.EqualTo(ex!.StatusCode), nameof(ex.StatusCode));
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
   }
 
   private class RequestCancellationHttpClientFactory : IHttpClientFactory {
@@ -141,6 +141,6 @@ partial class TapoClientTests {
 
     Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
-    Assert.IsNull(client.Session);
+    Assert.That(client.Session, Is.Null);
   }
 }

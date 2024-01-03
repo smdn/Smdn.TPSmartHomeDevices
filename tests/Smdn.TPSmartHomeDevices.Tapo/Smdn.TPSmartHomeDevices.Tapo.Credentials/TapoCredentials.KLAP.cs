@@ -14,15 +14,16 @@ partial class TapoCredentialsTests {
   [Test]
   public void TryComputeKlapAuthHash_CredentialNull()
   {
-    Assert.IsFalse(
+    Assert.That(
       TapoCredentials.TryComputeKlapAuthHash(
         credential: null!,
         destination: default,
         out var bytesWritten
-      )
+      ),
+      Is.False
     );
 
-    Assert.AreEqual(0, bytesWritten, nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.EqualTo(0), nameof(bytesWritten));
   }
 
   [TestCase(0)]
@@ -30,15 +31,16 @@ partial class TapoCredentialsTests {
   [TestCase(31)]
   public void TryComputeKlapAuthHash_DestinationTooShort(int length)
   {
-    Assert.IsFalse(
+    Assert.That(
       TapoCredentials.TryComputeKlapAuthHash(
         credential: null!,
         destination: 0 == length ? Span<byte>.Empty : stackalloc byte[length],
         out var bytesWritten
-      )
+      ),
+      Is.False
     );
 
-    Assert.AreEqual(0, bytesWritten, nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.EqualTo(0), nameof(bytesWritten));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TryComputeKlapAuthHash()
@@ -66,15 +68,16 @@ partial class TapoCredentialsTests {
   {
     var buffer = new byte[32];
 
-    Assert.IsTrue(
+    Assert.That(
       TapoCredentials.TryComputeKlapAuthHash(
         credential: serviceProvider.GetRequiredService<ITapoCredentialProvider>().GetCredential(null),
         destination: buffer.AsSpan(),
         out var bytesWritten
-      )
+      ),
+      Is.True
     );
 
-    Assert.AreEqual(32, bytesWritten, nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.EqualTo(32), nameof(bytesWritten));
 
     Assert.That(buffer, SequenceIs.EqualTo(expected), nameof(buffer));
   }

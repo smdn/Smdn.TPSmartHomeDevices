@@ -112,9 +112,9 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.DoesNotThrow(factory.Dispose);
 
     if (shouldDisposeResolver)
-      Assert.IsTrue(resolver.HasDisposed, nameof(resolver.HasDisposed));
+      Assert.That(resolver.HasDisposed, Is.True, nameof(resolver.HasDisposed));
     else
-      Assert.IsFalse(resolver.HasDisposed, nameof(resolver.HasDisposed));
+      Assert.That(resolver.HasDisposed, Is.False, nameof(resolver.HasDisposed));
   }
 
   [Test]
@@ -154,10 +154,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     var endPoint = factory.Create(PhysicalAddress.None);
 
-    Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
+    Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
+    Assert.That(endPoint, Is.InstanceOf<IDynamicDeviceEndPoint>(), nameof(endPoint));
     Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, port: 0), await endPoint.ResolveAsync());
+    Assert.That(await endPoint.ResolveAsync(), Is.EqualTo(new IPEndPoint(TestIPAddress, port: 0)));
   }
 
   [Test]
@@ -221,7 +221,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     );
     var endPoint = factory.Create(address: TestMacAddress);
 
-    Assert.AreEqual(TestMacAddress.ToMacAddressString(), endPoint.ToString(), nameof(endPoint.ToString));
+    Assert.That(endPoint.ToString(), Is.EqualTo(TestMacAddress.ToMacAddressString()), nameof(endPoint.ToString));
   }
 
   [Test]
@@ -238,10 +238,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     var endPoint = factory.Create(address: TestMacAddress);
 
-    Assert.IsNotNull(endPoint, nameof(endPoint));
+    Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
 
     Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
-    Assert.AreEqual(new IPEndPoint(TestIPAddress, 0), await endPoint.ResolveAsync());
+    Assert.That(await endPoint.ResolveAsync(), Is.EqualTo(new IPEndPoint(TestIPAddress, 0)));
   }
 
   [Test]
@@ -256,10 +256,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     var endPoint = factory.Create(address: TestMacAddress);
 
-    Assert.IsNotNull(endPoint, nameof(endPoint));
+    Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
 
     Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
-    Assert.IsNull(await endPoint.ResolveAsync());
+    Assert.That(await endPoint.ResolveAsync(), Is.Null);
   }
 
   [Test]
@@ -276,16 +276,16 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     var endPoint = factory.Create(address: TestMacAddress);
 
-    Assert.IsNotNull(endPoint, nameof(endPoint));
-    Assert.IsInstanceOf<IDynamicDeviceEndPoint>(endPoint, nameof(endPoint));
+    Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
+    Assert.That(endPoint, Is.InstanceOf<IDynamicDeviceEndPoint>(), nameof(endPoint));
 
     EndPoint? resolvedEndPointAddress = null;
 
     Assert.DoesNotThrowAsync(
       async () => resolvedEndPointAddress = await endPoint.ResolveAsync()
     );
-    Assert.IsNotNull(resolvedEndPointAddress, nameof(resolvedEndPointAddress));
-    Assert.AreEqual(resolvedEndPointAddress, new IPEndPoint(TestIPAddress, 0), nameof(resolvedEndPointAddress));
+    Assert.That(resolvedEndPointAddress, Is.Not.Null, nameof(resolvedEndPointAddress));
+    Assert.That(new IPEndPoint(TestIPAddress, 0), Is.EqualTo(resolvedEndPointAddress), nameof(resolvedEndPointAddress));
 
     // invalidate
     Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint)!.Invalidate());
@@ -295,6 +295,6 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.DoesNotThrowAsync(
       async () => resolvedEndPointAddressAfterInvalidation = await endPoint.ResolveAsync()
     );
-    Assert.IsNull(resolvedEndPointAddressAfterInvalidation, nameof(resolvedEndPointAddressAfterInvalidation));
+    Assert.That(resolvedEndPointAddressAfterInvalidation, Is.Null, nameof(resolvedEndPointAddressAfterInvalidation));
   }
 }

@@ -33,7 +33,7 @@ public class TimeSpanInSecondsJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<DeviceOnTime>(json)!;
 
-    Assert.AreEqual(expected, deserialized.OnTimeDuration);
+    Assert.That(deserialized.OnTimeDuration, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -50,7 +50,7 @@ public class TimeSpanInSecondsJsonConverterTests {
     var obj = new DeviceOnTime() { OnTimeDuration = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

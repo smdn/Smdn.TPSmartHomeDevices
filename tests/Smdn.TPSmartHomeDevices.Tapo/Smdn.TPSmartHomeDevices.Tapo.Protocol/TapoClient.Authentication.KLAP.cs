@@ -36,12 +36,12 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.IsNotNull(client.Session);
-    Assert.IsNull(client.Session!.Token);
-    Assert.IsNotNull(client.Session!.SessionId);
-    Assert.IsNotEmpty(client.Session.SessionId);
-    Assert.AreNotEqual(DateTime.MaxValue, client.Session.ExpiresOn);
-    Assert.IsFalse(client.Session.HasExpired);
+    Assert.That(client.Session, Is.Not.Null);
+    Assert.That(client.Session!.Token, Is.Null);
+    Assert.That(client.Session!.SessionId, Is.Not.Null);
+    Assert.That(client.Session.SessionId, Is.Not.Empty);
+    Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
+    Assert.That(client.Session.HasExpired, Is.False);
   }
 
   [Test]
@@ -64,10 +64,10 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.AreEqual(device.EndPointUri, ex!.EndPoint, nameof(ex.EndPoint));
-    Assert.IsNull(ex.InnerException, nameof(ex.InnerException));
+    Assert.That(ex!.EndPoint, Is.EqualTo(device.EndPointUri), nameof(ex.EndPoint));
+    Assert.That(ex.InnerException, Is.Null, nameof(ex.InnerException));
 
-    Assert.IsNull(client.Session, nameof(client.Session));
+    Assert.That(client.Session, Is.Null, nameof(client.Session));
   }
 
   [Test]
@@ -98,18 +98,18 @@ partial class TapoClientTests {
       )
     );
 
-    Assert.AreEqual(device.EndPointUri, ex!.EndPoint, nameof(ex.EndPoint));
+    Assert.That(ex!.EndPoint, Is.EqualTo(device.EndPointUri), nameof(ex.EndPoint));
 
-    Assert.IsInstanceOf<HttpRequestException>(ex.InnerException, nameof(ex.InnerException));
+    Assert.That(ex.InnerException, Is.InstanceOf<HttpRequestException>(), nameof(ex.InnerException));
 
     var httpRequestException = ex.InnerException as HttpRequestException;
 
-    Assert.AreEqual(
-      handshake2NonSuccessStatusCode,
+    Assert.That(
       httpRequestException!.StatusCode,
+      Is.EqualTo(handshake2NonSuccessStatusCode),
       nameof(httpRequestException.StatusCode)
     );
 
-    Assert.IsNull(client.Session, nameof(client.Session));
+    Assert.That(client.Session, Is.Null, nameof(client.Session));
   }
 }

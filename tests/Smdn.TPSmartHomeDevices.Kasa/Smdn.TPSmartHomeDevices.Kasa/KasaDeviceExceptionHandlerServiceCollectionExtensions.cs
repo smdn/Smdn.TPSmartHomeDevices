@@ -28,7 +28,7 @@ public class KasaDeviceExceptionHandlerServiceCollectionExtensionsTests {
 
     var exceptionHandler = services.BuildServiceProvider().GetRequiredService<KasaDeviceExceptionHandler>();
 
-    Assert.IsNotNull(exceptionHandler, nameof(exceptionHandler));
+    Assert.That(exceptionHandler, Is.Not.Null, nameof(exceptionHandler));
   }
 
   [Test]
@@ -54,6 +54,6 @@ public class KasaDeviceExceptionHandlerServiceCollectionExtensionsTests {
 
     var exceptionHandler = services.BuildServiceProvider().GetRequiredService<KasaDeviceExceptionHandler>();
 
-    Assert.AreSame(first, exceptionHandler, "first one must be returned");
+    Assert.That(exceptionHandler, Is.SameAs(first), "first one must be returned");
   }
 }

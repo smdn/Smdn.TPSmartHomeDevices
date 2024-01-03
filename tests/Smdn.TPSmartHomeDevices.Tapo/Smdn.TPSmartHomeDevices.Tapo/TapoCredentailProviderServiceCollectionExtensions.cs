@@ -66,12 +66,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-    Assert.AreEqual(Base64UserNameSHA1Digest, username);
-    Assert.AreEqual(Base64Password, password);
+    Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+    Assert.That(password, Is.EqualTo(Base64Password));
   }
 
   [Test]
@@ -90,12 +90,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-    Assert.AreEqual(Base64UserNameSHA1Digest, username);
-    Assert.AreEqual(Base64Password, password);
+    Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+    Assert.That(password, Is.EqualTo(Base64Password));
   }
 
   [TestCase(EMail, null)]
@@ -124,12 +124,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-    Assert.AreEqual(Base64UserNameSHA1Digest, username);
-    Assert.AreEqual(Base64Password, password);
+    Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+    Assert.That(password, Is.EqualTo(Base64Password));
   }
 
   [Test]
@@ -148,12 +148,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-    Assert.AreEqual(Base64UserNameSHA1Digest, username);
-    Assert.AreEqual(Base64Password, password);
+    Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+    Assert.That(password, Is.EqualTo(Base64Password));
   }
 
   [TestCase(Base64UserNameSHA1Digest, null)]
@@ -187,7 +187,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
       Environment.SetEnvironmentVariable(envVarUsername, EMail);
@@ -195,8 +195,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-      Assert.AreEqual(Base64UserNameSHA1Digest, username);
-      Assert.AreEqual(Base64Password, password);
+      Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+      Assert.That(password, Is.EqualTo(Base64Password));
     }
     finally {
       Environment.SetEnvironmentVariable(envVarUsername, null);
@@ -222,7 +222,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
       Environment.SetEnvironmentVariable(envVarUsername, username);
@@ -262,7 +262,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(credentialProvider, nameof(credentialProvider));
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
       Environment.SetEnvironmentVariable(envVarUsername, EMail);
@@ -270,8 +270,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
-      Assert.AreEqual(Base64UserNameSHA1Digest, username);
-      Assert.AreEqual(Base64Password, password);
+      Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
+      Assert.That(password, Is.EqualTo(Base64Password));
     }
     finally {
       Environment.SetEnvironmentVariable(envVarUsername, null);
@@ -312,8 +312,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var registeredCredentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(registeredCredentialProvider, nameof(registeredCredentialProvider));
-    Assert.AreSame(credentialProvider, registeredCredentialProvider);
+    Assert.That(registeredCredentialProvider, Is.Not.Null, nameof(registeredCredentialProvider));
+    Assert.That(registeredCredentialProvider, Is.SameAs(credentialProvider));
   }
 
   [Test]
@@ -332,8 +332,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var registeredCredentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    Assert.IsNotNull(registeredCredentialProvider, nameof(registeredCredentialProvider));
-    Assert.AreSame(firstCredentialProvider, registeredCredentialProvider);
+    Assert.That(registeredCredentialProvider, Is.Not.Null, nameof(registeredCredentialProvider));
+    Assert.That(registeredCredentialProvider, Is.SameAs(firstCredentialProvider));
   }
 
   [Test]

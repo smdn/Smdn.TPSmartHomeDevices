@@ -47,12 +47,11 @@ partial class TapoClientTests {
         $"attempt #{i}"
       );
 
-      Assert.IsNotNull(nullableResponse);
+      Assert.That(nullableResponse, Is.Not.Null);
 
       var response = nullableResponse!.Value;
 
-      Assert.AreEqual(KnownErrorCodes.Success, response.ErrorCode, nameof(response.ErrorCode));
-      Assert.IsNotNull(response.Result, nameof(response.Result));
+      Assert.That(response.ErrorCode, Is.EqualTo(KnownErrorCodes.Success), nameof(response.ErrorCode));
     }
   }
 
@@ -101,17 +100,17 @@ partial class TapoClientTests {
         $"attempt #{i}"
       );
 
-      Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
-      Assert.AreEqual(new GetDeviceInfoRequest().Method, ex.RequestMethod, nameof(ex.RequestMethod));
-      Assert.AreEqual(new Uri(device.EndPointUri!, $"/app/request?seq={sequenceNumber}"), ex.EndPoint, nameof(ex.EndPoint));
+      Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+      Assert.That(ex.RequestMethod, Is.EqualTo(new GetDeviceInfoRequest().Method), nameof(ex.RequestMethod));
+      Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app/request?seq={sequenceNumber}")), nameof(ex.EndPoint));
 
       if (prevSequenceNumber.HasValue)
-        Assert.AreEqual(sequenceNumber, prevSequenceNumber.Value + 1, nameof(sequenceNumber));
+        Assert.That(prevSequenceNumber.Value + 1, Is.EqualTo(sequenceNumber), nameof(sequenceNumber));
 
       prevSequenceNumber = sequenceNumber;
     }
 
     if (prevSequenceNumber.HasValue)
-      Assert.AreEqual(sequenceNumber, prevSequenceNumber.Value, nameof(sequenceNumber));
+      Assert.That(prevSequenceNumber.Value, Is.EqualTo(sequenceNumber), nameof(sequenceNumber));
   }
 }

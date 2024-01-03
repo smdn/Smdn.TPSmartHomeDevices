@@ -17,8 +17,8 @@ public partial class TapoCredentialsTests {
   {
     var buffer = new byte[TapoCredentials.HexSHA1HashSizeInBytes];
 
-    Assert.IsTrue(TapoCredentials.TryConvertToHexSHA1Hash(Encoding.UTF8.GetBytes(input), buffer, out var bytesWritten));
-    Assert.AreEqual(TapoCredentials.HexSHA1HashSizeInBytes, bytesWritten, nameof(bytesWritten));
+    Assert.That(TapoCredentials.TryConvertToHexSHA1Hash(Encoding.UTF8.GetBytes(input), buffer, out var bytesWritten), Is.True);
+    Assert.That(bytesWritten, Is.EqualTo(TapoCredentials.HexSHA1HashSizeInBytes), nameof(bytesWritten));
 
     Assert.That(buffer.AsMemory(0, bytesWritten), SequenceIs.EqualTo(Convert.FromBase64String(expected)));
   }
@@ -30,19 +30,19 @@ public partial class TapoCredentialsTests {
   {
     var buffer = new byte[bufferSize];
 
-    Assert.IsFalse(TapoCredentials.TryConvertToHexSHA1Hash(Array.Empty<byte>(), buffer, out var bytesWritten));
-    Assert.AreNotEqual(TapoCredentials.HexSHA1HashSizeInBytes, bytesWritten, nameof(bytesWritten));
+    Assert.That(TapoCredentials.TryConvertToHexSHA1Hash(Array.Empty<byte>(), buffer, out var bytesWritten), Is.False);
+    Assert.That(bytesWritten, Is.Not.EqualTo(TapoCredentials.HexSHA1HashSizeInBytes), nameof(bytesWritten));
   }
 
   [TestCase("user", "MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ==")]
   [TestCase("user@mail.test", "YjhlY2VjNWIzNjk0ZTVlNzE0YTYxMmNhZTZlZTJiNmExMjQ5ZmZmZQ==")]
   [TestCase("", "ZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ==")]
   public void ToBase64EncodedSHA1DigestString(string input, string expected)
-    => Assert.AreEqual(expected, TapoCredentials.ToBase64EncodedSHA1DigestString(input));
+    => Assert.That(TapoCredentials.ToBase64EncodedSHA1DigestString(input), Is.EqualTo(expected));
 
   [TestCase("pass", "cGFzcw==")]
   [TestCase("password", "cGFzc3dvcmQ=")]
   [TestCase("", "")]
   public void ToBase64EncodedString(string input, string expected)
-    => Assert.AreEqual(expected, TapoCredentials.ToBase64EncodedString(input));
+    => Assert.That(TapoCredentials.ToBase64EncodedString(input), Is.EqualTo(expected));
 }

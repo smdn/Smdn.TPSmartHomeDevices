@@ -117,7 +117,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   [TestCase(typeof(SecurePassThroughRequest<LoginDeviceRequest>), false)]
   [TestCase(typeof(SecurePassThroughResponse<LoginDeviceResponse>), false)]
   public void CanConvert(Type typeToConvert, bool expected)
-    => Assert.AreEqual(expected, CreateFactory().CanConvert(typeToConvert));
+    => Assert.That(CreateFactory().CanConvert(typeToConvert), Is.EqualTo(expected));
 
   [TestCase(typeof(HandshakeRequest))]
   [TestCase(typeof(HandshakeResponse))]
@@ -127,9 +127,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
   {
     var factory = CreateFactory();
 
-    Assert.IsFalse(factory.CanConvert(typeToConvert));
+    Assert.That(factory.CanConvert(typeToConvert), Is.False);
 
-    Assert.IsNull(factory.CreateConverter(typeToConvert, new()));
+    Assert.That(factory.CreateConverter(typeToConvert, new()), Is.Null);
   }
 
   [TestCase(typeof(LoginDeviceRequest))]
@@ -138,11 +138,11 @@ public class SecurePassThroughJsonConverterFactoryTests {
   {
     var factory = CreateFactory();
 
-    Assert.IsTrue(factory.CanConvert(typeToConvert));
+    Assert.That(factory.CanConvert(typeToConvert), Is.True);
 
     var converter = factory.CreateConverter(typeToConvert, new());
 
-    Assert.IsNotNull(converter);
+    Assert.That(converter, Is.Not.Null);
   }
 
   [TestCase(typeof(LoginDeviceResponse))]
@@ -151,11 +151,11 @@ public class SecurePassThroughJsonConverterFactoryTests {
   {
     var factory = CreateFactory();
 
-    Assert.IsTrue(factory.CanConvert(typeToConvert));
+    Assert.That(factory.CanConvert(typeToConvert), Is.True);
 
     var converter = factory.CreateConverter(typeToConvert, new());
 
-    Assert.IsNotNull(converter);
+    Assert.That(converter, Is.Not.Null);
   }
 
   [Test]
@@ -238,9 +238,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     var expectedJsonExpressionBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(expectedJsonExpression));
 
-    Assert.AreEqual(
-      "\"" + expectedJsonExpressionBase64 + "\"",
-      JsonSerializer.Serialize(request, request.GetType(), options)
+    Assert.That(
+      JsonSerializer.Serialize(request, request.GetType(), options),
+      Is.EqualTo("\"" + expectedJsonExpressionBase64 + "\"")
     );
   }
 
@@ -276,17 +276,17 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     serializedRequestStream.Position = 0L;
 
-    Assert.AreEqual(
-      (byte)'"',
+    Assert.That(
       serializedRequestStream.ReadByte(),
+      Is.EqualTo((byte)'"'),
       "first byte of serialized request"
     );
 
     serializedRequestStream.Position = serializedRequestStream.Length - 1L;
 
-    Assert.AreEqual(
-      (byte)'"',
+    Assert.That(
       serializedRequestStream.ReadByte(),
+      Is.EqualTo((byte)'"'),
       "last byte of serialized request"
     );
 
@@ -308,9 +308,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
       CryptoStreamMode.Read
     );
 
-    Assert.AreEqual(
-      expectedJsonExpression,
-      new StreamReader(decryptingStream).ReadToEnd()
+    Assert.That(
+      new StreamReader(decryptingStream).ReadToEnd(),
+      Is.EqualTo(expectedJsonExpression)
     );
   }
 
@@ -360,11 +360,11 @@ public class SecurePassThroughJsonConverterFactoryTests {
       @"{""error_code"":0,""result"":{""token"":""TOKEN""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.IsInstanceOf<LoginDeviceResponse>(deserialized);
+          Assert.That(deserialized, Is.InstanceOf<LoginDeviceResponse>());
 
           var resp = (LoginDeviceResponse)deserialized;
-          Assert.AreEqual(0, resp.ErrorCode, nameof(LoginDeviceResponse.ErrorCode));
-          Assert.AreEqual("TOKEN", resp.Result.Token, nameof(LoginDeviceResponse.ResponseResult.Token));
+          Assert.That(resp.ErrorCode, Is.EqualTo(0), nameof(LoginDeviceResponse.ErrorCode));
+          Assert.That(resp.Result.Token, Is.EqualTo("TOKEN"), nameof(LoginDeviceResponse.ResponseResult.Token));
         }
       )
     };
@@ -374,14 +374,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
       @"{""error_code"":-1,""result"":{""device_id"":""<device-id>"",""device_on"":true}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.IsInstanceOf<GetDeviceInfoResponse<GetDeviceInfoResponseResult>>(deserialized);
+          Assert.That(deserialized, Is.InstanceOf<GetDeviceInfoResponse<GetDeviceInfoResponseResult>>());
 
           var resp = (GetDeviceInfoResponse<GetDeviceInfoResponseResult>)deserialized;
-          Assert.AreEqual(-1, resp.ErrorCode, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.ErrorCode));
-          Assert.IsNotNull(resp.Result, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result));
-          Assert.AreEqual("<device-id>", resp.Result.Id, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.Id));
-          Assert.IsTrue(resp.Result.IsOn, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.IsOn));
-          Assert.IsNull(resp.Result.NickName, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.NickName));
+          Assert.That(resp.ErrorCode, Is.EqualTo(-1), nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.ErrorCode));
+          Assert.That(resp.Result.Id, Is.EqualTo("<device-id>"), nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.Id));
+          Assert.That(resp.Result.IsOn, Is.True, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.IsOn));
+          Assert.That(resp.Result.NickName, Is.Null, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.NickName));
         }
       )
     };
@@ -391,14 +390,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
       @"{""error_code"":1,""result"":{""foo"":0,""bar"":""baz"",""qux"":""extra property""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.IsInstanceOf<SetDeviceInfoResponse<SetDeviceInfoResponseResult>>(deserialized);
+          Assert.That(deserialized, Is.InstanceOf<SetDeviceInfoResponse<SetDeviceInfoResponseResult>>());
 
           var resp = (SetDeviceInfoResponse<SetDeviceInfoResponseResult>)deserialized;
 
-          Assert.AreEqual(1, resp.ErrorCode, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.ErrorCode));
-          Assert.IsNotNull(resp.Result, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result));
-          Assert.AreEqual(0, resp.Result.Foo, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Foo));
-          Assert.AreEqual("baz", resp.Result.Bar, nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Bar));
+          Assert.That(resp.ErrorCode, Is.EqualTo(1), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.ErrorCode));
+          Assert.That(resp.Result.Foo, Is.EqualTo(0), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Foo));
+          Assert.That(resp.Result.Bar, Is.EqualTo("baz"), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Bar));
         }
       )
     };
@@ -423,8 +421,8 @@ public class SecurePassThroughJsonConverterFactoryTests {
       options
     );
 
-    Assert.IsNotNull(deserialized, nameof(deserialized));
-    Assert.IsInstanceOf(returnType, deserialized, nameof(deserialized));
+    Assert.That(deserialized, Is.Not.Null, nameof(deserialized));
+    Assert.That(deserialized, Is.InstanceOf(returnType), nameof(deserialized));
 
     assert((ITapoPassThroughResponse)deserialized!);
   }
@@ -486,8 +484,8 @@ public class SecurePassThroughJsonConverterFactoryTests {
       options
     );
 
-    Assert.IsNotNull(deserialized, nameof(deserialized));
-    Assert.IsInstanceOf(returnType, deserialized, nameof(deserialized));
+    Assert.That(deserialized, Is.Not.Null, nameof(deserialized));
+    Assert.That(deserialized, Is.InstanceOf(returnType), nameof(deserialized));
 
     assert((ITapoPassThroughResponse)deserialized!);
   }

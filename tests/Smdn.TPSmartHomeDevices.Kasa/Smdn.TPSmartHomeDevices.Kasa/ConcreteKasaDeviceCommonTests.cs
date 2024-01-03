@@ -26,11 +26,11 @@ internal class ConcreteKasaDeviceCommonTests {
       culture: default
     )!;
 
-    Assert.AreEqual($"{typeof(TKasaDevice).Name} ({deviceEndPoint.StringRepresentation})", device.ToString());
+    Assert.That(device.ToString(), Is.EqualTo($"{typeof(TKasaDevice).Name} ({deviceEndPoint.StringRepresentation})"));
 
     device.Dispose();
 
-    Assert.AreEqual($"{typeof(TKasaDevice).Name} (disposed)", device.ToString());
+    Assert.That(device.ToString(), Is.EqualTo($"{typeof(TKasaDevice).Name} (disposed)"));
   }
 
   internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
@@ -166,10 +166,10 @@ internal class ConcreteKasaDeviceCommonTests {
 
       var actualException = ex!.InnerException!;
 
-      Assert.IsInstanceOf(expectedExceptionType, actualException);
+      Assert.That(actualException, Is.InstanceOf(expectedExceptionType));
 
       if (actualException is ArgumentException argumentException)
-        Assert.AreEqual(expectedParamName, argumentException.ParamName, nameof(argumentException.ParamName));
+        Assert.That(argumentException.ParamName, Is.EqualTo(expectedParamName), nameof(argumentException.ParamName));
     }
   }
 }

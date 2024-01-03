@@ -74,16 +74,17 @@ public class HashAlgorithmExtensionsTests {
     using var sha256 = SHA256.Create();
     Memory<byte> destination = new byte[32];
 
-    Assert.IsTrue(
+    Assert.That(
       sha256.TryComputeHash(
         destination.Span,
         source0,
         source1,
         source2,
         out var bytesWritten
-      )
+      ),
+      Is.True
     );
-    Assert.AreEqual(32, bytesWritten, nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.EqualTo(32), nameof(bytesWritten));
     Assert.That(destination, SequenceIs.EqualTo(expected), nameof(destination));
   }
 
@@ -188,7 +189,7 @@ public class HashAlgorithmExtensionsTests {
     using var sha256 = SHA256.Create();
     Memory<byte> destination = new byte[32];
 
-    Assert.IsTrue(
+    Assert.That(
       sha256.TryComputeHash(
         destination.Span,
         source0,
@@ -196,9 +197,10 @@ public class HashAlgorithmExtensionsTests {
         source2,
         source3,
         out var bytesWritten
-      )
+      ),
+      Is.True
     );
-    Assert.AreEqual(32, bytesWritten, nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.EqualTo(32), nameof(bytesWritten));
     Assert.That(destination, SequenceIs.EqualTo(expected), nameof(destination));
   }
 

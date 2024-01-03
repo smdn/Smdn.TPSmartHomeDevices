@@ -23,9 +23,9 @@ public class HS105Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""set_relay_state"":{""state"":1}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""set_relay_state"":{""state"":1}}}"),
           nameof(request)
         );
 
@@ -47,9 +47,9 @@ public class HS105Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""set_relay_state"":{""state"":0}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""set_relay_state"":{""state"":0}}}"),
           nameof(request)
         );
 
@@ -72,9 +72,9 @@ public class HS105Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""set_relay_state"":{""state"":" + (newState ? "1" : "0") + "}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""set_relay_state"":{""state"":" + (newState ? "1" : "0") + "}}}"),
           nameof(request)
         );
 
@@ -112,9 +112,9 @@ public class HS105Tests {
   {
     await using var pseudoDevice = new PseudoKasaDevice() {
       FuncGenerateResponse = (_, request) => {
-        Assert.AreEqual(
-          @"{""system"":{""get_sysinfo"":{}}}",
+        Assert.That(
           JsonSerializer.Serialize(request),
+          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 
@@ -129,7 +129,7 @@ public class HS105Tests {
     );
 
     Assert.DoesNotThrowAsync(async () => {
-      Assert.AreEqual(expectedState, await device.GetOnOffStateAsync(), nameof(expectedState));
+      Assert.That(await device.GetOnOffStateAsync(), Is.EqualTo(expectedState), nameof(expectedState));
     });
   }
 }

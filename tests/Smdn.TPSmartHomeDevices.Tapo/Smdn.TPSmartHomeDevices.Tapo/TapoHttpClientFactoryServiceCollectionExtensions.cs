@@ -26,7 +26,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
     Assert.DoesNotThrow(
       () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
     );
-    Assert.IsNotNull(factory, nameof(factory));
+    Assert.That(factory, Is.Not.Null, nameof(factory));
   }
 
   [Test]
@@ -48,13 +48,13 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
     Assert.DoesNotThrow(
       () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
     );
-    Assert.IsNotNull(factory, nameof(factory));
+    Assert.That(factory, Is.Not.Null, nameof(factory));
 
     using var client = factory!.CreateClient(name: string.Empty);
 
-    Assert.IsNotNull(client, nameof(client));
-    Assert.AreEqual(timeout, client.Timeout, nameof(client.Timeout));
-    Assert.AreEqual(baseAddress, client.BaseAddress, nameof(client.BaseAddress));
+    Assert.That(client, Is.Not.Null, nameof(client));
+    Assert.That(client.Timeout, Is.EqualTo(timeout), nameof(client.Timeout));
+    Assert.That(client.BaseAddress, Is.EqualTo(baseAddress), nameof(client.BaseAddress));
   }
 
   [Test]
@@ -79,13 +79,13 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
     Assert.DoesNotThrow(
       () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
     );
-    Assert.IsNotNull(factory, nameof(factory));
+    Assert.That(factory, Is.Not.Null, nameof(factory));
 
     using var client = factory!.CreateClient(name: string.Empty);
 
-    Assert.IsNotNull(client, nameof(client));
-    Assert.AreEqual(timeout, client.Timeout, nameof(client.Timeout));
-    Assert.AreEqual(baseAddress, client.BaseAddress, nameof(client.BaseAddress));
+    Assert.That(client, Is.Not.Null, nameof(client));
+    Assert.That(client.Timeout, Is.EqualTo(timeout), nameof(client.Timeout));
+    Assert.That(client.BaseAddress, Is.EqualTo(baseAddress), nameof(client.BaseAddress));
   }
 
   private readonly struct NullResult { }
@@ -160,8 +160,8 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
 
     var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await device.GetDeviceInfoAsync());
 
-    Assert.IsNotNull(ex!.InnerException, nameof(ex.InnerException));
-    Assert.IsInstanceOf<NotImplementedException>(ex.InnerException, nameof(ex.InnerException));
-    Assert.AreEqual(exceptionMessage, ex.InnerException!.Message);
+    Assert.That(ex!.InnerException, Is.Not.Null, nameof(ex.InnerException));
+    Assert.That(ex.InnerException, Is.InstanceOf<NotImplementedException>(), nameof(ex.InnerException));
+    Assert.That(ex.InnerException!.Message, Is.EqualTo(exceptionMessage));
   }
 }

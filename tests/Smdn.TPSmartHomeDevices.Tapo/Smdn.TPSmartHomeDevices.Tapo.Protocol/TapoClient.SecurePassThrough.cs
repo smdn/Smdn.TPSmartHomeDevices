@@ -42,12 +42,11 @@ partial class TapoClientTests {
       async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
 
-    Assert.IsNotNull(nullableResponse);
+    Assert.That(nullableResponse, Is.Not.Null);
 
     var response = nullableResponse!.Value;
 
-    Assert.AreEqual(KnownErrorCodes.Success, response.ErrorCode, nameof(response.ErrorCode));
-    Assert.IsNotNull(response.Result, nameof(response.Result));
+    Assert.That(response.ErrorCode, Is.EqualTo(KnownErrorCodes.Success), nameof(response.ErrorCode));
   }
 
   [Test]
@@ -101,9 +100,9 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
 
-    Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
-    Assert.AreEqual(new GetDeviceInfoRequest().Method, ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+    Assert.That(ex.RequestMethod, Is.EqualTo(new GetDeviceInfoRequest().Method), nameof(ex.RequestMethod));
+    Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}")), nameof(ex.EndPoint));
   }
 
   [Test]
@@ -139,8 +138,8 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
 
-    Assert.AreEqual(errorCode, ex!.RawErrorCode, nameof(ex.RawErrorCode));
-    Assert.AreEqual("securePassthrough", ex.RequestMethod, nameof(ex.RequestMethod));
-    Assert.AreEqual(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"), ex.EndPoint, nameof(ex.EndPoint));
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+    Assert.That(ex.RequestMethod, Is.EqualTo("securePassthrough"), nameof(ex.RequestMethod));
+    Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}")), nameof(ex.EndPoint));
   }
 }

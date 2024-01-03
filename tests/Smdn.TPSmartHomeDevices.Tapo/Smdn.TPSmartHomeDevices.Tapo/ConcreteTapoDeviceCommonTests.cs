@@ -293,10 +293,10 @@ internal class ConcreteTapoDeviceCommonTests {
       );
       var actualException = ex!.InnerException;
 
-      Assert.IsInstanceOf(expectedExceptionType, actualException);
+      Assert.That(actualException, Is.InstanceOf(expectedExceptionType));
 
       if (actualException is ArgumentException argumentException)
-        Assert.AreEqual(expectedParamName, argumentException.ParamName, nameof(argumentException.ParamName));
+        Assert.That(argumentException.ParamName, Is.EqualTo(expectedParamName), nameof(argumentException.ParamName));
     }
   }
 
@@ -322,10 +322,10 @@ internal class ConcreteTapoDeviceCommonTests {
       culture: default
     )!;
 
-    Assert.AreEqual($"{typeof(TTapoDevice).Name} ({deviceEndPoint.StringRepresentation})", device.ToString());
+    Assert.That(device.ToString(), Is.EqualTo($"{typeof(TTapoDevice).Name} ({deviceEndPoint.StringRepresentation})"));
 
     device.Dispose();
 
-    Assert.AreEqual($"{typeof(TTapoDevice).Name} (disposed)", device.ToString());
+    Assert.That(device.ToString(), Is.EqualTo($"{typeof(TTapoDevice).Name} (disposed)"));
   }
 }

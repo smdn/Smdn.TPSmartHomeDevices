@@ -36,16 +36,16 @@ public class DeviceEndPointTests {
   {
     var endPoint = DeviceEndPoint.Create(host: "localhost");
 
-    Assert.IsNotNull(endPoint);
+    Assert.That(endPoint, Is.Not.Null);
     Assert.That(endPoint, Is.AssignableTo<IDeviceEndPoint>(), nameof(endPoint));
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
-    Assert.AreEqual(
-      new DnsEndPoint("localhost", 0),
-      await endPoint.ResolveAsync(default)
+    Assert.That(
+      await endPoint.ResolveAsync(default),
+      Is.EqualTo(new DnsEndPoint("localhost", 0))
     );
-    Assert.AreEqual(
-      new DnsEndPoint("localhost", 0).ToString(),
+    Assert.That(
       endPoint.ToString(),
+      Is.EqualTo(new DnsEndPoint("localhost", 0).ToString()),
       nameof(endPoint.ToString)
     );
   }
@@ -59,16 +59,16 @@ public class DeviceEndPointTests {
   {
     var endPoint = DeviceEndPoint.Create(ipAddress: IPAddress.Loopback);
 
-    Assert.IsNotNull(endPoint);
+    Assert.That(endPoint, Is.Not.Null);
     Assert.That(endPoint, Is.AssignableTo<IDeviceEndPoint>(), nameof(endPoint));
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0),
-      await endPoint.ResolveAsync(default)
+    Assert.That(
+      await endPoint.ResolveAsync(default),
+      Is.EqualTo(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0))
     );
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0).ToString(),
+    Assert.That(
       endPoint.ToString(),
+      Is.EqualTo(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0).ToString()),
       nameof(endPoint.ToString)
     );
   }
@@ -78,16 +78,16 @@ public class DeviceEndPointTests {
   {
     var endPoint = DeviceEndPoint.Create(ipAddress: IPAddress.IPv6Loopback);
 
-    Assert.IsNotNull(endPoint);
+    Assert.That(endPoint, Is.Not.Null);
     Assert.That(endPoint, Is.AssignableTo<IDeviceEndPoint>(), nameof(endPoint));
     Assert.That(endPoint, Is.Not.AssignableTo<IDynamicDeviceEndPoint>(), nameof(endPoint));
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Parse("::1"), 0),
-      await endPoint.ResolveAsync(default)
+    Assert.That(
+      await endPoint.ResolveAsync(default),
+      Is.EqualTo(new IPEndPoint(IPAddress.Parse("::1"), 0))
     );
-    Assert.AreEqual(
-      new IPEndPoint(IPAddress.Parse("::1"), 0).ToString(),
+    Assert.That(
       endPoint.ToString(),
+      Is.EqualTo(new IPEndPoint(IPAddress.Parse("::1"), 0).ToString()),
       nameof(endPoint.ToString)
     );
   }
@@ -97,10 +97,10 @@ public class DeviceEndPointTests {
   {
     var endPoint = DeviceEndPoint.Create(address: PhysicalAddress.None, new MacAddressDeviceEndPointPseudoFactory());
 
-    Assert.IsNotNull(endPoint);
-    Assert.AreEqual(
-      MacAddressDeviceEndPointPseudoFactory.ResolvedEndPoint,
-      await endPoint.ResolveAsync(default)
+    Assert.That(endPoint, Is.Not.Null);
+    Assert.That(
+      await endPoint.ResolveAsync(default),
+      Is.EqualTo(MacAddressDeviceEndPointPseudoFactory.ResolvedEndPoint)
     );
   }
 
@@ -113,10 +113,10 @@ public class DeviceEndPointTests {
   {
     var endPoint = DeviceEndPoint.Create(address: new CustomAddress(), new CustomAddressDeviceEndPointPseudoFactory());
 
-    Assert.IsNotNull(endPoint);
-    Assert.AreEqual(
-      CustomAddressDeviceEndPointPseudoFactory.ResolvedEndPoint,
-      await endPoint.ResolveAsync(default)
+    Assert.That(endPoint, Is.Not.Null);
+    Assert.That(
+      await endPoint.ResolveAsync(default),
+      Is.EqualTo(CustomAddressDeviceEndPointPseudoFactory.ResolvedEndPoint)
     );
   }
 

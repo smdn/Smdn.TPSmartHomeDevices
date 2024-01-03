@@ -34,14 +34,14 @@ public class KasaClientTests {
       endPoint: endPoint
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, endPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(endPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.IsFalse(client.IsConnected), nameof(client.IsConnected));
-    Assert.Throws<ObjectDisposedException>(() => Assert.AreEqual(client.EndPoint, endPoint, nameof(client.EndPoint)));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.IsConnected, Is.False), nameof(client.IsConnected));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(endPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint)));
 #pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => client.SendAsync(
@@ -83,14 +83,14 @@ public class KasaClientTests {
       composeResult: static _ => _
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.IsFalse(client.IsConnected), nameof(client.IsConnected));
-    Assert.Throws<ObjectDisposedException>(() => Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint)));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.IsConnected, Is.False), nameof(client.IsConnected));
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint)));
 #pragma warning disable CA2012
     Assert.Throws<ObjectDisposedException>(
       () => client.SendAsync(
@@ -147,8 +147,8 @@ public class KasaClientTests {
       endPoint: device.Start()
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     var result = await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
@@ -157,12 +157,12 @@ public class KasaClientTests {
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
 
-    Assert.IsNotNull(result);
-    Assert.AreEqual(JsonValueKind.Object, result.RootElement.ValueKind, nameof(result.RootElement.ValueKind));
-    Assert.AreEqual(1, result.RootElement.GetProperty("on_off").GetInt32(), "on_off");
-    Assert.AreEqual(50, result.RootElement.GetProperty("brightness").GetInt32(), "on_off");
+    Assert.That(result, Is.Not.Null);
+    Assert.That(result.RootElement.ValueKind, Is.EqualTo(JsonValueKind.Object), nameof(result.RootElement.ValueKind));
+    Assert.That(result.RootElement.GetProperty("on_off").GetInt32(), Is.EqualTo(1), "on_off");
+    Assert.That(result.RootElement.GetProperty("brightness").GetInt32(), Is.EqualTo(50), "on_off");
   }
 
   [Test]
@@ -187,8 +187,8 @@ public class KasaClientTests {
       endPoint: device.Start()
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
@@ -197,8 +197,8 @@ public class KasaClientTests {
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     var result = await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
@@ -207,10 +207,10 @@ public class KasaClientTests {
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
-    Assert.IsNotNull(result);
-    Assert.AreEqual(JsonValueKind.Object, result.RootElement.ValueKind, nameof(result.RootElement.ValueKind));
-    Assert.AreEqual(1, result.RootElement.GetProperty("on_off").GetInt32(), "on_off");
-    Assert.AreEqual(50, result.RootElement.GetProperty("brightness").GetInt32(), "on_off");
+    Assert.That(result, Is.Not.Null);
+    Assert.That(result.RootElement.ValueKind, Is.EqualTo(JsonValueKind.Object), nameof(result.RootElement.ValueKind));
+    Assert.That(result.RootElement.GetProperty("on_off").GetInt32(), Is.EqualTo(1), "on_off");
+    Assert.That(result.RootElement.GetProperty("brightness").GetInt32(), Is.EqualTo(50), "on_off");
   }
 
   [Test]
@@ -234,8 +234,8 @@ public class KasaClientTests {
       endPoint: new DnsEndPoint(device.EndPoint!.Address.ToString(), device.EndPoint!.Port, AddressFamily.Unspecified)
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(AddressFamily.Unspecified, client.EndPoint.AddressFamily, nameof(client.EndPoint.AddressFamily));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(client.EndPoint.AddressFamily, Is.EqualTo(AddressFamily.Unspecified), nameof(client.EndPoint.AddressFamily));
 
     Assert.DoesNotThrowAsync(
       async () => await client.SendAsync(
@@ -246,7 +246,7 @@ public class KasaClientTests {
       )
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
   }
 
   [Test]
@@ -268,8 +268,8 @@ public class KasaClientTests {
       endPoint: device.Start()
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     static bool ThrowExceptionComposeResult(JsonElement _) => throw new NotImplementedException();
 
@@ -282,9 +282,9 @@ public class KasaClientTests {
       )
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
-    Assert.IsInstanceOf<NotImplementedException>(ex!.InnerException);
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
+    Assert.That(ex!.InnerException, Is.InstanceOf<NotImplementedException>());
   }
 
   [Test]
@@ -319,8 +319,8 @@ json: @"{
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     // disconnect from device
     await device.DisposeAsync();
@@ -339,7 +339,7 @@ json: @"{
 
     switch (ex) {
       case KasaDisconnectedException disconnectedException:
-        Assert.AreEqual(disconnectedException.DeviceEndPoint, device.EndPoint, nameof(disconnectedException.DeviceEndPoint));
+        Assert.That(device.EndPoint, Is.EqualTo(disconnectedException.DeviceEndPoint), nameof(disconnectedException.DeviceEndPoint));
         break;
 
       case OperationCanceledException:
@@ -347,7 +347,7 @@ json: @"{
         break;
 
       default: // unexpected exception
-        Assert.IsInstanceOf<KasaDisconnectedException>(ex);
+        Assert.That(ex, Is.InstanceOf<KasaDisconnectedException>());
         break;
     }
   }
@@ -389,8 +389,8 @@ json: @"{
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
-    Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
 
@@ -407,7 +407,7 @@ json: @"{
 
     switch (ex) {
       case KasaDisconnectedException disconnectedException:
-        Assert.AreEqual(disconnectedException.DeviceEndPoint, device.EndPoint, nameof(disconnectedException.DeviceEndPoint));
+        Assert.That(device.EndPoint, Is.EqualTo(disconnectedException.DeviceEndPoint), nameof(disconnectedException.DeviceEndPoint));
         break;
 
       case OperationCanceledException:
@@ -415,7 +415,7 @@ json: @"{
         break;
 
       default: // unexpected exception
-        Assert.IsInstanceOf<KasaDisconnectedException>(ex);
+        Assert.That(ex, Is.InstanceOf<KasaDisconnectedException>());
         break;
     }
   }
@@ -443,8 +443,8 @@ json: @"{
       endPoint: device.Start()
     );
 
-    Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
+    Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
     var ex = Assert.ThrowsAsync<KasaIncompleteResponseException>(
       async () => await client.SendAsync(
@@ -456,12 +456,12 @@ json: @"{
     );
 
     // Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
-    Assert.AreEqual(client.EndPoint, device.EndPoint, nameof(client.EndPoint));
-    Assert.IsInstanceOf<KasaMessageBodyTooShortException>(ex!.InnerException);
+    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
+    Assert.That(ex!.InnerException, Is.InstanceOf<KasaMessageBodyTooShortException>());
 
     var exBodyTooShortException = (ex.InnerException as KasaMessageBodyTooShortException)!;
 
-    Assert.AreEqual(actualBodyLength, exBodyTooShortException.ActualLength, nameof(exBodyTooShortException.ActualLength));
-    Assert.AreEqual(bodyLengthIndicatedInHeader, exBodyTooShortException.IndicatedLength, nameof(exBodyTooShortException.IndicatedLength));
+    Assert.That(exBodyTooShortException.ActualLength, Is.EqualTo(actualBodyLength), nameof(exBodyTooShortException.ActualLength));
+    Assert.That(exBodyTooShortException.IndicatedLength, Is.EqualTo(bodyLengthIndicatedInHeader), nameof(exBodyTooShortException.IndicatedLength));
   }
 }

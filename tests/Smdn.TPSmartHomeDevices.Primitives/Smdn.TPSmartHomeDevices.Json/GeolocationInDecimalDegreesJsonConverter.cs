@@ -35,7 +35,7 @@ public class GeolocationInDecimalDegreesJsonConverterTests {
   {
     var deserialized = JsonSerializer.Deserialize<Geolocation>(json)!;
 
-    Assert.AreEqual(expected, deserialized.Longitude);
+    Assert.That(deserialized.Longitude, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
@@ -53,7 +53,7 @@ public class GeolocationInDecimalDegreesJsonConverterTests {
     var obj = new Geolocation() { Longitude = value };
 
     if (typeOfExpectedException is null)
-      Assert.AreEqual(expected, JsonSerializer.Serialize(obj));
+      Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
       Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
   }

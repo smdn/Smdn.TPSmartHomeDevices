@@ -59,9 +59,9 @@ public class IDeviceEndPointExtensionsTests {
   {
     var deviceEndPoint = new StaticDeviceEndPoint(endPoint);
 
-    Assert.AreEqual(
-      expectedEndPoint,
-      await deviceEndPoint.ResolveOrThrowAsync(defaultPort: defaultPort)
+    Assert.That(
+      await deviceEndPoint.ResolveOrThrowAsync(defaultPort: defaultPort),
+      Is.EqualTo(expectedEndPoint)
     );
   }
 
@@ -73,8 +73,8 @@ public class IDeviceEndPointExtensionsTests {
       async () => await deviceEndPoint.ResolveOrThrowAsync(defaultPort: 80)
     );
 
-    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
-    Assert.AreSame(deviceEndPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
+    Assert.That(ex.DeviceEndPoint, Is.SameAs(deviceEndPoint), nameof(ex.DeviceEndPoint));
   }
 
   [Test]
@@ -85,10 +85,10 @@ public class IDeviceEndPointExtensionsTests {
       async () => await dynamicDeviceEndPoint.ResolveOrThrowAsync(defaultPort: 80)
     );
 
-    Assert.IsTrue(dynamicDeviceEndPoint.HasInvalidated, nameof(dynamicDeviceEndPoint.HasInvalidated));
+    Assert.That(dynamicDeviceEndPoint.HasInvalidated, Is.True, nameof(dynamicDeviceEndPoint.HasInvalidated));
 
-    Assert.IsNotNull(ex!.DeviceEndPoint, nameof(ex.DeviceEndPoint));
-    Assert.AreSame(dynamicDeviceEndPoint, ex.DeviceEndPoint, nameof(ex.DeviceEndPoint));
+    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
+    Assert.That(ex.DeviceEndPoint, Is.SameAs(dynamicDeviceEndPoint), nameof(ex.DeviceEndPoint));
   }
 
   [Test]

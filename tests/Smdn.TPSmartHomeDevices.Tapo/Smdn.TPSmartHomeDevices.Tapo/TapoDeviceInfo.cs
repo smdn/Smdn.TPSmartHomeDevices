@@ -21,11 +21,11 @@ public class TapoDeviceInfoTests {
       () => info = JsonSerializer.Deserialize<TapoDeviceInfo>("{}")
     );
 
-    Assert.IsNotNull(info);
-    Assert.AreNotEqual(info!.TimeStamp, DateTimeOffset.MinValue, nameof(info.TimeStamp));
-    Assert.IsNull(info.Id, nameof(info.Id));
-    Assert.IsFalse(info.IsOn, nameof(info.IsOn));
-    Assert.IsNull(info.NetworkSignalLevel, nameof(info.NetworkSignalLevel));
+    Assert.That(info, Is.Not.Null);
+    Assert.That(DateTimeOffset.MinValue, Is.Not.EqualTo(info!.TimeStamp), nameof(info.TimeStamp));
+    Assert.That(info.Id, Is.Null, nameof(info.Id));
+    Assert.That(info.IsOn, Is.False, nameof(info.IsOn));
+    Assert.That(info.NetworkSignalLevel, Is.Null, nameof(info.NetworkSignalLevel));
   }
 
   [Test]
@@ -59,33 +59,33 @@ public class TapoDeviceInfoTests {
 ""rssi"": 99.999
 }}");
 
-    Assert.IsNotNull(info);
-    Assert.AreNotEqual(info!.TimeStamp, DateTimeOffset.MinValue, nameof(info.TimeStamp));
-    CollectionAssert.AreEqual(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }, info!.Id, nameof(info.Id));
-    Assert.AreEqual("<type>", info!.TypeName, nameof(info.TypeName));
-    Assert.AreEqual("<model>", info!.ModelName, nameof(info.ModelName));
-    CollectionAssert.AreEqual(new byte[] { 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01 }, info!.FirmwareId, nameof(info.FirmwareId));
-    Assert.AreEqual("<fw_ver>", info!.FirmwareVersion, nameof(info.FirmwareVersion));
-    CollectionAssert.AreEqual(new byte[] { 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23 }, info!.HardwareId, nameof(info.HardwareId));
-    Assert.AreEqual("<hw_ver>", info!.HardwareVersion, nameof(info.HardwareVersion));
-    CollectionAssert.AreEqual(new byte[] { 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45 }, info!.OemId, nameof(info.OemId));
-    Assert.AreEqual(PhysicalAddress.Parse("00:00:5E:00:53:00"), info!.MacAddress, nameof(info.MacAddress));
-    Assert.AreEqual("<specs>", info!.HardwareSpecifications, nameof(info.HardwareSpecifications));
-    Assert.AreEqual("<lang>", info!.Language, nameof(info.Language));
-    Assert.IsTrue(info!.IsOn, nameof(info.IsOn));
-    Assert.AreEqual(TimeSpan.FromSeconds(1234), info!.OnTimeDuration, nameof(info.OnTimeDuration));
-    Assert.IsTrue(info!.IsOverheated, nameof(info.IsOverheated));
-    Assert.AreEqual("<nickname>", info!.NickName, nameof(info.NickName));
-    Assert.AreEqual("<avatar>", info!.Avatar, nameof(info.Avatar));
-    Assert.AreEqual(TimeSpan.FromHours(+9.0), info!.TimeZoneOffset, nameof(info.TimeZoneOffset));
-    Assert.AreEqual("<region>", info!.TimeZoneRegion, nameof(info.TimeZoneOffset));
-    Assert.AreEqual(1.2345m, info!.GeolocationLongitude, nameof(info.GeolocationLongitude));
-    Assert.AreEqual(6.7890m, info!.GeolocationLatitude, nameof(info.GeolocationLatitude));
-    Assert.IsTrue(info!.HasGeolocationInfoSet, nameof(info.HasGeolocationInfoSet));
-    Assert.AreEqual(System.Net.IPAddress.Parse("192.0.2.255"), info!.IPAddress, nameof(info.IPAddress));
-    Assert.AreEqual("<ssid>", info!.NetworkSsid, nameof(info.NetworkSsid));
-    Assert.AreEqual(999, info!.NetworkSignalLevel, nameof(info.NetworkSignalLevel));
-    Assert.AreEqual(99.999m, info!.NetworkRssi, nameof(info.NetworkRssi));
+    Assert.That(info, Is.Not.Null);
+    Assert.That(DateTimeOffset.MinValue, Is.Not.EqualTo(info!.TimeStamp), nameof(info.TimeStamp));
+    Assert.That(info!.Id, Is.EqualTo(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }).AsCollection, nameof(info.Id));
+    Assert.That(info!.TypeName, Is.EqualTo("<type>"), nameof(info.TypeName));
+    Assert.That(info!.ModelName, Is.EqualTo("<model>"), nameof(info.ModelName));
+    Assert.That(info!.FirmwareId, Is.EqualTo(new byte[] { 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01 }).AsCollection, nameof(info.FirmwareId));
+    Assert.That(info!.FirmwareVersion, Is.EqualTo("<fw_ver>"), nameof(info.FirmwareVersion));
+    Assert.That(info!.HardwareId, Is.EqualTo(new byte[] { 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23 }).AsCollection, nameof(info.HardwareId));
+    Assert.That(info!.HardwareVersion, Is.EqualTo("<hw_ver>"), nameof(info.HardwareVersion));
+    Assert.That(info!.OemId, Is.EqualTo(new byte[] { 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45 }).AsCollection, nameof(info.OemId));
+    Assert.That(info!.MacAddress, Is.EqualTo(PhysicalAddress.Parse("00:00:5E:00:53:00")), nameof(info.MacAddress));
+    Assert.That(info!.HardwareSpecifications, Is.EqualTo("<specs>"), nameof(info.HardwareSpecifications));
+    Assert.That(info!.Language, Is.EqualTo("<lang>"), nameof(info.Language));
+    Assert.That(info!.IsOn, Is.True, nameof(info.IsOn));
+    Assert.That(info!.OnTimeDuration, Is.EqualTo(TimeSpan.FromSeconds(1234)), nameof(info.OnTimeDuration));
+    Assert.That(info!.IsOverheated, Is.True, nameof(info.IsOverheated));
+    Assert.That(info!.NickName, Is.EqualTo("<nickname>"), nameof(info.NickName));
+    Assert.That(info!.Avatar, Is.EqualTo("<avatar>"), nameof(info.Avatar));
+    Assert.That(info!.TimeZoneOffset, Is.EqualTo(TimeSpan.FromHours(+9.0)), nameof(info.TimeZoneOffset));
+    Assert.That(info!.TimeZoneRegion, Is.EqualTo("<region>"), nameof(info.TimeZoneOffset));
+    Assert.That(info!.GeolocationLongitude, Is.EqualTo(1.2345m), nameof(info.GeolocationLongitude));
+    Assert.That(info!.GeolocationLatitude, Is.EqualTo(6.7890m), nameof(info.GeolocationLatitude));
+    Assert.That(info!.HasGeolocationInfoSet, Is.True, nameof(info.HasGeolocationInfoSet));
+    Assert.That(info!.IPAddress, Is.EqualTo(System.Net.IPAddress.Parse("192.0.2.255")), nameof(info.IPAddress));
+    Assert.That(info!.NetworkSsid, Is.EqualTo("<ssid>"), nameof(info.NetworkSsid));
+    Assert.That(info!.NetworkSignalLevel, Is.EqualTo(999), nameof(info.NetworkSignalLevel));
+    Assert.That(info!.NetworkRssi, Is.EqualTo(99.999m), nameof(info.NetworkRssi));
   }
 
   private static System.Collections.Generic.IEnumerable<(string, byte[]?)> YieldTestCases_IdProperties()
@@ -108,8 +108,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    CollectionAssert.AreEqual(expected, info.Id);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.Id, Is.EqualTo(expected).AsCollection);
   }
 
   private static System.Collections.IEnumerable YieldTestCases_HardwareId()
@@ -121,8 +121,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    CollectionAssert.AreEqual(expected, info.HardwareId);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.HardwareId, Is.EqualTo(expected).AsCollection);
   }
 
   private static System.Collections.IEnumerable YieldTestCases_FirmwareId()
@@ -134,8 +134,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    CollectionAssert.AreEqual(expected, info.FirmwareId);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.FirmwareId, Is.EqualTo(expected).AsCollection);
   }
 
   private static System.Collections.IEnumerable YieldTestCases_OemId()
@@ -147,8 +147,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    CollectionAssert.AreEqual(expected, info.OemId);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.OemId, Is.EqualTo(expected).AsCollection);
   }
 
   private static System.Collections.IEnumerable YieldTestCases_MacAddress()
@@ -166,8 +166,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.MacAddress);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.MacAddress, Is.EqualTo(expected));
   }
 
   [TestCase("{}", false)]
@@ -177,8 +177,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.IsOn);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.IsOn, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_OnTimeDuration()
@@ -197,8 +197,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.OnTimeDuration);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.OnTimeDuration, Is.EqualTo(expected));
   }
 
   [TestCase("{}", false)]
@@ -208,8 +208,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.IsOverheated);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.IsOverheated, Is.EqualTo(expected));
   }
 
   [TestCase("{}", null)]
@@ -223,8 +223,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.NickName);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.NickName, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TimeZoneOffset()
@@ -244,8 +244,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.TimeZoneOffset);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.TimeZoneOffset, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_GeolocationLongitude()
@@ -263,8 +263,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.GeolocationLongitude);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.GeolocationLongitude, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_GeolocationLatitude()
@@ -282,8 +282,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.GeolocationLatitude);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.GeolocationLatitude, Is.EqualTo(expected));
   }
 
   [TestCase("{}", false)]
@@ -293,8 +293,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.HasGeolocationInfoSet);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.HasGeolocationInfoSet, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_IPAddress()
@@ -313,8 +313,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.IPAddress);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.IPAddress, Is.EqualTo(expected));
   }
 
   [TestCase("{}", null)]
@@ -328,8 +328,8 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.NetworkSsid);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.NetworkSsid, Is.EqualTo(expected));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_NetworkRssi()
@@ -348,7 +348,7 @@ public class TapoDeviceInfoTests {
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
 
-    Assert.IsNotNull(info);
-    Assert.AreEqual(expected, info.NetworkRssi);
+    Assert.That(info, Is.Not.Null);
+    Assert.That(info.NetworkRssi, Is.EqualTo(expected));
   }
 }

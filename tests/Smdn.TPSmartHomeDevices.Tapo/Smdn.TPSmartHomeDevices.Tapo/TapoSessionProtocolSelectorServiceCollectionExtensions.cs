@@ -26,7 +26,7 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
     Assert.DoesNotThrow(
       () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
     );
-    Assert.IsNotNull(selector, nameof(selector));
+    Assert.That(selector, Is.Not.Null, nameof(selector));
   }
 
   [Test]

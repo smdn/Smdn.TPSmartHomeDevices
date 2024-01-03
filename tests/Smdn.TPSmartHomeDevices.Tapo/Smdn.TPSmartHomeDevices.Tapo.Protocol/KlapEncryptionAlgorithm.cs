@@ -91,24 +91,24 @@ partial class KlapEncryptionAlgorithmTests {
       userHash: userHash
     );
 
-    Assert.AreEqual(
-      expectedKey,
+    Assert.That(
       ToUpperCaseHexString(klap.Key),
+      Is.EqualTo(expectedKey),
       nameof(klap.Key)
     );
-    Assert.AreEqual(
-      expectedIV,
+    Assert.That(
       ToUpperCaseHexString(klap.IV),
+      Is.EqualTo(expectedIV),
       nameof(klap.IV)
     );
-    Assert.AreEqual(
-      expectedSequenceNumber,
+    Assert.That(
       klap.SequenceNumber,
+      Is.EqualTo(expectedSequenceNumber),
       nameof(klap.SequenceNumber)
     );
-    Assert.AreEqual(
-      expectedSignature,
+    Assert.That(
       ToUpperCaseHexString(klap.Signature),
+      Is.EqualTo(expectedSignature),
       nameof(klap.Signature)
     );
   }
@@ -186,19 +186,19 @@ partial class KlapEncryptionAlgorithmTests {
       dest
     );
 
-    Assert.AreEqual(
-      expectedEncryptedBytes,
+    Assert.That(
       ToUpperCaseHexString(dest.WrittenSpan),
+      Is.EqualTo(expectedEncryptedBytes),
       nameof(dest.WrittenSpan)
     );
-    Assert.AreEqual(
-      expectedSequenceNumber,
+    Assert.That(
       seq,
+      Is.EqualTo(expectedSequenceNumber),
       nameof(seq)
     );
-    Assert.AreEqual(
-      expectedSequenceNumber,
+    Assert.That(
       klap.SequenceNumber,
+      Is.EqualTo(expectedSequenceNumber),
       nameof(klap.SequenceNumber)
     );
   }
