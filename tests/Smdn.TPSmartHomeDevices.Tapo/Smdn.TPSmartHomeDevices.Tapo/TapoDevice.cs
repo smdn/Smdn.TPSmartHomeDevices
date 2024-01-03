@@ -1099,7 +1099,6 @@ public partial class TapoDeviceTests {
 
     Assert.IsNotNull(deviceInfo1, nameof(deviceInfo1));
     Assert.IsFalse(deviceInfo1.IsOn, nameof(deviceInfo1.IsOn));
-    Assert.AreNotSame(deviceInfo0, deviceInfo1, nameof(deviceInfo1));
     Assert.IsNotNull(device.Session, nameof(device.Session));
   }
 

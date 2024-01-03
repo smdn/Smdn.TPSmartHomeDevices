@@ -22,7 +22,7 @@ public class TapoDeviceInfoTests {
     );
 
     Assert.IsNotNull(info);
-    Assert.AreNotEqual(DateTime.MinValue, info!.TimeStamp, nameof(info.TimeStamp));
+    Assert.AreNotEqual(info!.TimeStamp, DateTimeOffset.MinValue, nameof(info.TimeStamp));
     Assert.IsNull(info.Id, nameof(info.Id));
     Assert.IsFalse(info.IsOn, nameof(info.IsOn));
     Assert.IsNull(info.NetworkSignalLevel, nameof(info.NetworkSignalLevel));
@@ -60,7 +60,7 @@ public class TapoDeviceInfoTests {
 }}");
 
     Assert.IsNotNull(info);
-    Assert.AreNotEqual(DateTime.MinValue, info!.TimeStamp, nameof(info.TimeStamp));
+    Assert.AreNotEqual(info!.TimeStamp, DateTimeOffset.MinValue, nameof(info.TimeStamp));
     CollectionAssert.AreEqual(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }, info!.Id, nameof(info.Id));
     Assert.AreEqual("<type>", info!.TypeName, nameof(info.TypeName));
     Assert.AreEqual("<model>", info!.ModelName, nameof(info.ModelName));

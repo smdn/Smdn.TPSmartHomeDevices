@@ -98,7 +98,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(result.ValueKind, JsonValueKind.Object);
+          Assert.AreEqual(JsonValueKind.Object, result.ValueKind);
         })
       },
       new {
@@ -124,7 +124,7 @@ public class KasaJsonSerializerTests {
         Assersion = new Action<JsonElement>(static result => {
           var foo = result.GetProperty("Foo");
 
-          Assert.AreEqual(foo.ValueKind, JsonValueKind.Object);
+          Assert.AreEqual(JsonValueKind.Object, foo.ValueKind);
           Assert.AreEqual("Baz", foo.GetProperty("Bar").GetString());
         })
       },
@@ -133,7 +133,7 @@ public class KasaJsonSerializerTests {
         Module = "module",
         Method = "method",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(result.ValueKind, JsonValueKind.Null);
+          Assert.AreEqual(JsonValueKind.Null, result.ValueKind);
         })
       },
       new {
@@ -141,7 +141,7 @@ public class KasaJsonSerializerTests {
         Module = "",
         Method = "",
         Assersion = new Action<JsonElement>(static result => {
-          Assert.AreEqual(result.ValueKind, JsonValueKind.Object);
+          Assert.AreEqual(JsonValueKind.Object, result.ValueKind);
         })
       },
     }) {

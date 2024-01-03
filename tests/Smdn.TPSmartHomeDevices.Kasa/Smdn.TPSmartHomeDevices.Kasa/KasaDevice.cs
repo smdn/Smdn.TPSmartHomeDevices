@@ -386,7 +386,7 @@ public class KasaDeviceTests {
       composeResult: composeResult
     );
 
-    Assert.AreEqual(resultFromEndPoint1, returnValueFromEndPoint1, nameof(resultFromEndPoint1));
+    Assert.AreEqual(returnValueFromEndPoint1, resultFromEndPoint1, nameof(resultFromEndPoint1));
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
     // endpoint changed
@@ -406,7 +406,7 @@ public class KasaDeviceTests {
       cancellationToken: cts.Token
     );
 
-    Assert.AreEqual(resultFromEndPoint2, returnValueFromEndPoint2, nameof(resultFromEndPoint2));
+    Assert.AreEqual(returnValueFromEndPoint2, resultFromEndPoint2, nameof(resultFromEndPoint2));
     Assert.IsTrue(device.IsConnected, nameof(device.IsConnected));
 
     // end point should not be marked as invalidated in this scenario
