@@ -5,10 +5,11 @@ using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+
 using NUnit.Framework;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
@@ -430,8 +431,8 @@ json: @"{
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (_, _) => JsonDocument.Parse(json: "{}")!,
       FuncEncryptResponse = _ => {
-        const int headerLength = 4;
-        var response = new byte[headerLength + actualBodyLength];
+        const int HeaderLength = 4;
+        var response = new byte[HeaderLength + actualBodyLength];
 
         BinaryPrimitives.WriteInt32BigEndian(response.AsSpan(0, 4), bodyLengthIndicatedInHeader);
 

@@ -3,8 +3,11 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
+
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;

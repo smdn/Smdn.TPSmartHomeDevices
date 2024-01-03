@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 namespace Smdn.TPSmartHomeDevices;
 
 internal sealed class StringifiableNullDeviceEndPoint : IDeviceEndPoint {
-  public string StringRepresentation { get; init;}
+  public string StringRepresentation { get; init; }
 
   public StringifiableNullDeviceEndPoint(string stringRepresentation)
   {

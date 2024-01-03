@@ -3,7 +3,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -70,14 +70,14 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_PassThroughResponse()
   {
-    const int errorCode = 9999;
+    const int ErrorCode = 9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         KnownErrorCodes.Success,
         new GetDeviceInfoResponse<NullResult>() {
-          ErrorCode = errorCode,
+          ErrorCode = ErrorCode,
           Result = new(),
         }
       )
@@ -100,7 +100,7 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
 
-    Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(ErrorCode), nameof(ex.RawErrorCode));
     Assert.That(ex.RequestMethod, Is.EqualTo(new GetDeviceInfoRequest().Method), nameof(ex.RequestMethod));
     Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}")), nameof(ex.EndPoint));
   }
@@ -108,12 +108,12 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_SecurePassThroughResponse()
   {
-    const int errorCode = 9999;
+    const int ErrorCode = 9999;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
-        errorCode,
+        ErrorCode,
         new GetDeviceInfoResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
@@ -138,7 +138,7 @@ partial class TapoClientTests {
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
     );
 
-    Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(ErrorCode), nameof(ex.RawErrorCode));
     Assert.That(ex.RequestMethod, Is.EqualTo("securePassthrough"), nameof(ex.RequestMethod));
     Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}")), nameof(ex.EndPoint));
   }

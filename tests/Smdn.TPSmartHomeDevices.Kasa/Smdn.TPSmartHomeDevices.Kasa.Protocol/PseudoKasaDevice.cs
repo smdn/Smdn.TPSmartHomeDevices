@@ -5,10 +5,10 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Smdn.Net;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
@@ -31,8 +31,10 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
 
   private void ThrowIfDisposed()
   {
+#pragma warning disable CA1513
     if (listener is null)
       throw new ObjectDisposedException(GetType().FullName);
+#pragma warning restore CA1513
   }
 
   public async ValueTask DisposeAsync()
@@ -144,7 +146,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     CancellationToken cancellationToken
   )
   {
-    for (; ;) {
+    for (; ; ) {
       if (listener is null)
         break;
 
@@ -189,19 +191,19 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
   {
     var buffer = new ArrayBufferWriter<byte>(initialCapacity: 1024);
 
-    for (; ;) {
+    for (; ; ) {
       JsonDocument? receivedJsonDocument = null;
 
       try {
-        const SocketFlags receiveSocketFlags = default;
-        const int receiveBlockSize = 0x100;
+        const SocketFlags ReceiveSocketFlags = default;
+        const int ReceiveBlockSize = 0x100;
 
-        for (; ;) {
-          var buf = buffer.GetMemory(receiveBlockSize);
+        for (; ; ) {
+          var buf = buffer.GetMemory(ReceiveBlockSize);
 
           var len = await socket.ReceiveAsync(
             buf,
-            receiveSocketFlags,
+            ReceiveSocketFlags,
             cancellationToken: cancellationToken
           ).ConfigureAwait(false);
 
@@ -237,7 +239,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
       bool shouldReturnBuffer = true;
 
       try {
-        const SocketFlags sendSocketFlags = default;
+        const SocketFlags SendSocketFlags = default;
 
         if (FuncEncryptResponse is null) {
           // perform default encryption
@@ -270,7 +272,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
 
         await socket.SendAsync(
           responseBuffer.AsMemory(0, responseLength),
-          sendSocketFlags,
+          SendSocketFlags,
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }

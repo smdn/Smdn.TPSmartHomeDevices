@@ -44,7 +44,7 @@ public class IDeviceEndPointExtensionsTests {
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
   {
-    foreach (var defaultPort in new[] { 12345 /*specific port*/, 0 /* default port*/ } ) {
+    foreach (var defaultPort in new[] { 12345 /*specific port*/, 0 /* default port*/ }) {
       yield return new object[] { new IPEndPoint(IPAddress.Loopback, 0), defaultPort, new IPEndPoint(IPAddress.Loopback, defaultPort) };
       yield return new object[] { new IPEndPoint(IPAddress.Loopback, 80), defaultPort, new IPEndPoint(IPAddress.Loopback, 80) };
       yield return new object[] { new DnsEndPoint("localhost", 0), defaultPort, new DnsEndPoint("localhost", defaultPort) };

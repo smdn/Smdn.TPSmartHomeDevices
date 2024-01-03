@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using NUnit.Framework;
 
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -73,7 +74,7 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_KLAP_Handshake2_HttpNonSuccessStatusCode()
   {
-    const HttpStatusCode handshake2NonSuccessStatusCode = HttpStatusCode.Unauthorized;
+    const HttpStatusCode Handshake2NonSuccessStatusCode = HttpStatusCode.Unauthorized;
 
     await using var device = new PseudoTapoDevice() {
       FuncGenerateKlapAuthHash = (_, _, authHash) =>
@@ -82,7 +83,7 @@ partial class TapoClientTests {
           authHash.Span,
           out _
         ),
-      FuncGenerateKlapHandshake2Response = _ => (handshake2NonSuccessStatusCode, handshake2NonSuccessStatusCode.ToString()),
+      FuncGenerateKlapHandshake2Response = _ => (Handshake2NonSuccessStatusCode, Handshake2NonSuccessStatusCode.ToString()),
     };
     var endPoint = device.Start();
 
@@ -106,7 +107,7 @@ partial class TapoClientTests {
 
     Assert.That(
       httpRequestException!.StatusCode,
-      Is.EqualTo(handshake2NonSuccessStatusCode),
+      Is.EqualTo(Handshake2NonSuccessStatusCode),
       nameof(httpRequestException.StatusCode)
     );
 

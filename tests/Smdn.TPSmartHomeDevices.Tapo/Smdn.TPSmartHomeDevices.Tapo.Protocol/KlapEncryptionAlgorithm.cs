@@ -3,6 +3,7 @@
 using System;
 using System.Buffers;
 using System.Text;
+
 using NUnit.Framework;
 
 using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
@@ -10,7 +11,7 @@ using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 [TestFixture]
-partial class KlapEncryptionAlgorithmTests {
+public class KlapEncryptionAlgorithmTests {
   private static string ToUpperCaseHexString(ReadOnlySpan<byte> sequence)
     =>
 #if SYSTEM_CONVERT_TOHEXSTRING

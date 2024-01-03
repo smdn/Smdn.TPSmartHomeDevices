@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Text;
+
 using NUnit.Framework;
+
 using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -15,7 +17,7 @@ public partial class TapoCredentialsTests {
   [TestCase("", TapoCredentials.HexSHA1HashSizeInBytes, "ZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ==")]
   public void TryConvertToHexSHA1Hash(string input, int bufferSize, string expected)
   {
-    var buffer = new byte[TapoCredentials.HexSHA1HashSizeInBytes];
+    var buffer = new byte[bufferSize];
 
     Assert.That(TapoCredentials.TryConvertToHexSHA1Hash(Encoding.UTF8.GetBytes(input), buffer, out var bytesWritten), Is.True);
     Assert.That(bytesWritten, Is.EqualTo(TapoCredentials.HexSHA1HashSizeInBytes), nameof(bytesWritten));

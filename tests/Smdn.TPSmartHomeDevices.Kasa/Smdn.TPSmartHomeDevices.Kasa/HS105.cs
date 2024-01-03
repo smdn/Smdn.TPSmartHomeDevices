@@ -3,7 +3,9 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using NUnit.Framework;
+
 using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;

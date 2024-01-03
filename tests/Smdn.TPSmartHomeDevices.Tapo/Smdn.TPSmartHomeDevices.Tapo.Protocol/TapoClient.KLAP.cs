@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Threading.Tasks;
+
 using NUnit.Framework;
 
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -58,7 +59,7 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_KLAP_ErrorResponse()
   {
-    const int errorCode = 9999;
+    const int ErrorCode = 9999;
     int? sequenceNumber = null;
 
     await using var device = new PseudoTapoDevice() {
@@ -72,7 +73,7 @@ partial class TapoClientTests {
         sequenceNumber = seq;
 
         return new GetDeviceInfoResponse<NullResult>() {
-          ErrorCode = errorCode,
+          ErrorCode = ErrorCode,
           Result = new(),
         };
       },
@@ -100,7 +101,7 @@ partial class TapoClientTests {
         $"attempt #{i}"
       );
 
-      Assert.That(ex!.RawErrorCode, Is.EqualTo(errorCode), nameof(ex.RawErrorCode));
+      Assert.That(ex!.RawErrorCode, Is.EqualTo(ErrorCode), nameof(ex.RawErrorCode));
       Assert.That(ex.RequestMethod, Is.EqualTo(new GetDeviceInfoRequest().Method), nameof(ex.RequestMethod));
       Assert.That(ex.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, $"/app/request?seq={sequenceNumber}")), nameof(ex.EndPoint));
 

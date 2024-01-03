@@ -400,14 +400,14 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task EnsureSessionEstablishedAsync_ResolvedEndPointHasChangedFromPreviousEndPoint()
   {
-    const string returnTokenFromEndPoint1 = "token1";
-    const string returnTokenFromEndPoint2 = "token2";
+    const string ReturnTokenFromEndPoint1 = "token1";
+    const string ReturnTokenFromEndPoint2 = "token2";
 
     await using var pseudoDeviceEndPoint1 = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => returnTokenFromEndPoint1,
+      FuncGenerateToken = static _ => ReturnTokenFromEndPoint1,
     };
     await using var pseudoDeviceEndPoint2 = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => returnTokenFromEndPoint2,
+      FuncGenerateToken = static _ => ReturnTokenFromEndPoint2,
     };
 
     pseudoDeviceEndPoint1.Start();
@@ -423,7 +423,7 @@ public partial class TapoDeviceTests {
 
     Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
     Assert.That(
-      device.Session!.Token, Is.EqualTo(returnTokenFromEndPoint1),
+      device.Session!.Token, Is.EqualTo(ReturnTokenFromEndPoint1),
       nameof(device.Session.Token)
     );
 
@@ -442,7 +442,7 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
     Assert.That(prevSession, Is.Not.SameAs(device.Session), nameof(device.Session));
     Assert.That(
-      device.Session.Token, Is.EqualTo(returnTokenFromEndPoint2),
+      device.Session.Token, Is.EqualTo(ReturnTokenFromEndPoint2),
       nameof(device.Session.Token)
     );
 
@@ -567,11 +567,11 @@ public partial class TapoDeviceTests {
 
   private async Task SendRequestAsync_EndPointUnreachable_DynamicEndPoint(bool caseWhenRetrySuccess)
   {
-    const string returnTokenFromEndPoint1 = "token1";
-    const string returnTokenFromEndPoint2 = "token2";
+    const string ReturnTokenFromEndPoint1 = "token1";
+    const string ReturnTokenFromEndPoint2 = "token2";
 
     await using var pseudoDeviceEndPoint1 = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => returnTokenFromEndPoint1,
+      FuncGenerateToken = static _ => ReturnTokenFromEndPoint1,
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
@@ -581,7 +581,7 @@ public partial class TapoDeviceTests {
       }
     };
     await using var pseudoDeviceEndPoint2 = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => returnTokenFromEndPoint2,
+      FuncGenerateToken = static _ => ReturnTokenFromEndPoint2,
       FuncGeneratePassThroughResponse = (_, method, _) => {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
@@ -696,7 +696,7 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_RetrySuccess()
   {
-    const int getDeviceInfoErrorCode = 1234;
+    const int GetDeviceInfoErrorCode = 1234;
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
@@ -704,7 +704,7 @@ public partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, _, _) => (
         KnownErrorCodes.Success,
         new GetDeviceInfoResponse<NullResult>() {
-          ErrorCode = request++ == 0 ? getDeviceInfoErrorCode : KnownErrorCodes.Success,
+          ErrorCode = request++ == 0 ? GetDeviceInfoErrorCode : KnownErrorCodes.Success,
           Result = new(),
         }
       ),
@@ -729,7 +729,7 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_ErrorResponse_RetryFailedWithErrorResponse()
   {
-    const int getDeviceInfoErrorCode = 1234;
+    const int GetDeviceInfoErrorCode = 1234;
     var request = 0;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
@@ -740,7 +740,7 @@ public partial class TapoDeviceTests {
         return (
           KnownErrorCodes.Success,
           new GetDeviceInfoResponse<NullResult>() {
-            ErrorCode = getDeviceInfoErrorCode,
+            ErrorCode = GetDeviceInfoErrorCode,
             Result = new(),
           }
         );
@@ -847,14 +847,14 @@ public partial class TapoDeviceTests {
       return;
     }
 
-    const int maxRetry = 3;
+    const int MaxRetry = 3;
 
     using var cts = new CancellationTokenSource();
-    var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
+    var pseudoDevices = new List<PseudoTapoDevice>(capacity: MaxRetry);
 
-    for (var attempt = 0; attempt < maxRetry; attempt++) {
+    for (var attempt = 0; attempt < MaxRetry; attempt++) {
       var state = Tuple.Create(
-        attempt < maxRetry - 1
+        attempt < MaxRetry - 1
           ? TimeSpan.FromSeconds(60)
           : TimeSpan.Zero,
         $"token-request{attempt}"
@@ -862,7 +862,7 @@ public partial class TapoDeviceTests {
 
       pseudoDevices.Add(
         new(state: state) {
-          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>)!.Item2,
+          FuncGenerateToken = static session => (session.State as Tuple<TimeSpan, string>)!.Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
             DelayUtils.Delay((session.State as Tuple<TimeSpan, string>)!.Item1, cts.Token);
@@ -927,12 +927,12 @@ public partial class TapoDeviceTests {
       return;
     }
 
-    const int maxRetry = 3;
+    const int MaxRetry = 3;
 
     using var cts = new CancellationTokenSource();
-    var pseudoDevices = new List<PseudoTapoDevice>(capacity: maxRetry);
+    var pseudoDevices = new List<PseudoTapoDevice>(capacity: MaxRetry);
 
-    for (var attempt = 0; attempt < maxRetry; attempt++) {
+    for (var attempt = 0; attempt < MaxRetry; attempt++) {
       var state = Tuple.Create(
         TimeSpan.FromSeconds(60),
         $"token-request{attempt}"
@@ -940,7 +940,7 @@ public partial class TapoDeviceTests {
 
       pseudoDevices.Add(
         new(state: state) {
-          FuncGenerateToken = static session => (string)(session.State as Tuple<TimeSpan, string>)!.Item2,
+          FuncGenerateToken = static session => (session.State as Tuple<TimeSpan, string>)!.Item2,
           FuncGeneratePassThroughResponse = (session, _, _) => {
             // perform latency
             DelayUtils.Delay((session.State as Tuple<TimeSpan, string>)!.Item1, cts.Token);
@@ -1069,7 +1069,7 @@ public partial class TapoDeviceTests {
             Result = new() {
               // response #0: IsOn = true
               // response #1: IsOn = false
-              IsOn = requestSequenceNumber++ == 0 ? true : false,
+              IsOn = requestSequenceNumber++ == 0,
             },
           }
         );
@@ -1101,8 +1101,8 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceInfoAsync_ComposeResult()
   {
-    const string deviceId = "device-id";
-    const bool isOn = true;
+    const string DeviceId = "device-id";
+    const bool IsOn = true;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -1113,8 +1113,8 @@ public partial class TapoDeviceTests {
           new GetDeviceInfoResponse<GetDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
-              IsOn = isOn,
-              Id = deviceId,
+              IsOn = IsOn,
+              Id = DeviceId,
             },
           }
         );
@@ -1132,8 +1132,8 @@ public partial class TapoDeviceTests {
       composeResult: result => (result.IsOn, result.Id)
     );
 
-    Assert.That(resultIsOn, Is.EqualTo(isOn), nameof(resultIsOn));
-    Assert.That(resultId, Is.EqualTo(deviceId), nameof(resultId));
+    Assert.That(resultIsOn, Is.EqualTo(IsOn), nameof(resultIsOn));
+    Assert.That(resultId, Is.EqualTo(DeviceId), nameof(resultId));
   }
 
   [Test]
@@ -1196,14 +1196,14 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceInfoAsync_ErrorResponse()
   {
-    const int getDeviceInfoErrorCode = 1234;
+    const int GetDeviceInfoErrorCode = 1234;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         KnownErrorCodes.Success,
         new GetDeviceInfoResponse<NullResult>() {
-          ErrorCode = getDeviceInfoErrorCode,
+          ErrorCode = GetDeviceInfoErrorCode,
           Result = new(),
         }
       ),
@@ -1222,7 +1222,7 @@ public partial class TapoDeviceTests {
       async () => await device.GetDeviceInfoAsync()
     );
     Assert.That(ex!.RequestMethod, Is.EqualTo("get_device_info"));
-    Assert.That(ex.RawErrorCode, Is.EqualTo(getDeviceInfoErrorCode));
+    Assert.That(ex.RawErrorCode, Is.EqualTo(GetDeviceInfoErrorCode));
     Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} after GetDeviceInfoAsync");
   }
 
@@ -1284,7 +1284,7 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SetDeviceInfoAsync_ErrorResponse()
   {
-    const int setDeviceInfoErrorCode = 1234;
+    const int SetDeviceInfoErrorCode = 1234;
 
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -1293,7 +1293,7 @@ public partial class TapoDeviceTests {
         return (
           KnownErrorCodes.Success,
           new SetDeviceInfoResponse<None>() {
-            ErrorCode = setDeviceInfoErrorCode,
+            ErrorCode = SetDeviceInfoErrorCode,
             Result = default,
           }
         );
@@ -1313,7 +1313,7 @@ public partial class TapoDeviceTests {
       async () => await device.SetDeviceInfoAsync(new { device_on = true })
     );
     Assert.That(ex!.RequestMethod, Is.EqualTo("set_device_info"));
-    Assert.That(ex.RawErrorCode, Is.EqualTo(setDeviceInfoErrorCode));
+    Assert.That(ex.RawErrorCode, Is.EqualTo(SetDeviceInfoErrorCode));
 
     Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync");
   }

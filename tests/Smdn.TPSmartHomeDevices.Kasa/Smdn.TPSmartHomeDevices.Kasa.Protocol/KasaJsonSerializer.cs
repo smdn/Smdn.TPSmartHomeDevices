@@ -5,7 +5,9 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Text;
 using System.Text.Json;
+
 using NUnit.Framework;
+
 using SequenceIs = Smdn.Test.NUnit.Constraints.Buffers.Is;
 
 namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
@@ -14,12 +16,12 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 public class KasaJsonSerializerTests {
   private static System.Collections.IEnumerable YieldTestCases_EncryptDecryptInPlace()
   {
-    const byte key = 0xAB;
+    const byte Key = 0xAB;
 
     yield return new[] { new byte[0], new byte[0] };
-    yield return new[] { new byte[1] { 0x01 }, new byte[1] { 0x01 ^ key } };
-    yield return new[] { new byte[2] { 0x01, 0x23 }, new byte[2] { 0x01 ^ key, 0x23 ^ 0x01 ^ key } };
-    yield return new[] { new byte[3] { 0x01, 0x23, 0x45 }, new byte[3] { 0x01 ^ key, 0x23 ^ 0x01 ^ key, 0x45 ^ 0x23 ^ 0x01 ^ key } };
+    yield return new[] { new byte[1] { 0x01 }, new byte[1] { 0x01 ^ Key } };
+    yield return new[] { new byte[2] { 0x01, 0x23 }, new byte[2] { 0x01 ^ Key, 0x23 ^ 0x01 ^ Key } };
+    yield return new[] { new byte[3] { 0x01, 0x23, 0x45 }, new byte[3] { 0x01 ^ Key, 0x23 ^ 0x01 ^ Key, 0x45 ^ 0x23 ^ 0x01 ^ Key } };
   }
 
   [TestCaseSource(nameof(YieldTestCases_EncryptDecryptInPlace))]

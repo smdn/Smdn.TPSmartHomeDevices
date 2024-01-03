@@ -11,9 +11,12 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using NUnit.Framework;
+
 using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
@@ -360,16 +363,16 @@ public class KasaDeviceTests {
         @$"{{""module"":{{""method"":{{""err_code"":0,""result"":""{result}""}}}}}}"
       );
 
-    Func<JsonElement, string> composeResult = static jsonElement => jsonElement.GetProperty("result").GetString()!;
+    static string ComposeResult(JsonElement jsonElement) => jsonElement.GetProperty("result").GetString()!;
 
-    const string returnValueFromEndPoint1 = "endpoint #1";
-    const string returnValueFromEndPoint2 = "endpoint #2";
+    const string ReturnValueFromEndPoint1 = "endpoint #1";
+    const string ReturnValueFromEndPoint2 = "endpoint #2";
 
     await using var pseudoDeviceEndPoint1 = new PseudoKasaDevice() {
-      FuncGenerateResponse = static (_, _) => GenerateResponse(returnValueFromEndPoint1),
+      FuncGenerateResponse = static (_, _) => GenerateResponse(ReturnValueFromEndPoint1),
     };
     await using var pseudoDeviceEndPoint2 = new PseudoKasaDevice() {
-      FuncGenerateResponse = static (_, _) => GenerateResponse(returnValueFromEndPoint2),
+      FuncGenerateResponse = static (_, _) => GenerateResponse(ReturnValueFromEndPoint2),
     };
 
     pseudoDeviceEndPoint1.Start();
@@ -383,10 +386,10 @@ public class KasaDeviceTests {
     var resultFromEndPoint1 = await device.SendRequestAsync(
       module: JsonEncodedText.Encode("module"),
       method: JsonEncodedText.Encode("method"),
-      composeResult: composeResult
+      composeResult: ComposeResult
     );
 
-    Assert.That(resultFromEndPoint1, Is.EqualTo(returnValueFromEndPoint1), nameof(resultFromEndPoint1));
+    Assert.That(resultFromEndPoint1, Is.EqualTo(ReturnValueFromEndPoint1), nameof(resultFromEndPoint1));
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
 
     // endpoint changed
@@ -402,11 +405,11 @@ public class KasaDeviceTests {
     var resultFromEndPoint2 = await device.SendRequestAsync(
       module: JsonEncodedText.Encode("module"),
       method: JsonEncodedText.Encode("method"),
-      composeResult: composeResult,
+      composeResult: ComposeResult,
       cancellationToken: cts.Token
     );
 
-    Assert.That(resultFromEndPoint2, Is.EqualTo(returnValueFromEndPoint2), nameof(resultFromEndPoint2));
+    Assert.That(resultFromEndPoint2, Is.EqualTo(ReturnValueFromEndPoint2), nameof(resultFromEndPoint2));
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
 
     // end point should not be marked as invalidated in this scenario

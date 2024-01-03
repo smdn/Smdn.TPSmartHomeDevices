@@ -4,8 +4,11 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
+
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
@@ -173,15 +176,15 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   [Test]
   public void AddTapoCredentialFromEnvironmentVariable()
   {
-    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
-    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+    const string EnvVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string EnvVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
 
     var services = new ServiceCollection();
 
     Assert.DoesNotThrow(
       () => services.AddTapoCredentialFromEnvironmentVariable(
-        envVarUsername: envVarUsername,
-        envVarPassword: envVarPassword
+        envVarUsername: EnvVarUsername,
+        envVarPassword: EnvVarPassword
       )
     );
 
@@ -190,8 +193,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
-      Environment.SetEnvironmentVariable(envVarUsername, EMail);
-      Environment.SetEnvironmentVariable(envVarPassword, Password);
+      Environment.SetEnvironmentVariable(EnvVarUsername, EMail);
+      Environment.SetEnvironmentVariable(EnvVarPassword, Password);
 
       var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
@@ -199,8 +202,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       Assert.That(password, Is.EqualTo(Base64Password));
     }
     finally {
-      Environment.SetEnvironmentVariable(envVarUsername, null);
-      Environment.SetEnvironmentVariable(envVarPassword, null);
+      Environment.SetEnvironmentVariable(EnvVarUsername, null);
+      Environment.SetEnvironmentVariable(EnvVarPassword, null);
     }
   }
 
@@ -208,15 +211,15 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   [TestCase(null, Password)]
   public void AddTapoCredentialFromEnvironmentVariable_EnvVarNotSet(string? username, string? password)
   {
-    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
-    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+    const string EnvVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string EnvVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
 
     var services = new ServiceCollection();
 
     Assert.DoesNotThrow(
       () => services.AddTapoCredentialFromEnvironmentVariable(
-        envVarUsername: envVarUsername,
-        envVarPassword: envVarPassword
+        envVarUsername: EnvVarUsername,
+        envVarPassword: EnvVarPassword
       )
     );
 
@@ -225,31 +228,31 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
-      Environment.SetEnvironmentVariable(envVarUsername, username);
-      Environment.SetEnvironmentVariable(envVarPassword, password);
+      Environment.SetEnvironmentVariable(EnvVarUsername, username);
+      Environment.SetEnvironmentVariable(EnvVarPassword, password);
 
       Assert.Throws<InvalidOperationException>(
         () => GetEncodedCredential(credentialProvider, identity: null)
       );
     }
     finally {
-      Environment.SetEnvironmentVariable(envVarUsername, null);
-      Environment.SetEnvironmentVariable(envVarPassword, null);
+      Environment.SetEnvironmentVariable(EnvVarUsername, null);
+      Environment.SetEnvironmentVariable(EnvVarPassword, null);
     }
   }
 
   [Test]
   public void AddTapoCredentialFromEnvironmentVariable_TryAddMultiple()
   {
-    const string envVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
-    const string envVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
+    const string EnvVarUsername = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_EMAIL";
+    const string EnvVarPassword = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_PASSWORD";
 
     var services = new ServiceCollection();
 
     Assert.DoesNotThrow(
       () => services.AddTapoCredentialFromEnvironmentVariable(
-        envVarUsername: envVarUsername,
-        envVarPassword: envVarPassword
+        envVarUsername: EnvVarUsername,
+        envVarPassword: EnvVarPassword
       )
     );
 
@@ -265,8 +268,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
 
     try {
-      Environment.SetEnvironmentVariable(envVarUsername, EMail);
-      Environment.SetEnvironmentVariable(envVarPassword, Password);
+      Environment.SetEnvironmentVariable(EnvVarUsername, EMail);
+      Environment.SetEnvironmentVariable(EnvVarPassword, Password);
 
       var (username, password) = GetEncodedCredential(credentialProvider, identity: null);
 
@@ -274,8 +277,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       Assert.That(password, Is.EqualTo(Base64Password));
     }
     finally {
-      Environment.SetEnvironmentVariable(envVarUsername, null);
-      Environment.SetEnvironmentVariable(envVarPassword, null);
+      Environment.SetEnvironmentVariable(EnvVarUsername, null);
+      Environment.SetEnvironmentVariable(EnvVarPassword, null);
     }
   }
 

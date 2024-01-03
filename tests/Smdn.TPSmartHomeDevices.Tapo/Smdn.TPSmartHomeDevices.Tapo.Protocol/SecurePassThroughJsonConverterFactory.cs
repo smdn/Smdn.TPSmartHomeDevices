@@ -6,9 +6,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using NUnit.Framework;
+
 using Smdn.IO.Streams;
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -25,8 +28,10 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
     {
+#pragma warning disable CA1513
       if (disposed)
         throw new ObjectDisposedException(GetType().FullName);
+#pragma warning restore CA1513
 
       Array.Copy(
         sourceArray: inputBuffer,
@@ -41,8 +46,10 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
     {
+#pragma warning disable CA1513
       if (disposed)
         throw new ObjectDisposedException(GetType().FullName);
+#pragma warning restore CA1513
 
       var outputBuffer = new byte[inputCount];
 
@@ -196,10 +203,12 @@ public class SecurePassThroughJsonConverterFactoryTests {
     Assert.Throws<ObjectDisposedException>(() => JsonSerializer.Deserialize<LoginDeviceResponse>("\"\"", options));
   }
 
+#pragma warning disable IDE1006
   private readonly record struct SetDeviceInfoRequestPseudoParams(
     bool device_on,
     int brightness
   );
+#pragma warning restore IDE1006
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughRequest()
   {
@@ -498,7 +507,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding()
   {
-    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), null };
     yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), new NullLogger() };
   }
 
@@ -598,9 +607,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_Null()
   {
-    yield return new object?[] { @"null", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"null", typeof(LoginDeviceResponse), null };
     yield return new object?[] { @"null", typeof(LoginDeviceResponse), new NullLogger() };
-    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), (ILogger?)null };
+    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), null };
     yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), new NullLogger() };
   }
 

@@ -6,13 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Smdn.Net;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -159,8 +159,10 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   private void ThrowIfDisposed()
   {
+#pragma warning disable CA1513
     if (listener is null)
       throw new ObjectDisposedException(GetType().FullName);
+#pragma warning restore CA1513
   }
 
   public async ValueTask DisposeAsync()
@@ -256,7 +258,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   private async Task ProcessListenerAsync()
   {
-    for (;;) {
+    for (; ; ) {
       try {
         if (listener is null)
           return; // disposed
@@ -318,13 +320,13 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     string content
   )
   {
-    const string contentType = "text/plain";
+    const string ContentType = "text/plain";
     var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
       response.ContentEncoding = contentEndcoding;
-      response.ContentType = contentType;
+      response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
       throw new ClientDisconnectedException();
@@ -359,11 +361,11 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     ReadOnlyMemory<byte> content
   )
   {
-    const string contentType = "application/octet-stream";
+    const string ContentType = "application/octet-stream";
 
     try {
       response.StatusCode = (int)statusCode;
-      response.ContentType = contentType;
+      response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
       throw new ClientDisconnectedException();
@@ -571,13 +573,13 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     HttpStatusCode statusCode = HttpStatusCode.OK
   )
   {
-    const string contentType = "application/json";
+    const string ContentType = "application/json";
     var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
       response.ContentEncoding = contentEndcoding;
-      response.ContentType = contentType;
+      response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
       throw new ClientDisconnectedException();
@@ -637,7 +639,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     var sessionId = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
     var sessionExpiresOn = DateTime.Now + TimeSpan.FromDays(1.0);
 
-    IPEndPoint? remoteEndPoint = null;
+    IPEndPoint? remoteEndPoint;
 
     try {
       remoteEndPoint = context.Request.RemoteEndPoint;
@@ -721,13 +723,13 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     ITapoPassThroughResponse passThroughResponse
   )
   {
-    const string contentType = "application/json";
+    const string ContentType = "application/json";
     var contentEndcoding = utf8nobom;
 
     try {
       response.StatusCode = (int)HttpStatusCode.OK;
       response.ContentEncoding = contentEndcoding;
-      response.ContentType = contentType;
+      response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
       throw new ClientDisconnectedException();
