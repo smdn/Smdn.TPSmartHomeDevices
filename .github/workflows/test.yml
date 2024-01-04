@@ -26,15 +26,37 @@ on:
         description: "The project name to run the test."
         required: false
         type: string
+
       os:
         description: "The OS label which run the test on. (ex: ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest)"
         required: false
         type: string
+
       verbose:
         description: "If true, enables verbose output."
         required: false
         type: boolean
         default: false
+
+      extra_options_common:
+        description: "The common extra options to be set on running the `dotnet restore/build/test` command."
+        required: false
+        type: string
+
+      dotnet_test_options_verbosity_level:
+        description: "The argument to be set to the `--verbosity <LEVEL>` option of the `dotnet test` command. <LEVEL> := q[uiet], m[inimal], n[ormal], d[etailed], diag[nostic]"
+        required: false
+        type: string
+
+      dotnet_test_options_framework:
+        description: "The argument to be set to the `--framework <FRAMEWORK>` option of the `dotnet test` command."
+        required: false
+        type: string
+
+      dotnet_test_options_filter_expression:
+        description: "The argument to be set to the `--filter <EXPRESSION>` option of the `dotnet test` command."
+        required: false
+        type: string
 
 jobs:
   prerequisites:
@@ -61,7 +83,7 @@ jobs:
         fi
 
   run-test:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.2.1
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.0
     needs: prerequisites
     with:
       project:            ${{ github.event.inputs.project }}
@@ -72,5 +94,9 @@ jobs:
       timeout_minutes_test_job:   10
       timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
       timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
+      extra_options_common:                   ${{ github.event.inputs.extra_options_common }}
+      dotnet_test_options_verbosity_level:    ${{ github.event.inputs.dotnet_test_options_verbosity_level }}
+      dotnet_test_options_framework:          ${{ github.event.inputs.dotnet_test_options_framework }}
+      dotnet_test_options_filter_expression:  ${{ github.event.inputs.dotnet_test_options_filter_expression }}
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}
