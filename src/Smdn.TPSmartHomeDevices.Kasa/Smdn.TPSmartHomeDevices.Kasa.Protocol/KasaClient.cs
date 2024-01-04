@@ -39,10 +39,10 @@ public sealed partial class KasaClient : IDisposable {
 #pragma warning restore SA1114
 
   // Kasa device seems to automatically close connection within approx 30 secs since the lastest request.
-  private static readonly TimeSpan connectionRefreshInterval = TimeSpan.FromSeconds(30);
+  private static readonly TimeSpan ConnectionRefreshInterval = TimeSpan.FromSeconds(30);
 
   // The timeout for receiving the rest of the response when the device sends a split partial response.
-  private static readonly TimeSpan receiveRestOfBodyTimeout = TimeSpan.FromMilliseconds(500);
+  private static readonly TimeSpan ReceiveRestOfBodyTimeout = TimeSpan.FromMilliseconds(500);
 
 #if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
   [MemberNotNullWhen(false, nameof(endPoint))]
@@ -216,7 +216,7 @@ public sealed partial class KasaClient : IDisposable {
     // If some period of interval has elapsed since the lastest request,
     // dispose the current connection since since it is likely that the
     // connection has already been disconnected.
-    if (socket is not null && lastSentAt + connectionRefreshInterval <= DateTime.Now) {
+    if (socket is not null && lastSentAt + ConnectionRefreshInterval <= DateTime.Now) {
       socket.Dispose();
       socket = null;
     }
@@ -238,7 +238,7 @@ public sealed partial class KasaClient : IDisposable {
      * send
      */
     try {
-      const SocketFlags sendSocketFlags = default;
+      const SocketFlags SendSocketFlags = default;
 
       KasaJsonSerializer.Serialize(buffer, module, method, parameter, logger);
 
@@ -247,7 +247,7 @@ public sealed partial class KasaClient : IDisposable {
       try {
         await socket.SendAsync(
           buffer.WrittenMemory,
-          sendSocketFlags,
+          SendSocketFlags,
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }
@@ -355,18 +355,18 @@ public sealed partial class KasaClient : IDisposable {
     CancellationTokenSource? linkedCancellationTokenSource = null;
 
     try {
-      const SocketFlags receiveSocketFlags = default;
-      const int receiveBlockSize = 0x400;
+      const SocketFlags ReceiveSocketFlags = default;
+      const int ReceiveBlockSize = 0x400;
       int expectedBodyLength = default;
 
       for (; ; ) {
-        var buf = buffer.GetMemory(receiveBlockSize);
+        var buf = buffer.GetMemory(ReceiveBlockSize);
         int len = default;
 
         try {
           len = await socket!.ReceiveAsync(
             buf,
-            receiveSocketFlags,
+            ReceiveSocketFlags,
             cancellationToken: cancellationToken
           ).ConfigureAwait(false);
         }
@@ -413,11 +413,11 @@ public sealed partial class KasaClient : IDisposable {
             "Not received up to expected message size, continue receiving. (expect {RestOfBodyLength} more bytes of {ExpectedBodyLength} bytes body, timeout {Timeout} ms)",
             expectedBodyLength - (buffer.WrittenCount - KasaJsonSerializer.SizeOfHeaderInBytes),
             expectedBodyLength,
-            receiveRestOfBodyTimeout.TotalMilliseconds
+            ReceiveRestOfBodyTimeout.TotalMilliseconds
           );
 
           // create CancellationTokenSource for timeout
-          cancellationTokenSourceForReceiveRestOfBody = new CancellationTokenSource(delay: receiveRestOfBodyTimeout);
+          cancellationTokenSourceForReceiveRestOfBody = new CancellationTokenSource(delay: ReceiveRestOfBodyTimeout);
 
           // link with the supplied CancellationToken
           linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(

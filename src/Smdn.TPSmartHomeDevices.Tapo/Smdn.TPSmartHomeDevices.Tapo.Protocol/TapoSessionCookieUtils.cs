@@ -102,9 +102,9 @@ public static class TapoSessionCookieUtils {
       else
         timeoutAttributeValue = timeoutAttributeValue.TrimEnd(); // for the case of "TIMEOUT=XXXXXXXXXX"
 
-      const NumberStyles timeoutNumberStyles = NumberStyles.AllowTrailingWhite;
+      const NumberStyles TimeoutNumberStyles = NumberStyles.AllowTrailingWhite;
 
-      if (int.TryParse(timeoutAttributeValue, timeoutNumberStyles, provider: null, out var to))
+      if (int.TryParse(timeoutAttributeValue, TimeoutNumberStyles, provider: null, out var to))
         timeout = to;
     }
 

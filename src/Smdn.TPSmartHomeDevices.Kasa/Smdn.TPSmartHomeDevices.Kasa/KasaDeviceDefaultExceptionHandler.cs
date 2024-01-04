@@ -81,10 +81,10 @@ internal sealed class KasaDeviceDefaultExceptionHandler : KasaDeviceExceptionHan
 
       case KasaIncompleteResponseException ex:
         // The peer has been in invalid state(?) and returnd incomplete response.
-        const int maxRetryIncompleteResponse = 3;
+        const int MaxRetryIncompleteResponse = 3;
         var nextAttempt = attempt + 1;
 
-        if (nextAttempt < maxRetryIncompleteResponse) { // retry up to max attempts
+        if (nextAttempt < MaxRetryIncompleteResponse) { // retry up to max attempts
           logger?.LogWarning("{Message}", ex.Message);
           return KasaDeviceExceptionHandling.CreateRetry(
             retryAfter: TimeSpan.FromSeconds(2.0),

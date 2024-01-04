@@ -25,7 +25,7 @@ public static class KasaJsonSerializer {
   public const byte InitialKey = 0xAB;
   internal const int SizeOfHeaderInBytes = 4;
 
-  private static readonly JsonSerializerOptions serializerOptions = new() {
+  private static readonly JsonSerializerOptions SerializerOptions = new() {
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
   };
 
@@ -54,7 +54,7 @@ public static class KasaJsonSerializer {
     JsonSerializer.Serialize(
       writer,
       parameter,
-      options: serializerOptions
+      options: SerializerOptions
     );
 
     writer.WriteEndObject(); // method

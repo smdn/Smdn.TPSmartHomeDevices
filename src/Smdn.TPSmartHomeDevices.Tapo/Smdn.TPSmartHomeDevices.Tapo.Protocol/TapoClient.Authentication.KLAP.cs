@@ -112,8 +112,8 @@ partial class TapoClient {
     );
   }
 
-  private static readonly Uri requestUriKlapHandshake1 = new("/app/handshake1", UriKind.Relative);
-  private static readonly Uri requestUriKlapHandshake2 = new("/app/handshake2", UriKind.Relative);
+  private static readonly Uri RequestUriKlapHandshake1 = new("/app/handshake1", UriKind.Relative);
+  private static readonly Uri RequestUriKlapHandshake2 = new("/app/handshake2", UriKind.Relative);
 
   private async
   ValueTask<(
@@ -130,7 +130,7 @@ partial class TapoClient {
     using var content = new ReadOnlyMemoryContent(localSeed);
 
     var (_, (responseHandshake1, sessionId, sessionTimeout)) = await PostAsync(
-      requestUri: requestUriKlapHandshake1,
+      requestUri: RequestUriKlapHandshake1,
       requestContent: content,
       processHttpResponseAsync: async response => {
         var responseHandshake1 = await response
@@ -247,7 +247,7 @@ partial class TapoClient {
 
       try {
         _ = await PostAsync<HttpStatusCode?>(
-          requestUri: requestUriKlapHandshake2,
+          requestUri: RequestUriKlapHandshake2,
           requestContent: content,
           processHttpResponseAsync: static httpResponse => new(result: httpResponse.StatusCode),
           cancellationToken: cancellationToken

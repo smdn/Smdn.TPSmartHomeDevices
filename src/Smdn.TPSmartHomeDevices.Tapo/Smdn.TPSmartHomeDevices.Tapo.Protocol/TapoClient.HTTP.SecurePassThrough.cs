@@ -73,7 +73,7 @@ partial class TapoClient {
 
     using var requestContent = JsonContent.Create(
       inputValue: request,
-      mediaType: mediaTypeJson,
+      mediaType: MediaTypeJson,
       options: jsonSerializerOptions
     );
 

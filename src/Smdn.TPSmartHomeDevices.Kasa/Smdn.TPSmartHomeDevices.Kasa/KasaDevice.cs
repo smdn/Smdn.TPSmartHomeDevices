@@ -361,11 +361,11 @@ public partial class KasaDevice : IDisposable {
       client = null;
     }
 
-    const int maxAttempts = 5;
+    const int MaxAttempts = 5;
     var delay = TimeSpan.Zero;
     EndPoint? endPoint = null;
 
-    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    for (var attempt = 0; attempt < MaxAttempts; attempt++) {
       if (TimeSpan.Zero < delay)
         await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
 

@@ -21,7 +21,7 @@ partial class TapoClient {
     configureClient: null
   );
 
-  private static readonly MediaTypeHeaderValue mediaTypeJson = new(mediaType: "application/json");
+  private static readonly MediaTypeHeaderValue MediaTypeJson = new(mediaType: "application/json");
 
   public TimeSpan? Timeout { get; set; }
 

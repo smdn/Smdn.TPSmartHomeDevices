@@ -485,10 +485,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
     where TRequest : notnull, ITapoPassThroughRequest
     where TResponse : ITapoPassThroughResponse
   {
-    const int maxAttempts = 5;
+    const int MaxAttempts = 5;
     var delay = TimeSpan.Zero;
 
-    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    for (var attempt = 0; attempt < MaxAttempts; attempt++) {
       if (TimeSpan.Zero < delay)
         await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
 
