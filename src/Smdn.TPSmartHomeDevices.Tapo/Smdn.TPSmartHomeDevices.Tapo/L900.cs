@@ -213,7 +213,7 @@ public class L900 : TapoDevice {
     );
 
   /// <summary>
-  /// Turns the light on and sets the light color to the specified color represented by hue and satulation.
+  /// Turns the light on and sets the light color to the specified color represented by hue and saturation.
   /// </summary>
   /// <param name="hue">
   /// The hue of the color in degree, in range of 0~360[°].
