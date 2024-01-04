@@ -7,6 +7,7 @@ using System.Net.Http;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 internal sealed class TapoHttpClientFactory : IHttpClientFactory {
+#pragma warning disable CA1859
   private static HttpMessageHandler CreateHandler()
     =>
 #if SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER
@@ -20,6 +21,7 @@ internal sealed class TapoHttpClientFactory : IHttpClientFactory {
         MaxConnectionsPerServer = 1,
         UseCookies = false,
       };
+#pragma warning restore CA1859
 
   private static HttpMessageHandler DefaultHandler { get; } = CreateHandler();
 

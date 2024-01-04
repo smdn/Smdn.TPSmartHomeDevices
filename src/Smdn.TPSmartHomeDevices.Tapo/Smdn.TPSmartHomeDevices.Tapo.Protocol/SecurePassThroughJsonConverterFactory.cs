@@ -92,7 +92,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
     disposed = true;
   }
 
-  private Stream CreateEncryptingStream(Stream stream)
+  private CryptoStream CreateEncryptingStream(Stream stream)
     => disposed
       ? throw new ObjectDisposedException(GetType().FullName)
       : new CryptoStream(
@@ -102,7 +102,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
         leaveOpen: true
       );
 
-  private Stream CreateDecryptingStream(Stream stream)
+  private CryptoStream CreateDecryptingStream(Stream stream)
     => disposed
       ? throw new ObjectDisposedException(GetType().FullName)
       : new CryptoStream(
