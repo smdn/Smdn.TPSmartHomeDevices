@@ -70,14 +70,20 @@ partial class TapoCredentials {
           return false;
       }
 
+      // SHA256(authHashInput) = SHA256(SHA1(username) + SHA1(password))
+#pragma warning disable SA1114
+#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA256_TRYHASHDATA
+      return SHA256.TryHashData(
+#else
       using var sha256 = SHA256.Create();
 
-      // SHA256(authHashInput) = SHA256(SHA1(username) + SHA1(password))
       return sha256.TryComputeHash(
+#endif
         authHashInput.AsSpan(0, bytesWrittenAuthHashInput),
         destination,
         out bytesWritten
       );
+#pragma warning restore SA1114
     }
     finally {
       if (authHashInput is not null)
