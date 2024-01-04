@@ -24,10 +24,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
 /// <seealso cref="SecurePassThroughInvalidPaddingException"/>
+#pragma warning disable IDE0055
 public sealed class SecurePassThroughJsonConverterFactory :
   JsonConverterFactory,
   IDisposable,
   SecurePassThroughJsonConverterFactory.IPassThroughObjectJsonConverter
+#pragma warning restore IDE0055
 {
   private interface IPassThroughObjectJsonConverter {
     void WriteEncryptedValue<TValue>(
@@ -217,12 +219,12 @@ public sealed class SecurePassThroughJsonConverterFactory :
     }
   }
 
-#pragma warning disable CA1812
+#pragma warning disable IDE0055, CA1812
   private sealed class PassThroughObjectJsonConverter<TPassThroughObject>
     : JsonConverter<TPassThroughObject>
     // where TPassThroughObject : ITapoPassThroughRequest or ITapoPassThroughResponse
+#pragma warning restore IDE0055, CA1812
   {
-#pragma warning restore CA1812
     private readonly IPassThroughObjectJsonConverter converter;
 
     public PassThroughObjectJsonConverter(IPassThroughObjectJsonConverter converter)

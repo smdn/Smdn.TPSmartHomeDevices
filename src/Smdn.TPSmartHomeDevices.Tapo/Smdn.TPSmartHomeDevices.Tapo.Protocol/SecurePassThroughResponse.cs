@@ -8,9 +8,11 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// The type that reflects <c>securePassthrough</c> JSON response.
 /// </summary>
 /// <typeparam name="TPassThroughResponse">A type that will be deserialized from the value of the encapsulated <c>response</c> JSON property.</typeparam>
+#pragma warning disable IDE0055
 public readonly struct SecurePassThroughResponse<TPassThroughResponse> :
   ITapoResponse
   where TPassThroughResponse : ITapoPassThroughResponse
+#pragma warning restore IDE0055
 {
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; init; }

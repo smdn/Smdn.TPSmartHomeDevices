@@ -68,7 +68,7 @@ public static class IDeviceEndPointExtensions {
           ? new DnsEndPoint(dnsEndPoint.Host, defaultPort)
           : dnsEndPoint,
 
-        /* EndPoint */ _ => endPoint,
+        _ => endPoint, // includes case for the type EndPoint
       };
     }
   }
