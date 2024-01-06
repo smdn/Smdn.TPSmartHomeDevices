@@ -212,6 +212,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
+#pragma warning disable IDE0060
   ValueTask IMulticolorSmartLight.SetBrightnessAsync(
     int brightness,
     TimeSpan transitionPeriod, // not supported
@@ -221,6 +222,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
       brightness,
       cancellationToken
     );
+#pragma warning restore IDE0060
 
   /// <summary>
   /// Turns the light on and sets the light color to the specified color represented by hue and saturation.
@@ -253,6 +255,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
+#pragma warning disable IDE0060
   ValueTask IMulticolorSmartLight.SetColorAsync(
     int hue,
     int saturation,
@@ -266,6 +269,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
       brightness,
       cancellationToken
     );
+#pragma warning restore IDE0060
 
   /// <summary>
   /// Turns the light on and sets the light color to the specified hue.
@@ -352,6 +356,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     );
   }
 
+#pragma warning disable IDE0060
   ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness,
@@ -363,4 +368,5 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
       brightness,
       cancellationToken
     );
+#pragma warning restore IDE0060
 }
