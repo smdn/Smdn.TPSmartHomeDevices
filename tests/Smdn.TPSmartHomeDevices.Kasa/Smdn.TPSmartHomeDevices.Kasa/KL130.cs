@@ -22,7 +22,6 @@ public class KL130Tests {
 
   private static System.Collections.IEnumerable YieldTestCases_TransitionPeriod()
   {
-    yield return new object?[] { null, "0" };
     yield return new object?[] { TimeSpan.Zero, "0" };
     yield return new object?[] { TimeSpan.FromMilliseconds(1), "1" };
     yield return new object?[] { TimeSpan.FromSeconds(1), "1000" };
@@ -54,7 +53,7 @@ public class KL130Tests {
 
   [TestCaseSource(nameof(YieldTestCases_TransitionPeriod))]
   public async Task TurnOnAsync_WithTransitionPeriod(
-    TimeSpan? transitionPeriod,
+    TimeSpan transitionPeriod,
     string expectedTransitionPeriod
   )
   {
@@ -105,7 +104,7 @@ public class KL130Tests {
 
   [TestCaseSource(nameof(YieldTestCases_TransitionPeriod))]
   public async Task TurnOffAsync_WithTransitionPeriod(
-    TimeSpan? transitionPeriod,
+    TimeSpan transitionPeriod,
     string expectedTransitionPeriod
   )
   {
@@ -168,7 +167,7 @@ public class KL130Tests {
   [TestCaseSource(nameof(YieldTestCases_SetOnOffStateAsync_WithTransitionPeriod))]
   public async Task SetOnOffStateAsync_WithTransitionPeriod(
     bool newState,
-    TimeSpan? transitionPeriod,
+    TimeSpan transitionPeriod,
     string expectedTransitionPeriod
   )
   {
@@ -197,10 +196,9 @@ public class KL130Tests {
 
   private static System.Collections.IEnumerable YieldTestCases_SetColorTemperatureAsync()
   {
-    yield return new object?[] { 3000, null, null, null, "0" };
-    yield return new object?[] { 5000, 1, null, "1", "0" };
-    yield return new object?[] { 5000, 100, null, "100", "0" };
-    yield return new object?[] { 8000, 100, TimeSpan.Zero, "100", "0" };
+    yield return new object?[] { 3000, null, TimeSpan.Zero, null, "0" };
+    yield return new object?[] { 5000, 1, TimeSpan.Zero, "1", "0" };
+    yield return new object?[] { 5000, 100, TimeSpan.Zero, "100", "0" };
     yield return new object?[] { 8000, 100, TimeSpan.FromMilliseconds(1), "100", "1" };
     yield return new object?[] { 8000, 100, TimeSpan.FromSeconds(1), "100", "1000" };
   }
@@ -209,7 +207,7 @@ public class KL130Tests {
   public async Task SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness,
-    TimeSpan? transitionPeriod,
+    TimeSpan transitionPeriod,
     string expectedBrightness,
     string expectedTransitionPeriod
   )
@@ -243,10 +241,9 @@ public class KL130Tests {
 
   private static System.Collections.IEnumerable YieldTestCases_SetColorAsync()
   {
-    yield return new object?[] { 0, 0, null, null, null, "0" };
-    yield return new object?[] { 360, 100, null, null, null, "0" };
-    yield return new object?[] { 180, 50, 1, null, "1", "0" };
-    yield return new object?[] { 180, 50, 100, null, "100", "0" };
+    yield return new object?[] { 0, 0, null, TimeSpan.Zero, null, "0" };
+    yield return new object?[] { 360, 100, null, TimeSpan.Zero, null, "0" };
+    yield return new object?[] { 180, 50, 1, TimeSpan.Zero, "1", "0" };
     yield return new object?[] { 360, 100, 100, TimeSpan.Zero, "100", "0" };
     yield return new object?[] { 360, 100, 100, TimeSpan.FromMilliseconds(1), "100", "1" };
     yield return new object?[] { 360, 100, 100, TimeSpan.FromSeconds(1), "100", "1000" };
@@ -257,7 +254,7 @@ public class KL130Tests {
     int hue,
     int saturation,
     int? brightness,
-    TimeSpan? transitionPeriod,
+    TimeSpan transitionPeriod,
     string expectedBrightness,
     string expectedTransitionPeriod
   )

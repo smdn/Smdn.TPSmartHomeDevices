@@ -116,15 +116,12 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       serviceProvider: serviceProvider
     );
 
-  private static TimeSpan ValidateTransitionPeriod(TimeSpan? value, string paramName)
+  private static TimeSpan ValidateTransitionPeriod(TimeSpan value, string paramName)
   {
-    if (value == null)
-      return TimeSpan.Zero;
-
-    if (value.Value < TimeSpan.Zero)
+    if (value < TimeSpan.Zero)
       throw new ArgumentOutOfRangeException(paramName: paramName, actualValue: value, message: "The value for transition period must be zero or positive value.");
 
-    return value.Value;
+    return value;
   }
 
 #pragma warning disable SA1313
@@ -147,14 +144,14 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </summary>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
   /// The default value is <see langword="default" />.
   /// </param>
   public ValueTask TurnOnAsync(
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -172,14 +169,14 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </summary>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
   /// The default value is <see langword="default" />.
   /// </param>
   public ValueTask TurnOffAsync(
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -200,7 +197,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -208,7 +205,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   public ValueTask SetOnOffStateAsync(
     bool newOnOffState,
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -227,7 +224,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   )
     => SetOnOffStateAsync(
       newOnOffState: newOnOffState,
-      transitionPeriod: null,
+      transitionPeriod: default,
       cancellationToken: cancellationToken
     );
 
@@ -301,7 +298,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -310,7 +307,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   public ValueTask SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness = null,
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -321,19 +318,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
-      cancellationToken
-    );
-
-  ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
-    int colorTemperature,
-    int? brightness,
-    TimeSpan transitionPeriod,
-    CancellationToken cancellationToken
-  )
-    => SetColorTemperatureAsync(
-      colorTemperature,
-      brightness,
-      transitionPeriod,
       cancellationToken
     );
 
@@ -376,7 +360,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -386,7 +370,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     int hue,
     int saturation,
     int? brightness = null,
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -401,21 +385,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
-  ValueTask IMulticolorSmartLight.SetColorAsync(
-    int hue,
-    int saturation,
-    int? brightness,
-    TimeSpan transitionPeriod,
-    CancellationToken cancellationToken
-  )
-    => SetColorAsync(
-      hue,
-      saturation,
-      brightness,
-      transitionPeriod,
-      cancellationToken
-    );
-
   /// <summary>
   /// Turns the light on and sets the light brightness.
   /// </summary>
@@ -424,7 +393,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   /// <param name="transitionPeriod">
   /// The value that indicates the time interval between completion of gradual state transition.
-  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -432,7 +401,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   /// </param>
   public ValueTask SetBrightnessAsync(
     int brightness,
-    TimeSpan? transitionPeriod = null,
+    TimeSpan transitionPeriod = default,
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync(
@@ -444,17 +413,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
-      cancellationToken
-    );
-
-  ValueTask IMulticolorSmartLight.SetBrightnessAsync(
-    int brightness,
-    TimeSpan transitionPeriod,
-    CancellationToken cancellationToken
-  )
-    => SetBrightnessAsync(
-      brightness,
-      transitionPeriod,
       cancellationToken
     );
 }
