@@ -214,7 +214,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
 
   ValueTask IMulticolorSmartLight.SetBrightnessAsync(
     int brightness,
-    TimeSpan? transitionPeriod, // not supported
+    TimeSpan transitionPeriod, // not supported
     CancellationToken cancellationToken
   )
     => SetBrightnessAsync(
@@ -257,7 +257,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     int hue,
     int saturation,
     int? brightness,
-    TimeSpan? transitionPeriod, // not supported
+    TimeSpan transitionPeriod, // not supported
     CancellationToken cancellationToken
   )
     => SetColorAsync(
@@ -355,7 +355,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
   ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
     int colorTemperature,
     int? brightness,
-    TimeSpan? transitionPeriod, // not supported
+    TimeSpan transitionPeriod, // not supported
     CancellationToken cancellationToken
   )
     => SetColorTemperatureAsync(

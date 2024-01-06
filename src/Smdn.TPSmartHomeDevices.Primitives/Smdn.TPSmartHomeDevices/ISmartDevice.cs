@@ -21,7 +21,7 @@ public interface ISmartDevice {
   /// </param>
   ValueTask SetOnOffStateAsync(
     bool newOnOffState,
-    CancellationToken cancellationToken = default
+    CancellationToken cancellationToken
   );
 
 #if NET6_0_OR_GREATER // default interface methods; .NET Core 3.x + C# 8.0
@@ -54,6 +54,6 @@ public interface ISmartDevice {
   /// The default value is <see langword="default" />.
   /// </param>
   ValueTask<bool> GetOnOffStateAsync(
-    CancellationToken cancellationToken = default
+    CancellationToken cancellationToken
   );
 }

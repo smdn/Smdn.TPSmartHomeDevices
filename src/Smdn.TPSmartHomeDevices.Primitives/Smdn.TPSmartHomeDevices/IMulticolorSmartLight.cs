@@ -27,7 +27,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </param>
   /// <param name="transitionPeriod">
   /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
-  /// If the value is <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -41,8 +41,8 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </exception>
   ValueTask SetBrightnessAsync(
     int brightness,
-    TimeSpan? transitionPeriod = null,
-    CancellationToken cancellationToken = default
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
   );
 
   /// <summary>
@@ -67,7 +67,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </param>
   /// <param name="transitionPeriod">
   /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
-  /// If the value is <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -82,9 +82,9 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </exception>
   ValueTask SetColorTemperatureAsync(
     int colorTemperature,
-    int? brightness = null,
-    TimeSpan? transitionPeriod = null,
-    CancellationToken cancellationToken = default
+    int? brightness,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
   );
 
   /// <summary>
@@ -111,7 +111,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </param>
   /// <param name="transitionPeriod">
   /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
-  /// If the value is <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
   /// </param>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -128,9 +128,9 @@ public interface IMulticolorSmartLight : ISmartDevice {
   ValueTask SetColorAsync(
     int hue,
     int saturation,
-    int? brightness = null,
-    TimeSpan? transitionPeriod = null,
-    CancellationToken cancellationToken = default
+    int? brightness,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
   );
 
 #if NET6_0_OR_GREATER // default interface methods; .NET Core 3.x + C# 8.0
@@ -151,7 +151,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   ValueTask SetOnOffStateAsync(
     bool newOnOffState,
     TimeSpan transitionPeriod,
-    CancellationToken cancellationToken = default
+    CancellationToken cancellationToken
   )
     // ignores the value of transitionPeriod
     => SetOnOffStateAsync(
@@ -172,7 +172,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </param>
   ValueTask TurnOnAsync(
     TimeSpan transitionPeriod,
-    CancellationToken cancellationToken = default
+    CancellationToken cancellationToken
   )
     => SetOnOffStateAsync(
       newOnOffState: true,
@@ -193,7 +193,7 @@ public interface IMulticolorSmartLight : ISmartDevice {
   /// </param>
   ValueTask TurnOffAsync(
     TimeSpan transitionPeriod,
-    CancellationToken cancellationToken = default
+    CancellationToken cancellationToken
   )
     => SetOnOffStateAsync(
       newOnOffState: false,

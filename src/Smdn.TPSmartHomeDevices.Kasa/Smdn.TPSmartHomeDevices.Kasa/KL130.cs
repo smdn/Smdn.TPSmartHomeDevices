@@ -324,6 +324,19 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
+  ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
+    int colorTemperature,
+    int? brightness,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
+  )
+    => SetColorTemperatureAsync(
+      colorTemperature,
+      brightness,
+      transitionPeriod,
+      cancellationToken
+    );
+
 #pragma warning disable SA1313
   private readonly record struct SetColorParameter(
     [property: JsonPropertyName("hue")]
@@ -388,6 +401,21 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
+  ValueTask IMulticolorSmartLight.SetColorAsync(
+    int hue,
+    int saturation,
+    int? brightness,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
+  )
+    => SetColorAsync(
+      hue,
+      saturation,
+      brightness,
+      transitionPeriod,
+      cancellationToken
+    );
+
   /// <summary>
   /// Turns the light on and sets the light brightness.
   /// </summary>
@@ -416,6 +444,17 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      cancellationToken
+    );
+
+  ValueTask IMulticolorSmartLight.SetBrightnessAsync(
+    int brightness,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken
+  )
+    => SetBrightnessAsync(
+      brightness,
+      transitionPeriod,
       cancellationToken
     );
 }
