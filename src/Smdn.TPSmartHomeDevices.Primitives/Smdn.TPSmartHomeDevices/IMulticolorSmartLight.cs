@@ -132,4 +132,73 @@ public interface IMulticolorSmartLight : ISmartDevice {
     TimeSpan? transitionPeriod = null,
     CancellationToken cancellationToken = default
   );
+
+#if NET6_0_OR_GREATER // default interface methods; .NET Core 3.x + C# 8.0
+  /// <summary>
+  /// Sets the on/off state of the light according to the parameter <paramref name="newOnOffState" />.
+  /// </summary>
+  /// <param name="newOnOffState">
+  /// The value that indicates new on/off state to be set. <see langword="true"/> for on, otherwise off.
+  /// </param>
+  /// <param name="transitionPeriod">
+  /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  ValueTask SetOnOffStateAsync(
+    bool newOnOffState,
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken = default
+  )
+    // ignores the value of transitionPeriod
+    => SetOnOffStateAsync(
+      newOnOffState: newOnOffState,
+      cancellationToken: cancellationToken
+    );
+
+  /// <summary>
+  /// Turns on the light.
+  /// </summary>
+  /// <param name="transitionPeriod">
+  /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  ValueTask TurnOnAsync(
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken = default
+  )
+    => SetOnOffStateAsync(
+      newOnOffState: true,
+      transitionPeriod: transitionPeriod,
+      cancellationToken: cancellationToken
+    );
+
+  /// <summary>
+  /// Turns off the light.
+  /// </summary>
+  /// <param name="transitionPeriod">
+  /// The <see cref="TimeSpan" /> value that indicates the time interval between completion of gradual state transition.
+  /// If the value is <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  ValueTask TurnOffAsync(
+    TimeSpan transitionPeriod,
+    CancellationToken cancellationToken = default
+  )
+    => SetOnOffStateAsync(
+      newOnOffState: false,
+      transitionPeriod: transitionPeriod,
+      cancellationToken: cancellationToken
+    );
+#endif
 }
