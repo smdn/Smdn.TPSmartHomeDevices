@@ -21,7 +21,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// </remarks>
 /// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-l530e/">Tapo L530 product information (ja)</seealso>
 /// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l530e/">Tapo L530 product information (en)</seealso>
-public class L530 : TapoDevice {
+public class L530 : TapoDevice, IMulticolorSmartLight {
   /// <summary>
   /// Initializes a new instance of the <see cref="L530"/> class with specifying the device endpoint by host name.
   /// </summary>
@@ -211,6 +211,16 @@ public class L530 : TapoDevice {
       cancellationToken
     );
 
+  ValueTask IMulticolorSmartLight.SetBrightnessAsync(
+    int brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetBrightnessAsync(
+      brightness,
+      cancellationToken
+    );
+
   /// <summary>
   /// Turns the light on and sets the light color to the specified color temperature.
   /// </summary>
@@ -234,6 +244,18 @@ public class L530 : TapoDevice {
         Temperature: MulticolorLightUtils.ValidateColorTemperatureValue(colorTemperature, nameof(colorTemperature)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
+      cancellationToken
+    );
+
+  ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
+    int colorTemperature,
+    int? brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetColorTemperatureAsync(
+      colorTemperature,
+      brightness,
       cancellationToken
     );
 
@@ -265,6 +287,20 @@ public class L530 : TapoDevice {
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
+      cancellationToken
+    );
+
+  ValueTask IMulticolorSmartLight.SetColorAsync(
+    int hue,
+    int saturation,
+    int? brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetColorAsync(
+      hue,
+      saturation,
+      brightness,
       cancellationToken
     );
 

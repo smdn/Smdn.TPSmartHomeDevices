@@ -22,7 +22,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// </remarks>
 /// <seealso href="https://www.tp-link.com/jp/home-networking/smart-bulb/kl130/">Kasa KL130 product information (ja)</seealso>
 /// <seealso href="https://www.kasasmart.com/us/products/smart-lighting/kasa-smart-light-bulb-multicolor-kl130">Kasa KL130 product information (en)</seealso>
-public class KL130 : KasaDevice {
+public class KL130 : KasaDevice, IMulticolorSmartLight {
 #pragma warning disable SA1114
   private static readonly JsonEncodedText ModuleTextLightingService = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
@@ -221,6 +221,16 @@ public class KL130 : KasaDevice {
       cancellationToken: cancellationToken
     );
 
+  ValueTask ISmartDevice.SetOnOffStateAsync(
+    bool newOnOffState,
+    CancellationToken cancellationToken
+  )
+    => SetOnOffStateAsync(
+      newOnOffState: newOnOffState,
+      transitionPeriod: null,
+      cancellationToken: cancellationToken
+    );
+
   private readonly struct GetSysInfoLightStateParameter {
     [JsonPropertyName("light_state")]
     public KL130LightState LightState { get; init; }
@@ -372,6 +382,37 @@ public class KL130 : KasaDevice {
       new SetColorParameter(
         Hue: hue, // TODO: validation
         Saturation: saturation, // TODO: validation
+        Brightness: brightness, // TODO: validation
+        TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
+      ),
+      cancellationToken
+    );
+
+  /// <summary>
+  /// Turns the light on and sets the light brightness.
+  /// </summary>
+  /// <param name="brightness">
+  /// The brightness in percent value, in range of 1~100[%].
+  /// </param>
+  /// <param name="transitionPeriod">
+  /// The value that indicates the time interval between completion of gradual state transition.
+  /// If <see langword="null"/> or <see cref="TimeSpan.Zero"/>, the state transition will be performed immediately rather than gradual change.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  public ValueTask SetBrightnessAsync(
+    int brightness,
+    TimeSpan? transitionPeriod = null,
+    CancellationToken cancellationToken = default
+  )
+    => SendRequestAsync(
+      module: ModuleTextLightingService,
+      method: MethodTextTransitionLightState,
+      new SetColorParameter(
+        Hue: null,
+        Saturation: null,
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),

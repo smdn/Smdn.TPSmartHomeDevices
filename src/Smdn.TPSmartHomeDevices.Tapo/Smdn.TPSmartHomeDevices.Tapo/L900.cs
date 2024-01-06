@@ -23,7 +23,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-l900-10/">Tapo L900-10 product information (ja)</seealso>
 /// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l900-5/">Tapo Tapo L900-5 product information (en)</seealso>
 /// <seealso href="https://www.tapo.com/en/product/smart-light-bulb/tapo-l900-10/">Tapo Tapo L900-10 product information (en)</seealso>
-public class L900 : TapoDevice {
+public class L900 : TapoDevice, IMulticolorSmartLight {
   /// <summary>
   /// Initializes a new instance of the <see cref="L900"/> class with specifying the device endpoint by host name.
   /// </summary>
@@ -212,6 +212,16 @@ public class L900 : TapoDevice {
       cancellationToken
     );
 
+  ValueTask IMulticolorSmartLight.SetBrightnessAsync(
+    int brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetBrightnessAsync(
+      brightness,
+      cancellationToken
+    );
+
   /// <summary>
   /// Turns the light on and sets the light color to the specified color represented by hue and saturation.
   /// </summary>
@@ -240,6 +250,20 @@ public class L900 : TapoDevice {
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
+      cancellationToken
+    );
+
+  ValueTask IMulticolorSmartLight.SetColorAsync(
+    int hue,
+    int saturation,
+    int? brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetColorAsync(
+      hue,
+      saturation,
+      brightness,
       cancellationToken
     );
 
@@ -294,6 +318,49 @@ public class L900 : TapoDevice {
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
+      cancellationToken
+    );
+
+  /// <summary>
+  /// Turns the light on and sets the light color to the specified color temperature.
+  /// </summary>
+  /// <param name="colorTemperature">
+  /// The color temperature in kelvin [K].
+  /// Available color temperatures depend on the device model.
+  /// </param>
+  /// <param name="brightness">
+  /// The brightness in percent value, in range of 1~100[%].
+  /// If <see langword="null"/>, the current brightness will be kept.
+  /// </param>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  public ValueTask SetColorTemperatureAsync(
+    int colorTemperature,
+    int? brightness = null,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var (hue, saturation, _) = ColorModelUtils.ConvertColorTemperatureToHsv(colorTemperature);
+
+    return SetColorAsync(
+      hue: hue,
+      saturation: saturation,
+      brightness: brightness,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(
+    int colorTemperature,
+    int? brightness,
+    TimeSpan? transitionPeriod, // not supported
+    CancellationToken cancellationToken
+  )
+    => SetColorTemperatureAsync(
+      colorTemperature,
+      brightness,
       cancellationToken
     );
 }
