@@ -111,3 +111,9 @@ SOFTWARE.
 - https://github.com/petretiandrea/plugp100/blob/main/LICENSE
 
 'petretiandrea/plugp100' is released under the GNU General Public License v3.0.
+
+
+## License notice for the pseudo code from "How to Convert Temperature (K) to RGB: Algorithm and Sample Code"
+- https://tannerhelland.com/2012/09/18/convert-temperature-rgb-algorithm-code.html
+
+The pseudo codes listed in the above document is published under the CC BY-SA 4.0.

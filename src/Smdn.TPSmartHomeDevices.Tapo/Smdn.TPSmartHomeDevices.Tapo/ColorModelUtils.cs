@@ -21,9 +21,6 @@ internal static partial class ColorModelUtils {
       Math.Clamp((int)(s * 100.0f), 0, 100),
       (byte)(v * byte.MaxValue)
     );
-
-    static (byte R, byte G, byte B) ConvertColorTemperatureToRgb(int colorTemperatureInKelvin)
-      => throw new NotImplementedException();
   }
 
   private static (
