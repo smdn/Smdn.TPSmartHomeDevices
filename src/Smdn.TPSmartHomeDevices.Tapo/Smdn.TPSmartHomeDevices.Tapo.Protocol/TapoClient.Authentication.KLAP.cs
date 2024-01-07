@@ -50,7 +50,11 @@ partial class TapoClient {
     // local_auth_hash = SHA256(SHA1(username) + SHA1(password))
     var localAuthHash = new byte[SHA256HashSizeInBytes];
 
-    using (var credential = credentialProvider.GetCredential(identity)) {
+    using (
+      var credential =
+        credentialProvider.GetCredential(identity)
+        ?? throw TapoCredentials.CreateExceptionNoCredentialForIdentity(identity)
+    ) {
       _ = TapoCredentials.TryComputeKlapAuthHash(
         credential,
         localAuthHash.AsSpan(0, SHA256HashSizeInBytes),

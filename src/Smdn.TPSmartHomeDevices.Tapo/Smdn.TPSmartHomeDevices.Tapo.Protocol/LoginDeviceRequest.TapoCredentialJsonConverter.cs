@@ -50,7 +50,7 @@ partial struct LoginDeviceRequest {
     )
     {
       using var credential = value.GetCredential(identity)
-        ?? throw new InvalidOperationException($"Could not get a credential for an identity '{identity?.ToString() ?? "(null)"}'");
+        ?? throw TapoCredentials.CreateExceptionNoCredentialForIdentity(identity);
 
       writer.WriteStartObject();
 

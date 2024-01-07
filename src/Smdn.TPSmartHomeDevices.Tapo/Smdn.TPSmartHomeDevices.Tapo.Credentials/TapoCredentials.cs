@@ -126,6 +126,9 @@ public static partial class TapoCredentials {
     }
   }
 
+  internal static InvalidOperationException CreateExceptionNoCredentialForIdentity(ITapoCredentialIdentity? identity)
+    => new($"Could not get a credential for an identity '{identity?.ToString() ?? "(null)"}'");
+
   internal static ITapoCredentialProvider CreateProviderFromPlainText(string email, string password)
     => new SingleIdentityStringCredentialProvider(
       username: email ?? throw new ArgumentNullException(nameof(email)),

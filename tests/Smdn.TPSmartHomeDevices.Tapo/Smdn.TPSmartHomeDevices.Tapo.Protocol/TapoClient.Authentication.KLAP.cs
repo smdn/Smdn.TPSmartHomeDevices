@@ -113,4 +113,38 @@ partial class TapoClientTests {
 
     Assert.That(client.Session, Is.Null, nameof(client.Session));
   }
+
+  [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_IdentifyCredentialForIdentity))]
+  public async Task AuthenticateAsync_KLAP_IdentifyCredentialForIdentity(
+    ITapoCredentialProvider credentialProvider,
+    ITapoCredentialIdentity identity,
+    ITapoCredential credentialForKlapAuthHash,
+    Type? typeOfExpectedException
+  )
+  {
+    await using var device = new PseudoTapoDevice() {
+      FuncGenerateKlapAuthHash = (_, _, authHash) =>
+        _ = TapoCredentials.TryComputeKlapAuthHash(
+          credentialForKlapAuthHash,
+          authHash.Span,
+          out _
+        )
+    };
+    var endPoint = device.Start();
+
+    using var client = new TapoClient(
+      endPoint: endPoint
+    );
+
+    await Assert.ThatAsync(
+      async () => await client.AuthenticateAsync(
+        protocol: TapoSessionProtocol.Klap,
+        identity: identity,
+        credential: credentialProvider
+      ),
+      typeOfExpectedException is null ? Throws.Nothing : Throws.TypeOf(typeOfExpectedException)
+    );
+
+    Assert.That(client.Session, typeOfExpectedException is null ? Is.Not.Null : Is.Null);
+  }
 }
