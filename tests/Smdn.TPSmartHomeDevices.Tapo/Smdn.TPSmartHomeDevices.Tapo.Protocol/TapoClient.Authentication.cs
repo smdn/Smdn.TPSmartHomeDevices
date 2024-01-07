@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -173,9 +174,9 @@ partial class TapoClientTests {
   private class TapoCredentialNotFoundException : Exception { }
 
   private class TapoMultipleCredentialProvider : ITapoCredentialProvider {
-    private readonly Dictionary<ITapoCredentialIdentity, ITapoCredential> credentials = new();
+    private readonly Dictionary<ITapoCredentialIdentity, ITapoCredential?> credentials = new();
 
-    public void AddCredential(ITapoCredentialIdentity identity, ITapoCredential credentialForIdentity)
+    public void AddCredential(ITapoCredentialIdentity identity, ITapoCredential? credentialForIdentity)
       => credentials[identity] = credentialForIdentity;
 
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
@@ -185,7 +186,7 @@ partial class TapoClientTests {
       if (!credentials.TryGetValue(identity, out var credential))
         throw new TapoCredentialNotFoundException();
 
-      return credential;
+      return credential!; // may be null
     }
   }
 
@@ -209,23 +210,42 @@ partial class TapoClientTests {
       => writer.WriteStringValue(Password); // write non-encoded string
 
     public int HashPassword(HashAlgorithm algorithm, Span<byte> destination)
-      => throw new NotImplementedException();
+      => algorithm.TryComputeHash(Encoding.ASCII.GetBytes(Password), destination, out var bytesWritten)
+        ? bytesWritten
+        : 0;
 
     public int HashUsername(HashAlgorithm algorithm, Span<byte> destination)
-      => throw new NotImplementedException();
+      => algorithm.TryComputeHash(Encoding.ASCII.GetBytes(Username), destination, out var bytesWritten)
+        ? bytesWritten
+        : 0;
   }
 
-  [Test]
-  public async Task AuthenticateAsync_IdentifyCredentialForIdentity()
+  private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_IdentifyCredentialForIdentity()
   {
     var credentialProvider = new TapoMultipleCredentialProvider();
     var user1 = new TapoCredential("user1", "pass1");
     var user2 = new TapoCredential("user2", "pass2");
+    var user3 = new TapoCredential("user3", "pass3");
     var userNotRegisteredInCredentialProvider = new TapoCredential("user3", "pass3");
 
     credentialProvider.AddCredential(user1, user1);
     credentialProvider.AddCredential(user2, user2);
+    credentialProvider.AddCredential(user3, null);
 
+    yield return new object?[] { credentialProvider, user1, user1, null };
+    yield return new object?[] { credentialProvider, user2, user2, null };
+    yield return new object?[] { credentialProvider, user3, user3, typeof(InvalidOperationException) };
+    yield return new object?[] { credentialProvider, userNotRegisteredInCredentialProvider, userNotRegisteredInCredentialProvider, typeof(TapoCredentialNotFoundException) };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_IdentifyCredentialForIdentity))]
+  public async Task AuthenticateAsync_IdentifyCredentialForIdentity(
+    ITapoCredentialProvider credentialProvider,
+    ITapoCredentialIdentity identity,
+    ITapoCredential _,
+    Type? typeOfExpectedException
+  )
+  {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateLoginDeviceResponse = (_, param) => {
         var username = param.GetProperty("username").GetString();
@@ -246,35 +266,21 @@ partial class TapoClientTests {
       endPoint: endPoint
     );
 
-    Assert.DoesNotThrowAsync(
+    await Assert.ThatAsync(
       async () => await client.AuthenticateAsync(
-        identity: user1,
+        identity: identity,
         credential: credentialProvider
       ),
-      $"select identity {nameof(user1)}"
+      typeOfExpectedException is null ? Throws.Nothing : Throws.TypeOf(typeOfExpectedException)
     );
 
-    Assert.That(client.Session, Is.Not.Null);
-    Assert.That(client.Session!.Token, Is.EqualTo(user1.Username));
-
-    Assert.DoesNotThrowAsync(
-      async () => await client.AuthenticateAsync(
-        identity: user2,
-        credential: credentialProvider
-      ),
-      $"select identity {nameof(user1)}"
-    );
-
-    Assert.That(client.Session, Is.Not.Null);
-    Assert.That(client.Session.Token, Is.EqualTo(user2.Username));
-
-    Assert.ThrowsAsync<TapoCredentialNotFoundException>(
-      async () => await client.AuthenticateAsync(
-        identity: userNotRegisteredInCredentialProvider,
-        credential: credentialProvider
-      ),
-      $"cannot select appropriate identity"
-    );
+    if (typeOfExpectedException is null) {
+      Assert.That(client.Session, Is.Not.Null);
+      Assert.That(client.Session!.Token, Is.EqualTo((identity as TapoCredential)!.Username));
+    }
+    else {
+      Assert.That(client.Session, Is.Null);
+    }
   }
 
   [Test]
