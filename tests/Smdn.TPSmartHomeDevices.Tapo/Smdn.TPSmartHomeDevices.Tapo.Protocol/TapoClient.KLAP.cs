@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
-using Smdn.TPSmartHomeDevices.Tapo.Credentials;
-
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClientTests {
@@ -14,12 +12,7 @@ partial class TapoClientTests {
   public async Task SendRequestAsync_KLAP()
   {
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) =>
-        _ = TapoCredentials.TryComputeKlapAuthHash(
-          defaultCredentialProvider!.GetCredential(null),
-          authHash.Span,
-          out _
-        ),
+      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
       FuncGenerateKlapRequestResponse = (_, _, _) => new GetDeviceInfoResponse<NullResult>() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new(),
@@ -36,7 +29,7 @@ partial class TapoClientTests {
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
-        credential: defaultCredentialProvider!
+        credential: defaultKlapCredentialProvider!
       )
     );
 
@@ -63,12 +56,7 @@ partial class TapoClientTests {
     int? sequenceNumber = null;
 
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) =>
-        _ = TapoCredentials.TryComputeKlapAuthHash(
-          defaultCredentialProvider!.GetCredential(null),
-          authHash.Span,
-          out _
-        ),
+      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
       FuncGenerateKlapRequestResponse = (_, _, seq) => {
         sequenceNumber = seq;
 
@@ -89,7 +77,7 @@ partial class TapoClientTests {
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
-        credential: defaultCredentialProvider!
+        credential: defaultKlapCredentialProvider!
       )
     );
 

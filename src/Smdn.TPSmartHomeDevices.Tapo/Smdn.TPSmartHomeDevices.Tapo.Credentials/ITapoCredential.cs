@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
-using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
@@ -9,6 +8,8 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 /// <summary>
 /// Provides a mechanism for abstracting credentials used for authentication in Tapo's communication protocol.
 /// </summary>
+/// <seealso cref="ITapoCredentialProvider"/>
+/// <seealso cref="Protocol.TapoSessionProtocol.SecurePassThrough"/>
 public interface ITapoCredential : IDisposable {
   /// <summary>
   /// Writes the password corresponding to this credential into a JSON property.
@@ -18,6 +19,7 @@ public interface ITapoCredential : IDisposable {
   /// Also, the password must be written as a BASE64-encoded value.
   /// </remarks>
   /// <param name="writer">The <see cref="Utf8JsonWriter"/> currently pointing to where the property value is to be written.</param>
+  /// <seealso cref="Protocol.TapoSessionProtocol.SecurePassThrough"/>
   /// <seealso cref="Protocol.LoginDeviceRequest"/>
   /// <seealso cref="TapoCredentials.ToBase64EncodedString(ReadOnlySpan{char})"/>
   void WritePasswordPropertyValue(Utf8JsonWriter writer);
@@ -30,17 +32,8 @@ public interface ITapoCredential : IDisposable {
   /// Also, the user name must be written as a BASE64-encoded value of the its SHA-1 digest.
   /// </remarks>
   /// <param name="writer">The <see cref="Utf8JsonWriter"/> currently pointing to where the property value is to be written.</param>
+  /// <seealso cref="Protocol.TapoSessionProtocol.SecurePassThrough"/>
   /// <seealso cref="Protocol.LoginDeviceRequest"/>
   /// <seealso cref="TapoCredentials.ToBase64EncodedSHA1DigestString(ReadOnlySpan{char})"/>
   void WriteUsernamePropertyValue(Utf8JsonWriter writer);
-
-  /// <summary>
-  /// Computes the hash of the password corresponding to this credential with the specific hash algorithm.
-  /// </summary>
-  int HashPassword(HashAlgorithm algorithm, Span<byte> destination);
-
-  /// <summary>
-  /// Computes the hash of the user name corresponding to this credential with the specific hash algorithm.
-  /// </summary>
-  int HashUsername(HashAlgorithm algorithm, Span<byte> destination);
 }

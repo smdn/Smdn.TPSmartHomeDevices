@@ -21,6 +21,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   private const string Base64UserNameSHA1Digest = "YjhlY2VjNWIzNjk0ZTVlNzE0YTYxMmNhZTZlZTJiNmExMjQ5ZmZmZQ==";
   private const string Base64Password = "cGFzc3dvcmQ=";
 
+  private const string KlapLocalAuthHash = "0F2256EF19E6AC29DAD1F079E98FB53B7DDE48FB4E09ECDFB0B712F20C906F4F";
+
   private static (string Username, string Password) GetEncodedCredential(
     ITapoCredentialProvider provider,
     ITapoCredentialIdentity? identity
@@ -57,6 +59,20 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
     return (username, password);
   }
 
+  private static string GetKlapLocalAuthHash(
+    ITapoCredentialProvider provider,
+    ITapoCredentialIdentity? identity
+  )
+  {
+    using var credential = provider.GetKlapCredential(identity: identity);
+
+    Span<byte> destination = stackalloc byte[32]; // SHA256.HashSizeInBytes
+
+    credential.WriteLocalAuthHash(destination);
+
+    return Convert.ToHexString(destination);
+  }
+
   [Test]
   public void AddTapoCredential()
   {
@@ -75,6 +91,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
     Assert.That(password, Is.EqualTo(Base64Password));
+
+    Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
   }
 
   [Test]
@@ -99,6 +117,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
     Assert.That(password, Is.EqualTo(Base64Password));
+
+    Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
   }
 
   [TestCase(EMail, null)]
@@ -133,6 +153,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
     Assert.That(password, Is.EqualTo(Base64Password));
+
+    Assert.That(() => GetKlapLocalAuthHash(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
   }
 
   [Test]
@@ -157,6 +179,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
     Assert.That(password, Is.EqualTo(Base64Password));
+
+    Assert.That(() => GetKlapLocalAuthHash(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
   }
 
   [TestCase(Base64UserNameSHA1Digest, null)]
@@ -200,6 +224,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
       Assert.That(password, Is.EqualTo(Base64Password));
+
+      Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
     }
     finally {
       Environment.SetEnvironmentVariable(EnvVarUsername, null);
@@ -233,6 +259,10 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       Assert.Throws<InvalidOperationException>(
         () => GetEncodedCredential(credentialProvider, identity: null)
+      );
+
+      Assert.Throws<InvalidOperationException>(
+        () => GetKlapLocalAuthHash(credentialProvider, identity: null)
       );
     }
     finally {
@@ -275,6 +305,8 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       Assert.That(username, Is.EqualTo(Base64UserNameSHA1Digest));
       Assert.That(password, Is.EqualTo(Base64Password));
+
+      Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
     }
     finally {
       Environment.SetEnvironmentVariable(EnvVarUsername, null);
@@ -300,6 +332,9 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
   private class ConcreteTapoCredentialProvider : ITapoCredentialProvider {
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+      => throw new NotSupportedException();
+
+    public ITapoKlapCredential GetKlapCredential(ITapoCredentialIdentity? identity)
       => throw new NotSupportedException();
   }
 

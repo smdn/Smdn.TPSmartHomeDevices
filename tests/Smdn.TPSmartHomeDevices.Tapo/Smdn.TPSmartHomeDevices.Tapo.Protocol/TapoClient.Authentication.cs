@@ -174,23 +174,29 @@ partial class TapoClientTests {
   private class TapoCredentialNotFoundException : Exception { }
 
   private class TapoMultipleCredentialProvider : ITapoCredentialProvider {
-    private readonly Dictionary<ITapoCredentialIdentity, ITapoCredential?> credentials = new();
+    private readonly Dictionary<ITapoCredentialIdentity, TapoCredential?> credentials = new();
 
-    public void AddCredential(ITapoCredentialIdentity identity, ITapoCredential? credentialForIdentity)
+    public void AddCredential(ITapoCredentialIdentity identity, TapoCredential? credentialForIdentity)
       => credentials[identity] = credentialForIdentity;
 
-    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+    private TapoCredential? GetTapoCredential(ITapoCredentialIdentity? identity)
     {
       if (identity is null)
         throw new InvalidOperationException("identity must be specified");
       if (!credentials.TryGetValue(identity, out var credential))
         throw new TapoCredentialNotFoundException();
 
-      return credential!; // may be null
+      return credential!;
     }
+
+    public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
+      => GetTapoCredential(identity)!; // return null as is even if null.
+
+    public ITapoKlapCredential GetKlapCredential(ITapoCredentialIdentity? identity)
+      => GetTapoCredential(identity)!; // return null as is even if null.
   }
 
-  private class TapoCredential : ITapoCredentialIdentity, ITapoCredential {
+  private class TapoCredential : ITapoCredentialIdentity, ITapoCredential, ITapoKlapCredential {
     public string Name => $"{nameof(TapoCredential)}:{Username}";
     public string Username { get; }
     public string Password { get; }
@@ -209,15 +215,13 @@ partial class TapoClientTests {
     public void WritePasswordPropertyValue(Utf8JsonWriter writer)
       => writer.WriteStringValue(Password); // write non-encoded string
 
-    public int HashPassword(HashAlgorithm algorithm, Span<byte> destination)
-      => algorithm.TryComputeHash(Encoding.ASCII.GetBytes(Password), destination, out var bytesWritten)
-        ? bytesWritten
-        : 0;
-
-    public int HashUsername(HashAlgorithm algorithm, Span<byte> destination)
-      => algorithm.TryComputeHash(Encoding.ASCII.GetBytes(Username), destination, out var bytesWritten)
-        ? bytesWritten
-        : 0;
+    public void WriteLocalAuthHash(Span<byte> destination)
+      => _ = TapoCredentials.TryComputeKlapLocalAuthHash(
+        Encoding.ASCII.GetBytes(Username),
+        Encoding.ASCII.GetBytes(Password),
+        destination,
+        out _
+      );
   }
 
   private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_IdentifyCredentialForIdentity()
@@ -242,7 +246,7 @@ partial class TapoClientTests {
   public async Task AuthenticateAsync_IdentifyCredentialForIdentity(
     ITapoCredentialProvider credentialProvider,
     ITapoCredentialIdentity identity,
-    ITapoCredential _,
+    ITapoKlapCredential _,
     Type? typeOfExpectedException
   )
   {
@@ -592,12 +596,6 @@ partial class TapoClientTests {
       writer.WriteStringValue(TapoCredentials.ToBase64EncodedSHA1DigestString(username));
     }
 
-    public int HashPassword(HashAlgorithm algorithm, Span<byte> destination)
-      => throw new NotImplementedException();
-
-    public int HashUsername(HashAlgorithm algorithm, Span<byte> destination)
-      => throw new NotImplementedException();
-
     public void Dispose()
     {
       username = null!;
@@ -615,6 +613,9 @@ partial class TapoClientTests {
 
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
       => credential;
+
+    public ITapoKlapCredential GetKlapCredential(ITapoCredentialIdentity? identity)
+      => throw new NotImplementedException();
   }
 
   private static System.Collections.IEnumerable YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten()

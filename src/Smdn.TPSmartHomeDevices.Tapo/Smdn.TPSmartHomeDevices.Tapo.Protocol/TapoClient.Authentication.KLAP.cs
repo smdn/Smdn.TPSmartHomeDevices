@@ -52,23 +52,10 @@ partial class TapoClient {
 
     using (
       var credential =
-        credentialProvider.GetCredential(identity)
+        credentialProvider.GetKlapCredential(identity)
         ?? throw TapoCredentials.CreateExceptionNoCredentialForIdentity(identity)
     ) {
-      _ = TapoCredentials.TryComputeKlapAuthHash(
-        credential,
-        localAuthHash.AsSpan(0, SHA256HashSizeInBytes),
-#if DEBUG
-        out var bytesWritten
-#else
-        out _
-#endif
-      );
-
-#if DEBUG
-      if (bytesWritten != SHA256HashSizeInBytes)
-        throw new InvalidOperationException("invalid legnth of local_auth_hash");
-#endif
+      credential.WriteLocalAuthHash(localAuthHash.AsSpan(0, SHA256HashSizeInBytes));
     }
 
     var baseTimeForExpiration = DateTime.Now;

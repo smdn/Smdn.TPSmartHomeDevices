@@ -306,6 +306,9 @@ internal class ConcreteTapoDeviceCommonTests {
   private sealed class NullCredentialProvider : ITapoCredentialProvider {
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)
       => throw new NotImplementedException();
+
+    public ITapoKlapCredential GetKlapCredential(ITapoCredentialIdentity? identity)
+      => throw new NotImplementedException();
   }
 
   internal static void TestToString<TTapoDevice>()

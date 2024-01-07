@@ -26,16 +26,14 @@ partial class TapoCredentials {
   /// forked from <see href="https://github.com/K4CZP3R/tapo-p100-python">K4CZP3R/tapo-p100-python</see>.
   /// </remarks>
 #pragma warning disable CA5350
-  public static bool TryComputeKlapAuthHash(
-    ITapoCredential credential,
+  public static bool TryComputeKlapLocalAuthHash(
+    ReadOnlySpan<byte> username,
+    ReadOnlySpan<byte> password,
     Span<byte> destination,
     out int bytesWritten
   )
   {
     bytesWritten = 0;
-
-    if (credential is null)
-      return false;
 
     if (destination.Length < SHA256HashSizeInBytes)
       return false; // destination too short
@@ -49,25 +47,49 @@ partial class TapoCredentials {
       authHashInput = ArrayPool<byte>.Shared.Rent(2 * SHA1HashSizeInBytes);
 
       // SHA1(username)
-      using (var sha1 = SHA1.Create()) {
-        bytesWrittenAuthHashInput += credential.HashUsername(
-          sha1,
-          authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes)
+#pragma warning disable SA1114
+#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
+      {
+        var retUsernameHash = SHA1.TryHashData(
+#else
+      using (var sha1ForUsername = SHA1.Create()) {
+        var retUsernameHash = sha1ForUsername.TryComputeHash(
+#endif
+          username,
+          authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes),
+          out var bytesWrittenByUsernameHash
         );
+#pragma warning restore SA1114
 
-        if (bytesWrittenAuthHashInput != SHA1HashSizeInBytes)
+        if (!retUsernameHash)
           return false;
+        if (bytesWrittenByUsernameHash != SHA1HashSizeInBytes)
+          return false;
+
+        bytesWrittenAuthHashInput += bytesWrittenByUsernameHash;
       }
 
       // SHA1(password)
-      using (var sha1 = SHA1.Create()) {
-        bytesWrittenAuthHashInput += credential.HashPassword(
-          sha1,
-          authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes)
+#pragma warning disable SA1114
+#if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
+      {
+        var retPasswordHash = SHA1.TryHashData(
+#else
+      using (var sha1ForPassword = SHA1.Create()) {
+        var retPasswordHash = sha1ForPassword.TryComputeHash(
+#endif
+          password,
+          authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes),
+          out var bytesWrittenByPasswordHash
         );
+#pragma warning restore SA1114
 
-        if (bytesWrittenAuthHashInput != SHA1HashSizeInBytes * 2)
+        if (!retPasswordHash)
           return false;
+        if (bytesWrittenByPasswordHash != SHA1HashSizeInBytes)
+          return false;
+
+        bytesWrittenAuthHashInput += bytesWrittenByPasswordHash;
       }
 
       // SHA256(authHashInput) = SHA256(SHA1(username) + SHA1(password))

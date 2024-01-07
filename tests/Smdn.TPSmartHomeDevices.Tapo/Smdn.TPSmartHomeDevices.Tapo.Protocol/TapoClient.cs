@@ -18,6 +18,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 public partial class TapoClientTests {
   private ServiceCollection? services;
   private ITapoCredentialProvider? defaultCredentialProvider;
+  private ITapoCredentialProvider? defaultKlapCredentialProvider;
   private IHttpClientFactory? defaultHttpClientFactory;
 
   private readonly struct NullResult { }
@@ -42,6 +43,15 @@ public partial class TapoClientTests {
 
     defaultCredentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
     defaultHttpClientFactory = services?.BuildServiceProvider()!.GetService<IHttpClientFactory>();
+
+    var servicesForDefaultKlapCredentialProvider = new ServiceCollection();
+
+    servicesForDefaultKlapCredentialProvider.AddTapoCredential(
+      email: "user",
+      password: "pass"
+    );
+
+    defaultKlapCredentialProvider = servicesForDefaultKlapCredentialProvider.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
   }
 
   [Test]

@@ -163,7 +163,7 @@ public static partial class TapoCredentials {
     );
   }
 
-  private sealed class SingleIdentityStringCredentialProvider : ITapoCredentialProvider, ITapoCredential {
+  private sealed class SingleIdentityStringCredentialProvider : ITapoCredentialProvider, ITapoCredential, ITapoKlapCredential {
     private readonly byte[] utf8Username;
     private readonly byte[] utf8Password;
     private readonly bool isPlainText;
@@ -180,6 +180,9 @@ public static partial class TapoCredentials {
     }
 
     ITapoCredential ITapoCredentialProvider.GetCredential(ITapoCredentialIdentity? identity) => this;
+
+    ITapoKlapCredential ITapoCredentialProvider.GetKlapCredential(ITapoCredentialIdentity? identity)
+      => isPlainText ? this : throw new NotSupportedException("KLAP protocol does not support base64 encoded username and password");
 
     void IDisposable.Dispose() { /* nothing to do */ }
 
@@ -211,18 +214,11 @@ public static partial class TapoCredentials {
       }
     }
 
-    int ITapoCredential.HashPassword(HashAlgorithm algorithm, Span<byte> destination)
-      => algorithm.TryComputeHash(utf8Password, destination, out var bytesWritten)
-        ? bytesWritten
-        : 0;
-
-    int ITapoCredential.HashUsername(HashAlgorithm algorithm, Span<byte> destination)
-      => algorithm.TryComputeHash(utf8Username, destination, out var bytesWritten)
-        ? bytesWritten
-        : 0;
+    void ITapoKlapCredential.WriteLocalAuthHash(Span<byte> destination)
+      => _ = TryComputeKlapLocalAuthHash(utf8Username, utf8Password, destination, out _);
   }
 
-  private sealed class SingleIdentityEnvVarCredentialProvider : ITapoCredentialProvider, ITapoCredential {
+  private sealed class SingleIdentityEnvVarCredentialProvider : ITapoCredentialProvider, ITapoCredential, ITapoKlapCredential {
     private readonly string envVarUsername;
     private readonly string envVarPassword;
 
@@ -237,13 +233,14 @@ public static partial class TapoCredentials {
 
     ITapoCredential ITapoCredentialProvider.GetCredential(ITapoCredentialIdentity? identity) => this;
 
+    ITapoKlapCredential ITapoCredentialProvider.GetKlapCredential(ITapoCredentialIdentity? identity) => this;
+
     void IDisposable.Dispose() { /* nothing to do */ }
 
     void ITapoCredential.WritePasswordPropertyValue(Utf8JsonWriter writer)
       => ReadEnvVar(
         envVarPassword,
-        output: Span<None>.Empty,
-        (utf8Password, output) => {
+        utf8Password => {
           writer.WriteBase64StringValue(utf8Password);
           return default(None);
         }
@@ -252,8 +249,7 @@ public static partial class TapoCredentials {
     void ITapoCredential.WriteUsernamePropertyValue(Utf8JsonWriter writer)
       => ReadEnvVar(
         envVarUsername,
-        output: Span<None>.Empty,
-        (utf8Username, output) => {
+        utf8Username => {
           Span<byte> buffer = stackalloc byte[HexSHA1HashSizeInBytes];
 
           try {
@@ -270,30 +266,44 @@ public static partial class TapoCredentials {
         }
       );
 
-    int ITapoCredential.HashPassword(HashAlgorithm algorithm, Span<byte> destination)
-      => ReadEnvVar(
-        envVarPassword,
-        destination,
-        (utf8Password, dest) => algorithm.TryComputeHash(utf8Password, dest, out var bytesWritten)
-          ? bytesWritten
-          : 0
-      );
+    void ITapoKlapCredential.WriteLocalAuthHash(Span<byte> destination)
+    {
+      byte[]? utf8EncodedUsername = null;
+      byte[]? utf8EncodedPassword = null;
 
-    int ITapoCredential.HashUsername(HashAlgorithm algorithm, Span<byte> destination)
-      => ReadEnvVar(
-        envVarUsername,
-        destination,
-        (utf8Username, dest) => algorithm.TryComputeHash(utf8Username, dest, out var bytesWritten)
-          ? bytesWritten
-          : 0
-      );
+      try {
+        static (byte[], int) CopyToRentArrayPool(ReadOnlySpan<byte> val)
+        {
+          var buffer = ArrayPool<byte>.Shared.Rent(val.Length);
 
-    private delegate TResult ReadEnvVarFunc<T, TOut, TResult>(ReadOnlySpan<T> span, Span<TOut> output);
+          val.CopyTo(buffer.AsSpan(0, val.Length));
 
-    private static TResult ReadEnvVar<TOut, TResult>(
+          return (buffer, val.Length);
+        }
+
+        (utf8EncodedUsername, var usernameLength) = ReadEnvVar(envVarUsername, CopyToRentArrayPool);
+        (utf8EncodedPassword, var passwordLength) = ReadEnvVar(envVarPassword, CopyToRentArrayPool);
+
+        _ = TryComputeKlapLocalAuthHash(
+          username: utf8EncodedUsername.AsSpan(0, usernameLength),
+          password: utf8EncodedPassword.AsSpan(0, passwordLength),
+          destination,
+          out _
+        );
+      }
+      finally {
+        if (utf8EncodedUsername is not null)
+          ArrayPool<byte>.Shared.Return(utf8EncodedUsername, clearArray: true);
+        if (utf8EncodedPassword is not null)
+          ArrayPool<byte>.Shared.Return(utf8EncodedPassword, clearArray: true);
+      }
+    }
+
+    private delegate TResult ReadEnvVarFunc<TResult>(ReadOnlySpan<byte> span);
+
+    private static TResult ReadEnvVar<TResult>(
       string envVar,
-      Span<TOut> output,
-      ReadEnvVarFunc<byte, TOut, TResult> func
+      ReadEnvVarFunc<TResult> func
     )
     {
       byte[]? utf8EncodedEnvVarValue = null;
@@ -308,7 +318,7 @@ public static partial class TapoCredentials {
 
         var len = Encoding.UTF8.GetBytes(envVarValue, utf8EncodedEnvVarValue);
 
-        return func(utf8EncodedEnvVarValue.AsSpan(0, len), output);
+        return func(utf8EncodedEnvVarValue.AsSpan(0, len));
       }
       finally {
         if (utf8EncodedEnvVarValue is not null)

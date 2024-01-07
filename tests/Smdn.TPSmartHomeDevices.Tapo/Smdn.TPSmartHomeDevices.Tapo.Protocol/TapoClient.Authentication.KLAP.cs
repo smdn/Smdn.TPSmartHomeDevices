@@ -16,12 +16,7 @@ partial class TapoClientTests {
   public async Task AuthenticateAsync_KLAP()
   {
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) =>
-        _ = TapoCredentials.TryComputeKlapAuthHash(
-          defaultCredentialProvider!.GetCredential(null),
-          authHash.Span,
-          out _
-        )
+      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
     };
     var endPoint = device.Start();
 
@@ -33,7 +28,7 @@ partial class TapoClientTests {
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
-        credential: defaultCredentialProvider!
+        credential: defaultKlapCredentialProvider!
       )
     );
 
@@ -61,7 +56,7 @@ partial class TapoClientTests {
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
-        credential: defaultCredentialProvider!
+        credential: defaultKlapCredentialProvider!
       )
     );
 
@@ -77,12 +72,7 @@ partial class TapoClientTests {
     const HttpStatusCode Handshake2NonSuccessStatusCode = HttpStatusCode.Unauthorized;
 
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) =>
-        _ = TapoCredentials.TryComputeKlapAuthHash(
-          defaultCredentialProvider!.GetCredential(null),
-          authHash.Span,
-          out _
-        ),
+      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
       FuncGenerateKlapHandshake2Response = _ => (Handshake2NonSuccessStatusCode, Handshake2NonSuccessStatusCode.ToString()),
     };
     var endPoint = device.Start();
@@ -95,7 +85,7 @@ partial class TapoClientTests {
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
-        credential: defaultCredentialProvider!
+        credential: defaultKlapCredentialProvider!
       )
     );
 
@@ -118,17 +108,12 @@ partial class TapoClientTests {
   public async Task AuthenticateAsync_KLAP_IdentifyCredentialForIdentity(
     ITapoCredentialProvider credentialProvider,
     ITapoCredentialIdentity identity,
-    ITapoCredential credentialForKlapAuthHash,
+    ITapoKlapCredential credentialForKlapAuthHash,
     Type? typeOfExpectedException
   )
   {
     await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) =>
-        _ = TapoCredentials.TryComputeKlapAuthHash(
-          credentialForKlapAuthHash,
-          authHash.Span,
-          out _
-        )
+      FuncGenerateKlapAuthHash = (_, _, authHash) => credentialForKlapAuthHash.WriteLocalAuthHash(authHash.Span)
     };
     var endPoint = device.Start();
 
