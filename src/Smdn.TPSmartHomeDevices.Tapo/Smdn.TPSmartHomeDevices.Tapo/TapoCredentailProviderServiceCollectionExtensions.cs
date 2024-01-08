@@ -95,6 +95,33 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
 
   /// <summary>
   /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
+  /// This overload creates <see cref="ITapoCredentialProvider"/> that retrieves the base64-encoded KLAP <c>local_auth_hash</c> from environment variables.
+  /// To authenticate using this method, the device firmware must support KLAP.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="envVarBase64KlapLocalAuthHash">The name of environment variable that holds the <c>local_auth_hash</c> for authentication to the Tapo device.</param>
+  public static IServiceCollection AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+    this IServiceCollection services,
+    string envVarBase64KlapLocalAuthHash
+  )
+  {
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+
+    services.TryAdd(
+      ServiceDescriptor.Singleton(
+        typeof(ITapoCredentialProvider),
+        TapoCredentials.CreateProviderFromEnvironmentVariables(
+          envVarBase64KlapLocalAuthHash: envVarBase64KlapLocalAuthHash
+        )
+      )
+    );
+
+    return services;
+  }
+
+  /// <summary>
+  /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.
   /// </summary>
   /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
   /// <param name="credentialProvider">A <see cref="ITapoCredentialProvider"/> used for authentication to the Tapo device.</param>

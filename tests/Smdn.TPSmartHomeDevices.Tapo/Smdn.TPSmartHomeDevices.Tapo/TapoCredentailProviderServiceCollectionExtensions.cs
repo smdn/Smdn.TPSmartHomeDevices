@@ -22,6 +22,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   private const string Base64Password = "cGFzc3dvcmQ=";
 
   private const string KlapLocalAuthHash = "0F2256EF19E6AC29DAD1F079E98FB53B7DDE48FB4E09ECDFB0B712F20C906F4F";
+  private static readonly string Base64KlapLocalAuthHash = Convert.ToBase64String(Convert.FromHexString(KlapLocalAuthHash));
 
   private static (string Username, string Password) GetEncodedCredential(
     ITapoCredentialProvider provider,
@@ -326,6 +327,112 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: envVarUsername!,
         envVarPassword: envVarPassword!
+      )
+    );
+  }
+
+  [Test]
+  public void AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable()
+  {
+    const string EnvVarKlapLocalAuthHash = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_KLAPLOCALAUTHHASH";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+        envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, Base64KlapLocalAuthHash);
+
+      Assert.That(() => GetEncodedCredential(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
+
+      Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
+    }
+    finally {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, null);
+    }
+  }
+
+  [Test]
+  public void AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable_EnvVarNotSet()
+  {
+    const string EnvVarKlapLocalAuthHash = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_KLAPLOCALAUTHHASH";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+        envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, null);
+
+      Assert.That(() => GetEncodedCredential(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
+
+      Assert.That(() => GetKlapLocalAuthHash(credentialProvider, identity: null), Throws.TypeOf<InvalidOperationException>());
+    }
+    finally {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, null);
+    }
+  }
+
+  [Test]
+  public void AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable_TryAddMultiple()
+  {
+    const string EnvVarKlapLocalAuthHash = "SMDN_TPSMARTHOMEDEVICES_TAPO_CREDENTIAL_KLAPLOCALAUTHHASH";
+
+    var services = new ServiceCollection();
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+        envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
+      )
+    );
+
+    Assert.DoesNotThrow(
+      () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+        envVarBase64KlapLocalAuthHash: "this_must_not_be_selected"
+      )
+    );
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    Assert.That(credentialProvider, Is.Not.Null, nameof(credentialProvider));
+
+    try {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, Base64KlapLocalAuthHash);
+
+      Assert.That(() => GetEncodedCredential(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
+
+      Assert.That(GetKlapLocalAuthHash(credentialProvider, identity: null), Is.EqualTo(KlapLocalAuthHash));
+    }
+    finally {
+      Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, null);
+    }
+  }
+
+  [TestCase(null)]
+  [TestCase("")]
+  public void AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable_ArgumentNullOrEmpty(string? envVarBase64KlapLocalAuthHash)
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<ArgumentException>(
+      () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+        envVarBase64KlapLocalAuthHash: envVarBase64KlapLocalAuthHash!
       )
     );
   }
