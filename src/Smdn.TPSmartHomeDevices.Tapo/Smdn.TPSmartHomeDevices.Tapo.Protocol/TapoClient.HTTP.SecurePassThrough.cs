@@ -105,6 +105,7 @@ partial class TapoClient {
           ).ConfigureAwait(false),
           await processHttpResponseAsync(httpResponse).ConfigureAwait(false)
         ),
+      logContentAsKlapProtocol: false,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 

@@ -29,6 +29,7 @@ partial class TapoClient {
     Uri requestUri,
     HttpContent requestContent,
     Func<HttpResponseMessage, ValueTask<THttpResult?>> processHttpResponseAsync,
+    bool logContentAsKlapProtocol,
     CancellationToken cancellationToken
   )
   {
@@ -39,14 +40,31 @@ partial class TapoClient {
       "HTTP Request headers: {RequestHeaders}",
       string.Join(" ", requestContent.Headers.Select(static header => string.Concat(header.Key, ": ", string.Join("; ", header.Value))))
     );
-    logger?.LogTrace(
-      "HTTP Request content: {RequestContent}",
-#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
-      await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+
+    if (logContentAsKlapProtocol) {
+#pragma warning disable SA1114
+      logger?.LogTrace(
+        "HTTP Request content (Base64): {RequestContent}",
+        Convert.ToBase64String(
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASBYTEARRAYASYNC_CANCELLATIONTOKEN
+          await requestContent.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false)
 #else
-      await requestContent.ReadAsStringAsync().ConfigureAwait(false)
+          await requestContent.ReadAsByteArrayAsync().ConfigureAwait(false)
 #endif
-    );
+        )
+      );
+#pragma warning restore SA1114
+    }
+    else {
+      logger?.LogTrace(
+        "HTTP Request content: {RequestContent}",
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
+        await requestContent.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+#else
+        await requestContent.ReadAsStringAsync().ConfigureAwait(false)
+#endif
+      );
+    }
 
     using var httpClient = httpClientFactory.CreateClient(
       name: string.Concat(nameof(TapoClient), " (", endPointUri, ")")
@@ -73,14 +91,31 @@ partial class TapoClient {
       "HTTP Response headers: {ResponseHeaders}",
       string.Join(" ", httpResponse.Content.Headers.Concat(httpResponse.Headers).Select(static header => string.Concat(header.Key, ": ", string.Join("; ", header.Value))))
     );
-    logger?.LogTrace(
-      "HTTP Response content: {ResponseContent}",
-#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
-      await httpResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+
+    if (logContentAsKlapProtocol) {
+#pragma warning disable SA1114
+      logger?.LogTrace(
+        "HTTP Response content (Base64): {ResponseContent}",
+        Convert.ToBase64String(
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASBYTEARRAYASYNC_CANCELLATIONTOKEN
+          await httpResponse.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false)
 #else
-      await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false)
+          await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false)
 #endif
-    );
+        )
+      );
+#pragma warning restore SA1114
+    }
+    else {
+      logger?.LogTrace(
+        "HTTP Response content: {ResponseContent}",
+#if SYSTEM_NET_HTTP_HTTPCONTENT_READASSTRINGASYNC_CANCELLATIONTOKEN
+        await httpResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
+#else
+        await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false)
+#endif
+      );
+    }
 
     httpResponse.EnsureSuccessStatusCode();
 

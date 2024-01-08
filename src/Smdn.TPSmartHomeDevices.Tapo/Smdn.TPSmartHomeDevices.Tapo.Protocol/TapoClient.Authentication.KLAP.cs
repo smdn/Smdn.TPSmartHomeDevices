@@ -137,6 +137,7 @@ partial class TapoClient {
 
         return (responseHandshake1, sessionId, sessionTimeout);
       },
+      logContentAsKlapProtocol: true,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
@@ -241,6 +242,7 @@ partial class TapoClient {
           requestUri: RequestUriKlapHandshake2,
           requestContent: content,
           processHttpResponseAsync: static httpResponse => new(result: httpResponse.StatusCode),
+          logContentAsKlapProtocol: true,
           cancellationToken: cancellationToken
         ).ConfigureAwait(false);
       }

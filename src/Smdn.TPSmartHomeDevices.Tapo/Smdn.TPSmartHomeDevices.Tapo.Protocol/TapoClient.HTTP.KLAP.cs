@@ -59,6 +59,7 @@ partial class TapoClient {
         sequenceNumber: sequenceNumber,
         jsonSerializerOptions: jsonSerializerOptions
       ),
+      logContentAsKlapProtocol: true,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
 
