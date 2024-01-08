@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview2)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview3)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview2+297c36b69acac89037a580a95eda0233f9529f71
+//   InformationalVersion: 2.0.0-preview3+431906bdfe9a3cf559bfddbf5593f2ab1e266f1b
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -9,7 +9,7 @@
 //     Microsoft.Extensions.Http, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Microsoft.Extensions.Logging.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Smdn.Fundamental.PrintableEncoding.Hexadecimal, Version=3.0.1.0, Culture=neutral
-//     Smdn.TPSmartHomeDevices.Primitives, Version=1.0.0.0, Culture=neutral
+//     Smdn.TPSmartHomeDevices.Primitives, Version=1.1.0.0, Culture=neutral
 //     System.Net.Http.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
@@ -35,7 +35,10 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo {
-  public class L530 : TapoDevice {
+  public class L530 :
+    TapoDevice,
+    IMulticolorSmartLight
+  {
     public static L530 Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
 
     public L530(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
@@ -51,9 +54,15 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public ValueTask SetColorHueAsync(int hue, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
+    ValueTask IMulticolorSmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask IMulticolorSmartLight.SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
   }
 
-  public class L900 : TapoDevice {
+  public class L900 :
+    TapoDevice,
+    IMulticolorSmartLight
+  {
     public static L900 Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
 
     public L900(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
@@ -68,9 +77,16 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public ValueTask SetColorAsync(int hue, int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorHueAsync(int hue, int? brightness, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
+    public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
+    ValueTask IMulticolorSmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask IMulticolorSmartLight.SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
   }
 
-  public class P105 : TapoDevice {
+  public class P105 :
+    TapoDevice,
+    ISmartPlug
+  {
     public static P105 Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
 
     public P105(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
@@ -88,6 +104,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
   public static class TapoCredentailProviderServiceCollectionExtensions {
     public static IServiceCollection AddTapoBase64EncodedCredential(this IServiceCollection services, string base64UserNameSHA1Digest, string base64Password) {}
+    public static IServiceCollection AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(this IServiceCollection services, string envVarBase64KlapLocalAuthHash) {}
     public static IServiceCollection AddTapoCredential(this IServiceCollection services, string email, string password) {}
     public static IServiceCollection AddTapoCredentialFromEnvironmentVariable(this IServiceCollection services, string envVarUsername, string envVarPassword) {}
     public static IServiceCollection AddTapoCredentialProvider(this IServiceCollection services, ITapoCredentialProvider credentialProvider) {}
@@ -261,8 +278,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
   public interface ITapoCredential : IDisposable {
-    int HashPassword(HashAlgorithm algorithm, Span<byte> destination);
-    int HashUsername(HashAlgorithm algorithm, Span<byte> destination);
     [...] <unknown> WritePasswordPropertyValue(...);
     [...] <unknown> WriteUsernamePropertyValue(...);
   }
@@ -272,6 +287,11 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
 
   public interface ITapoCredentialProvider {
     ITapoCredential GetCredential(ITapoCredentialIdentity? identity);
+    ITapoKlapCredential GetKlapCredential(ITapoCredentialIdentity? identity);
+  }
+
+  public interface ITapoKlapCredential : IDisposable {
+    void WriteLocalAuthHash(Span<byte> destination);
   }
 
   public static class TapoCredentials {
@@ -279,7 +299,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
 
     public static string ToBase64EncodedSHA1DigestString(ReadOnlySpan<char> str) {}
     public static string ToBase64EncodedString(ReadOnlySpan<char> str) {}
-    public static bool TryComputeKlapAuthHash(ITapoCredential credential, Span<byte> destination, out int bytesWritten) {}
+    public static bool TryComputeKlapLocalAuthHash(ReadOnlySpan<byte> username, ReadOnlySpan<byte> password, Span<byte> destination, out int bytesWritten) {}
     public static bool TryConvertToHexSHA1Hash(ReadOnlySpan<byte> input, Span<byte> destination, out int bytesWritten) {}
   }
 }
@@ -518,5 +538,5 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public TResult Result { get; init; }
   }
 }
-// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.2.2.0.
+// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.3.2.0.
 // Smdn.Reflection.ReverseGenerating.ListApi.Core v1.2.0.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
