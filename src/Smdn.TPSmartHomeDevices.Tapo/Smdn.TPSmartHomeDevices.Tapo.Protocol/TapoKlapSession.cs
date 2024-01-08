@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Buffers;
+using System.Text;
 using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
@@ -150,7 +151,8 @@ internal sealed class TapoKlapSession : TapoSession {
   internal TResponse? Decrypt<TResponse>(
     ReadOnlySpan<byte> encryptedText,
     int sequenceNumber,
-    JsonSerializerOptions jsonSerializerOptions
+    JsonSerializerOptions jsonSerializerOptions,
+    ILogger? logger
   ) where TResponse : ITapoPassThroughResponse
   {
     ThrowIfDisposed();
@@ -161,6 +163,12 @@ internal sealed class TapoKlapSession : TapoSession {
       encryptedText,
       sequenceNumber,
       decryptionBuffer
+    );
+
+    logger?.LogTrace(
+      "KLAP Decrypted text (seq={SequenceNumber}): {DecryptedText}",
+      sequenceNumber,
+      Encoding.UTF8.GetString(decryptionBuffer.WrittenSpan)
     );
 
     return JsonSerializer.Deserialize<TResponse>(

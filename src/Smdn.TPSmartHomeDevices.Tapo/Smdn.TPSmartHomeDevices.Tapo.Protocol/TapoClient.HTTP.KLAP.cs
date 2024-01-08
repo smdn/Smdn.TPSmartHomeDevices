@@ -57,7 +57,8 @@ partial class TapoClient {
       processHttpResponseAsync: async httpResponse => klapSession.Decrypt<TResponse>(
         encryptedText: await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false), // TODO: reduce allocation
         sequenceNumber: sequenceNumber,
-        jsonSerializerOptions: jsonSerializerOptions
+        jsonSerializerOptions: jsonSerializerOptions,
+        logger: logger
       ),
       logContentAsKlapProtocol: true,
       cancellationToken: cancellationToken
