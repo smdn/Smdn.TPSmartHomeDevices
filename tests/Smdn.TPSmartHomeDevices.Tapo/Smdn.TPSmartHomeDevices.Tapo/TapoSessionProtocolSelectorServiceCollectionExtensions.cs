@@ -12,8 +12,43 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
 public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
+  private class NullTapoSessionProtocolSelector : TapoSessionProtocolSelector {
+    public override TapoSessionProtocol? SelectProtocol(TapoDevice device) => throw new NotImplementedException();
+  }
+
   [Test]
-  public void AddTapoProtocolSelector()
+  public void AddTapoProtocolSelector_TapoSessionProtocolSelector()
+  {
+    var services = new ServiceCollection();
+    var selector = new NullTapoSessionProtocolSelector();
+
+    services.AddTapoProtocolSelector(selector: selector);
+
+    TapoSessionProtocolSelector? addedSelector = null;
+
+    Assert.DoesNotThrow(
+      () => addedSelector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    );
+    Assert.That(addedSelector, Is.Not.Null);
+    Assert.That(addedSelector, Is.SameAs(selector));
+  }
+
+  [Test]
+  public void AddTapoProtocolSelector_TapoSessionProtocolSelector_Null()
+  {
+    var services = new ServiceCollection();
+
+    Assert.Throws<ArgumentNullException>(
+      () => services.AddTapoProtocolSelector(selector: (TapoSessionProtocolSelector)null!)
+    );
+
+    Assert.Throws<InvalidOperationException>(
+      () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    );
+  }
+
+  [Test]
+  public void AddTapoProtocolSelector_FuncProtocolSelector()
   {
     var services = new ServiceCollection();
 
@@ -30,7 +65,7 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
   }
 
   [Test]
-  public void AddTapoProtocolSelector_Null()
+  public void AddTapoProtocolSelector_FuncProtocolSelector_Null()
   {
     var services = new ServiceCollection();
 

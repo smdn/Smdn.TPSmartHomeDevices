@@ -23,16 +23,36 @@ public static class TapoSessionProtocolSelectorServiceCollectionExtensions {
     this IServiceCollection services,
     Func<TapoDevice, TapoSessionProtocol?> selectProtocol
   )
+    => AddTapoProtocolSelector(
+      services,
+      new TapoSessionProtocolSelector.FuncSelector(
+        selectProtocol ?? throw new ArgumentNullException(nameof(selectProtocol))
+      )
+    );
+
+  /// <summary>
+  /// Adds <see cref="TapoSessionProtocolSelector"/> that selects an <see cref="TapoSessionProtocol"/> for the <see cref="TapoDevice"/>, to <see cref="IServiceCollection"/>.
+  /// </summary>
+  /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+  /// <param name="selector">
+  /// The concrete instance of <see cref="TapoSessionProtocolSelector"/> that selects the <see cref="TapoSessionProtocol"/> value
+  /// that represents the protocol used by <see cref="TapoDevice"/> for authentication and requests.
+  /// </param>
+  /// <seealso cref="TapoSessionProtocol"/>
+  public static IServiceCollection AddTapoProtocolSelector(
+    this IServiceCollection services,
+    TapoSessionProtocolSelector selector
+  )
   {
     if (services is null)
       throw new ArgumentNullException(nameof(services));
-    if (selectProtocol is null)
-      throw new ArgumentNullException(nameof(selectProtocol));
+    if (selector is null)
+      throw new ArgumentNullException(nameof(selector));
 
     services.TryAdd(
       ServiceDescriptor.Singleton(
         typeof(TapoSessionProtocolSelector),
-        new TapoSessionProtocolSelector.FuncSelector(selectProtocol)
+        selector
       )
     );
 
