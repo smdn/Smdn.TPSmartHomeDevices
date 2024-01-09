@@ -77,6 +77,7 @@ internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHan
           shouldReestablishSession: true
         );
 
+      case TapoErrorCodes.InvalidRequest:
       case TapoErrorCodes.RequestParameterError:
         logger?.LogWarning("{Message}", errorResponseException.Message);
         return TapoDeviceExceptionHandling.Throw;

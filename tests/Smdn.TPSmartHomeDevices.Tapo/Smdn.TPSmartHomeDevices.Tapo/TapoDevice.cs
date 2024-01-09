@@ -833,6 +833,43 @@ public partial class TapoDeviceTests {
   }
 
   [Test]
+  public async Task SendRequestAsync_ResponseWithErrorCodeMinus1002_RetryMustNotBeAttempted()
+  {
+    var request = 0;
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = _ => $"token-request{request}",
+      FuncGeneratePassThroughResponse = (_, _, _) => {
+        request++;
+
+        return (
+          KnownErrorCodes.Success,
+          new GetDeviceInfoResponse<NullResult>() {
+            ErrorCode = KnownErrorCodes.Minus1002,
+            Result = new(),
+          }
+        );
+      },
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services!.BuildServiceProvider()
+    );
+
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
+
+    var ex = Assert.ThrowsAsync<TapoErrorResponseException>(async () => await device.GetDeviceInfoAsync());
+
+    Assert.That(request, Is.EqualTo(1), nameof(request)); // retry not performed
+    Assert.That(ex!.RawErrorCode, Is.EqualTo(KnownErrorCodes.Minus1002), nameof(ex.RawErrorCode));
+    Assert.That(ex.EndPoint!.Query, Does.Contain("token=token-request0"), nameof(ex.EndPoint.Query));
+    Assert.That(device.Session, Is.Null, nameof(device.Session));
+  }
+
+  [Test]
   public Task SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory()
     => SendRequestAsync_Timeout_RetrySuccess(setTimeoutViaIHttpClientFactory: true);
 

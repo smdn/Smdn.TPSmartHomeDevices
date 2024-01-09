@@ -7,6 +7,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 // Therefore, these error codes cannot be made public APIs.
 internal static class TapoErrorCodes {
   public const int Success = 0;
+  public const int InvalidRequest = -1002;
   public const int InvalidCredentials = -1501;
   public const int DeviceBusy = -1301;
   public const int RequestParameterError = -1008;
