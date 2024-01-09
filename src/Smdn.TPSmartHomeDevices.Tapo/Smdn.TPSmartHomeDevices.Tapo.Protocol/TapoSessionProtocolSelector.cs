@@ -13,6 +13,13 @@ public abstract class TapoSessionProtocolSelector {
     public override TapoSessionProtocol? SelectProtocol(TapoDevice device) => null;
   }
 
+  internal sealed class ConstantSelector(TapoSessionProtocol protocol) : TapoSessionProtocolSelector {
+    private readonly TapoSessionProtocol protocol = protocol;
+
+    public override TapoSessionProtocol? SelectProtocol(TapoDevice device)
+      => protocol;
+  }
+
   internal sealed class FuncSelector : TapoSessionProtocolSelector {
     private readonly Func<TapoDevice, TapoSessionProtocol?> selectProtocol;
 

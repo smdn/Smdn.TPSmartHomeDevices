@@ -77,4 +77,24 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
       () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
     );
   }
+
+  [TestCase(TapoSessionProtocol.SecurePassThrough, null)]
+  [TestCase(TapoSessionProtocol.Klap, null)]
+  [TestCase((TapoSessionProtocol)9999, typeof(ArgumentException))]
+  public void AddTapoProtocolSelector_TapoSessionProtocol(TapoSessionProtocol protocol, Type? typeOfExpectedException)
+  {
+    var services = new ServiceCollection();
+
+    Assert.That(() => services.AddTapoProtocolSelector(protocol), typeOfExpectedException is null ? Throws.Nothing : Throws.TypeOf(typeOfExpectedException));
+
+    if (typeOfExpectedException is not null)
+      return;
+
+    TapoSessionProtocolSelector? selector = null;
+
+    Assert.DoesNotThrow(
+      () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    );
+    Assert.That(selector, Is.Not.Null, nameof(selector));
+  }
 }
