@@ -14,6 +14,7 @@ public abstract class TapoSession : IDisposable {
   public DateTime ExpiresOn { get; }
   public bool HasExpired => ExpiresOn <= DateTime.Now;
   public abstract string? Token { get; }
+  public abstract TapoSessionProtocol Protocol { get; }
 
   private protected TapoSession(
     string? sessionId,

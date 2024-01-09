@@ -113,6 +113,7 @@ partial class TapoClientTests {
     Assert.That(client.Session.SessionId, Is.Not.Empty);
     Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.SecurePassThrough));
   }
 
   [Test]
@@ -169,6 +170,7 @@ partial class TapoClientTests {
     Assert.That(client.Session.SessionId, Is.Not.Empty);
     Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.SecurePassThrough));
   }
 
   private class TapoCredentialNotFoundException : Exception { }
@@ -410,6 +412,7 @@ partial class TapoClientTests {
     Assert.That(client.Session!.SessionId, Is.Null);
     Assert.That(client.Session!.ExpiresOn, Is.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.SecurePassThrough));
   }
 
   [TestCase("")]
@@ -444,6 +447,7 @@ partial class TapoClientTests {
     Assert.That(client.Session.Token, Is.EqualTo(Token));
     Assert.That(client.Session!.ExpiresOn, Is.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.SecurePassThrough));
   }
 
   [Test]
@@ -566,6 +570,7 @@ partial class TapoClientTests {
     Assert.That(client.Session.SessionId, Is.Not.Empty);
     Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.SecurePassThrough));
   }
 
   private class DisposableCredential : ITapoCredential {

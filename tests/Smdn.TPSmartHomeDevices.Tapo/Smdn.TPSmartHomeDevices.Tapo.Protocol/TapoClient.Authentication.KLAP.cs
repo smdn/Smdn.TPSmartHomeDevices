@@ -38,6 +38,7 @@ partial class TapoClientTests {
     Assert.That(client.Session.SessionId, Is.Not.Empty);
     Assert.That(client.Session.ExpiresOn, Is.Not.EqualTo(DateTime.MaxValue));
     Assert.That(client.Session.HasExpired, Is.False);
+    Assert.That(client.Session.Protocol, Is.EqualTo(TapoSessionProtocol.Klap));
   }
 
   [Test]

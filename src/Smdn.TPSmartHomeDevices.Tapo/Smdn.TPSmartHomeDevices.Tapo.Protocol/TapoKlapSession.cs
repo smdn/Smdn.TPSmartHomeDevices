@@ -22,6 +22,7 @@ internal sealed class TapoKlapSession : TapoSession {
   private const string RequestPath = "/app/request";
 
   public override string? Token => null;
+  public override TapoSessionProtocol Protocol => TapoSessionProtocol.Klap;
 
   private KlapEncryptionAlgorithm klap;
 

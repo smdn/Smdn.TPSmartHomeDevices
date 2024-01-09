@@ -23,6 +23,7 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
 
   public Uri RequestPathAndQuery { get; private set; } = RequestPath;
   public override string? Token => token;
+  public override TapoSessionProtocol Protocol => TapoSessionProtocol.SecurePassThrough;
 
   private string? token;
   private Aes? aes;
