@@ -450,6 +450,43 @@ public partial class TapoDeviceTests {
     Assert.That(endPoint.HasInvalidated, Is.False, nameof(endPoint.HasInvalidated));
   }
 
+  private class ConstantTapoSessionProtocolSelector(TapoSessionProtocol? protocol) : TapoSessionProtocolSelector {
+    public override TapoSessionProtocol? SelectProtocol(TapoDevice device) => protocol;
+  }
+
+  [TestCase(TapoSessionProtocol.SecurePassThrough, TapoSessionProtocol.SecurePassThrough)]
+  [TestCase(TapoSessionProtocol.Klap, TapoSessionProtocol.Klap)]
+  [TestCase(null, TapoSessionProtocol.SecurePassThrough)] // select default protocol
+  public async Task EnsureSessionEstablishedAsync_PerformAuthenticationWithSelectedProtocol(
+    TapoSessionProtocol? protocolToBeSelected,
+    TapoSessionProtocol expectedProtocol
+  )
+  {
+    var services = new ServiceCollection();
+
+    services.AddTapoCredential("user", "pass");
+    services.AddTapoProtocolSelector(new ConstantTapoSessionProtocolSelector(protocolToBeSelected));
+
+    var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGenerateKlapAuthHash = (_, _, authHash) => credentialProvider.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new ConcreteTapoDevice(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services!.BuildServiceProvider()
+    );
+
+    Assert.That(async () => await device.EnsureSessionEstablishedAsync(), Throws.Nothing);
+
+    Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
+    Assert.That(device.Session.Protocol, Is.EqualTo(expectedProtocol));
+  }
+
   [Test]
   public async Task SendRequestAsync_SocketException()
   {
