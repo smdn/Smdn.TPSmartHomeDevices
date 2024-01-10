@@ -40,7 +40,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = new() {
@@ -97,7 +97,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = null, // missing property in response
@@ -139,7 +139,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = new() {
@@ -183,7 +183,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = new() {
@@ -225,7 +225,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = new() {
@@ -269,7 +269,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TimeUsage = new() {
@@ -315,7 +315,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new TapoPassThroughResponse<GetCumulativeUsageResult>() {
+          new GetDeviceUsageResponse<GetCumulativeUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               // This property will be just ignored
