@@ -212,7 +212,7 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     );
 
 #pragma warning disable IDE0060
-  ValueTask IMulticolorSmartLight.SetBrightnessAsync(
+  ValueTask ISmartLight.SetBrightnessAsync(
     int brightness,
     TimeSpan transitionPeriod, // not supported
     CancellationToken cancellationToken
