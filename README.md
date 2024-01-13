@@ -53,6 +53,7 @@ The following devices and functions are currently supported.
   - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
   - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
   - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
+  - P110M smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P110MPlug/)
   - Supports default (`securePassthrough`) and new (`KLAP`) protocol - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/)
 - Kasa devices (as of version 1.0.0)
   - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
