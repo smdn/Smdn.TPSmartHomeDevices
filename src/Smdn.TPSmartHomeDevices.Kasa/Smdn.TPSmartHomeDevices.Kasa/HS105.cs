@@ -22,7 +22,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// </remarks>
 /// <seealso href="https://www.tp-link.com/jp/home-networking/smart-plug/hs105/">Kasa HS105 product information (ja)</seealso>
 /// <seealso href="https://www.kasasmart.com/us/products/smart-plugs/kasa-smart-wifi-plug-mini">Kasa HS105 product information (en)</seealso>
-public class HS105 : KasaDevice, ISmartPlug {
+public class HS105 : KasaDevice {
 #pragma warning disable SA1114
   private static readonly JsonEncodedText MethodTextSetRelayState = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER

@@ -18,7 +18,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// </remarks>
 /// <seealso href="https://www.tp-link.com/jp/smart-home/tapo/tapo-p105/">Tapo P105 product information (ja)</seealso>
 /// <seealso href="https://www.tapo.com/en/product/smart-plug/tapo-p105/">Tapo P105 product information (en)</seealso>
-public class P105 : TapoDevice, ISmartPlug {
+public class P105 : TapoDevice {
   /// <summary>
   /// Initializes a new instance of the <see cref="P105"/> class with specifying the device endpoint by host name.
   /// </summary>
