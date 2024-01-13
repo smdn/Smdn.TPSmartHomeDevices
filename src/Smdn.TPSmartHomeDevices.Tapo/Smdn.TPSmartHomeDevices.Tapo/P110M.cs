@@ -186,4 +186,23 @@ public class P110M : TapoDevice {
       composeResult: static result => result.Result.CurrentPower,
       cancellationToken: cancellationToken
     );
+
+  /// <summary>
+  /// Gets the monitoring data report for the device connected to <see cref="P110M"/>.
+  /// </summary>
+  /// <returns>
+  /// A <see cref="ValueTask{TResult}"/> representing the result of method.
+  /// </returns>
+  public virtual ValueTask<TapoPlugMonitoringData> GetMonitoringDataAsync(
+    CancellationToken cancellationToken = default
+  )
+    => SendRequestAsync<
+      GetEnergyUsageRequest,
+      GetEnergyUsageResponse<TapoPlugMonitoringData>,
+      TapoPlugMonitoringData
+    >(
+      request: default,
+      composeResult: static result => result.Result,
+      cancellationToken: cancellationToken
+    );
 }

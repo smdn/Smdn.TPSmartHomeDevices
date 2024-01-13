@@ -70,4 +70,68 @@ public class P110MTests {
     Assert.That(powerConsumption, Is.Not.Null);
     Assert.That(powerConsumption.Value, Is.EqualTo(expectedValueInWatt));
   }
+
+  private readonly struct GetEnergyUsageResult {
+    [JsonPropertyName("today_runtime")]
+    public int? TodayRuntime { get; init; }
+
+    [JsonPropertyName("month_runtime")]
+    public int? MonthRuntime { get; init; }
+
+    [JsonPropertyName("today_energy")]
+    public int? TodayEnergy { get; init; }
+
+    [JsonPropertyName("month_energy")]
+    public int? MonthEnergy { get; init; }
+
+    [JsonPropertyName("local_time")]
+    public string? LocalTime { get; init; }
+
+    // TODO: electricity_charge
+    // [JsonPropertyName("electricity_charge")]
+
+    [JsonPropertyName("current_power")]
+    public int? CurrentPower { get; init; }
+  }
+
+  [Test]
+  public async Task GetMonitoringDataAsync()
+  {
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+        return (
+          KnownErrorCodes.Success,
+          new GetCurrentPowerResponse<GetEnergyUsageResult>() {
+            ErrorCode = KnownErrorCodes.Success,
+            Result = new() {
+              TodayRuntime = 41,
+              MonthRuntime = 125,
+              TodayEnergy = 13,
+              MonthEnergy = 16,
+              LocalTime = "2024-01-13 16:54:32",
+              CurrentPower = 6900,
+            },
+          }
+        );
+      }
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new P110M(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services!.BuildServiceProvider()
+    );
+
+    var monitoringData = await device.GetMonitoringDataAsync();
+
+    Assert.That(monitoringData, Is.Not.Null);
+    Assert.That(monitoringData.TotalOperatingTimeToday, Is.EqualTo(TimeSpan.FromMinutes(41)));
+    Assert.That(monitoringData.TotalOperatingTimeThisMonth, Is.EqualTo(TimeSpan.FromMinutes(125)));
+    Assert.That(monitoringData.CumulativeEnergyUsageToday, Is.EqualTo(13.0m));
+    Assert.That(monitoringData.CumulativeEnergyUsageThisMonth, Is.EqualTo(16.0m));
+    Assert.That(monitoringData.TimeStamp, Is.EqualTo(new DateTime(2024, 1, 13, 16, 54, 32, DateTimeKind.Unspecified)));
+    Assert.That(monitoringData.CurrentPowerConsumption, Is.EqualTo(6.9m));
+  }
 }
