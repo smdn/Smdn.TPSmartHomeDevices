@@ -30,7 +30,7 @@ SPDX-License-Identifier: MIT
 
   <PropertyGroup Label="package properties">
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-    <PackageTags>tplink-tapo,tapo,L530,L900,P105,$(PackageCommonTags)</PackageTags>
+    <PackageTags>tplink-tapo,tapo,L530,L900,P105,P110M,$(PackageCommonTags)</PackageTags>
     <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
