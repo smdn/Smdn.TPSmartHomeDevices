@@ -19,7 +19,7 @@ partial class TapoDevice {
   }
 
   /// <summary>
-  /// Gets the total operating time and usage amount of cumulative electric energy of Tapo device.
+  /// Gets the total operating time and cumulative usage amount of electric energy of Tapo device.
   /// </summary>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -28,7 +28,7 @@ partial class TapoDevice {
   /// <returns>
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
   /// If the device does not support retrieving the total operating time, <see cref="TapoDeviceOperatingTime"/> in the return value will be <see langword="null"/>.
-  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the cumulative usage amount of electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
   /// </returns>
   /// <seealso cref="GetTotalOperatingTimeAsync"/>
   /// <seealso cref="GetCumulativeEnergyUsageAsync"/>
@@ -76,7 +76,7 @@ partial class TapoDevice {
     );
 
   /// <summary>
-  /// Gets the usage amount of cumulative electric energy of Tapo device.
+  /// Gets the cumulative usage amount of electric energy of Tapo device.
   /// </summary>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -84,7 +84,7 @@ partial class TapoDevice {
   /// </param>
   /// <returns>
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
-  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the cumulative usage amount of electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
   /// </returns>
   /// <seealso cref="GetDeviceUsageAsync(CancellationToken)"/>
   public virtual ValueTask<TapoDeviceEnergyUsage?> GetCumulativeEnergyUsageAsync(
