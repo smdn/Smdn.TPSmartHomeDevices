@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2024 smdn <smdn@smdn.jp>
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -7,6 +7,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// <summary>
 /// The type that reflects <c>get_current_power</c> JSON request.
 /// </summary>
+/// <remarks>
+/// This implementation is based on and ported from the following
+/// Python implementation by <see href="https://github.com/petretiandrea">petretiandrea</see>:
+/// <see href="https://github.com/petretiandrea/plugp100">petretiandrea/plugp100</see>, published under the GPL-3.0 license,
+/// forked from <see href="https://github.com/K4CZP3R/tapo-p100-python">K4CZP3R/tapo-p100-python</see>.
+/// </remarks>
 public readonly struct GetCurrentPowerRequest : ITapoPassThroughRequest {
   [JsonPropertyName("method")]
   [JsonPropertyOrder(0)]
