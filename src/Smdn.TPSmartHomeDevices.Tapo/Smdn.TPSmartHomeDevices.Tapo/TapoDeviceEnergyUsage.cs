@@ -9,7 +9,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// <summary>
 /// Represents the cumulative electric energy usage of Tapo device as retrieved from the device.
 /// </summary>
-public readonly struct TapoDeviceCumulativeEnergyUsage {
+public readonly struct TapoDeviceEnergyUsage {
   /// <summary>Gets the <see cref="ElectricEnergyAmount"/> value that represents the amount of cumulative electric energy used today.</summary>
   /// <value>The <see cref="ElectricEnergyAmount"/>. <see langword="null"/> if the device does not return value for this property.</value>
   [JsonPropertyName("today")]

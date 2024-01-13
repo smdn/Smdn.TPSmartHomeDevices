@@ -13,13 +13,13 @@ partial class TapoDevice {
 #pragma warning restore IDE0040
   private readonly struct GetDeviceUsageResult {
     [JsonPropertyName("time_usage")]
-    public TapoDeviceCumulativeTimeUsage? TimeUsage { get; init; }
+    public TapoDeviceOperatingTime? TimeUsage { get; init; }
     [JsonPropertyName("power_usage")]
-    public TapoDeviceCumulativeEnergyUsage? EnergyUsage { get; init; }
+    public TapoDeviceEnergyUsage? EnergyUsage { get; init; }
   }
 
   /// <summary>
-  /// Gets the usage amount of cumulative time and electric energy of Tapo device.
+  /// Gets the total operating time and usage amount of cumulative electric energy of Tapo device.
   /// </summary>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -27,18 +27,20 @@ partial class TapoDevice {
   /// </param>
   /// <returns>
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
-  /// If the device does not support retrieving the usage amount of cumulative time, <see cref="TapoDeviceCumulativeTimeUsage"/> in the return value will be <see langword="null"/>.
-  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceCumulativeEnergyUsage"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the total operating time, <see cref="TapoDeviceOperatingTime"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
   /// </returns>
-  /// <seealso cref="GetCumulativeTimeUsageAsync"/>
+  /// <seealso cref="GetTotalOperatingTimeAsync"/>
   /// <seealso cref="GetCumulativeEnergyUsageAsync"/>
-  public virtual ValueTask<(TapoDeviceCumulativeTimeUsage? TimeUsage, TapoDeviceCumulativeEnergyUsage? EnergyUsage)> GetCumulativeUsageAsync(
+  public virtual
+  ValueTask<(TapoDeviceOperatingTime? TotalOperatingTime, TapoDeviceEnergyUsage? CumulativeEnergyUsage)>
+  GetDeviceUsageAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
       GetDeviceUsageResponse<GetDeviceUsageResult>,
-      (TapoDeviceCumulativeTimeUsage?, TapoDeviceCumulativeEnergyUsage?)
+      (TapoDeviceOperatingTime?, TapoDeviceEnergyUsage?)
     >(
       request: default,
       composeResult: static result => (
@@ -49,7 +51,7 @@ partial class TapoDevice {
     );
 
   /// <summary>
-  /// Gets the usage amount of cumulative time of Tapo device.
+  /// Gets the total operating time of Tapo device.
   /// </summary>
   /// <param name="cancellationToken">
   /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
@@ -57,15 +59,16 @@ partial class TapoDevice {
   /// </param>
   /// <returns>
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
-  /// If the device does not support retrieving the usage amount of cumulative time, <see cref="TapoDeviceCumulativeTimeUsage"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the total operating time, <see cref="TapoDeviceOperatingTime"/> in the return value will be <see langword="null"/>.
   /// </returns>
-  public virtual ValueTask<TapoDeviceCumulativeTimeUsage?> GetCumulativeTimeUsageAsync(
+  /// <seealso cref="GetDeviceUsageAsync(CancellationToken)"/>
+  public virtual ValueTask<TapoDeviceOperatingTime?> GetTotalOperatingTimeAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
       GetDeviceUsageResponse<GetDeviceUsageResult>,
-      TapoDeviceCumulativeTimeUsage?
+      TapoDeviceOperatingTime?
     >(
       request: default,
       composeResult: static result => result.Result.TimeUsage,
@@ -81,15 +84,16 @@ partial class TapoDevice {
   /// </param>
   /// <returns>
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
-  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceCumulativeEnergyUsage"/> in the return value will be <see langword="null"/>.
+  /// If the device does not support retrieving the usage amount of cumulative electric energy, <see cref="TapoDeviceEnergyUsage"/> in the return value will be <see langword="null"/>.
   /// </returns>
-  public virtual ValueTask<TapoDeviceCumulativeEnergyUsage?> GetCumulativeEnergyUsageAsync(
+  /// <seealso cref="GetDeviceUsageAsync(CancellationToken)"/>
+  public virtual ValueTask<TapoDeviceEnergyUsage?> GetCumulativeEnergyUsageAsync(
     CancellationToken cancellationToken = default
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
       GetDeviceUsageResponse<GetDeviceUsageResult>,
-      TapoDeviceCumulativeEnergyUsage?
+      TapoDeviceEnergyUsage?
     >(
       request: default,
       composeResult: static result => result.Result.EnergyUsage,

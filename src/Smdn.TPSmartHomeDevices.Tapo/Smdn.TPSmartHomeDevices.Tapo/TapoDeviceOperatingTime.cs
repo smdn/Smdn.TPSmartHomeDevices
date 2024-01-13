@@ -8,9 +8,9 @@ using Smdn.TPSmartHomeDevices.Json;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 /// <summary>
-/// Represents the cumulative time usage of Tapo device as retrieved from the device.
+/// Represents the total operating time of Tapo device as retrieved from the device.
 /// </summary>
-public readonly struct TapoDeviceCumulativeTimeUsage {
+public readonly struct TapoDeviceOperatingTime {
   /// <summary>Gets the <see cref="TimeSpan"/> value that represents the cumulative usage time for today.</summary>
   /// <value>The <see cref="TimeSpan"/>. <see langword="null"/> if the device does not return value for this property.</value>
   [JsonPropertyName("today")]

@@ -33,7 +33,7 @@ partial class TapoDeviceTests {
   }
 
   [Test]
-  public async Task GetCumulativeUsageAsync()
+  public async Task GetDeviceUsageAsync()
   {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -66,15 +66,15 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var (timeUsage, energyUsage) = await device.GetCumulativeUsageAsync();
+    var (operatingTime, energyUsage) = await device.GetDeviceUsageAsync();
 
-    Assert.That(timeUsage, Is.Not.Null);
-    Assert.That(timeUsage.Value.Today, Is.Not.Null);
-    Assert.That(timeUsage.Value.Today.Value, Is.EqualTo(TimeSpan.FromMinutes(1)));
-    Assert.That(timeUsage.Value.Past7Days, Is.Not.Null);
-    Assert.That(timeUsage.Value.Past7Days.Value, Is.EqualTo(TimeSpan.FromMinutes(2)));
-    Assert.That(timeUsage.Value.Past30Days, Is.Not.Null);
-    Assert.That(timeUsage.Value.Past30Days.Value, Is.EqualTo(TimeSpan.FromMinutes(3)));
+    Assert.That(operatingTime, Is.Not.Null);
+    Assert.That(operatingTime.Value.Today, Is.Not.Null);
+    Assert.That(operatingTime.Value.Today.Value, Is.EqualTo(TimeSpan.FromMinutes(1)));
+    Assert.That(operatingTime.Value.Past7Days, Is.Not.Null);
+    Assert.That(operatingTime.Value.Past7Days.Value, Is.EqualTo(TimeSpan.FromMinutes(2)));
+    Assert.That(operatingTime.Value.Past30Days, Is.Not.Null);
+    Assert.That(operatingTime.Value.Past30Days.Value, Is.EqualTo(TimeSpan.FromMinutes(3)));
 
     Assert.That(energyUsage, Is.Not.Null);
     Assert.That(energyUsage.Value.Today, Is.Not.Null);
@@ -90,7 +90,7 @@ partial class TapoDeviceTests {
   }
 
   [Test]
-  public async Task GetCumulativeUsageAsync_MissingTimeUsageInResponse()
+  public async Task GetDeviceUsageAsync_MissingTimeUsageInResponse()
   {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -119,16 +119,16 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var (timeUsage, energyUsage) = await device.GetCumulativeUsageAsync();
+    var (operatingTime, energyUsage) = await device.GetDeviceUsageAsync();
 
-    Assert.That(timeUsage, Is.Null);
+    Assert.That(operatingTime, Is.Null);
     Assert.That(energyUsage, Is.Not.Null);
   }
 
   [TestCase(false, true, true)]
   [TestCase(true, false, true)]
   [TestCase(true, true, false)]
-  public async Task GetCumulativeUsageAsync_MissingTimeUsagePropertyInResponse(
+  public async Task GetDeviceUsageAsync_MissingTimeUsagePropertyInResponse(
     bool respondValueForToday,
     bool respondValueForPast7days,
     bool respondValueForPast30days
@@ -165,18 +165,18 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var (timeUsage, energyUsage) = await device.GetCumulativeUsageAsync();
+    var (operatingTime, energyUsage) = await device.GetDeviceUsageAsync();
 
-    Assert.That(timeUsage, Is.Not.Null);
-    Assert.That(timeUsage.Value.Today, respondValueForToday ? Is.Not.Null : Is.Null);
-    Assert.That(timeUsage.Value.Past7Days, respondValueForPast7days ? Is.Not.Null : Is.Null);
-    Assert.That(timeUsage.Value.Past30Days, respondValueForPast30days ? Is.Not.Null : Is.Null);
+    Assert.That(operatingTime, Is.Not.Null);
+    Assert.That(operatingTime.Value.Today, respondValueForToday ? Is.Not.Null : Is.Null);
+    Assert.That(operatingTime.Value.Past7Days, respondValueForPast7days ? Is.Not.Null : Is.Null);
+    Assert.That(operatingTime.Value.Past30Days, respondValueForPast30days ? Is.Not.Null : Is.Null);
 
     Assert.That(energyUsage, Is.Not.Null);
   }
 
   [Test]
-  public async Task GetCumulativeUsageAsync_MissingEnergyUsageInResponse()
+  public async Task GetDeviceUsageAsync_MissingEnergyUsageInResponse()
   {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -205,16 +205,16 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var (timeUsage, energyUsage) = await device.GetCumulativeUsageAsync();
+    var (operatingTime, energyUsage) = await device.GetDeviceUsageAsync();
 
-    Assert.That(timeUsage, Is.Not.Null);
+    Assert.That(operatingTime, Is.Not.Null);
     Assert.That(energyUsage, Is.Null);
   }
 
   [TestCase(false, true, true)]
   [TestCase(true, false, true)]
   [TestCase(true, true, false)]
-  public async Task GetCumulativeUsageAsync_MissingEnergyUsagePropertyInResponse(
+  public async Task GetDeviceUsageAsync_MissingEnergyUsagePropertyInResponse(
     bool respondValueForToday,
     bool respondValueForPast7days,
     bool respondValueForPast30days
@@ -251,9 +251,9 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var (timeUsage, energyUsage) = await device.GetCumulativeUsageAsync();
+    var (operatingTime, energyUsage) = await device.GetDeviceUsageAsync();
 
-    Assert.That(timeUsage, Is.Not.Null);
+    Assert.That(operatingTime, Is.Not.Null);
 
     Assert.That(energyUsage, Is.Not.Null);
     Assert.That(energyUsage.Value.Today, respondValueForToday ? Is.Not.Null : Is.Null);
@@ -262,7 +262,7 @@ partial class TapoDeviceTests {
   }
 
   [Test]
-  public async Task GetCumulativeTimeUsageAsync()
+  public async Task GetTotalOperatingTimeAsync()
   {
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
@@ -296,15 +296,15 @@ partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    var timeUsage = await device.GetCumulativeTimeUsageAsync();
+    var operatingTime = await device.GetTotalOperatingTimeAsync();
 
-    Assert.That(timeUsage, Is.Not.Null);
-    Assert.That(timeUsage.Value.Today, Is.Not.Null);
-    Assert.That(timeUsage.Value.Today.Value, Is.EqualTo(TimeSpan.FromMinutes(1)));
-    Assert.That(timeUsage.Value.Past7Days, Is.Not.Null);
-    Assert.That(timeUsage.Value.Past7Days.Value, Is.EqualTo(TimeSpan.FromHours(1)));
-    Assert.That(timeUsage.Value.Past30Days, Is.Not.Null);
-    Assert.That(timeUsage.Value.Past30Days.Value, Is.EqualTo(TimeSpan.FromDays(1)));
+    Assert.That(operatingTime, Is.Not.Null);
+    Assert.That(operatingTime.Value.Today, Is.Not.Null);
+    Assert.That(operatingTime.Value.Today.Value, Is.EqualTo(TimeSpan.FromMinutes(1)));
+    Assert.That(operatingTime.Value.Past7Days, Is.Not.Null);
+    Assert.That(operatingTime.Value.Past7Days.Value, Is.EqualTo(TimeSpan.FromHours(1)));
+    Assert.That(operatingTime.Value.Past30Days, Is.Not.Null);
+    Assert.That(operatingTime.Value.Past30Days.Value, Is.EqualTo(TimeSpan.FromDays(1)));
   }
 
   [Test]
