@@ -63,7 +63,8 @@ The following devices and functions are currently supported.
   - Set color (color temperature)
   - Set color (hue and saturation)
   - Set brightness
-  - Get device informations (Tapo)
+  - Get device informations [Tapo devices]
+  - Get device usage (operating time and cumulative energy usage) [Tapo devices]
   - Get light color/brightness
   - Get on/off stete
   - Get monitoring data (power consumption and cumulative energy usage) [Tapo P110M]
