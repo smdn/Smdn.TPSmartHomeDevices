@@ -3,8 +3,13 @@
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
+using Smdn.TPSmartHomeDevices.Tapo.Json;
+using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
@@ -153,5 +158,32 @@ public class P110M : TapoDevice {
       ),
       credential: credential,
       serviceProvider: serviceProvider
+    );
+
+  private readonly struct GetCurrentPowerResult {
+    [JsonPropertyName("current_power")]
+    [JsonConverter(typeof(TapoElectricPowerInWattJsonConverter))]
+    public decimal? CurrentPower { get; init; }
+  }
+
+  /// <summary>
+  /// Gets the current power consumption for the device connected to <see cref="P110M"/>.
+  /// </summary>
+  /// <returns>
+  /// A <see cref="ValueTask{TResult}"/> representing the result of method.
+  /// If the power consumption is successfully retrieved, the <see cref="decimal"/> value that represents the power consumption in unit of watt [W], is set.
+  /// If the device does not support retrieving the power consumption, the value of <see cref="ValueTask{TResult}"/> will be <see langword="null"/>.
+  /// </returns>
+  public virtual ValueTask<decimal?> GetCurrentPowerConsumptionAsync(
+    CancellationToken cancellationToken = default
+  )
+    => SendRequestAsync<
+      GetCurrentPowerRequest,
+      GetCurrentPowerResponse<GetCurrentPowerResult>,
+      decimal?
+    >(
+      request: default,
+      composeResult: static result => result.Result.CurrentPower,
+      cancellationToken: cancellationToken
     );
 }
