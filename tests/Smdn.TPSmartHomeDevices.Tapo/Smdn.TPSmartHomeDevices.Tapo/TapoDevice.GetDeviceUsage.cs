@@ -77,16 +77,9 @@ partial class TapoDeviceTests {
     Assert.That(operatingTime.Value.Past30Days.Value, Is.EqualTo(TimeSpan.FromMinutes(3)));
 
     Assert.That(energyUsage, Is.Not.Null);
-    Assert.That(energyUsage.Value.Today, Is.Not.Null);
-    Assert.That(energyUsage.Value.Today.Value.WattHour, Is.EqualTo(4.0m));
-    Assert.That(energyUsage.Value.Past7Days, Is.Not.Null);
-    Assert.That(energyUsage.Value.Past7Days.Value.WattHour, Is.EqualTo(5.0m));
-    Assert.That(energyUsage.Value.Past30Days, Is.Not.Null);
-    Assert.That(energyUsage.Value.Past30Days.Value.WattHour, Is.EqualTo(6.0m));
-
-    Assert.That(energyUsage.Value.Today.Value.KiloWattHour, Is.EqualTo(0.004m));
-    Assert.That(energyUsage.Value.Past7Days.Value.KiloWattHour, Is.EqualTo(0.005m));
-    Assert.That(energyUsage.Value.Past30Days.Value.KiloWattHour, Is.EqualTo(0.006m));
+    Assert.That(energyUsage.Value.Today, Is.EqualTo(4.0m));
+    Assert.That(energyUsage.Value.Past7Days, Is.EqualTo(5.0m));
+    Assert.That(energyUsage.Value.Past30Days, Is.EqualTo(6.0m));
   }
 
   [Test]
@@ -345,17 +338,8 @@ partial class TapoDeviceTests {
     var energyUsage = await device.GetCumulativeEnergyUsageAsync();
 
     Assert.That(energyUsage, Is.Not.Null);
-
-    Assert.That(energyUsage.Value.Today, Is.Not.Null);
-    Assert.That(energyUsage.Value.Today.Value.WattHour, Is.EqualTo(1.0m));
-    Assert.That(energyUsage.Value.Today.Value.KiloWattHour, Is.EqualTo(0.001m));
-
-    Assert.That(energyUsage.Value.Past7Days, Is.Not.Null);
-    Assert.That(energyUsage.Value.Past7Days.Value.WattHour, Is.EqualTo(1000.0m));
-    Assert.That(energyUsage.Value.Past7Days.Value.KiloWattHour, Is.EqualTo(1.0m));
-
-    Assert.That(energyUsage.Value.Past30Days, Is.Not.Null);
-    Assert.That(energyUsage.Value.Past30Days.Value.WattHour, Is.EqualTo(1_000_000.0m));
-    Assert.That(energyUsage.Value.Past30Days.Value.KiloWattHour, Is.EqualTo(1000.0m));
+    Assert.That(energyUsage.Value.Today, Is.EqualTo(1.0m));
+    Assert.That(energyUsage.Value.Past7Days, Is.EqualTo(1000.0m));
+    Assert.That(energyUsage.Value.Past30Days, Is.EqualTo(1_000_000.0m));
   }
 }
