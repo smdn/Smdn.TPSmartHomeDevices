@@ -66,6 +66,7 @@ The following devices and functions are currently supported.
   - Get device informations (Tapo)
   - Get light color/brightness
   - Get on/off stete
+  - Get monitoring data (power consumption and cumulative energy usage) [Tapo P110M]
 
 ### Library features
 - Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#smdntpsmarthomedevicesmacaddressendpoint)
