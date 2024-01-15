@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -102,6 +103,14 @@ internal sealed class TapoDeviceDefaultExceptionHandler : TapoDeviceExceptionHan
   {
     switch (exception) {
       case HttpRequestException httpRequestException:
+        if (
+          httpRequestException.InnerException is IOException innerIOException &&
+          attempt == 0 /* retry just once */
+        ) {
+          logger?.LogWarning("Request IO error; {ExceptionMessage}", innerIOException.Message);
+          return TapoDeviceExceptionHandling.Retry;
+        }
+
         if (httpRequestException.InnerException is not SocketException innerSocketException)
           return TapoDeviceExceptionHandling.Throw;
 
