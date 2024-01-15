@@ -56,4 +56,19 @@ public interface ISmartDevice {
   ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken
   );
+
+  /// <summary>
+  /// Gets the device information.
+  /// </summary>
+  /// <param name="cancellationToken">
+  /// The <see cref="CancellationToken" /> to monitor for cancellation requests.
+  /// The default value is <see langword="default" />.
+  /// </param>
+  /// <returns>
+  /// A <see cref="ValueTask{IDeviceInfo}"/> representing the result of method.
+  /// </returns>
+  /// <seealso cref="IDeviceInfo"/>
+  ValueTask<IDeviceInfo> GetDeviceInfoAsync(
+    CancellationToken cancellationToken = default
+  );
 }

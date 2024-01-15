@@ -9,6 +9,9 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 #pragma warning disable IDE0040
 partial class TapoDevice {
 #pragma warning restore IDE0040
+  async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
+    => await GetDeviceInfoAsync<TapoDeviceInfo>(cancellationToken).ConfigureAwait(false);
+
   /// <summary>
   /// Gets the Tapo device information including current device status.
   /// </summary>

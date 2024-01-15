@@ -14,6 +14,66 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 partial class TapoDeviceTests {
+  private readonly struct TapoDeviceInfoResultEafe {
+    [JsonPropertyName("device_id")]
+    public string? Id { get; init; }
+
+    [JsonPropertyName("model")]
+    public string? ModelName { get; init; }
+
+    [JsonPropertyName("fw_ver")]
+    public string? FirmwareVersion { get; init; }
+
+    [JsonPropertyName("hw_ver")]
+    public string? HardwareVersion { get; init; }
+
+    [JsonPropertyName("mac")]
+    public string? MacAddress { get; init; }
+  }
+
+  [Test]
+  public async Task ISmartDevice_GetDeviceInfoAsync()
+  {
+    const string DeviceModelName = "X-PSEUDO-TAPO-DEVICE";
+    const string DeviceFirmwareVersion = "1.2.3 Build 456789";
+    const string DeviceHardwareVersion = "1.0";
+    const string DeviceMacAddress = "00:00:5E:00:53:42";
+
+    await using var pseudoDevice = new PseudoTapoDevice() {
+      FuncGenerateToken = static _ => "token",
+      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+        return (
+          KnownErrorCodes.Success,
+          new GetDeviceInfoResponse<TapoDeviceInfoResultEafe>() {
+            ErrorCode = KnownErrorCodes.Success,
+            Result = new() {
+              Id = "0123456789ABCDEF",
+              ModelName = DeviceModelName,
+              FirmwareVersion = DeviceFirmwareVersion,
+              HardwareVersion = DeviceHardwareVersion,
+              MacAddress = DeviceMacAddress,
+            },
+          }
+        );
+      }
+    };
+
+    pseudoDevice.Start();
+
+    using var device = TapoDevice.Create(
+      deviceEndPoint: pseudoDevice.GetEndPoint(),
+      serviceProvider: services!.BuildServiceProvider()
+    );
+
+    var smartDevice = (ISmartDevice)device;
+    var info = await smartDevice.GetDeviceInfoAsync();
+
+    Assert.That(info.Id.ToArray(), Is.EqualTo(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }).AsCollection, nameof(info.Id));
+    Assert.That(info.ModelName, Is.EqualTo(DeviceModelName), nameof(info.ModelName));
+    Assert.That(info.FirmwareVersion, Is.EqualTo(DeviceFirmwareVersion), nameof(info.FirmwareVersion));
+    Assert.That(info.HardwareVersion, Is.EqualTo(DeviceHardwareVersion), nameof(info.HardwareVersion));
+    Assert.That(info.MacAddress, Is.EqualTo(PhysicalAddress.Parse(DeviceMacAddress)), nameof(info.MacAddress));
+  }
 
   private readonly struct TapoDeviceInfoResult {
     [JsonPropertyName("model")]

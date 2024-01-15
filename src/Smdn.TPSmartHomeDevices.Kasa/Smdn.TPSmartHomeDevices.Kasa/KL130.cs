@@ -124,6 +124,9 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     return value;
   }
 
+  async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
+    => await GetDeviceInfoAsync(cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Could not retrieve device information since it was null.");
+
 #pragma warning disable SA1313
   private readonly record struct SetOnOffStateParameter(
     [property: JsonPropertyName("on_off")]

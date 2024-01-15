@@ -109,6 +109,9 @@ public class HS105 : KasaDevice, ISmartDevice {
       serviceProvider: serviceProvider
     );
 
+  async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
+    => await GetDeviceInfoAsync(cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Could not retrieve device information since it was null.");
+
   private readonly struct SetRelayStateParameter {
     public static readonly SetRelayStateParameter SetOff = new(false);
     public static readonly SetRelayStateParameter SetOn = new(true);

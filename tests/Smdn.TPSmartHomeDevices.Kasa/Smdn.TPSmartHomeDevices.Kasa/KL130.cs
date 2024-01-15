@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -19,6 +20,44 @@ public class KL130Tests {
   [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<KL130>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
+
+  [Test]
+  public async Task ISmartDevice_GetDeviceInfoAsync()
+  {
+    const string DeviceModelName = "X-PSEUDO-TAPO-DEVICE";
+    const string DeviceFirmwareVersion = "1.2.3 Build 456789";
+    const string DeviceHardwareVersion = "1.0";
+    const string DeviceMacAddress = "00:00:5E:00:53:42";
+
+    await using var pseudoDevice = new PseudoKasaDevice() {
+      FuncGenerateResponse = (_, request) => JsonDocument.Parse(@$"{{
+  ""system"":{{
+    ""get_sysinfo"":{{
+      ""sw_ver"":""{DeviceFirmwareVersion}"",
+      ""hw_ver"":""{DeviceHardwareVersion}"",
+      ""model"":""{DeviceModelName}"",
+      ""mic_mac"":""{DeviceMacAddress}"",
+      ""deviceId"":""0123456789ABCDEF""
+    }}
+  }}
+}}")
+    };
+
+    pseudoDevice.Start();
+
+    using var device = new KL130(
+      deviceEndPoint: pseudoDevice.GetEndPoint()
+    );
+
+    var smartDevice = (ISmartDevice)device;
+    var info = await smartDevice.GetDeviceInfoAsync();
+
+    Assert.That(info.Id.ToArray(), Is.EqualTo(new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF }).AsCollection, nameof(info.Id));
+    Assert.That(info.ModelName, Is.EqualTo(DeviceModelName), nameof(info.ModelName));
+    Assert.That(info.FirmwareVersion, Is.EqualTo(DeviceFirmwareVersion), nameof(info.FirmwareVersion));
+    Assert.That(info.HardwareVersion, Is.EqualTo(DeviceHardwareVersion), nameof(info.HardwareVersion));
+    Assert.That(info.MacAddress, Is.EqualTo(PhysicalAddress.Parse(DeviceMacAddress)), nameof(info.MacAddress));
+  }
 
   private static System.Collections.IEnumerable YieldTestCases_TransitionPeriod()
   {
