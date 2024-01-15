@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 
 using Smdn.Formats;
 
-namespace Smdn.TPSmartHomeDevices.Tapo.Json;
+namespace Smdn.TPSmartHomeDevices.Json;
 
-public sealed class TapoBase16ByteArrayJsonConverter : JsonConverter<byte[]?> {
+public sealed class Base16ByteArrayJsonConverter : JsonConverter<byte[]?> {
   public override byte[]? Read(
     ref Utf8JsonReader reader,
     Type typeToConvert,

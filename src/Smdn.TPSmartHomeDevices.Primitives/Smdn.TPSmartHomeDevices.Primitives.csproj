@@ -39,6 +39,7 @@ This library does not provide any specific implementations to operate Kasa and T
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>

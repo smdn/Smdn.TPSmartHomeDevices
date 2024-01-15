@@ -29,7 +29,7 @@ public class TapoDeviceInfo {
   /// <summary>Gets the Tapo device's ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("device_id")]
-  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? Id { get; init; }
 #pragma warning restore CA1819
 
@@ -47,7 +47,7 @@ public class TapoDeviceInfo {
   /// <summary>Gets the Tapo device's current firmware ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("fw_id")]
-  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? FirmwareId { get; init; }
 #pragma warning restore CA1819
 
@@ -60,7 +60,7 @@ public class TapoDeviceInfo {
   /// <summary>Gets the Tapo device's hardware ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("hw_id")]
-  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? HardwareId { get; init; }
 #pragma warning restore CA1819
 
@@ -73,7 +73,7 @@ public class TapoDeviceInfo {
   /// <summary>Gets the Tapo device's OEM ID.</summary>
   /// <remarks>The value will be a <see cref="string"/> representing a HEX-encoded(Base16) byte array.</remarks>
   [JsonPropertyName("oem_id")]
-  [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+  [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? OemId { get; init; }
 #pragma warning restore CA1819
 
