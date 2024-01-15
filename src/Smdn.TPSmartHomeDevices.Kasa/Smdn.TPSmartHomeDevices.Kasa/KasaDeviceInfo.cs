@@ -17,7 +17,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// Represents Kasa device information, including current status.
 /// </summary>
 /// <seealso cref="KasaDevice.GetDeviceInfoAsync(System.Threading.CancellationToken)"/>
-public class KasaDeviceInfo {
+public class KasaDeviceInfo : IDeviceInfo {
   /// <summary>
   /// Gets the <see cref="DateTimeOffset"/> that represents the time at which this instance was acquired.
   /// </summary>
@@ -34,6 +34,8 @@ public class KasaDeviceInfo {
   [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? Id { get; init; }
 #pragma warning restore CA1819
+
+  ReadOnlySpan<byte> IDeviceInfo.Id => Id is null ? ReadOnlySpan<byte>.Empty : Id.AsSpan();
 
   /// <summary>Gets the Kasa device's description.</summary>
   public string? Description => JsonPropertyDescription ?? JsonPropertyDevName;

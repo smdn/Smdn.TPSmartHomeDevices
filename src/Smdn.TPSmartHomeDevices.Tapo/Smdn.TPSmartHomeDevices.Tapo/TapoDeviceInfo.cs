@@ -14,7 +14,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// Represents Tapo device information, including current status.
 /// </summary>
 /// <seealso cref="TapoDevice.GetDeviceInfoAsync(System.Threading.CancellationToken)"/>
-public class TapoDeviceInfo {
+public class TapoDeviceInfo : IDeviceInfo {
   /// <summary>
   /// Gets the <see cref="DateTimeOffset"/> that represents the time at which this instance was acquired.
   /// </summary>
@@ -32,6 +32,8 @@ public class TapoDeviceInfo {
   [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
   public byte[]? Id { get; init; }
 #pragma warning restore CA1819
+
+  ReadOnlySpan<byte> IDeviceInfo.Id => Id is null ? ReadOnlySpan<byte>.Empty : Id.AsSpan();
 
   /// <summary>Gets the Tapo device's type name.</summary>
   /// <remarks>The value would be like <c>SMART.TAPOBULB</c> for Tapo L530, as an example.</remarks>
