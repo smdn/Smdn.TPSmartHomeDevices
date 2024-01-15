@@ -30,7 +30,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// This API is released under the <see href="https://opensource.org/license/mit/">MIT License</see>, and as stated in the terms of the MIT License,
 /// there is no warranty for the results of using this API and no responsibility is taken for those results.
 /// </remarks>
-public partial class TapoDevice : ITapoCredentialIdentity, IDisposable {
+public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDisposable {
   private readonly struct LoggerScopeEndPointState {
     public EndPoint CurrentEndPoint { get; }
     public IDeviceEndPoint DeviceEndPoint { get; }
