@@ -22,7 +22,7 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
-public class KasaDeviceTests {
+public partial class KasaDeviceTests {
   private const int RertyMaxAttemptsForIncompleteResponse = 3;
 
   [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]

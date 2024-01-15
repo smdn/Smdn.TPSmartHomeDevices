@@ -46,23 +46,6 @@ public partial class KasaDevice : IDisposable {
         : $"{CurrentEndPoint} ({DeviceEndPoint})";
   }
 
-#pragma warning disable SA1114
-  protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
-    "system"u8
-#else
-    "system"
-#endif
-  );
-  protected static readonly JsonEncodedText MethodTextGetSysInfo = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
-    "get_sysinfo"u8
-#else
-    "get_sysinfo"
-#endif
-  );
-#pragma warning restore SA1114
-
   protected readonly struct NullParameter { }
 
   private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
