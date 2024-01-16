@@ -1,11 +1,13 @@
-// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0-preview1)
+// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0-preview2)
 //   Name: Smdn.TPSmartHomeDevices.Primitives
 //   AssemblyVersion: 1.1.0.0
-//   InformationalVersion: 1.1.0-preview1+d9122eb664899e2e3470e87efca152f3456eb904
+//   InformationalVersion: 1.1.0-preview2+e153b40ab2e10cbae4165a6013f9be14e5465b75
 //   TargetFramework: .NETStandard,Version=v2.0
 //   Configuration: Release
 //   Referenced assemblies:
 //     Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
+//     Smdn.Fundamental.PrintableEncoding.Hexadecimal, Version=3.0.1.0, Culture=neutral
+//     System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
@@ -31,22 +33,31 @@ namespace Smdn.TPSmartHomeDevices {
     IDeviceEndPoint Create(TAddress address);
   }
 
+  public interface IDeviceInfo {
+    string? FirmwareVersion { get; }
+    string? HardwareVersion { get; }
+    ReadOnlySpan<byte> Id { get; }
+    PhysicalAddress? MacAddress { get; }
+    string? ModelName { get; }
+  }
+
   public interface IDynamicDeviceEndPoint : IDeviceEndPoint {
     void Invalidate();
   }
 
-  public interface IMulticolorSmartLight : ISmartDevice {
-    ValueTask SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
+  public interface IMulticolorSmartLight : ISmartLight {
     ValueTask SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
     ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
   }
 
   public interface ISmartDevice {
+    ValueTask<IDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default);
     ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken);
     ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken);
   }
 
-  public interface ISmartPlug : ISmartDevice {
+  public interface ISmartLight : ISmartDevice {
+    ValueTask SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
   }
 
   public static class DeviceEndPoint {
@@ -80,6 +91,13 @@ namespace Smdn.TPSmartHomeDevices {
 }
 
 namespace Smdn.TPSmartHomeDevices.Json {
+  public sealed class Base16ByteArrayJsonConverter : JsonConverter<byte[]> {
+    public Base16ByteArrayJsonConverter() {}
+
+    public override byte[]? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
+    public override void Write(Utf8JsonWriter writer, byte[]? @value, JsonSerializerOptions options) {}
+  }
+
   public sealed class GeolocationInDecimalDegreesJsonConverter : JsonConverter<decimal?> {
     public GeolocationInDecimalDegreesJsonConverter() {}
 
