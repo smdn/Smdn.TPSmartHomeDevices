@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.0.0-preview1)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.0.0-preview2)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview1+79057c306c2fede642a92b623a95cbb150e83873
+//   InformationalVersion: 2.0.0-preview2+d001e07a3ea43a47290d9e9d2f4d582e14caa297
 //   TargetFramework: .NETCoreApp,Version=v8.0
 //   Configuration: Release
 //   Referenced assemblies:
@@ -38,7 +38,7 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 namespace Smdn.TPSmartHomeDevices.Kasa {
   public class HS105 :
     KasaDevice,
-    ISmartPlug
+    ISmartDevice
   {
     public static HS105 Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider) where TAddress : notnull {}
 
@@ -49,6 +49,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
 
     public ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
     public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
+    async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken) {}
     public ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
     public ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
   }
@@ -70,6 +71,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     public ValueTask SetColorAsync(int hue, int saturation, int? brightness = null, TimeSpan transitionPeriod = default, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, TimeSpan transitionPeriod = default, CancellationToken cancellationToken = default) {}
     public ValueTask SetOnOffStateAsync(bool newOnOffState, TimeSpan transitionPeriod = default, CancellationToken cancellationToken = default) {}
+    async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken) {}
     ValueTask ISmartDevice.SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken) {}
     public ValueTask TurnOffAsync(TimeSpan transitionPeriod = default, CancellationToken cancellationToken = default) {}
     public ValueTask TurnOnAsync(TimeSpan transitionPeriod = default, CancellationToken cancellationToken = default) {}
@@ -99,6 +101,8 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
 
     protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
+    public ValueTask<KasaDeviceInfo?> GetDeviceInfoAsync(CancellationToken cancellationToken = default) {}
+    protected ValueTask<TSysInfo> GetSysInfoAsync<TSysInfo>(Func<JsonElement, TSysInfo> composeResult, CancellationToken cancellationToken = default) {}
     public ValueTask<EndPoint> ResolveEndPointAsync(CancellationToken cancellationToken = default) {}
     protected ValueTask SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, CancellationToken cancellationToken) {}
     protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
@@ -116,6 +120,37 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
 
   public static class KasaDeviceExceptionHandlerServiceCollectionExtensions {
     public static IServiceCollection AddKasaDeviceExceptionHandler(this IServiceCollection services, KasaDeviceExceptionHandler exceptionHandler) {}
+  }
+
+  public class KasaDeviceInfo : IDeviceInfo {
+    public KasaDeviceInfo() {}
+
+    public string? Description { get; }
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
+    [JsonPropertyName("fwId")]
+    public byte[]? FirmwareId { get; init; }
+    [JsonPropertyName("sw_ver")]
+    public string? FirmwareVersion { get; init; }
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
+    [JsonPropertyName("hwId")]
+    public byte[]? HardwareId { get; init; }
+    [JsonPropertyName("hw_ver")]
+    public string? HardwareVersion { get; init; }
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
+    [JsonPropertyName("deviceId")]
+    public byte[]? Id { get; init; }
+    public PhysicalAddress? MacAddress { get; }
+    [JsonPropertyName("model")]
+    public string? ModelName { get; init; }
+    [JsonPropertyName("rssi")]
+    public decimal? NetworkRssi { get; init; }
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
+    [JsonPropertyName("oemId")]
+    public byte[]? OemId { get; init; }
+    ReadOnlySpan<byte> IDeviceInfo.Id { get; }
+    [JsonIgnore]
+    public DateTimeOffset TimeStamp { get; }
+    public string? TypeName { get; }
   }
 
   public class KasaDisconnectedException : KasaProtocolException {
