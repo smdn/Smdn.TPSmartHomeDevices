@@ -30,7 +30,7 @@ public sealed class Base16ByteArrayJsonConverter : JsonConverter<byte[]?> {
 
     var result = new byte[str.Length / 2];
 
-    return Hexadecimal.TryDecode(str, result, out var length) && length == result.Length
+    return Hexadecimal.TryDecode(str.AsSpan(), result.AsSpan(), out var length) && length == result.Length
       ? result
       : null;
   }
