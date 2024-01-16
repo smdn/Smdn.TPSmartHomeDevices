@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview3)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview4)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview3+431906bdfe9a3cf559bfddbf5593f2ab1e266f1b
+//   InformationalVersion: 2.0.0-preview4+d29dbb7e70fe6953f2864f5a4e35e63cca4b507a
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -32,6 +32,7 @@ using Microsoft.Extensions.Logging;
 using Smdn.TPSmartHomeDevices;
 using Smdn.TPSmartHomeDevices.Tapo;
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
+using Smdn.TPSmartHomeDevices.Tapo.Json;
 using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo {
@@ -54,9 +55,9 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public ValueTask SetColorHueAsync(int hue, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
-    ValueTask IMulticolorSmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
     ValueTask IMulticolorSmartLight.SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
     ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask ISmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
   }
 
   public class L900 :
@@ -78,15 +79,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public ValueTask SetColorHueAsync(int hue, int? brightness, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorSaturationAsync(int saturation, int? brightness = null, CancellationToken cancellationToken = default) {}
     public ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness = null, CancellationToken cancellationToken = default) {}
-    ValueTask IMulticolorSmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
     ValueTask IMulticolorSmartLight.SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
     ValueTask IMulticolorSmartLight.SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    ValueTask ISmartLight.SetBrightnessAsync(int brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
   }
 
-  public class P105 :
-    TapoDevice,
-    ISmartPlug
-  {
+  public class P105 : TapoDevice {
     public static P105 Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
 
     public P105(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
@@ -96,6 +94,21 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public P105(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
     public P105(string host, IServiceProvider serviceProvider) {}
     public P105(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
+  }
+
+  public class P110M : TapoDevice {
+    public static P110M Create<TAddress>(TAddress deviceAddress, IServiceProvider serviceProvider, ITapoCredentialProvider? credential = null) where TAddress : notnull {}
+
+    public P110M(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
+    public P110M(IPAddress ipAddress, IServiceProvider serviceProvider) {}
+    public P110M(IPAddress ipAddress, string email, string password, IServiceProvider? serviceProvider = null) {}
+    public P110M(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
+    public P110M(PhysicalAddress macAddress, string email, string password, IServiceProvider serviceProvider) {}
+    public P110M(string host, IServiceProvider serviceProvider) {}
+    public P110M(string host, string email, string password, IServiceProvider? serviceProvider = null) {}
+
+    public virtual ValueTask<decimal?> GetCurrentPowerConsumptionAsync(CancellationToken cancellationToken = default) {}
+    public virtual ValueTask<TapoPlugMonitoringData> GetMonitoringDataAsync(CancellationToken cancellationToken = default) {}
   }
 
   public class TapoAuthenticationException : TapoProtocolException {
@@ -112,6 +125,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
   public class TapoDevice :
     IDisposable,
+    ISmartDevice,
     ITapoCredentialIdentity
   {
     public static TapoDevice Create(IDeviceEndPoint deviceEndPoint, ITapoCredentialProvider? credential = null, IServiceProvider? serviceProvider = null) {}
@@ -140,15 +154,19 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
     protected ValueTask EnsureSessionEstablishedAsync(CancellationToken cancellationToken = default) {}
+    public virtual ValueTask<TapoDeviceEnergyUsage?> GetCumulativeEnergyUsageAsync(CancellationToken cancellationToken = default) {}
     public ValueTask<TDeviceInfo> GetDeviceInfoAsync<TDeviceInfo>(CancellationToken cancellationToken = default) {}
     public ValueTask<TResult> GetDeviceInfoAsync<TDeviceInfo, TResult>(Func<TDeviceInfo, TResult> composeResult, CancellationToken cancellationToken = default) {}
     public ValueTask<TapoDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default) {}
+    public virtual ValueTask<(TapoDeviceOperatingTime? TotalOperatingTime, TapoDeviceEnergyUsage? CumulativeEnergyUsage)> GetDeviceUsageAsync(CancellationToken cancellationToken = default) {}
     public ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken = default) {}
+    public virtual ValueTask<TapoDeviceOperatingTime?> GetTotalOperatingTimeAsync(CancellationToken cancellationToken = default) {}
     public ValueTask<EndPoint> ResolveEndPointAsync(CancellationToken cancellationToken = default) {}
     protected ValueTask SendRequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default) where TRequest : notnull, ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
     protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(TRequest request, Func<TResponse, TResult> composeResult, CancellationToken cancellationToken = default) where TRequest : notnull, ITapoPassThroughRequest where TResponse : ITapoPassThroughResponse {}
     public ValueTask SetDeviceInfoAsync<TDeviceInfo>(TDeviceInfo deviceInfo, CancellationToken cancellationToken = default) {}
     public ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken = default) {}
+    async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken) {}
     public override string? ToString() {}
     public ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
     public ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
@@ -166,12 +184,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public static IServiceCollection AddTapoDeviceExceptionHandler(this IServiceCollection services, TapoDeviceExceptionHandler exceptionHandler) {}
   }
 
-  public class TapoDeviceInfo {
+  public class TapoDeviceInfo : IDeviceInfo {
     public TapoDeviceInfo() {}
 
     [JsonPropertyName("avatar")]
     public string? Avatar { get; init; }
-    [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
     [JsonPropertyName("fw_id")]
     public byte[]? FirmwareId { get; init; }
     [JsonPropertyName("fw_ver")]
@@ -182,7 +200,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     [JsonConverter(typeof(GeolocationInDecimalDegreesJsonConverter))]
     [JsonPropertyName("longitude")]
     public decimal? GeolocationLongitude { get; init; }
-    [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
     [JsonPropertyName("hw_id")]
     public byte[]? HardwareId { get; init; }
     [JsonPropertyName("specs")]
@@ -194,7 +212,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     [JsonConverter(typeof(TapoIPAddressJsonConverter))]
     [JsonPropertyName("ip")]
     public IPAddress? IPAddress { get; init; }
-    [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
     [JsonPropertyName("device_id")]
     public byte[]? Id { get; init; }
     [JsonPropertyName("device_on")]
@@ -218,12 +236,13 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     [JsonConverter(typeof(TapoBase64StringJsonConverter))]
     [JsonPropertyName("nickname")]
     public string? NickName { get; init; }
-    [JsonConverter(typeof(TapoBase16ByteArrayJsonConverter))]
+    [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
     [JsonPropertyName("oem_id")]
     public byte[]? OemId { get; init; }
     [JsonConverter(typeof(TimeSpanInSecondsJsonConverter))]
     [JsonPropertyName("on_time")]
     public TimeSpan? OnTimeDuration { get; init; }
+    ReadOnlySpan<byte> IDeviceInfo.Id { get; }
     [JsonIgnore]
     public DateTimeOffset TimeStamp { get; }
     [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
@@ -246,6 +265,29 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public static IServiceCollection AddTapoHttpClient(this IServiceCollection services, Action<HttpClient>? configureClient = null) {}
   }
 
+  public class TapoPlugMonitoringData {
+    public TapoPlugMonitoringData() {}
+
+    [JsonConverter(typeof(TapoElectricEnergyInWattHourJsonConverter))]
+    [JsonPropertyName("month_energy")]
+    public decimal? CumulativeEnergyUsageThisMonth { get; init; }
+    [JsonConverter(typeof(TapoElectricEnergyInWattHourJsonConverter))]
+    [JsonPropertyName("today_energy")]
+    public decimal? CumulativeEnergyUsageToday { get; init; }
+    [JsonConverter(typeof(TapoElectricPowerInMilliWattJsonConverter))]
+    [JsonPropertyName("current_power")]
+    public decimal? CurrentPowerConsumption { get; init; }
+    [JsonConverter(typeof(TapoLocalDateAndTimeJsonConverter))]
+    [JsonPropertyName("local_time")]
+    public DateTime? TimeStamp { get; init; }
+    [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
+    [JsonPropertyName("month_runtime")]
+    public TimeSpan? TotalOperatingTimeThisMonth { get; init; }
+    [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
+    [JsonPropertyName("today_runtime")]
+    public TimeSpan? TotalOperatingTimeToday { get; init; }
+  }
+
   public class TapoProtocolException : InvalidOperationException {
     internal protected TapoProtocolException(string message, Uri endPoint, Exception? innerException) {}
 
@@ -254,6 +296,20 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
 
   public static class TapoSessionProtocolSelectorServiceCollectionExtensions {
     public static IServiceCollection AddTapoProtocolSelector(this IServiceCollection services, Func<TapoDevice, TapoSessionProtocol?> selectProtocol) {}
+    public static IServiceCollection AddTapoProtocolSelector(this IServiceCollection services, TapoSessionProtocol protocol) {}
+    public static IServiceCollection AddTapoProtocolSelector(this IServiceCollection services, TapoSessionProtocolSelector selector) {}
+  }
+
+  public readonly struct TapoDeviceEnergyUsage {
+    [JsonConverter(typeof(TapoElectricEnergyInWattHourJsonConverter))]
+    [JsonPropertyName("past30")]
+    public decimal? Past30Days { get; init; }
+    [JsonConverter(typeof(TapoElectricEnergyInWattHourJsonConverter))]
+    [JsonPropertyName("past7")]
+    public decimal? Past7Days { get; init; }
+    [JsonConverter(typeof(TapoElectricEnergyInWattHourJsonConverter))]
+    [JsonPropertyName("today")]
+    public decimal? Today { get; init; }
   }
 
   public readonly struct TapoDeviceExceptionHandling {
@@ -273,6 +329,18 @@ namespace Smdn.TPSmartHomeDevices.Tapo {
     public bool ShouldWrapIntoTapoProtocolException { get; init; }
 
     public override string ToString() {}
+  }
+
+  public readonly struct TapoDeviceOperatingTime {
+    [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
+    [JsonPropertyName("past30")]
+    public TimeSpan? Past30Days { get; init; }
+    [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
+    [JsonPropertyName("past7")]
+    public TimeSpan? Past7Days { get; init; }
+    [JsonConverter(typeof(TimeSpanInMinutesJsonConverter))]
+    [JsonPropertyName("today")]
+    public TimeSpan? Today { get; init; }
   }
 }
 
@@ -305,13 +373,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Credentials {
 }
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Json {
-  public sealed class TapoBase16ByteArrayJsonConverter : JsonConverter<byte[]> {
-    public TapoBase16ByteArrayJsonConverter() {}
-
-    public override byte[]? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
-    [...] public override <unknown> Write(...) {}
-  }
-
   public sealed class TapoBase64StringJsonConverter : JsonConverter<string> {
     public TapoBase64StringJsonConverter() {}
 
@@ -319,10 +380,39 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Json {
     [...] public override <unknown> Write(...) {}
   }
 
+  public sealed class TapoElectricEnergyInWattHourJsonConverter : JsonConverter<decimal?> {
+    public TapoElectricEnergyInWattHourJsonConverter() {}
+
+    public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
+    [...] public override <unknown> Write(...) {}
+  }
+
+  public sealed class TapoElectricPowerInMilliWattJsonConverter : TapoElectricPowerJsonConverter {
+    public TapoElectricPowerInMilliWattJsonConverter() {}
+  }
+
+  public sealed class TapoElectricPowerInWattJsonConverter : TapoElectricPowerJsonConverter {
+    public TapoElectricPowerInWattJsonConverter() {}
+  }
+
+  public abstract class TapoElectricPowerJsonConverter : JsonConverter<decimal?> {
+    protected TapoElectricPowerJsonConverter() {}
+
+    public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
+    [...] public override <unknown> Write(...) {}
+  }
+
   public sealed class TapoIPAddressJsonConverter : JsonConverter<IPAddress> {
     public TapoIPAddressJsonConverter() {}
 
     public override IPAddress? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
+    [...] public override <unknown> Write(...) {}
+  }
+
+  public sealed class TapoLocalDateAndTimeJsonConverter : JsonConverter<DateTime?> {
+    public TapoLocalDateAndTimeJsonConverter() {}
+
+    public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {}
     [...] public override <unknown> Write(...) {}
   }
 }
@@ -401,6 +491,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
   public abstract class TapoSession : IDisposable {
     public DateTime ExpiresOn { get; }
     public bool HasExpired { get; }
+    public abstract TapoSessionProtocol Protocol { get; }
     public string? SessionId { get; }
     public abstract string? Token { get; }
 
@@ -420,6 +511,21 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
     public abstract TapoSessionProtocol? SelectProtocol(TapoDevice device);
   }
 
+  public readonly struct GetCurrentPowerRequest : ITapoPassThroughRequest {
+    [JsonPropertyName("method")]
+    [JsonPropertyOrder(0)]
+    public string Method { get; }
+    [JsonPropertyName("requestTimeMils")]
+    public long RequestTimeMilliseconds { get; }
+  }
+
+  public readonly struct GetCurrentPowerResponse<TResult> : ITapoPassThroughResponse {
+    [JsonPropertyName("error_code")]
+    public int ErrorCode { get; init; }
+    [JsonPropertyName("result")]
+    public TResult Result { get; init; }
+  }
+
   public readonly struct GetDeviceInfoRequest : ITapoPassThroughRequest {
     [JsonPropertyName("method")]
     [JsonPropertyOrder(0)]
@@ -429,6 +535,36 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol {
   }
 
   public readonly struct GetDeviceInfoResponse<TResult> : ITapoPassThroughResponse {
+    [JsonPropertyName("error_code")]
+    public int ErrorCode { get; init; }
+    [JsonPropertyName("result")]
+    public TResult Result { get; init; }
+  }
+
+  public readonly struct GetDeviceUsageRequest : ITapoPassThroughRequest {
+    [JsonPropertyName("method")]
+    [JsonPropertyOrder(0)]
+    public string Method { get; }
+    [JsonPropertyName("requestTimeMils")]
+    public long RequestTimeMilliseconds { get; }
+  }
+
+  public readonly struct GetDeviceUsageResponse<TResult> : ITapoPassThroughResponse {
+    [JsonPropertyName("error_code")]
+    public int ErrorCode { get; init; }
+    [JsonPropertyName("result")]
+    public TResult Result { get; init; }
+  }
+
+  public readonly struct GetEnergyUsageRequest : ITapoPassThroughRequest {
+    [JsonPropertyName("method")]
+    [JsonPropertyOrder(0)]
+    public string Method { get; }
+    [JsonPropertyName("requestTimeMils")]
+    public long RequestTimeMilliseconds { get; }
+  }
+
+  public readonly struct GetEnergyUsageResponse<TResult> : ITapoPassThroughResponse {
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; init; }
     [JsonPropertyName("result")]
