@@ -91,7 +91,7 @@ jobs:
       verbose:            ${{ fromJSON(needs.prerequisites.outputs.verbose) }}
       path_proj_install_project_assets: "eng/InstallProjectAssets.proj"
       dotnet_sdk_version: '8.0.100'
-      timeout_minutes_test_job:   20 # Smdn.TPSmartHomeDevices.Tapo on macos-12 may exceed the 15 minutes limit.
+      timeout_minutes_test_job:   25 # Smdn.TPSmartHomeDevices.Tapo on macos-12 may exceed the 20 minutes limit.
       timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
       timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
       extra_options_common:                   ${{ github.event.inputs.extra_options_common }}
