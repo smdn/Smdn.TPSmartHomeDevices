@@ -38,13 +38,19 @@ public class KasaDeviceInfo : IDeviceInfo {
   ReadOnlySpan<byte> IDeviceInfo.Id => Id is null ? ReadOnlySpan<byte>.Empty : Id.AsSpan();
 
   /// <summary>Gets the Kasa device's description.</summary>
-  public string? Description => JsonPropertyDescription ?? JsonPropertyDevName;
+  public string? Description =>
+#if !SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
+#pragma warning disable CS0618
+#endif
+    JsonPropertyDescription ?? JsonPropertyDevName;
+#pragma warning restore CS0618
 
   [JsonPropertyName("description")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(Description)}' to get the value.")]
   public
 #endif
   string? JsonPropertyDescription { get; set; }
@@ -54,19 +60,26 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(Description)}' to get the value.")]
   public
 #endif
   string? JsonPropertyDevName { get; set; }
 
   /// <summary>Gets the Kasa device's type name.</summary>
   /// <remarks>The value would be like <c>IOT.SMARTBULB</c> for Kasa KL130, as an example.</remarks>
-  public string? TypeName => JsonPropertyMicType ?? JsonPropertyType;
+  public string? TypeName =>
+#if !SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
+#pragma warning disable CS0618
+#endif
+     JsonPropertyMicType ?? JsonPropertyType;
+#pragma warning restore CS0618
 
   [JsonPropertyName("mic_type")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(TypeName)}' to get the value.")]
   public
 #endif
   string? JsonPropertyMicType { get; set; }
@@ -76,6 +89,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(TypeName)}' to get the value.")]
   public
 #endif
   string? JsonPropertyType { get; set; }
@@ -120,7 +134,12 @@ public class KasaDeviceInfo : IDeviceInfo {
 #pragma warning restore CA1819
 
   /// <summary>Gets the <see cref="PhysicalAddress"/> that represents the Kasa device's MAC address.</summary>
-  public PhysicalAddress? MacAddress => JsonPropertyMicMac ?? JsonPropertyMac;
+  public PhysicalAddress? MacAddress =>
+#if !SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
+#pragma warning disable CS0618
+#endif
+    JsonPropertyMicMac ?? JsonPropertyMac;
+#pragma warning restore CS0618
 
   [JsonPropertyName("mic_mac")]
   [JsonConverter(typeof(MacAddressJsonConverter))]
@@ -128,6 +147,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(MacAddress)}' to get the value.")]
   public
 #endif
   PhysicalAddress? JsonPropertyMicMac { get; init; }
@@ -138,6 +158,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonInclude]
   private
 #else
+  [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(MacAddress)}' to get the value.")]
   public
 #endif
   PhysicalAddress? JsonPropertyMac { get; init; }
