@@ -42,7 +42,7 @@ SPDX-License-Identifier: MIT
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" Condition="$(TargetFramework.StartsWith('netstandard'))" /> <!-- for alternative of System.Convert.ToHexString -->
-    <ProjectOrPackageReference ReferencePackageVersion="1.1.0-preview2" Include="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
+    <ProjectOrPackageReference ReferencePackageVersion="1.1.0-preview3" Include="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>
