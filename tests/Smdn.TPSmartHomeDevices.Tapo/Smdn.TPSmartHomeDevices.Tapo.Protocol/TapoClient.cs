@@ -158,8 +158,8 @@ public partial class TapoClientTests {
     Assert.Throws<ObjectDisposedException>(() => Assert.That(client.Session, Is.Null));
 
 #pragma warning disable CA2012
-    Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());
-    Assert.ThrowsAsync<ObjectDisposedException>(async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>());
+    Assert.Throws<ObjectDisposedException>(() => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>());
+    Assert.ThrowsAsync<ObjectDisposedException>(async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>());
 
     Assert.Throws<ObjectDisposedException>(
       () => client.AuthenticateAsync(

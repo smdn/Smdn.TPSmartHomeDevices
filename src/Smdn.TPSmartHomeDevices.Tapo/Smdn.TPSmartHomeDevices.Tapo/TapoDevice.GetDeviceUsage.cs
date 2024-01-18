@@ -39,7 +39,7 @@ partial class TapoDevice {
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
-      GetDeviceUsageResponse<GetDeviceUsageResult>,
+      PassThroughResponse<GetDeviceUsageResult>,
       (TapoDeviceOperatingTime?, TapoDeviceEnergyUsage?)
     >(
       request: default,
@@ -67,7 +67,7 @@ partial class TapoDevice {
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
-      GetDeviceUsageResponse<GetDeviceUsageResult>,
+      PassThroughResponse<GetDeviceUsageResult>,
       TapoDeviceOperatingTime?
     >(
       request: default,
@@ -92,7 +92,7 @@ partial class TapoDevice {
   )
     => SendRequestAsync<
       GetDeviceUsageRequest,
-      GetDeviceUsageResponse<GetDeviceUsageResult>,
+      PassThroughResponse<GetDeviceUsageResult>,
       TapoDeviceEnergyUsage?
     >(
       request: default,

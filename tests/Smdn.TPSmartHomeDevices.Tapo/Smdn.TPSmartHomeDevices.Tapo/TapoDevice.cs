@@ -552,7 +552,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>()
+          new PassThroughResponse<NullResult>()
         );
       }
     };
@@ -613,7 +613,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>()
+          new PassThroughResponse<NullResult>()
         );
       }
     };
@@ -623,7 +623,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>() {
+          new PassThroughResponse<NullResult>() {
             ErrorCode = caseWhenRetrySuccess
               ? KnownErrorCodes.Success
               // this causes an exception to be raised in the request to the pseudo device #2,
@@ -703,7 +703,7 @@ public partial class TapoDeviceTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
@@ -720,7 +720,7 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.ThrowsAsync<NotSupportedException>(
-      async () => await device.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>, int>(
+      async () => await device.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>, int>(
         request: new GetDeviceInfoRequest(),
         composeResult: static resp => throw new NotSupportedException("unexpected exception"),
         cancellationToken: default
@@ -740,7 +740,7 @@ public partial class TapoDeviceTests {
       FuncGenerateToken = _ => $"token-request{request}",
       FuncGeneratePassThroughResponse = (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = request++ == 0 ? GetDeviceInfoErrorCode : KnownErrorCodes.Success,
           Result = new(),
         }
@@ -776,7 +776,7 @@ public partial class TapoDeviceTests {
 
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>() {
+          new PassThroughResponse<NullResult>() {
             ErrorCode = GetDeviceInfoErrorCode,
             Result = new(),
           }
@@ -809,7 +809,7 @@ public partial class TapoDeviceTests {
       FuncGenerateToken = _ => $"token-request{request}",
       FuncGeneratePassThroughResponse = (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = request++ == 0 ? KnownErrorCodes.Minus1301 : KnownErrorCodes.Success,
           Result = new(),
         }
@@ -844,7 +844,7 @@ public partial class TapoDeviceTests {
 
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>() {
+          new PassThroughResponse<NullResult>() {
             ErrorCode = KnownErrorCodes.Minus1301,
             Result = new(),
           }
@@ -881,7 +881,7 @@ public partial class TapoDeviceTests {
 
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>() {
+          new PassThroughResponse<NullResult>() {
             ErrorCode = KnownErrorCodes.Minus1002,
             Result = new(),
           }
@@ -943,7 +943,7 @@ public partial class TapoDeviceTests {
 
             return (
               KnownErrorCodes.Success,
-              new GetDeviceInfoResponse<NullResult>() {
+              new PassThroughResponse<NullResult>() {
                 ErrorCode = KnownErrorCodes.Success,
                 Result = new(),
               }
@@ -1021,7 +1021,7 @@ public partial class TapoDeviceTests {
 
             return (
               KnownErrorCodes.Success,
-              new GetDeviceInfoResponse<NullResult>() {
+              new PassThroughResponse<NullResult>() {
                 ErrorCode = KnownErrorCodes.Success,
                 Result = new(),
               }
@@ -1088,7 +1088,7 @@ public partial class TapoDeviceTests {
 
         return new(
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<NullResult>() {
+          new PassThroughResponse<NullResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new(),
           }
@@ -1138,7 +1138,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<GetDeviceInfoResult>() {
+          new PassThroughResponse<GetDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               // response #0: IsOn = true
@@ -1184,7 +1184,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<GetDeviceInfoResult>() {
+          new PassThroughResponse<GetDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               IsOn = IsOn,
@@ -1246,7 +1246,7 @@ public partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = static (_, _, _) => {
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<GetDeviceInfoResult>() {
+          new PassThroughResponse<GetDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               IsOn = true,
@@ -1276,7 +1276,7 @@ public partial class TapoDeviceTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = GetDeviceInfoErrorCode,
           Result = new(),
         }
@@ -1325,7 +1325,7 @@ public partial class TapoDeviceTests {
 
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -1366,7 +1366,7 @@ public partial class TapoDeviceTests {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = SetDeviceInfoErrorCode,
             Result = default,
           }

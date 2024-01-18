@@ -109,7 +109,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => new(
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
@@ -144,7 +144,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => new(
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }

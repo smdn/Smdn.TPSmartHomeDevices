@@ -13,7 +13,7 @@ partial class TapoClientTests {
   {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-      FuncGenerateKlapRequestResponse = (_, _, _) => new GetDeviceInfoResponse<NullResult>() {
+      FuncGenerateKlapRequestResponse = (_, _, _) => new PassThroughResponse<NullResult>() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new(),
       },
@@ -33,11 +33,11 @@ partial class TapoClientTests {
       )
     );
 
-    GetDeviceInfoResponse<NullResult>? nullableResponse = null;
+    PassThroughResponse<NullResult>? nullableResponse = null;
 
     for (var i = 0; i < 3; i++) {
       Assert.DoesNotThrowAsync(
-        async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>(),
+        async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
         $"attempt #{i}"
       );
 
@@ -60,7 +60,7 @@ partial class TapoClientTests {
       FuncGenerateKlapRequestResponse = (_, _, seq) => {
         sequenceNumber = seq;
 
-        return new GetDeviceInfoResponse<NullResult>() {
+        return new PassThroughResponse<NullResult>() {
           ErrorCode = ErrorCode,
           Result = new(),
         };
@@ -85,7 +85,7 @@ partial class TapoClientTests {
 
     for (var i = 0; i < 3; i++) {
       var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
-        async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>(),
+        async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
         $"attempt #{i}"
       );
 

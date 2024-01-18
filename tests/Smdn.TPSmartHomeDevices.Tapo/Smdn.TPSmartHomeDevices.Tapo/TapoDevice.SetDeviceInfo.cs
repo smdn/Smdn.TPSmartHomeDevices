@@ -21,7 +21,7 @@ partial class TapoDeviceTests {
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -49,7 +49,7 @@ partial class TapoDeviceTests {
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.False);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -78,7 +78,7 @@ partial class TapoDeviceTests {
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.EqualTo(newState));
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }

@@ -16,7 +16,7 @@ partial class TapoClientTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
@@ -36,10 +36,10 @@ partial class TapoClientTests {
       )
     );
 
-    GetDeviceInfoResponse<NullResult>? nullableResponse = null;
+    PassThroughResponse<NullResult>? nullableResponse = null;
 
     Assert.DoesNotThrowAsync(
-      async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
+      async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>()
     );
 
     Assert.That(nullableResponse, Is.Not.Null);
@@ -58,11 +58,11 @@ partial class TapoClientTests {
     );
 
     Assert.ThrowsAsync<InvalidOperationException>(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>()
     );
 #pragma warning disable CA2012
     Assert.Throws<InvalidOperationException>(
-      () => client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
+      () => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>()
     );
 #pragma warning restore CA2012
   }
@@ -76,7 +76,7 @@ partial class TapoClientTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         KnownErrorCodes.Success,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = ErrorCode,
           Result = new(),
         }
@@ -97,7 +97,7 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>()
     );
 
     Assert.That(ex!.RawErrorCode, Is.EqualTo(ErrorCode), nameof(ex.RawErrorCode));
@@ -114,7 +114,7 @@ partial class TapoClientTests {
       FuncGenerateToken = static _ => "token",
       FuncGeneratePassThroughResponse = static (_, _, _) => (
         ErrorCode,
-        new GetDeviceInfoResponse<NullResult>() {
+        new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
@@ -135,7 +135,7 @@ partial class TapoClientTests {
     );
 
     var ex = Assert.ThrowsAsync<TapoErrorResponseException>(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<NullResult>>()
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>()
     );
 
     Assert.That(ex!.RawErrorCode, Is.EqualTo(ErrorCode), nameof(ex.RawErrorCode));

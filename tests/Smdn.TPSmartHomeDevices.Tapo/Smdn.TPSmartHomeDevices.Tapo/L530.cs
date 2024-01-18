@@ -70,7 +70,7 @@ public class L530Tests {
         Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -131,7 +131,7 @@ public class L530Tests {
           Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -203,7 +203,7 @@ public class L530Tests {
           Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -268,7 +268,7 @@ public class L530Tests {
           Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }
@@ -333,7 +333,7 @@ public class L530Tests {
           Assert.That(requestParams.TryGetProperty("brightness", out var discard), Is.False);
         return (
           KnownErrorCodes.Success,
-          new SetDeviceInfoResponse<None>() {
+          new PassThroughResponse<None>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = default,
           }

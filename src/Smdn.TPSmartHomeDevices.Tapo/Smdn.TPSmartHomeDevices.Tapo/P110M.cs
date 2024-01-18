@@ -179,7 +179,7 @@ public class P110M : TapoDevice {
   )
     => SendRequestAsync<
       GetCurrentPowerRequest,
-      GetCurrentPowerResponse<GetCurrentPowerResult>,
+      PassThroughResponse<GetCurrentPowerResult>,
       decimal?
     >(
       request: default,
@@ -198,7 +198,7 @@ public class P110M : TapoDevice {
   )
     => SendRequestAsync<
       GetEnergyUsageRequest,
-      GetEnergyUsageResponse<TapoPlugMonitoringData>,
+      PassThroughResponse<TapoPlugMonitoringData>,
       TapoPlugMonitoringData
     >(
       request: default,

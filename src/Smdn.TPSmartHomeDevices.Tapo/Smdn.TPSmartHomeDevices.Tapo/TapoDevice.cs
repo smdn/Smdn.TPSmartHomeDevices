@@ -661,7 +661,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
     if (composeResult is null)
       throw new ArgumentNullException(nameof(composeResult));
 
-    return SendRequestAsync<GetDeviceInfoRequest, GetDeviceInfoResponse<TDeviceInfo>, TResult>(
+    return SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<TDeviceInfo>, TResult>(
       request: default,
       composeResult: result => composeResult(result.Result),
       cancellationToken: cancellationToken
@@ -689,7 +689,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
     TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<SetDeviceInfoRequest<TDeviceInfo>, SetDeviceInfoResponse<None>>(
+    => SendRequestAsync<SetDeviceInfoRequest<TDeviceInfo>, PassThroughResponse<None>>(
       request: new(
         terminalUuid: TerminalUuidString,
         parameters: deviceInfo

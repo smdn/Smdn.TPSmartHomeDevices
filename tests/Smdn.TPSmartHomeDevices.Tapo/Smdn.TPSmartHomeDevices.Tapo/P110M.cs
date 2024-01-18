@@ -50,7 +50,7 @@ public class P110MTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new GetCurrentPowerResponse<GetCurrentPowerResult>() {
+          new PassThroughResponse<GetCurrentPowerResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new(currentPower: currentPower),
           }
@@ -102,7 +102,7 @@ public class P110MTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new GetCurrentPowerResponse<GetEnergyUsageResult>() {
+          new PassThroughResponse<GetEnergyUsageResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               TodayRuntime = 41,

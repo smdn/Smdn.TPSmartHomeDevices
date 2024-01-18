@@ -120,7 +120,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   [TestCase(typeof(LoginDeviceRequest), true)]
   [TestCase(typeof(LoginDeviceResponse), true)]
   [TestCase(typeof(GetDeviceInfoRequest), true)]
-  [TestCase(typeof(GetDeviceInfoResponse<NullResult>), true)]
+  [TestCase(typeof(PassThroughResponse<NullResult>), true)]
   [TestCase(typeof(SecurePassThroughRequest<LoginDeviceRequest>), false)]
   [TestCase(typeof(SecurePassThroughResponse<LoginDeviceResponse>), false)]
   public void CanConvert(Type typeToConvert, bool expected)
@@ -153,7 +153,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   [TestCase(typeof(LoginDeviceResponse))]
-  [TestCase(typeof(GetDeviceInfoResponse<NullResult>))]
+  [TestCase(typeof(PassThroughResponse<NullResult>))]
   public void CreateConverter_ITapoPassThroughResponse(Type typeToConvert)
   {
     var factory = CreateFactory();
@@ -379,33 +379,33 @@ public class SecurePassThroughJsonConverterFactoryTests {
     };
 
     yield return new object[] {
-      typeof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>),
+      typeof(PassThroughResponse<GetDeviceInfoResponseResult>),
       @"{""error_code"":-1,""result"":{""device_id"":""<device-id>"",""device_on"":true}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.That(deserialized, Is.InstanceOf<GetDeviceInfoResponse<GetDeviceInfoResponseResult>>());
+          Assert.That(deserialized, Is.InstanceOf<PassThroughResponse<GetDeviceInfoResponseResult>>());
 
-          var resp = (GetDeviceInfoResponse<GetDeviceInfoResponseResult>)deserialized;
-          Assert.That(resp.ErrorCode, Is.EqualTo(-1), nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.ErrorCode));
-          Assert.That(resp.Result.Id, Is.EqualTo("<device-id>"), nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.Id));
-          Assert.That(resp.Result.IsOn, Is.True, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.IsOn));
-          Assert.That(resp.Result.NickName, Is.Null, nameof(GetDeviceInfoResponse<GetDeviceInfoResponseResult>.Result.NickName));
+          var resp = (PassThroughResponse<GetDeviceInfoResponseResult>)deserialized;
+          Assert.That(resp.ErrorCode, Is.EqualTo(-1), nameof(PassThroughResponse<GetDeviceInfoResponseResult>.ErrorCode));
+          Assert.That(resp.Result.Id, Is.EqualTo("<device-id>"), nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.Id));
+          Assert.That(resp.Result.IsOn, Is.True, nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.IsOn));
+          Assert.That(resp.Result.NickName, Is.Null, nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.NickName));
         }
       )
     };
 
     yield return new object[] {
-      typeof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>),
+      typeof(PassThroughResponse<SetDeviceInfoResponseResult>),
       @"{""error_code"":1,""result"":{""foo"":0,""bar"":""baz"",""qux"":""extra property""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
-          Assert.That(deserialized, Is.InstanceOf<SetDeviceInfoResponse<SetDeviceInfoResponseResult>>());
+          Assert.That(deserialized, Is.InstanceOf<PassThroughResponse<SetDeviceInfoResponseResult>>());
 
-          var resp = (SetDeviceInfoResponse<SetDeviceInfoResponseResult>)deserialized;
+          var resp = (PassThroughResponse<SetDeviceInfoResponseResult>)deserialized;
 
-          Assert.That(resp.ErrorCode, Is.EqualTo(1), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.ErrorCode));
-          Assert.That(resp.Result.Foo, Is.EqualTo(0), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Foo));
-          Assert.That(resp.Result.Bar, Is.EqualTo("baz"), nameof(SetDeviceInfoResponse<SetDeviceInfoResponseResult>.Result.Bar));
+          Assert.That(resp.ErrorCode, Is.EqualTo(1), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.ErrorCode));
+          Assert.That(resp.Result.Foo, Is.EqualTo(0), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Foo));
+          Assert.That(resp.Result.Bar, Is.EqualTo("baz"), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Bar));
         }
       )
     };

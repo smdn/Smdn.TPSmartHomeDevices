@@ -44,7 +44,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<TapoDeviceInfoResultEafe>() {
+          new PassThroughResponse<TapoDeviceInfoResultEafe>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               Id = "0123456789ABCDEF",
@@ -105,7 +105,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<TapoDeviceInfoResult>() {
+          new PassThroughResponse<TapoDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               ModelName = DeviceModelName,
@@ -151,7 +151,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new GetDeviceInfoResponse<GetDeviceInfoResponseGetOnOffStateResult>() {
+          new PassThroughResponse<GetDeviceInfoResponseGetOnOffStateResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() { DeviceOn = currentState },
           }
