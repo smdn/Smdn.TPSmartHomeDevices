@@ -14,7 +14,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 partial class TapoDeviceTests {
-  private readonly struct TapoDeviceInfoResultEafe {
+  private readonly struct TapoCommonDeviceInfoResult {
     [JsonPropertyName("device_id")]
     public string? Id { get; init; }
 
@@ -44,7 +44,7 @@ partial class TapoDeviceTests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
-          new PassThroughResponse<TapoDeviceInfoResultEafe>() {
+          new PassThroughResponse<TapoCommonDeviceInfoResult>() {
             ErrorCode = KnownErrorCodes.Success,
             Result = new() {
               Id = "0123456789ABCDEF",
