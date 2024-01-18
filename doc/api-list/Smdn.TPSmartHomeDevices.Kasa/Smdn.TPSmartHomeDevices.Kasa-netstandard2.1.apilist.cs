@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.0.0-preview2)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.0.0-preview3)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview2+d001e07a3ea43a47290d9e9d2f4d582e14caa297
+//   InformationalVersion: 2.0.0-preview3+8f11224df269f7ecb743bef2e7c9b994a578c8dd
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Referenced assemblies:
@@ -87,6 +87,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     protected KasaDevice(PhysicalAddress macAddress, IServiceProvider serviceProvider) {}
     protected KasaDevice(string host, IServiceProvider? serviceProvider) {}
 
+    public IDeviceEndPoint EndPoint { get; }
     public bool IsConnected { get; }
     protected bool IsDisposed { get; }
 
