@@ -10,6 +10,20 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.GetDeviceInfoResponse`1</Target>
+    <Left>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.SetDeviceInfoResponse`1</Target>
+    <Left>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Smdn.TPSmartHomeDevices.Tapo.Json.TapoBase16ByteArrayJsonConverter</Target>
     <Left>lib/net7.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
     <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
@@ -17,7 +31,35 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.GetDeviceInfoResponse`1</Target>
+    <Left>lib/net7.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.SetDeviceInfoResponse`1</Target>
+    <Left>lib/net7.0/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/net6.0/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Smdn.TPSmartHomeDevices.Tapo.Json.TapoBase16ByteArrayJsonConverter</Target>
+    <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.GetDeviceInfoResponse`1</Target>
+    <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
+    <Right>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Smdn.TPSmartHomeDevices.Tapo.Protocol.SetDeviceInfoResponse`1</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Left>
     <Right>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Tapo.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
