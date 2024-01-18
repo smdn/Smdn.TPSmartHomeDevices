@@ -10,6 +10,12 @@ namespace Smdn.TPSmartHomeDevices;
 /// </summary>
 public interface ISmartDevice {
   /// <summary>
+  /// Gets the <see cref="IDeviceEndPoint"/> representing a endpoint of smart device,
+  /// which will be used to resolve the actual endpoint used to communicate with smart devices.
+  /// </summary>
+  IDeviceEndPoint EndPoint { get; }
+
+  /// <summary>
   /// Sets the on/off state of the device according to the parameter <paramref name="newOnOffState" />.
   /// </summary>
   /// <param name="newOnOffState">
