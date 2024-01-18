@@ -129,6 +129,7 @@ public partial class TapoDeviceTests {
       "password"
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort))
@@ -144,6 +145,7 @@ public partial class TapoDeviceTests {
       "password"
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new DnsEndPoint("localhost", TapoClient.DefaultPort))
@@ -166,6 +168,7 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new IPEndPoint(IPAddress.Loopback, TapoClient.DefaultPort))
@@ -190,11 +193,14 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task Create_WithEndPoint()
   {
+    var endpoint = new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0));
+
     using var device = TapoDevice.Create(
-      deviceEndPoint: new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0)),
+      deviceEndPoint: endpoint,
       serviceProvider: services!.BuildServiceProvider()
     );
 
+    Assert.That(device.EndPoint, Is.EqualTo(endpoint));
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new DnsEndPoint("localhost", TapoClient.DefaultPort))
@@ -248,6 +254,8 @@ public partial class TapoDeviceTests {
     Assert.DoesNotThrow(device.Dispose, "dispose again");
 
     Assert.That(device.Session, Is.Null, nameof(device.Session));
+
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.EndPoint, Is.Not.Null), nameof(device.EndPoint));
 
 #pragma warning disable CA2012
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));

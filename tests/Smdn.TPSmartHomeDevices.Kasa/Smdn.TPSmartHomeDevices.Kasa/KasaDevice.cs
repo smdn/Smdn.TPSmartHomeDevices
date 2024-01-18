@@ -52,6 +52,7 @@ public partial class KasaDeviceTests {
       ipAddress: IPAddress.Loopback
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort))
@@ -65,6 +66,7 @@ public partial class KasaDeviceTests {
       host: "localhost"
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new DnsEndPoint("localhost", KasaClient.DefaultPort))
@@ -85,6 +87,7 @@ public partial class KasaDeviceTests {
       serviceProvider: services.BuildServiceProvider()
     );
 
+    Assert.That(device.EndPoint, Is.Not.Null);
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new IPEndPoint(IPAddress.Loopback, KasaClient.DefaultPort))
@@ -107,10 +110,13 @@ public partial class KasaDeviceTests {
   [Test]
   public async Task Create_WithEndPoint()
   {
+    var endpoint = new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0));
+
     using var device = KasaDevice.Create(
-      deviceEndPoint: new StaticDeviceEndPoint(new DnsEndPoint("localhost", 0))
+      deviceEndPoint: endpoint
     );
 
+    Assert.That(device.EndPoint, Is.EqualTo(endpoint));
     Assert.That(
       await device.ResolveEndPointAsync(),
       Is.EqualTo(new DnsEndPoint("localhost", KasaClient.DefaultPort))
@@ -127,6 +133,7 @@ public partial class KasaDeviceTests {
     Assert.DoesNotThrow(device.Dispose, "dispose");
     Assert.DoesNotThrow(device.Dispose, "dispose again");
 
+    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.EndPoint, Is.Not.Null), nameof(device.EndPoint));
     Assert.Throws<ObjectDisposedException>(() => Assert.That(device.IsConnected, Is.False), nameof(device.IsConnected));
 
     Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));

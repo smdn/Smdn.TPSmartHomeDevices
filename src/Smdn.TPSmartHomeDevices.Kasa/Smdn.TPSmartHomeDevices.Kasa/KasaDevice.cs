@@ -50,6 +50,19 @@ public partial class KasaDevice : IDisposable {
 
   private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
 
+  /// <summary>
+  /// Gets the <see cref="IDeviceEndPoint"/> representing a endpoint of smart device,
+  /// which will be used to resolve the actual endpoint used to communicate with smart devices.
+  /// </summary>
+  /// <exception cref="ObjectDisposedException">The device has been disposed.</exception>
+  public IDeviceEndPoint EndPoint {
+    get {
+      ThrowIfDisposed();
+
+      return deviceEndPoint;
+    }
+  }
+
 #if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
   [MemberNotNullWhen(false, nameof(deviceEndPoint))]
 #endif
