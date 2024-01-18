@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0-preview2)
+// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0-preview3)
 //   Name: Smdn.TPSmartHomeDevices.Primitives
 //   AssemblyVersion: 1.1.0.0
-//   InformationalVersion: 1.1.0-preview2+e153b40ab2e10cbae4165a6013f9be14e5465b75
+//   InformationalVersion: 1.1.0-preview3+997d1abe73c225c5c322bcb1043abfc410f19baf
 //   TargetFramework: .NETStandard,Version=v2.0
 //   Configuration: Release
 //   Referenced assemblies:
@@ -51,6 +51,8 @@ namespace Smdn.TPSmartHomeDevices {
   }
 
   public interface ISmartDevice {
+    IDeviceEndPoint EndPoint { get; }
+
     ValueTask<IDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default);
     ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken);
     ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken);
