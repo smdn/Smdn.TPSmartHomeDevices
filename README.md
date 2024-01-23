@@ -144,16 +144,16 @@ await plug.TurnOnAsync();
 
 The environment variable `TAPO_KLAP_LOCALAUTHHASH` has to be a BASE64 string calculated by the formula `BASE64(SHA256(SHA1(username) + SHA1(password)))`. See [this example](./examples/Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/) for detail.
 
-[!NOTE]
-Although `Smdn.TPSmartHomeDevices.Tapo` still supports devices with older protocol/firmware, it is recommended that you update your Tapo device's firmware to the latest version before using the library.
+> [!NOTE]
+> Although `Smdn.TPSmartHomeDevices.Tapo` still supports devices with older protocol/firmware, it is recommended that you update your Tapo device's firmware to the latest version before using the library.
 
 
 
 ### Feature Request
-[!NOTE]
-See also [Contribution guidelines](#for-contributers).
-
 If you have a request that you would like library to add API for the device functions to devices currently supported, please send it as a [Feature Request](/../../issues/new?template=02_feature-request.yml) or Pull Request.
+
+> [!NOTE]
+> See also [Contribution guidelines](#for-contributers).
 
 If you would like to request support for a device that is not currently supported, please send a Pull Request. Alternatively, please consider [supporting this project](https://github.com/sponsors/smdn?frequency=one-time) through GitHub Sponsors.
 
