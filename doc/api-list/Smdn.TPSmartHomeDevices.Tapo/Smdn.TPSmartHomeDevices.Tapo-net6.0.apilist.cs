@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0-preview5)
+// Smdn.TPSmartHomeDevices.Tapo.dll (Smdn.TPSmartHomeDevices.Tapo-2.0.0)
 //   Name: Smdn.TPSmartHomeDevices.Tapo
 //   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0-preview5+841a75d6ea4ddf46fff7f06ee411eda75389c726
+//   InformationalVersion: 2.0.0+b94237e3ade205b0c2874616f6f9c9259586dcbd
 //   TargetFramework: .NETCoreApp,Version=v6.0
 //   Configuration: Release
 //   Referenced assemblies:
