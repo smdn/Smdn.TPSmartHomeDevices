@@ -3,30 +3,76 @@
 [![CodeQL](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/smdn/Smdn.TPSmartHomeDevices/actions/workflows/codeql-analysis.yml)
 
 # Smdn.TPSmartHomeDevices
-The .NET implementations for [Kasa](https://www.kasasmart.com) and [Tapo](https://www.tapo.com/), the TP-Link smart home devices.
+The .NET implementations for controlling [Kasa](https://www.kasasmart.com) and [Tapo](https://www.tapo.com/), the TP-Link smart home devices.
 
 ## Smdn.TPSmartHomeDevices.Tapo / Smdn.TPSmartHomeDevices.Kasa
-|Library|NuGet package|View code|
-|-|-|-|
-|`Smdn.TPSmartHomeDevices.Tapo`|[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Tapo.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/)|[Smdn.TPSmartHomeDevices.Tapo](./src/Smdn.TPSmartHomeDevices.Tapo/)|
-|`Smdn.TPSmartHomeDevices.Kasa`|[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Kasa.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/)|[Smdn.TPSmartHomeDevices.Kasa](./src/Smdn.TPSmartHomeDevices.Kasa/)|
+- Smdn.TPSmartHomeDevices.Tapo: [![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Tapo.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+- Smdn.TPSmartHomeDevices.Kasa: [![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Kasa.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)|
 
-[Smdn.TPSmartHomeDevices.Tapo](./src/Smdn.TPSmartHomeDevices.Tapo/) and [Smdn.TPSmartHomeDevices.Kasa](./src/Smdn.TPSmartHomeDevices.Kasa/) are class libraries that provide .NET APIs for operating Tapo and Kasa smart home devices. These libraries perform operations by communicating directly with Tapo/Kasa devices in the same network.
+[Smdn.TPSmartHomeDevices.Tapo](./src/Smdn.TPSmartHomeDevices.Tapo/) and [Smdn.TPSmartHomeDevices.Kasa](./src/Smdn.TPSmartHomeDevices.Kasa/) are class libraries that provide .NET APIs for operating Tapo and Kasa smart home devices.
 
-These class libraries provide classes such as [L530](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/) and [KL130](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/), which have the same name as the device's product name. These classes do not simply provide methods to wrap the sending of requests to the device, but also provide following features:
+These class libraries provide device classes such as `L530` (`Smdn.TPSmartHomeDevices.Tapo` namespace) and `KL130` (`Smdn.TPSmartHomeDevices.Kasa` namespace), which have the same name as the device's product model name.
 
-- Automatic connection/authentication/session management, including reconnection and re-authentication.
-- Built-in/customizable error handling for typical errors and retries (like device busy, session expired, request timeout)
-- Using MAC address and following IP address change in DHCP networks (requires [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#smdntpsmarthomedevicesmacaddressendpoint)).
-- `async` operation and cancellation.
+These device classes perform operations by communicating directly with Tapo/Kasa devices in the same network. Remote operation via the Internet is not supported.
 
-The following is an example of code to operate L530. This example illustrates the basic API usage as well as what happens in the background of a method.
+```csharp
+using Smdn.TPSmartHomeDevices.Tapo;
+
+// Creates device object for L530 multicolor light bulb
+using var bulb = new L530(
+  "192.0.2.1",      // IP address currently assigned to the device
+  "user@mail.test", // E-mail address for your Tapo account
+  "password"        // Password for your Tapo account
+);
+
+// Sets the color temperature and brightness.
+// In the off state, the bulb will automatically turn on.
+await bulb.SetColorTemperatureAsync(colorTemperature: 5500, brightness: 80);
+```
+
+### Supported device and functions
+#### Supported devices
+The following devices have been confirmed to work on the actual devices:
+
+|Model|Device type|Hardware version|Hardware specs|Firmware version|Usage example|
+|-|-|-|-|-|-|
+|Tapo L530|Bulb|1.0.0<br/>1.20|JP<br/>JP|1.3.0 Build 20230831 Rel. 75926<br/>1.1.0 Build 230823 Rel.162531|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)|
+|Tapo L900|Light strip|1.0|-|1.1.0 Build 230905 Rel.184939|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)|
+|Tapo P105|Plug|1.0.0|JP|1.4.1 Build 20231103 Rel. 36519|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)|
+|Tapo P110M|Plug|1.0|JP|1.1.0 Build 231009 Rel.155719|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/P110MPlug/)|
+|Kasa KL130|Bulb|1.0|JP|1.8.11 Build 191113 Rel.105336|[example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)|
+|Kasa HS105|Plug|1.0|JP|1.5.8 Build 191125 Rel.135255|[example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)|
+
+#### Supported functions
+The library supports performing the following device functions:
+
+- Turn on/off
+- Set color (color temperature)
+- Set color (hue and saturation)
+- Set brightness
+- Get on/off stete
+- Get current light color/brightness
+- Get monitoring data: power consumption and cumulative energy usage [Tapo P110M]
+- Get device informations ([Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/DisplayDeviceInfo/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/DisplayDeviceInfo/))
+- Get device usage: operating time and cumulative energy usage (only for Tapo devices, [example](./examples/Smdn.TPSmartHomeDevices.Tapo/DeviceUsage/))
+
+#### Confirmed to work
+The library has been tested and confirmed to work with actual devices, on the following environments:
+- Windows 10
+- Ubuntu 22.04 LTS
+- Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
+
+
+### More library features
+The device class such as `L530` does not simply provide methods to wrap the sending of requests to the device. `Smdn.TPSmartHomeDevices.Tapo` and `Smdn.TPSmartHomeDevices.Kasa` also provides the following features.
+
+The following example illustrates the basic API usage as well as what happens in the background of a method.
 
 ```csharp
 using Smdn.TPSmartHomeDevices.Tapo;
 
 // Creates client for L530 multicolor light bulb
-using var bulb = new L530("192.0.2.255", "user@mail.test", "password");
+using var bulb = new L530("192.0.2.1", "user@mail.test", "password");
 
 // Turn on the bulb, and set the color temperature and brightness.
 await bulb.SetColorTemperatureAsync(colorTemperature: 5500, brightness: 80);
@@ -46,54 +92,66 @@ await bulb.SetColorTemperatureAsync(colorTemperature: 4000, brightness: 40);
 //    resolve it again. (requires Smdn.TPSmartHomeDevices.MacAddressEndPoint)
 ```
 
-### Supported devices and functions
-The following devices and functions are currently supported.
+#### Automated session management
+Connection and authentication to the device is performed automatically when a request is sent to the device. Reconnection and reauthentication is also performed automatically when an exception occurs or when a session expires.
 
-- Tapo devices (as of version 2.0.0)
-  - L530 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)
-  - L900 multicolor light strip - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)
-  - P105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)
-  - P110M smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/P110MPlug/)
-  - Supports default (`securePassthrough`) and new (`KLAP`) protocol - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/)
-- Kasa devices (as of version 1.0.0)
-  - HS105 smart plug - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/)
-  - KL130 multicolor bulb - [example](./examples/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/)
-- Functions
-  - Turn on/off
-  - Set color (color temperature)
-  - Set color (hue and saturation)
-  - Set brightness
-  - Get device informations [Tapo devices]
-  - Get device usage (operating time and cumulative energy usage) [Tapo devices]
-  - Get light color/brightness
-  - Get on/off stete
-  - Get monitoring data (power consumption and cumulative energy usage) [Tapo P110M]
+#### Built-in and customizable retry and error handling
+Built-in error handling is provided by default for typical errors such as device busy, session expired, or request timeout. Customized error handling is also available, allowing you to define handling for each type of exception and retries. See [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/) and [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/).
 
-### Library features
-- Specifying devices by MAC address - [example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/), see also: [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#smdntpsmarthomedevicesmacaddressendpoint)
-- Built-in and customizable error handling
-    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/)
-    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/)
+#### Supports default protocol (`securePassthrough`) and new protocol (`KLAP`)
+`Smdn.TPSmartHomeDevices.Tapo` version 2.0.0 or later supports the new protocol `KLAP` for Tapo devices. By default, the appropriate protocol is automatically selected. You can also explicitly specify a protocol. See [this example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/).
+
+#### Addressing devices using MAC addresses
+Supports specifying device endpoint by MAC address. This is useful in networks with variable IP addresses, such as networks using DHCP. This feature requires an extension library [Smdn.TPSmartHomeDevices.MacAddressEndPoint](#smdntpsmarthomedevicesmacaddressendpoint).
+
+#### Other features
 - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
-  - Logging (`Microsoft.Extensions.Logging`)
-    - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/)
-    - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
+  - Logging (`Microsoft.Extensions.Logging`) - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
   - HTTP (`Microsoft.Extensions.Http`) - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
+- Providing Tapo credentials via environment variables - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/)
 - Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
-- Customizable Tapo protocol selection - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/)
-- Configuring timeout and cancellation
-  - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
-  - [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
+- Configuring timeout and cancellation - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
 
-### Testing
-- Tested with pseudo devices and actual devices
-- Confirmed to work on:
-  - Windows 10
-  - Ubuntu 22.04 LTS
-  - Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
+### Recommended usage on Tapo devices
+Tapo devices have introduced secure authentication methods in new firmware released after summer 2023. If new firmware is installed, hashed credentials can be used for authentication. This means that it is no longer necessary to embed the username and password in plain text.
+
+Additionally, Smdn.TPSmartHomeDevices.Tapo can retrieve hashed credentials from environment variables.
+
+The following code shows an example of retrieving hashed credential from the `TAPO_KLAP_LOCALAUTHHASH` environment variable and using it when authenticating to a Tapo device.
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+using Smdn.TPSmartHomeDevices.Tapo;
+using Smdn.TPSmartHomeDevices.Tapo.Credentials;
+using Smdn.TPSmartHomeDevices.Tapo.Protocol;
+
+var services = new ServiceCollection();
+
+// Specifies that the device should be operated using the newer protocol.
+services.AddTapoProtocolSelector(TapoSessionProtocol.Klap);
+
+// Specifies the environment variable in which the hashed credential
+// used for authentication is set.
+services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
+  envVarBase64KlapLocalAuthHash: "TAPO_KLAP_LOCALAUTHHASH"
+);
+
+using var plug = new P105("192.0.2.1", services.BuildServiceProvider());
+
+await plug.TurnOnAsync();
+```
+
+The environment variable `TAPO_KLAP_LOCALAUTHHASH` has to be a BASE64 string calculated by the formula `BASE64(SHA256(SHA1(username) + SHA1(password)))`. See [this example](./examples/Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/) for detail.
+
+[!NOTE]
+Although `Smdn.TPSmartHomeDevices.Tapo` still supports devices with older protocol/firmware, it is recommended that you update your Tapo device's firmware to the latest version before using the library.
+
+
 
 ### Feature Request
-(See also [Contribution guidelines](#for-contributers))
+[!NOTE]
+See also [Contribution guidelines](#for-contributers).
 
 If you have a request that you would like library to add API for the device functions to devices currently supported, please send it as a [Feature Request](/../../issues/new?template=02_feature-request.yml) or Pull Request.
 
@@ -104,22 +162,18 @@ If you would like to request support for a device that is not currently supporte
 When adding support for a new device, I would like to purchase and perform testing with the actual device as much as possible, if it is available in Japan.
 
 ## Smdn.TPSmartHomeDevices.MacAddressEndPoint
-|NuGet package|View code|
-|-|-|
-|[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.MacAddressEndPoint.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|[Smdn.TPSmartHomeDevices.MacAddressEndPoint](./src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/)|
+[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.MacAddressEndPoint.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.MacAddressEndPoint/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`Smdn.TPSmartHomeDevices.MacAddressEndPoint` is an extension library that enables to use MAC addresses to specify the device endpoints, instead of IP addresses or host names. This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+[Smdn.TPSmartHomeDevices.MacAddressEndPoint](./src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/) is an extension library that enables to use MAC addresses to specify the device endpoints, instead of IP addresses or host names. This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
 
 See [this example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/) for using MAC addresses to identify the Tapo and Kasa devices.
 
 This library relies on [Smdn.Net.AddressResolution](https://www.nuget.org/packages/Smdn.Net.AddressResolution) [![Smdn.Net.AddressResolution](https://img.shields.io/nuget/v/Smdn.Net.AddressResolution.svg)](https://www.nuget.org/packages/Smdn.Net.AddressResolution/) for MAC address resolution. For further details such as functions and supported platforms, refer [smdn/Smdn.Net.AddressResolution](https://github.com/smdn/Smdn.Net.AddressResolution) repository.
 
 ## Smdn.TPSmartHomeDevices.Primitives
-|NuGet package|View code|
-|-|-|
-|[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Primitives.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Primitives/)|[Smdn.TPSmartHomeDevices.Primitives](./src/Smdn.TPSmartHomeDevices.Primitives/)|
+[![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Primitives.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Primitives/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`Smdn.TPSmartHomeDevices.Primitives` provides common types for `Smdn.TPSmartHomeDevices.*`. This library includes abstraction interfaces, extension methods and custom `JsonConverter`s. This library does not provide any specific implementations to operate Kasa and Tapo devices.
+[Smdn.TPSmartHomeDevices.Primitives](./src/Smdn.TPSmartHomeDevices.Primitives/) provides common types for `Smdn.TPSmartHomeDevices.*`. This library includes abstraction interfaces, extension methods and custom `JsonConverter`s. This library does not provide any specific implementations to operate Kasa and Tapo devices.
 
 More description to be added.
 
