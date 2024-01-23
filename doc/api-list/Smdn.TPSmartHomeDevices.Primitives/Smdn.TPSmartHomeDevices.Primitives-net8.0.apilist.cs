@@ -1,7 +1,7 @@
-// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0-preview3)
+// Smdn.TPSmartHomeDevices.Primitives.dll (Smdn.TPSmartHomeDevices.Primitives-1.1.0)
 //   Name: Smdn.TPSmartHomeDevices.Primitives
 //   AssemblyVersion: 1.1.0.0
-//   InformationalVersion: 1.1.0-preview3+997d1abe73c225c5c322bcb1043abfc410f19baf
+//   InformationalVersion: 1.1.0+62f4dfe508fe750dce82db61618115e330ed4321
 //   TargetFramework: .NETCoreApp,Version=v8.0
 //   Configuration: Release
 //   Referenced assemblies:
