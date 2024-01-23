@@ -1,12 +1,15 @@
 ﻿// SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System.Net;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Smdn.TPSmartHomeDevices.Kasa;
 
 var services = new ServiceCollection();
 
+// Adds logging services to the ServiceCollection.
 services
   .AddLogging(
     static builder => builder
@@ -16,7 +19,12 @@ services
         options.IncludeScopes = true;
         options.SingleLine = true;
       })
-      .AddFilter(static level => LogLevel.Trace <= level)
+      .AddFilter(
+        // The log output from this library can be filtered by the
+        // category name 'Smdn.TPSmartHomeDevices.Kasa.Protocol.KasaClient'.
+        category: typeof(Smdn.TPSmartHomeDevices.Kasa.Protocol.KasaClient).FullName,
+        level: LogLevel.Trace
+      )
   );
 
 using var plug = new HS105(
