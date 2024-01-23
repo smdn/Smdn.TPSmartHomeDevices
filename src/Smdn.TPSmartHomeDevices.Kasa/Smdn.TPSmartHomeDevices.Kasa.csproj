@@ -62,7 +62,7 @@ SPDX-License-Identifier: MIT
     <PropertyGroup>
       <PackageReadmeFileContent><![CDATA[# $(PackageId) $(PackageVersion)
 `$(PackageId)` is a library that provides APIs for operating Kasa, the TP-Link smart home devices.
-This library performs operations by communicating directly with Kasa devices in the same network.
+This library performs operations by communicating directly with Kasa devices in the same network. Remote operation via the Internet is not supported.
 
 This library also provides following features:
 
