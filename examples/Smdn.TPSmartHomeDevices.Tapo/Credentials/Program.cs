@@ -9,18 +9,18 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 // For basic usage, you can create Tapo device instance by specifying the
 // email address and password used for authentication in the constructor.
-using var plug0 = new P105(IPAddress.Parse("192.0.2.0"), "user@mail.test", "password");
+using var plug1 = new P105(IPAddress.Parse("192.0.2.1"), "user@mail.test", "password");
 
 
 
 // In addition to this, IServiceProvider can be used to specify the
 // credentials to be used for authentication.
-var services1 = new ServiceCollection();
+var servicesPlug2 = new ServiceCollection();
 
-services1.AddTapoCredential("user@mail.test", "password");
+servicesPlug2.AddTapoCredential("user@mail.test", "password");
 
-// In this example, plug1 obtains credentials from the IServiceProvider.
-using var plug1 = new P105(IPAddress.Parse("192.0.2.1"), services1.BuildServiceProvider());
+// In this example, plug2 obtains credentials from the IServiceProvider.
+using var plug2 = new P105(IPAddress.Parse("192.0.2.2"), servicesPlug2.BuildServiceProvider());
 
 
 
@@ -29,14 +29,14 @@ using var plug1 = new P105(IPAddress.Parse("192.0.2.1"), services1.BuildServiceP
 //
 // But the credentials added by this method can be used only for
 // old authentication protocol ('secure pass through').
-var services2 = new ServiceCollection();
+var servicesPlug3 = new ServiceCollection();
 
-services2.AddTapoBase64EncodedCredential(
+servicesPlug3.AddTapoBase64EncodedCredential(
   base64UserNameSHA1Digest: "YjhlY2VjNWIzNjk0ZTVlNzE0YTYxMmNhZTZlZTJiNmExMjQ5ZmZmZQ==", // = BASE64(SHA1("user@mail.test"))
   base64Password: "cGFzc3dvcmQ=" // = BASE64("password")
 );
 
-using var plug2 = new P105(IPAddress.Parse("192.0.2.2"), services2.BuildServiceProvider());
+using var plug3 = new P105(IPAddress.Parse("192.0.2.3"), servicesPlug3.BuildServiceProvider());
 
 // Note:
 //   As you can see from the examples above, the authentication in Tapo's
@@ -58,12 +58,12 @@ using var plug2 = new P105(IPAddress.Parse("192.0.2.2"), services2.BuildServiceP
 //
 // For user name (email), use TapoCredentials.ToBase64EncodedSHA1DigestString.
 // For password, use TapoCredentials.ToBase64EncodedString.
-var services3 = new ServiceCollection();
+var servicesPlug4 = new ServiceCollection();
 
-services3.AddTapoBase64EncodedCredential(
+servicesPlug4.AddTapoBase64EncodedCredential(
   base64UserNameSHA1Digest: TapoCredentials.ToBase64EncodedSHA1DigestString("user@mail.test"),
   base64Password: TapoCredentials.ToBase64EncodedString("password")
 );
 
-using var plug3 = new P105(IPAddress.Parse("192.0.2.3"), services2.BuildServiceProvider());
+using var plug4 = new P105(IPAddress.Parse("192.0.2.4"), servicesPlug4.BuildServiceProvider());
 

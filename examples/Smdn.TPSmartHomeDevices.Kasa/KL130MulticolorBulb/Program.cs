@@ -3,7 +3,7 @@
 using System.Net;
 using Smdn.TPSmartHomeDevices.Kasa;
 
-using var bulb = new KL130(IPAddress.Parse("192.0.2.255"));
+using var bulb = new KL130(IPAddress.Parse("192.0.2.1"));
 
 await bulb.SetColorTemperatureAsync(5000, 20, TimeSpan.FromSeconds(3.0));
 

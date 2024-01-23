@@ -25,7 +25,7 @@ services.AddTapoHttpClient(
   }
 );
 
-using var plug = new P105("192.0.2.255", services.BuildServiceProvider());
+using var plug = new P105("192.0.2.1", services.BuildServiceProvider());
 
 // Here, the timeout period configured above will be used for HTTP requests.
 // Note that the timeout period applies *only to each HTTP request*.

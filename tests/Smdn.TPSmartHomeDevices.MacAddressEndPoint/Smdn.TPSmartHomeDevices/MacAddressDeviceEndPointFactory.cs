@@ -93,7 +93,7 @@ public class MacAddressDeviceEndPointFactoryTests {
   }
 
 
-  private static readonly IPAddress TestIPAddress = IPAddress.Parse("192.0.2.255");
+  private static readonly IPAddress TestIPAddress = IPAddress.Parse("192.0.2.1");
   private static readonly PhysicalAddress TestMacAddress = PhysicalAddress.Parse("00:00:5E:00:53:00");
 
   [Test]

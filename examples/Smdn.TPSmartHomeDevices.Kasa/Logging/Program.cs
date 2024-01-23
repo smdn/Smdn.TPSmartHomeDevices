@@ -20,7 +20,7 @@ services
   );
 
 using var plug = new HS105(
-  IPAddress.Parse("192.0.2.255"),
+  IPAddress.Parse("192.0.2.1"),
   services.BuildServiceProvider()
 );
 

@@ -3,7 +3,7 @@
 using System.Net;
 using Smdn.TPSmartHomeDevices.Tapo;
 
-using var plug = new P110M(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
+using var plug = new P110M(IPAddress.Parse("192.0.2.1"), "user@mail.test", "password");
 
 await plug.TurnOnAsync();
 

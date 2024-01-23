@@ -3,7 +3,7 @@
 using System.Net;
 using Smdn.TPSmartHomeDevices.Kasa;
 
-using var plug = new HS105(IPAddress.Parse("192.0.2.255"));
+using var plug = new HS105(IPAddress.Parse("192.0.2.1"));
 
 await plug.TurnOnAsync();
 

@@ -54,7 +54,7 @@ public class TapoDeviceInfoTests {
 ""longitude"": 12345,
 ""latitude"": 67890,
 ""has_set_location_info"": true,
-""ip"": ""192.0.2.255"",
+""ip"": ""192.0.2.1"",
 ""ssid"": ""{Convert.ToBase64String(Encoding.UTF8.GetBytes("<ssid>"))}"",
 ""signal_level"": 999,
 ""rssi"": 99.999
@@ -83,7 +83,7 @@ public class TapoDeviceInfoTests {
     Assert.That(info!.GeolocationLongitude, Is.EqualTo(1.2345m), nameof(info.GeolocationLongitude));
     Assert.That(info!.GeolocationLatitude, Is.EqualTo(6.7890m), nameof(info.GeolocationLatitude));
     Assert.That(info!.HasGeolocationInfoSet, Is.True, nameof(info.HasGeolocationInfoSet));
-    Assert.That(info!.IPAddress, Is.EqualTo(System.Net.IPAddress.Parse("192.0.2.255")), nameof(info.IPAddress));
+    Assert.That(info!.IPAddress, Is.EqualTo(System.Net.IPAddress.Parse("192.0.2.1")), nameof(info.IPAddress));
     Assert.That(info!.NetworkSsid, Is.EqualTo("<ssid>"), nameof(info.NetworkSsid));
     Assert.That(info!.NetworkSignalLevel, Is.EqualTo(999), nameof(info.NetworkSignalLevel));
     Assert.That(info!.NetworkRssi, Is.EqualTo(99.999m), nameof(info.NetworkRssi));
@@ -304,9 +304,9 @@ public class TapoDeviceInfoTests {
     yield return new object?[] { @"{""ip"": ""invalid""}", null };
     yield return new object?[] { @"{""ip"": ""999.999.999.999""}", null }; // invalid
     yield return new object?[] { @"{""ip"": ""00:00:5E:00:53:00""}", null }; // invalid
-    yield return new object?[] { @"{""ip"": ""192.0.2.255""}", System.Net.IPAddress.Parse("192.0.2.255") };
+    yield return new object?[] { @"{""ip"": ""192.0.2.1""}", System.Net.IPAddress.Parse("192.0.2.1") };
     yield return new object?[] { @"{""ip"": ""2001:db8::0""}", System.Net.IPAddress.Parse("2001:db8::0") };
-    yield return new object?[] { @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.255""}", System.Net.IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.255") };
+    yield return new object?[] { @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.1""}", System.Net.IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.1") };
   }
 
   [TestCaseSource(nameof(YieldTestCases_IPAddress))]

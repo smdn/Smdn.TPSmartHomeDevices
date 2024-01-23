@@ -11,7 +11,7 @@ var services = new ServiceCollection();
 // (By default, the built-in exception handler class is used.)
 services.AddKasaDeviceExceptionHandler(new CustomKasaExceptionHandler());
 
-using var plug = new HS105(IPAddress.Parse("192.0.2.255"), services.BuildServiceProvider());
+using var plug = new HS105(IPAddress.Parse("192.0.2.1"), services.BuildServiceProvider());
 
 await plug.TurnOnAsync();
 

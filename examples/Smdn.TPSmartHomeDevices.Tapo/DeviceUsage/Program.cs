@@ -4,7 +4,7 @@ using System.Net;
 
 using Smdn.TPSmartHomeDevices.Tapo;
 
-using var device = TapoDevice.Create(IPAddress.Parse("192.0.2.255"), "user@mail.test", "password");
+using var device = TapoDevice.Create(IPAddress.Parse("192.0.2.1"), "user@mail.test", "password");
 
 // The TapoDevice.GetDeviceUsageAsync() method can be used to obtain the
 // total operating times and the cumulative usage amount of electric

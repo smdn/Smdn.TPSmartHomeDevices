@@ -20,7 +20,7 @@ services
   );
 
 using var plug = new P105(
-  IPAddress.Parse("192.0.2.255"),
+  IPAddress.Parse("192.0.2.1"),
   "user@mail.test",
   "password",
   services.BuildServiceProvider()

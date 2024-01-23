@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Smdn.TPSmartHomeDevices.Kasa;
 
-using var device = KasaDevice.Create(IPAddress.Parse("192.0.2.255"));
+using var device = KasaDevice.Create(IPAddress.Parse("192.0.2.1"));
 
 var info = await device.GetDeviceInfoAsync();
 

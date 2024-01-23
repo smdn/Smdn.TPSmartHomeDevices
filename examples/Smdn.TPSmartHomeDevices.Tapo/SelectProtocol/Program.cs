@@ -34,7 +34,7 @@ services.AddTapoProtocolSelector(
 );
 
 using var bulb = new L530(
-  "192.0.2.255",
+  "192.0.2.1",
   "user@mail.test",
   "password",
   services.BuildServiceProvider()

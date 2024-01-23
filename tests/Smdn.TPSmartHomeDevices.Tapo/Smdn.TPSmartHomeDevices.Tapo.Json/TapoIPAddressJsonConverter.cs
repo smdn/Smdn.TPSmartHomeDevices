@@ -19,9 +19,9 @@ public class TapoIPAddressJsonConverterTests {
     yield return new object?[] { @"{""ip"": ""invalid""}", null }; // invalid
     yield return new object?[] { @"{""ip"": ""999.999.999.999""}", null }; // invalid address
     yield return new object?[] { @"{""ip"": ""00:00:5E:00:53:00""}", null }; // invalid address
-    yield return new object?[] { @"{""ip"": ""192.0.2.255""}", IPAddress.Parse("192.0.2.255") };
+    yield return new object?[] { @"{""ip"": ""192.0.2.1""}", IPAddress.Parse("192.0.2.1") };
     yield return new object?[] { @"{""ip"": ""2001:db8::0""}", IPAddress.Parse("2001:db8::0") };
-    yield return new object?[] { @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.255""}", IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.255") };
+    yield return new object?[] { @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.1""}", IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.1") };
   }
 
   private readonly struct NetworkInfo {
