@@ -65,7 +65,7 @@ jobs:
       os: ${{ steps.input-prerequisites.outputs.os }}
       verbose: ${{ steps.input-prerequisites.outputs.verbose }}
     env:
-      RUNS_ON_OS_LIST_DEFAULT: 'ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest'
+      RUNS_ON_OS_LIST_DEFAULT: 'ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest'
     steps:
     - name: Determine prerequisites
       id: input-prerequisites
@@ -83,7 +83,7 @@ jobs:
         fi
 
   run-test:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.2
     needs: prerequisites
     with:
       project:            ${{ github.event.inputs.project }}
