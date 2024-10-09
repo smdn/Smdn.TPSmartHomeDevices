@@ -25,16 +25,9 @@ SPDX-License-Identifier: MIT
   />
 
   <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
-    <PackageReference Include="NUnit" Version="4.0.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
-    <!--
-      Workaround for the NUnit issue.
-      Manually add a reference to System.Threading.Tasks.Extensions as essentially required by NUnit.
-      This may be fixed in NUnit 4.1.
-      ref: https://github.com/nunit/nunit/issues/4581
-    -->
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="$(TargetFramework.StartsWith('net4'))" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
   </ItemGroup>
 
   <ItemGroup>
