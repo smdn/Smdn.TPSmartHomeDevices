@@ -8,7 +8,8 @@ SPDX-License-Identifier: MIT
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet)' == 'true' ">net8.0;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet80)' == 'true' ">net8.0;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet60)' == 'true' ">net6.0;$(TargetFrameworks)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetFx)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 </Project>
