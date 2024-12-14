@@ -4,7 +4,7 @@ SPDX-License-Identifier: MIT
 -->
 <Project>
   <PropertyGroup>
-    <SmdnProjectAssets_Common_PackageVersion Condition=" '$(SmdnProjectAssets_Common_PackageVersion)' == '' ">1.4.0</SmdnProjectAssets_Common_PackageVersion>
+    <SmdnProjectAssets_Common_PackageVersion Condition=" '$(SmdnProjectAssets_Common_PackageVersion)' == '' ">1.4.1</SmdnProjectAssets_Common_PackageVersion>
     <SmdnProjectAssets_Library_PackageVersion Condition=" '$(SmdnProjectAssets_Library_PackageVersion)' == '' ">1.7.3</SmdnProjectAssets_Library_PackageVersion>
   </PropertyGroup>
 
