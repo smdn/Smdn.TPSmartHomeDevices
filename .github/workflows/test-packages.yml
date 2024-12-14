@@ -15,7 +15,12 @@ on:
         type: string
 
       os:
-        description: "The OS label which run the test on. (ex: ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest)"
+        description: "The OS label which run the test on. (ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest, etc.)"
+        required: false
+        type: string
+
+      dotnet_sdk_version:
+        description: "The minimum .NET SDK version which is used to run tests."
         required: false
         type: string
 
@@ -41,52 +46,21 @@ on:
         type: string
 
 jobs:
-  prerequisites:
-    runs-on: ubuntu-latest
-    outputs:
-      os: ${{ steps.input-prerequisites.outputs.os }}
-      verbose: ${{ steps.input-prerequisites.outputs.verbose }}
-    env:
-      RUNS_ON_OS_LIST_DEFAULT: 'ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest'
-    steps:
-    - name: Delay until the package is published
-      run: |
-        # If the workflow is triggered by 'release' event,
-        # wait for a while until the package is published on NuGet
-        if [ '${{ github.event_name }}' = 'release' ]; then
-          sleep 5.0m
-        fi
-
-    - name: Determine prerequisites
-      id: input-prerequisites
-      run: |
-        if [ -z '${{ github.event.inputs.os }}' ]; then
-          echo "os=${RUNS_ON_OS_LIST_DEFAULT}" >> $GITHUB_OUTPUT
-        else
-          echo 'os=${{ github.event.inputs.os }}' >> $GITHUB_OUTPUT
-        fi
-
-        if [ '${{ github.event.inputs.verbose }}' = 'true' ]; then
-          echo 'verbose=true' >> $GITHUB_OUTPUT
-        else
-          echo 'verbose=false' >> $GITHUB_OUTPUT
-        fi
-
   run-test:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.3.2
-    needs: prerequisites
+    name: Run tests with released packages
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test-v1.4.0
     with:
-      project:              ${{ github.event.inputs.project }}
-      os:                   ${{ needs.prerequisites.outputs.os }}
-      extra_options_common: '/p:TestReleasedPackage=true'
-      verbose:              ${{ fromJSON(needs.prerequisites.outputs.verbose) }}
-      path_proj_install_project_assets: "eng/InstallProjectAssets.proj"
-      dotnet_sdk_version:   '8.0.100'
-      timeout_minutes_test_job:   25 # Smdn.TPSmartHomeDevices.Tapo on macos-12 may exceed the 20 minutes limit.
-      timeout_hang:               "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
-      timeout_vstest_connection:  "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
-      dotnet_test_options_verbosity_level:    ${{ github.event.inputs.dotnet_test_options_verbosity_level }}
-      dotnet_test_options_framework:          ${{ github.event.inputs.dotnet_test_options_framework }}
-      dotnet_test_options_filter_expression:  ${{ github.event.inputs.dotnet_test_options_filter_expression }}
+      project:                                ${{ inputs.project }}
+      os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest' || inputs.os }}
+      extra_options_common:                   '/p:TestReleasedPackage=true'
+      verbose:                                ${{ inputs.verbose == 'true' }}
+      path_proj_install_project_assets:       "eng/InstallProjectAssets.proj"
+      dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '8.0.100' || inputs.dotnet_sdk_version }}
+      timeout_minutes_test_job:               10
+      timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
+      timeout_vstest_connection:              "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
+      dotnet_test_options_verbosity_level:    ${{ inputs.dotnet_test_options_verbosity_level }}
+      dotnet_test_options_framework:          ${{ inputs.dotnet_test_options_framework }}
+      dotnet_test_options_filter_expression:  ${{ inputs.dotnet_test_options_filter_expression }}
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}

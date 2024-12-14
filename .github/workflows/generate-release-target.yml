@@ -61,7 +61,7 @@ jobs:
         exit 1
 
   run-generate-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target-v1.9.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target-v1.10.0
     needs: determine-release-target
     if: startsWith(needs.determine-release-target.outputs.tag_name, 'new-release/')
     with:
@@ -71,7 +71,7 @@ jobs:
       release_tag_prefix: 'releases/'
       workflow_runs_on: 'ubuntu-24.04'
       dotnet_sdk_version: '8.0.100'
-      dry_run: ${{ fromJSON(needs.determine-release-target.outputs.dry_run) }}
+      dry_run: ${{ needs.determine-release-target.outputs.dry_run == 'true' }}
     secrets:
       token_repo:         ${{ secrets.PUBLISH_NEW_RELEASE }}
       token_pullrequest:  ${{ secrets.PUBLISH_NEW_RELEASE }}
