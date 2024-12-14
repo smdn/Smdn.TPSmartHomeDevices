@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- enable target framework net* (.NET >= 5.0) by default -->
     <EnableTargetFrameworkDotNet>true</EnableTargetFrameworkDotNet>
-    <EnableTargetFrameworkDotNet60>true</EnableTargetFrameworkDotNet60>
     <EnableTargetFrameworkDotNet80>true</EnableTargetFrameworkDotNet80>
     <!-- enable target framework net* (.NET Framework/Mono) by default -->
     <EnableTargetFrameworkNetFx>true</EnableTargetFrameworkNetFx>
@@ -35,13 +34,7 @@ SPDX-License-Identifier: MIT
       $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 24.04'))
     "
   >
-    <!-- disable net6.0 on GitHub Actions Ubuntu 24.04 runner images -->
-    <EnableTargetFrameworkDotNet60 Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkDotNet60>
-  </PropertyGroup>
-
-  <!-- On MacOS -->
-  <PropertyGroup Condition="$([System.OperatingSystem]::IsMacOS())">
-    <!-- disable net6.0 on GitHub Actions MacOS runner images -->
-    <EnableTargetFrameworkDotNet60 Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkDotNet60>
+    <!-- disable Mono on GitHub Actions Ubuntu 24.04 runner images -->
+    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 </Project>
