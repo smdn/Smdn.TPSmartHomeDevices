@@ -61,7 +61,7 @@ jobs:
         exit 1
 
   run-generate-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target-v1.10.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target/v1.10.2
     needs: determine-release-target
     if: startsWith(needs.determine-release-target.outputs.tag_name, 'new-release/')
     with:
