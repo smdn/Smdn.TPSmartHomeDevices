@@ -13,8 +13,15 @@ namespace Smdn.TPSmartHomeDevices;
 [TestFixture]
 public class DeviceEndPointFactoryServiceCollectionExtensionsTests {
   private class NullDeviceEndPointFactory : IDeviceEndPointFactory<string> {
+    public IServiceProvider? ServiceProvider { get; }
+
     public NullDeviceEndPointFactory()
     {
+    }
+
+    public NullDeviceEndPointFactory(IServiceProvider serviceProvider)
+    {
+      ServiceProvider = serviceProvider;
     }
 
     public IDeviceEndPoint Create(string address)
@@ -36,5 +43,32 @@ public class DeviceEndPointFactoryServiceCollectionExtensionsTests {
       actualEndPointFactory,
       Is.SameAs(expectedEndPointFactory)
     );
+
+    Assert.That((actualEndPointFactory as NullDeviceEndPointFactory)?.ServiceProvider, Is.Null);
+  }
+
+  [Test]
+  public void AddDeviceEndPointFactory_WithImplementationFactory()
+  {
+    var services = new ServiceCollection();
+    IDeviceEndPointFactory<string>? expectedEndPointFactory = null;
+
+    services.AddDeviceEndPointFactory(
+      serviceProvider => {
+        expectedEndPointFactory = new NullDeviceEndPointFactory(serviceProvider);
+
+        return expectedEndPointFactory;
+      }
+    );
+
+    var serviceProvider = services.BuildServiceProvider();
+    var actualEndPointFactory = serviceProvider.GetRequiredService<IDeviceEndPointFactory<string>>();
+
+    Assert.That(
+      actualEndPointFactory,
+      Is.SameAs(expectedEndPointFactory)
+    );
+
+    Assert.That((actualEndPointFactory as NullDeviceEndPointFactory)?.ServiceProvider, Is.Not.Null);
   }
 }
