@@ -51,7 +51,7 @@ jobs:
     uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.4.1
     with:
       project:                                ${{ inputs.project }}
-      os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, ubuntu-20.04, windows-latest, macos-latest' || inputs.os }}
+      os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest' || inputs.os }}
       extra_options_common:                   '/p:TestReleasedPackage=true'
       verbose:                                ${{ inputs.verbose == 'true' }}
       path_proj_install_project_assets:       "eng/InstallProjectAssets.proj"
