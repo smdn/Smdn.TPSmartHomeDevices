@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#pragma warning disable CA1815 // TODO: implement equality comparison
+
 using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
@@ -14,8 +16,10 @@ public readonly struct LoginDeviceResponse : ITapoPassThroughResponse {
   [JsonPropertyName("result")]
   public ResponseResult Result { get; init; }
 
+#pragma warning disable CA1034
   public readonly struct ResponseResult {
     [JsonPropertyName("token")]
     public string Token { get; init; }
   }
+#pragma warning restore CA1034
 }

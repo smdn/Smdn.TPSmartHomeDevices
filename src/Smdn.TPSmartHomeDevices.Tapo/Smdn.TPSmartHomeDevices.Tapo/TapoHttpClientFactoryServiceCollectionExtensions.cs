@@ -26,8 +26,7 @@ public static class TapoHttpClientFactoryServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(services));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(IHttpClientFactory),
+      ServiceDescriptor.Singleton<IHttpClientFactory>(
         new TapoHttpClientFactory(
           configureClient: configureClient
         )

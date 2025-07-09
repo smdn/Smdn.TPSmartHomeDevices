@@ -51,6 +51,7 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
     aes.Key = key.ToArray();
     aes.IV = iv.ToArray();
 
+#pragma warning disable CA5401
     securePassThroughJsonConverterFactory = new(
       identity: identity,
       encryptorForPassThroughRequest: aes.CreateEncryptor(),
@@ -58,6 +59,7 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
       baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,
       logger: logger
     );
+#pragma warning restore CA5401
 
     SecurePassThroughJsonSerializerOptions = new(baseJsonSerializerOptions);
     SecurePassThroughJsonSerializerOptions.Converters.Add(securePassThroughJsonConverterFactory);

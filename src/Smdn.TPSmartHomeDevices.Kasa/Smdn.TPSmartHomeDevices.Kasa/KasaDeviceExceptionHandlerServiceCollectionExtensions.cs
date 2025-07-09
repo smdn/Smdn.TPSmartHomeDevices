@@ -24,7 +24,7 @@ public static class KasaDeviceExceptionHandlerServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(exceptionHandler));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(typeof(KasaDeviceExceptionHandler), exceptionHandler)
+      ServiceDescriptor.Singleton<KasaDeviceExceptionHandler>(exceptionHandler)
     );
 
     return services;

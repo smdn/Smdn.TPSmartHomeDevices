@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#pragma warning disable CA1815 // TODO: implement equality comparison
+
 using System;
 using System.Text.Json.Serialization;
 
@@ -21,7 +23,9 @@ public readonly struct HandshakeRequest : ITapoRequest {
     Parameters = new() { Key = key ?? throw new ArgumentNullException(nameof(key)) };
   }
 
+#pragma warning disable CA1034
   public readonly struct RequestParameters {
+#pragma warning restore CA1034
     [JsonPropertyName("key")]
     public string Key { get; init; }
 

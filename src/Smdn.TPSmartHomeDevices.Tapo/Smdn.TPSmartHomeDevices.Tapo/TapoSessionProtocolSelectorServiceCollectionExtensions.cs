@@ -74,8 +74,7 @@ public static class TapoSessionProtocolSelectorServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(selector));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(TapoSessionProtocolSelector),
+      ServiceDescriptor.Singleton<TapoSessionProtocolSelector>(
         selector
       )
     );

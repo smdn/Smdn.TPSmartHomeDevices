@@ -67,7 +67,7 @@ public class L900Tests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
-        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.EqualTo(0));
+        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
         Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
         return (
           KnownErrorCodes.Success,
@@ -135,7 +135,7 @@ public class L900Tests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
-        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.EqualTo(0));
+        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
         Assert.That(requestParams.GetProperty("hue")!.GetInt32(), Is.EqualTo(newHue));
         Assert.That(requestParams.GetProperty("saturation")!.GetInt32(), Is.EqualTo(newSaturation));
         if (newBrightness.HasValue)
@@ -202,7 +202,7 @@ public class L900Tests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
-        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.EqualTo(0));
+        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
         Assert.That(requestParams.GetProperty("hue")!.GetInt32(), Is.EqualTo(newHue));
         if (newBrightness.HasValue)
           Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));
@@ -268,7 +268,7 @@ public class L900Tests {
       FuncGeneratePassThroughResponse = (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
-        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.EqualTo(0));
+        Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
         Assert.That(requestParams.GetProperty("saturation")!.GetInt32(), Is.EqualTo(newSaturation));
         if (newBrightness.HasValue)
           Assert.That(requestParams.GetProperty("brightness")!.GetInt32(), Is.EqualTo(newBrightness));

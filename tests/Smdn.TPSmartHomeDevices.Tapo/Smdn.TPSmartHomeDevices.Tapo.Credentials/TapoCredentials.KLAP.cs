@@ -25,7 +25,7 @@ partial class TapoCredentialsTests {
       Is.False
     );
 
-    Assert.That(bytesWritten, Is.EqualTo(0), nameof(bytesWritten));
+    Assert.That(bytesWritten, Is.Zero, nameof(bytesWritten));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_TryComputeKlapLocalAuthHash()

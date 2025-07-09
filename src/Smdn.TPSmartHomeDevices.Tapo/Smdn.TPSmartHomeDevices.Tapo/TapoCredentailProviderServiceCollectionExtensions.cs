@@ -30,8 +30,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(services));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(ITapoCredentialProvider),
+      ServiceDescriptor.Singleton<ITapoCredentialProvider>(
         TapoCredentials.CreateProviderFromPlainText(email, password)
       )
     );
@@ -61,8 +60,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(services));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(ITapoCredentialProvider),
+      ServiceDescriptor.Singleton<ITapoCredentialProvider>(
         TapoCredentials.CreateProviderFromBase64EncodedText(base64UserNameSHA1Digest, base64Password)
       )
     );
@@ -90,8 +88,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(services));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(ITapoCredentialProvider),
+      ServiceDescriptor.Singleton<ITapoCredentialProvider>(
         TapoCredentials.CreateProviderFromEnvironmentVariables(
           envVarUsername: envVarUsername,
           envVarPassword: envVarPassword
@@ -121,8 +118,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(services));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(ITapoCredentialProvider),
+      ServiceDescriptor.Singleton<ITapoCredentialProvider>(
         TapoCredentials.CreateProviderFromEnvironmentVariables(
           envVarBase64KlapLocalAuthHash: envVarBase64KlapLocalAuthHash
         )
@@ -149,7 +145,7 @@ public static class TapoCredentailProviderServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(credentialProvider));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(typeof(ITapoCredentialProvider), credentialProvider)
+      ServiceDescriptor.Singleton<ITapoCredentialProvider>(credentialProvider)
     );
 
     return services;

@@ -25,7 +25,11 @@ public static class DeviceEndPointFactoryServiceCollectionExtensions {
     if (endPointFactory is null)
       throw new ArgumentNullException(nameof(endPointFactory));
 
-    services.TryAdd(ServiceDescriptor.Singleton(typeof(IDeviceEndPointFactory<TAddress>), endPointFactory));
+    services.TryAdd(
+      ServiceDescriptor.Singleton<IDeviceEndPointFactory<TAddress>>(
+        endPointFactory
+      )
+    );
 
     return services;
   }
@@ -50,8 +54,7 @@ public static class DeviceEndPointFactoryServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(implementationFactoryForEndPointFactory));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(
-        typeof(IDeviceEndPointFactory<TAddress>),
+      ServiceDescriptor.Singleton<IDeviceEndPointFactory<TAddress>>(
         implementationFactory: implementationFactoryForEndPointFactory
       )
     );

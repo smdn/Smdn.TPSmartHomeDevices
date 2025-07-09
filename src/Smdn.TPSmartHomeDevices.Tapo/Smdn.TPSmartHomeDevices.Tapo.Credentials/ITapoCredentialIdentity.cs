@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#pragma warning disable CA1040
+
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 /// <summary>

@@ -24,7 +24,7 @@ public static class TapoDeviceExceptionHandlerServiceCollectionExtensions {
       throw new ArgumentNullException(nameof(exceptionHandler));
 
     services.TryAdd(
-      ServiceDescriptor.Singleton(typeof(TapoDeviceExceptionHandler), exceptionHandler)
+      ServiceDescriptor.Singleton<TapoDeviceExceptionHandler>(exceptionHandler)
     );
 
     return services;

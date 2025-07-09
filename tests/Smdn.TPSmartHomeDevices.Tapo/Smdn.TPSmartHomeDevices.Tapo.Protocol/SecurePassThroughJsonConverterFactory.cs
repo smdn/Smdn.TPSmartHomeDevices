@@ -372,7 +372,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
           Assert.That(deserialized, Is.InstanceOf<LoginDeviceResponse>());
 
           var resp = (LoginDeviceResponse)deserialized;
-          Assert.That(resp.ErrorCode, Is.EqualTo(0), nameof(LoginDeviceResponse.ErrorCode));
+          Assert.That(resp.ErrorCode, Is.Zero, nameof(LoginDeviceResponse.ErrorCode));
           Assert.That(resp.Result.Token, Is.EqualTo("TOKEN"), nameof(LoginDeviceResponse.ResponseResult.Token));
         }
       )
@@ -404,7 +404,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
           var resp = (PassThroughResponse<SetDeviceInfoResponseResult>)deserialized;
 
           Assert.That(resp.ErrorCode, Is.EqualTo(1), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.ErrorCode));
-          Assert.That(resp.Result.Foo, Is.EqualTo(0), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Foo));
+          Assert.That(resp.Result.Foo, Is.Zero, nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Foo));
           Assert.That(resp.Result.Bar, Is.EqualTo("baz"), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Bar));
         }
       )

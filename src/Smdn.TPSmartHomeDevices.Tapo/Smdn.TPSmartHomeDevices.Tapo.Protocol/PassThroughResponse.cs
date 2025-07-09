@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2024 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#pragma warning disable CA1815 // TODO: implement equality comparison
+
 using System.Text.Json.Serialization;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;

@@ -209,6 +209,7 @@ public class KlapEncryptionAlgorithm {
 
       using var cipherTextStream = new MemoryStream(buffer: cipherTextBuffer, writable: true);
 
+#pragma warning disable CA5401
       using (var encryptingStream = new CryptoStream(
         stream: cipherTextStream,
         transform: aes.CreateEncryptor(),
@@ -219,6 +220,7 @@ public class KlapEncryptionAlgorithm {
 
         encryptingStream.Flush();
       }
+#pragma warning restore CA5401
 
       cipherTextBuffer.AsSpan(0, cipherTextLength).CopyTo(cipherTextSpan);
 
