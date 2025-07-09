@@ -102,7 +102,7 @@ public class MacAddressDeviceEndPointFactoryTests {
 
   [Test]
   public void Ctor_ArgumentNull_MacAddressResolver([Values] bool shouldDisposeResolver)
-    => Assert.Throws<ArgumentNullException>(() => new MacAddressDeviceEndPointFactory((MacAddressResolverBase)null!, shouldDisposeResolver: shouldDisposeResolver));
+    => Assert.Throws<ArgumentNullException>(() => new MacAddressDeviceEndPointFactory(null!, shouldDisposeResolver: shouldDisposeResolver));
 
   [TestCase(true)]
   [TestCase(false)]

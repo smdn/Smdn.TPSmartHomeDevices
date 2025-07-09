@@ -74,7 +74,7 @@ public class KL130Tests {
       FuncGenerateResponse = static (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":0,""ignore_default"":0}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":1,""transition_period"":0,""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -125,7 +125,7 @@ public class KL130Tests {
       FuncGenerateResponse = static (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":0,""ignore_default"":0}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""smartlife.iot.smartbulb.lightingservice"":{""transition_light_state"":{""on_off"":0,""transition_period"":0,""ignore_default"":0}}}"),
           nameof(request)
         );
 
@@ -330,6 +330,7 @@ public class KL130Tests {
   private static System.Collections.IEnumerable YieldTestCases_GetLightStateAsync()
   {
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":1,""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
         Assert.That(lightState.IsOn, Is.True, nameof(lightState.IsOn));
@@ -344,6 +345,7 @@ public class KL130Tests {
       }),
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":0,""dft_on_state"":{""mode"":""normal"",""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50}},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
         Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
@@ -354,6 +356,7 @@ public class KL130Tests {
       }),
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""light_state"":{},""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
         Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
@@ -364,6 +367,7 @@ public class KL130Tests {
       }),
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""err_code"":0}}}",
       new Action<KL130LightState>(static lightState => {
         Assert.That(lightState.IsOn, Is.False, nameof(lightState.IsOn));
@@ -382,7 +386,7 @@ public class KL130Tests {
       FuncGenerateResponse = (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 
@@ -406,18 +410,22 @@ public class KL130Tests {
   private static System.Collections.IEnumerable YieldTestCases_GetOnOffStateAsync()
   {
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":1,""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50},""err_code"":0}}}",
       true,
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""KL130"",""light_state"":{""on_off"":0,""dft_on_state"":{""mode"":""normal"",""hue"":180,""saturation"":100,""color_temp"":5000,""brightness"":50}},""err_code"":0}}}",
       false,
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""light_state"":{},""err_code"":0}}}",
       false,
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""err_code"":0}}}",
       false,
     };
@@ -430,7 +438,7 @@ public class KL130Tests {
       FuncGenerateResponse = (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 

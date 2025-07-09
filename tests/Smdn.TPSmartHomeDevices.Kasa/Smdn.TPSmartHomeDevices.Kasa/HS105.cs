@@ -68,11 +68,11 @@ public class HS105Tests {
       FuncGenerateResponse = static (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""set_relay_state"":{""state"":1}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""set_relay_state"":{""state"":1}}}"),
           nameof(request)
         );
 
-        return JsonDocument.Parse(@"{""system"":{""set_relay_state"":{""err_code"":0}}}");
+        return JsonDocument.Parse(/*lang=json,strict*/ @"{""system"":{""set_relay_state"":{""err_code"":0}}}");
       }
     };
 
@@ -92,11 +92,11 @@ public class HS105Tests {
       FuncGenerateResponse = static (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""set_relay_state"":{""state"":0}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""set_relay_state"":{""state"":0}}}"),
           nameof(request)
         );
 
-        return JsonDocument.Parse(@"{""system"":{""set_relay_state"":{""err_code"":0}}}");
+        return JsonDocument.Parse(/*lang=json,strict*/ @"{""system"":{""set_relay_state"":{""err_code"":0}}}");
       }
     };
 
@@ -137,14 +137,17 @@ public class HS105Tests {
   private static System.Collections.IEnumerable YieldTestCases_GetOnOffStateAsync()
   {
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""HS105"",""relay_state"":1,""on_time"":0,""err_code"":0}}}",
       true,
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""sw_ver"":""x.y.z"",""model"":""HS105"",""relay_state"":0,""on_time"":0,""err_code"":0}}}",
       false,
     };
     yield return new object[] {
+      /*lang=json,strict*/
       @"{""system"":{""get_sysinfo"":{""err_code"":0}}}",
       false,
     };
@@ -157,7 +160,7 @@ public class HS105Tests {
       FuncGenerateResponse = (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 

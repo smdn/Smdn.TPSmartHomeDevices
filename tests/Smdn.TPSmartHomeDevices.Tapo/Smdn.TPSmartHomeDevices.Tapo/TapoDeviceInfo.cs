@@ -92,12 +92,12 @@ public class TapoDeviceInfoTests {
   private static System.Collections.Generic.IEnumerable<(string, byte[]?)> YieldTestCases_IdProperties()
   {
     yield return ("{}", null);
-    yield return (@"{""<ID>"": ""invalid""}", null);
-    yield return (@"{""<ID>"": ""0""}", null); // invalid
-    yield return (@"{""<ID>"": ""012""}", null); // invalid
-    yield return (@"{""<ID>"": """"}", Array.Empty<byte>());
-    yield return (@"{""<ID>"": ""01""}", new byte[] { 0x01 });
-    yield return (@"{""<ID>"": ""0123456789ABCDEF""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
+    yield return (/*lang=json,strict*/ @"{""<ID>"": ""invalid""}", null);
+    yield return (/*lang=json,strict*/ @"{""<ID>"": ""0""}", null); // invalid
+    yield return (/*lang=json,strict*/ @"{""<ID>"": ""012""}", null); // invalid
+    yield return (/*lang=json,strict*/ @"{""<ID>"": """"}", Array.Empty<byte>());
+    yield return (/*lang=json,strict*/ @"{""<ID>"": ""01""}", new byte[] { 0x01 });
+    yield return (/*lang=json,strict*/ @"{""<ID>"": ""0123456789ABCDEF""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF });
   }
 
   private static System.Collections.IEnumerable YieldTestCases_Id()
@@ -155,11 +155,11 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_MacAddress()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""mac"": ""invalid""}", null };
-    yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:XX""}", null }; // invalid
-    yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
-    yield return new object?[] { @"{""mac"": ""00-00-5E-00-53-00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
-    yield return new object?[] { @"{""mac"": ""00:00:00:00:00:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""invalid""}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:5E:00:53:XX""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:5E:00:53:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00-00-5E-00-53-00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:00:00:00:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }) };
   }
 
   [TestCaseSource(nameof(YieldTestCases_MacAddress))]
@@ -172,8 +172,8 @@ public class TapoDeviceInfoTests {
   }
 
   [TestCase("{}", false)]
-  [TestCase(@"{""device_on"": true}", true)]
-  [TestCase(@"{""device_on"": false}", false)]
+  [TestCase(/*lang=json,strict*/ @"{""device_on"": true}", true)]
+  [TestCase(/*lang=json,strict*/ @"{""device_on"": false}", false)]
   public void IsOn(string json, bool expected)
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
@@ -185,12 +185,12 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_OnTimeDuration()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""on_time"": null}", null };
-    yield return new object?[] { @"{""on_time"": 0.0}", null }; // invalid (decimal notation)
-    yield return new object?[] { @"{""on_time"": 1E400}", null }; // invalid (exponent notation)
-    yield return new object?[] { @"{""on_time"": 0}", TimeSpan.Zero };
-    yield return new object?[] { @"{""on_time"": 1}", TimeSpan.FromSeconds(1) };
-    yield return new object?[] { @"{""on_time"": -1}", TimeSpan.FromSeconds(-1) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 0.0}", null }; // invalid (decimal notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 1E400}", null }; // invalid (exponent notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 0}", TimeSpan.Zero };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 1}", TimeSpan.FromSeconds(1) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": -1}", TimeSpan.FromSeconds(-1) };
   }
 
   [TestCaseSource(nameof(YieldTestCases_OnTimeDuration))]
@@ -203,8 +203,8 @@ public class TapoDeviceInfoTests {
   }
 
   [TestCase("{}", false)]
-  [TestCase(@"{""overheated"": true}", true)]
-  [TestCase(@"{""overheated"": false}", false)]
+  [TestCase(/*lang=json,strict*/ @"{""overheated"": true}", true)]
+  [TestCase(/*lang=json,strict*/ @"{""overheated"": false}", false)]
   public void IsOverheated(string json, bool expected)
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
@@ -214,12 +214,12 @@ public class TapoDeviceInfoTests {
   }
 
   [TestCase("{}", null)]
-  [TestCase(@"{""nickname"": null}", null)]
-  [TestCase(@"{""nickname"": ""invalid""}", null)]
-  [TestCase(@"{""nickname"": ""4=""}", null)] // invalid
-  [TestCase(@"{""nickname"": """"}", "")]
-  [TestCase(@"{""nickname"": ""TklDS05BTUU=""}", "NICKNAME")]
-  [TestCase(@"{""nickname"": ""44OL44OD44Kv44ON44O844Og""}", "ニックネーム")]
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": null}", null)]
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": ""invalid""}", null)]
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": ""4=""}", null)] // invalid
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": """"}", "")]
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": ""TklDS05BTUU=""}", "NICKNAME")]
+  [TestCase(/*lang=json,strict*/ @"{""nickname"": ""44OL44OD44Kv44ON44O844Og""}", "ニックネーム")]
   public void NickName(string json, string? expected)
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
@@ -231,13 +231,13 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_TimeZoneOffset()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""time_diff"": null}", null };
-    yield return new object?[] { @"{""time_diff"": 0.0}", null }; // invalid (decimal notation)
-    yield return new object?[] { @"{""time_diff"": 1E400}", null }; // invalid (exponent notation)
-    yield return new object?[] { @"{""time_diff"": 0}", TimeSpan.Zero };
-    yield return new object?[] { @"{""time_diff"": 540}", TimeSpan.FromHours(+9.0) };
-    yield return new object?[] { @"{""time_diff"": 330}", TimeSpan.FromHours(+5.5) };
-    yield return new object?[] { @"{""time_diff"": -300}", TimeSpan.FromHours(-5.0) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": 0.0}", null }; // invalid (decimal notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": 1E400}", null }; // invalid (exponent notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": 0}", TimeSpan.Zero };
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": 540}", TimeSpan.FromHours(+9.0) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": 330}", TimeSpan.FromHours(+5.5) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""time_diff"": -300}", TimeSpan.FromHours(-5.0) };
   }
 
   [TestCaseSource(nameof(YieldTestCases_TimeZoneOffset))]
@@ -252,11 +252,11 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_GeolocationLongitude()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""longitude"": null}", null };
-    yield return new object?[] { @"{""longitude"": 0}", 0m };
-    yield return new object?[] { @"{""longitude"": 0.0}", 0m };
-    yield return new object?[] { @"{""longitude"": 1397666}", 139.7666m };
-    yield return new object?[] { @"{""longitude"": 225414}", 22.5414m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""longitude"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""longitude"": 0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""longitude"": 0.0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""longitude"": 1397666}", 139.7666m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""longitude"": 225414}", 22.5414m };
   }
 
   [TestCaseSource(nameof(YieldTestCases_GeolocationLongitude))]
@@ -271,11 +271,11 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_GeolocationLatitude()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""latitude"": null}", null };
-    yield return new object?[] { @"{""latitude"": 0}", 0m };
-    yield return new object?[] { @"{""latitude"": 0.0}", 0m };
-    yield return new object?[] { @"{""latitude"": 356813}", 35.6813m };
-    yield return new object?[] { @"{""latitude"": -762705}", -76.2705m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""latitude"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""latitude"": 0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""latitude"": 0.0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""latitude"": 356813}", 35.6813m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""latitude"": -762705}", -76.2705m };
   }
 
   [TestCaseSource(nameof(YieldTestCases_GeolocationLatitude))]
@@ -288,8 +288,8 @@ public class TapoDeviceInfoTests {
   }
 
   [TestCase("{}", false)]
-  [TestCase(@"{""has_set_location_info"": true}", true)]
-  [TestCase(@"{""has_set_location_info"": false}", false)]
+  [TestCase(/*lang=json,strict*/ @"{""has_set_location_info"": true}", true)]
+  [TestCase(/*lang=json,strict*/ @"{""has_set_location_info"": false}", false)]
   public void HasGeolocationInfoSet(string json, bool expected)
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
@@ -301,12 +301,12 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_IPAddress()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""ip"": ""invalid""}", null };
-    yield return new object?[] { @"{""ip"": ""999.999.999.999""}", null }; // invalid
-    yield return new object?[] { @"{""ip"": ""00:00:5E:00:53:00""}", null }; // invalid
-    yield return new object?[] { @"{""ip"": ""192.0.2.1""}", System.Net.IPAddress.Parse("192.0.2.1") };
-    yield return new object?[] { @"{""ip"": ""2001:db8::0""}", System.Net.IPAddress.Parse("2001:db8::0") };
-    yield return new object?[] { @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.1""}", System.Net.IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.1") };
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""invalid""}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""999.999.999.999""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""00:00:5E:00:53:00""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""192.0.2.1""}", System.Net.IPAddress.Parse("192.0.2.1") };
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""2001:db8::0""}", System.Net.IPAddress.Parse("2001:db8::0") };
+    yield return new object?[] { /*lang=json,strict*/ @"{""ip"": ""2001:0db8:0000:0000:0000:0000:192.0.2.1""}", System.Net.IPAddress.Parse("2001:0db8:0000:0000:0000:0000:192.0.2.1") };
   }
 
   [TestCaseSource(nameof(YieldTestCases_IPAddress))]
@@ -319,12 +319,12 @@ public class TapoDeviceInfoTests {
   }
 
   [TestCase("{}", null)]
-  [TestCase(@"{""ssid"": null}", null)]
-  [TestCase(@"{""ssid"": ""invalid""}", null)]
-  [TestCase(@"{""ssid"": ""4=""}", null)] // invalid
-  [TestCase(@"{""ssid"": """"}", "")]
-  [TestCase(@"{""ssid"": ""RlJFRS1XSUZJ""}", "FREE-WIFI")]
-  [TestCase(@"{""ssid"": ""6L+344GE54yr44Kq44O844OQ44O8TEFO""}", "迷い猫オーバーLAN")]
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": null}", null)]
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": ""invalid""}", null)]
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": ""4=""}", null)] // invalid
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": """"}", "")]
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": ""RlJFRS1XSUZJ""}", "FREE-WIFI")]
+  [TestCase(/*lang=json,strict*/ @"{""ssid"": ""6L+344GE54yr44Kq44O844OQ44O8TEFO""}", "迷い猫オーバーLAN")]
   public void NetworkSsid(string json, string? expected)
   {
     var info = JsonSerializer.Deserialize<TapoDeviceInfo>(json)!;
@@ -336,12 +336,12 @@ public class TapoDeviceInfoTests {
   private static System.Collections.IEnumerable YieldTestCases_NetworkRssi()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""rssi"": null}", null };
-    yield return new object?[] { @"{""rssi"": 0}", 0m };
-    yield return new object?[] { @"{""rssi"": 0.0}", 0m };
-    yield return new object?[] { @"{""rssi"": -30.0}", -30.0m };
-    yield return new object?[] { @"{""rssi"": -30.1234567890123456789}", -30.1234567890123456789m };
-    yield return new object?[] { @"{""rssi"": 999}", 999m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": 0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": 0.0}", 0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": -30.0}", -30.0m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": -30.1234567890123456789}", -30.1234567890123456789m };
+    yield return new object?[] { /*lang=json,strict*/ @"{""rssi"": 999}", 999m };
   }
 
   [TestCaseSource(nameof(YieldTestCases_NetworkRssi))]

@@ -13,13 +13,13 @@ public class TimeSpanInSecondsJsonConverterTests {
   private static System.Collections.IEnumerable YieldTestCases_Read()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""on_time"": null}", null }; // invalid
-    yield return new object?[] { @"{""on_time"": ""invalid""}", null }; // invalid
-    yield return new object?[] { @"{""on_time"": 0.0}", null }; // invalid (decimal notation)
-    yield return new object?[] { @"{""on_time"": 1E400}", null }; // invalid (exponent notation)
-    yield return new object?[] { @"{""on_time"": 0}", TimeSpan.Zero };
-    yield return new object?[] { @"{""on_time"": 1}", TimeSpan.FromSeconds(1) };
-    yield return new object?[] { @"{""on_time"": -1}", TimeSpan.FromSeconds(-1) }; // This should be invalid?
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": null}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": ""invalid""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 0.0}", null }; // invalid (decimal notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 1E400}", null }; // invalid (exponent notation)
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 0}", TimeSpan.Zero };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": 1}", TimeSpan.FromSeconds(1) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_time"": -1}", TimeSpan.FromSeconds(-1) }; // This should be invalid?
   }
 
   private readonly struct DeviceOnTime {
@@ -38,10 +38,10 @@ public class TimeSpanInSecondsJsonConverterTests {
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
   {
-    yield return new object?[] { null, @"{""on_time"":null}", null };
-    yield return new object?[] { TimeSpan.Zero, @"{""on_time"":0}", typeof(NotImplementedException) };
-    yield return new object?[] { TimeSpan.FromSeconds(1), @"{""on_time"":1}", typeof(NotImplementedException) };
-    yield return new object?[] { TimeSpan.FromSeconds(-1), @"{""on_time"":-1}", typeof(NotImplementedException) }; // This should be invalid?
+    yield return new object?[] { null, /*lang=json,strict*/ @"{""on_time"":null}", null };
+    yield return new object?[] { TimeSpan.Zero, /*lang=json,strict*/ @"{""on_time"":0}", typeof(NotImplementedException) };
+    yield return new object?[] { TimeSpan.FromSeconds(1), /*lang=json,strict*/ @"{""on_time"":1}", typeof(NotImplementedException) };
+    yield return new object?[] { TimeSpan.FromSeconds(-1), /*lang=json,strict*/ @"{""on_time"":-1}", typeof(NotImplementedException) }; // This should be invalid?
   }
 
   [TestCaseSource(nameof(YieldTestCases_Write))]

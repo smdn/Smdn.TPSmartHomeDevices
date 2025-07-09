@@ -13,15 +13,15 @@ public class Base16ByteArrayJsonConverterTests {
   private static System.Collections.IEnumerable YieldTestCases_Read()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""id"": null}", null };
-    yield return new object?[] { @"{""id"": ""0""}", null }; // invalid
-    yield return new object?[] { @"{""id"": ""XX""}", null }; // invalid
-    yield return new object?[] { @"{""id"": ""000""}", null }; // invalid
-    yield return new object?[] { @"{""id"": ""000X""}", null }; // invalid
-    yield return new object?[] { @"{""id"": 1234}", null }; // invalid
-    yield return new object?[] { @"{""id"": """"}", Array.Empty<byte>() };
-    yield return new object?[] { @"{""id"": ""0123456789ABCDEF""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF } };
-    yield return new object?[] { @"{""id"": ""0123456789abcdef""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF } };
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": null}", null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""0""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""XX""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""000""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""000X""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": 1234}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": """"}", Array.Empty<byte>() };
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""0123456789ABCDEF""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF } };
+    yield return new object?[] { /*lang=json,strict*/ @"{""id"": ""0123456789abcdef""}", new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF } };
   }
 
   private readonly struct FirmwareInfo {

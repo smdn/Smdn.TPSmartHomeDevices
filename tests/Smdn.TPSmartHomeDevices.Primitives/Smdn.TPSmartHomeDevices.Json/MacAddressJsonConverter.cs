@@ -14,15 +14,15 @@ public class MacAddressJsonConverterTests {
   private static System.Collections.IEnumerable YieldTestCases_Read()
   {
     yield return new object?[] { "{}", null };
-    yield return new object?[] { @"{""mac"": null}", null }; // invalid
-    yield return new object?[] { @"{""mac"": 0}", null }; // invalid
-    yield return new object?[] { @"{""mac"": ""invalid""}", null }; // invalid
-    yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:XX""}", null }; // invalid
-    yield return new object?[] { @"{""mac"": ""0x00005E005300""}", null }; // invalid
-    yield return new object?[] { @"{""mac"": ""00005E005300""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
-    yield return new object?[] { @"{""mac"": ""00:00:5E:00:53:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
-    yield return new object?[] { @"{""mac"": ""00-00-5E-00-53-00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
-    yield return new object?[] { @"{""mac"": ""00:00:00:00:00:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": null}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": 0}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""invalid""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:5E:00:53:XX""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""0x00005E005300""}", null }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00005E005300""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:5E:00:53:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00-00-5E-00-53-00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }) };
+    yield return new object?[] { /*lang=json,strict*/ @"{""mac"": ""00:00:00:00:00:00""}", new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }) };
   }
 
   private readonly struct EndPoint {
@@ -41,10 +41,10 @@ public class MacAddressJsonConverterTests {
 
   private static System.Collections.IEnumerable YieldTestCases_Write()
   {
-    yield return new object?[] { null, @"{""mac"":null}", null };
-    yield return new object?[] { PhysicalAddress.None, @"{""mac"":""""}", typeof(NotImplementedException) }; // This should be invalid?
-    yield return new object?[] { new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }), @"{""mac"":""00:00:00:00:00:00""}", typeof(NotImplementedException) };
-    yield return new object?[] { new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }), @"{""mac"":""00:00:5E:00:53:00""}", typeof(NotImplementedException) };
+    yield return new object?[] { null, /*lang=json,strict*/ @"{""mac"":null}", null };
+    yield return new object?[] { PhysicalAddress.None, /*lang=json,strict*/ @"{""mac"":""""}", typeof(NotImplementedException) }; // This should be invalid?
+    yield return new object?[] { new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }), /*lang=json,strict*/ @"{""mac"":""00:00:00:00:00:00""}", typeof(NotImplementedException) };
+    yield return new object?[] { new PhysicalAddress(new byte[6] { 0x00, 0x00, 0x5E, 0x00, 0x53, 0x00 }), /*lang=json,strict*/ @"{""mac"":""00:00:5E:00:53:00""}", typeof(NotImplementedException) };
   }
 
   [TestCaseSource(nameof(YieldTestCases_Write))]

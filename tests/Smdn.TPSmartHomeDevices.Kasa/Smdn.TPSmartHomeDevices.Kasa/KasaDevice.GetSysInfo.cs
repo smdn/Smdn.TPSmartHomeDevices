@@ -13,12 +13,13 @@ using Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
-partial class KasaDeviceTests {
+public partial class KasaDeviceTests {
   private static System.Collections.IEnumerable YieldTestCases_GetDeviceInfoAsync()
   {
     // Kasa KL130(JP)
     yield return new object?[] {
-      @"{
+      /*lang=json,strict*/
+@"{
   ""system"":{
     ""get_sysinfo"":{
       ""sw_ver"":""<sw_ver>"",
@@ -52,7 +53,8 @@ partial class KasaDeviceTests {
 
     // Kasa HS105(JP)
     yield return new object?[] {
-      @"{
+      /*lang=json,strict*/
+@"{
   ""system"":{
     ""get_sysinfo"":{
       ""sw_ver"":""<sw_ver>"",
@@ -93,7 +95,7 @@ partial class KasaDeviceTests {
       FuncGenerateResponse = (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""system"":{""get_sysinfo"":{}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""system"":{""get_sysinfo"":{}}}"),
           nameof(request)
         );
 

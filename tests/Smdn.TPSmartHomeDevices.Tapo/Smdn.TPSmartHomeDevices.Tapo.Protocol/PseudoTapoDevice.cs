@@ -135,9 +135,6 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   public Uri? EndPointUri => EndPoint is null ? null : new Uri(CreateEndPointHttpUrl(EndPoint));
   private HttpListener? listener;
   private Task? taskProcessListener;
-
-  private bool IsDisposed => listener is null;
-
   private readonly ConcurrentDictionary<string, UnauthorizedSession> unauthorizedSessions = new();
   private readonly ConcurrentDictionary<string, AuthorizedSession> authorizedSessions = new();
 
@@ -157,14 +154,6 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   {
     State = state;
     EndPoint = null;
-  }
-
-  private void ThrowIfDisposed()
-  {
-#pragma warning disable CA1513
-    if (listener is null)
-      throw new ObjectDisposedException(GetType().FullName);
-#pragma warning restore CA1513
   }
 
   public async ValueTask DisposeAsync()

@@ -39,7 +39,7 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
     var services = new ServiceCollection();
 
     Assert.Throws<ArgumentNullException>(
-      () => services.AddTapoProtocolSelector(selector: (TapoSessionProtocolSelector)null!)
+      () => services.AddTapoProtocolSelector(selector: null!)
     );
 
     Assert.Throws<InvalidOperationException>(

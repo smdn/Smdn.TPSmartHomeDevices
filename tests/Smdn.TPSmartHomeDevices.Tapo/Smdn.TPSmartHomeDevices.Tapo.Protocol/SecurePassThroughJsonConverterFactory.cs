@@ -223,14 +223,17 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     yield return new object[] {
       new LoginDeviceRequest(credentialProvider),
+      /*lang=json,strict*/
       @"{""method"":""login_device"",""params"":{""password"":""cGFzcw=="",""username"":""MTJkZWE5NmZlYzIwNTkzNTY2YWI3NTY5MmM5OTQ5NTk2ODMzYWRjOQ==""},""requestTimeMils"":0}"
     };
     yield return new object[] {
       new GetDeviceInfoRequest(),
+      /*lang=json,strict*/
       @"{""method"":""get_device_info"",""requestTimeMils"":0}"
     };
     yield return new object[] {
       new SetDeviceInfoRequest<SetDeviceInfoRequestPseudoParams>("uuid", new(true, 100)),
+      /*lang=json,strict*/
       @"{""method"":""set_device_info"",""requestTimeMils"":0,""terminalUUID"":""uuid"",""params"":{""device_on"":true,""brightness"":100}}"
     };
   }
@@ -366,6 +369,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   {
     yield return new object[] {
       typeof(LoginDeviceResponse),
+      /*lang=json,strict*/
       @"{""error_code"":0,""result"":{""token"":""TOKEN""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
@@ -380,6 +384,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     yield return new object[] {
       typeof(PassThroughResponse<GetDeviceInfoResponseResult>),
+      /*lang=json,strict*/
       @"{""error_code"":-1,""result"":{""device_id"":""<device-id>"",""device_on"":true}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
@@ -396,6 +401,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     yield return new object[] {
       typeof(PassThroughResponse<SetDeviceInfoResponseResult>),
+      /*lang=json,strict*/
       @"{""error_code"":1,""result"":{""foo"":0,""bar"":""baz"",""qux"":""extra property""}}",
       new Action<ITapoPassThroughResponse>(
         static (ITapoPassThroughResponse deserialized) => {
@@ -507,8 +513,8 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding()
   {
-    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), null };
-    yield return new object?[] { @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), new NullLogger() };
+    yield return new object?[] { /*lang=json,strict*/ @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""error_code"":0,""result"":{""token"":""TOKEN""}}", typeof(LoginDeviceResponse), new NullLogger() };
   }
 
   [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_InvalidPadding))]
@@ -609,8 +615,8 @@ public class SecurePassThroughJsonConverterFactoryTests {
   {
     yield return new object?[] { @"null", typeof(LoginDeviceResponse), null };
     yield return new object?[] { @"null", typeof(LoginDeviceResponse), new NullLogger() };
-    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), null };
-    yield return new object?[] { @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), new NullLogger() };
+    yield return new object?[] { /*lang=json,strict*/ @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), null };
+    yield return new object?[] { /*lang=json,strict*/ @"{""error_code"":0,""result"":null}", typeof(LoginDeviceResponse), new NullLogger() };
   }
 
   [TestCaseSource(nameof(YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_Null))]

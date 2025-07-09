@@ -29,14 +29,6 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
   public Func<EndPoint, JsonDocument, JsonDocument>? FuncGenerateResponse { get; set; }
   public Func<JsonDocument, byte[]>? FuncEncryptResponse { get; set; }
 
-  private void ThrowIfDisposed()
-  {
-#pragma warning disable CA1513
-    if (listener is null)
-      throw new ObjectDisposedException(GetType().FullName);
-#pragma warning restore CA1513
-  }
-
   public async ValueTask DisposeAsync()
   {
     try {
@@ -70,8 +62,7 @@ public sealed class PseudoKasaDevice : IDisposable, IAsyncDisposable {
     listenerCancellationTokenSource = null;
 
     try {
-      if (taskProcessListener is not null)
-        taskProcessListener.Wait();
+      taskProcessListener?.Wait();
     }
     catch (OperationCanceledException) {
       // expected

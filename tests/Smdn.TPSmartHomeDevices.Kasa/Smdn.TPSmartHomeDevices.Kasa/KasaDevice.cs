@@ -238,7 +238,7 @@ public partial class KasaDeviceTests {
       FuncGenerateResponse = static (_, request) => {
         Assert.That(
           JsonSerializer.Serialize(request),
-          Is.EqualTo(@"{""module"":{""method"":{}}}"),
+          Is.EqualTo(/*lang=json,strict*/ @"{""module"":{""method"":{}}}"),
           nameof(request)
         );
 

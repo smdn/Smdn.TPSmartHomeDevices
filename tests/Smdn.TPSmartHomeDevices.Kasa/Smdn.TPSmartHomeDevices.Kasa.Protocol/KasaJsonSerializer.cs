@@ -42,14 +42,14 @@ public class KasaJsonSerializerTests {
 
   private static System.Collections.IEnumerable YieldTestCases_Serialize()
   {
-    yield return new object[] { "module", "method", new { }, @"{""module"":{""method"":{}}}" };
-    yield return new object[] { "module", "method", new { Foo = (string)null! }, @"{""module"":{""method"":{}}}" };
-    yield return new object[] { "module", "method", new { Foo = (string)null!, Bar = "Baz" }, @"{""module"":{""method"":{""Bar"":""Baz""}}}" };
-    yield return new object[] { "module", "method", new { Foo = "Bar" }, @"{""module"":{""method"":{""Foo"":""Bar""}}}" };
-    yield return new object[] { "module", "method", new { Foo = 42 }, @"{""module"":{""method"":{""Foo"":42}}}" };
-    yield return new object[] { "module", "method", new { Foo = new { Bar = "Baz" } }, @"{""module"":{""method"":{""Foo"":{""Bar"":""Baz""}}}}" };
-    yield return new object[] { "module", "method", null!, @"{""module"":{""method"":null}}" };
-    yield return new object[] { "", "", new { }, @"{"""":{"""":{}}}" };
+    yield return new object[] { "module", "method", new { }, /*lang=json,strict*/ @"{""module"":{""method"":{}}}" };
+    yield return new object[] { "module", "method", new { Foo = (string)null! }, /*lang=json,strict*/ @"{""module"":{""method"":{}}}" };
+    yield return new object[] { "module", "method", new { Foo = (string)null!, Bar = "Baz" }, /*lang=json,strict*/ @"{""module"":{""method"":{""Bar"":""Baz""}}}" };
+    yield return new object[] { "module", "method", new { Foo = "Bar" }, /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":""Bar""}}}" };
+    yield return new object[] { "module", "method", new { Foo = 42 }, /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":42}}}" };
+    yield return new object[] { "module", "method", new { Foo = new { Bar = "Baz" } }, /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":{""Bar"":""Baz""}}}}" };
+    yield return new object[] { "module", "method", null!, /*lang=json,strict*/ @"{""module"":{""method"":null}}" };
+    yield return new object[] { "", "", new { }, /*lang=json,strict*/ @"{"""":{"""":{}}}" };
   }
 
   [TestCaseSource(nameof(YieldTestCases_Serialize))]
@@ -96,7 +96,7 @@ public class KasaJsonSerializerTests {
   {
     foreach (var testCase in new[] {
       new {
-        Json = @"{""module"":{""method"":{}}}",
+        Json = /*lang=json,strict*/ @"{""module"":{""method"":{}}}",
         Module = "module",
         Method = "method",
         Assertion = new Action<JsonElement>(static result => {
@@ -104,7 +104,7 @@ public class KasaJsonSerializerTests {
         })
       },
       new {
-        Json = @"{""module"":{""method"":{""Foo"":""Bar""}}}",
+        Json = /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":""Bar""}}}",
         Module = "module",
         Method = "method",
         Assertion = new Action<JsonElement>(static result => {
@@ -112,7 +112,7 @@ public class KasaJsonSerializerTests {
         })
       },
       new {
-        Json = @"{""module"":{""method"":{""Foo"":42}}}",
+        Json = /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":42}}}",
         Module = "module",
         Method = "method",
         Assertion = new Action<JsonElement>(static result => {
@@ -120,7 +120,7 @@ public class KasaJsonSerializerTests {
         })
       },
       new {
-        Json = @"{""module"":{""method"":{""Foo"":{""Bar"":""Baz""}}}}",
+        Json = /*lang=json,strict*/ @"{""module"":{""method"":{""Foo"":{""Bar"":""Baz""}}}}",
         Module = "module",
         Method = "method",
         Assertion = new Action<JsonElement>(static result => {
@@ -131,7 +131,7 @@ public class KasaJsonSerializerTests {
         })
       },
       new {
-        Json = @"{""module"":{""method"":null}}",
+        Json = /*lang=json,strict*/ @"{""module"":{""method"":null}}",
         Module = "module",
         Method = "method",
         Assertion = new Action<JsonElement>(static result => {
@@ -139,7 +139,7 @@ public class KasaJsonSerializerTests {
         })
       },
       new {
-        Json = @"{"""":{"""":{}}}",
+        Json = /*lang=json,strict*/ @"{"""":{"""":{}}}",
         Module = "",
         Method = "",
         Assertion = new Action<JsonElement>(static result => {

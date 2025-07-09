@@ -138,6 +138,7 @@ public class KlapEncryptionAlgorithmTests {
       Array.Empty<byte>(),
       Array.Empty<byte>(),
       Array.Empty<byte>(),
+      /*lang=json,strict*/
       "{\"method\":\"xxx\"}", // 16 bytes
       "659B26E31FB68230DF25E8D8F5D31A690615CDFB8413AD3000D68B5BF36D8A3390ED06D7F695812C88A324F94720ABDBE90F020FFB51F2EFC99A2CBADB0637F7",
       -355025126
@@ -246,7 +247,7 @@ public class KlapEncryptionAlgorithmTests {
       Array.Empty<byte>(),
       FromHexString("659B26E31FB68230DF25E8D8F5D31A690615CDFB8413AD3000D68B5BF36D8A3390ED06D7F695812C88A324F94720ABDBE90F020FFB51F2EFC99A2CBADB0637F7"),
       -355025126,
-      Encoding.UTF8.GetBytes("{\"method\":\"xxx\"}")
+      Encoding.UTF8.GetBytes(/*lang=json,strict*/ "{\"method\":\"xxx\"}")
     };
 
     yield return new object[] {

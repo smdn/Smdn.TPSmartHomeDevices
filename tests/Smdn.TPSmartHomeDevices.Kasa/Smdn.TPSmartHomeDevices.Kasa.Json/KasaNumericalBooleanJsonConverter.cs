@@ -17,14 +17,14 @@ public class KasaNumericalBooleanJsonConverterTests {
 
   private static System.Collections.IEnumerable YieldTestCases_Read()
   {
-    yield return new object?[] { "{}", false };
-    yield return new object?[] { @"{""on_off"": null}", false }; // invalid
-    yield return new object?[] { @"{""on_off"": ""invalid""}", false }; // invalid
-    yield return new object?[] { @"{""on_off"": ""0""}", false }; // invalid
-    yield return new object?[] { @"{""on_off"": 0}", false };
-    yield return new object?[] { @"{""on_off"": 1}", true };
-    yield return new object?[] { @"{""on_off"": 2}", true };
-    yield return new object?[] { @"{""on_off"": -1}", true };
+    yield return new object?[] { /*lang=json,strict*/ "{}", false };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": null}", false }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": ""invalid""}", false }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": ""0""}", false }; // invalid
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": 0}", false };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": 1}", true };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": 2}", true };
+    yield return new object?[] { /*lang=json,strict*/ @"{""on_off"": -1}", true };
   }
 
   [TestCaseSource(nameof(YieldTestCases_Read))]
@@ -35,8 +35,8 @@ public class KasaNumericalBooleanJsonConverterTests {
     Assert.That(deserialized.IsOn, Is.EqualTo(expected));
   }
 
-  [TestCase(true, @"{""on_off"":1}")]
-  [TestCase(false, @"{""on_off"":0}")]
+  [TestCase(true, /*lang=json,strict*/ @"{""on_off"":1}")]
+  [TestCase(false, /*lang=json,strict*/ @"{""on_off"":0}")]
   public void Write(bool isOn, string expected)
     => Assert.That(
       JsonSerializer.Serialize(new OnOffState() { IsOn = isOn }),
