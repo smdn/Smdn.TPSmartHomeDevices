@@ -17,7 +17,7 @@ internal static class MulticolorLightUtils {
   private const int SaturationMinValue = 0;
   private const int SaturationMaxValue = 100;
 
-  private static readonly string BrightnessVallueOutOfRangeExceptionMessage =
+  private static readonly string BrightnessValueOutOfRangeExceptionMessage =
     $"The value for brightness must be in range of {BrightnessMinValue}~{BrightnessMaxValue}";
 
   private static readonly string HueValueOutOfRangeExceptionMessage =
@@ -51,7 +51,7 @@ internal static class MulticolorLightUtils {
       throw new ArgumentOutOfRangeException(
         paramName: paramName,
         actualValue: newValue.Value,
-        message: BrightnessVallueOutOfRangeExceptionMessage
+        message: BrightnessValueOutOfRangeExceptionMessage
       );
     }
 

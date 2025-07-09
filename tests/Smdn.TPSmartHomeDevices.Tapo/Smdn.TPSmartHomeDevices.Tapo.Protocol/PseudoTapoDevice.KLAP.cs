@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore SESSIONID,nobom
+
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
@@ -308,7 +310,7 @@ partial class PseudoTapoDevice {
 
     var requestJsonDocument = JsonDocument.Parse(session.DecryptionBuffer.WrittenMemory);
 
-    var contentEndcoding = utf8nobom;
+    var contentEncoding = utf8nobom;
     var responseString = JsonSerializer.Serialize(
       FuncGenerateKlapRequestResponse?.Invoke(session, requestJsonDocument, sequenceNumber.Value)
     );
@@ -316,7 +318,7 @@ partial class PseudoTapoDevice {
     session.EncryptionBuffer.Clear();
 
     session.KlapEncryptionAlgorithm.Encrypt(
-      rawText: contentEndcoding.GetBytes(responseString ?? string.Empty),
+      rawText: contentEncoding.GetBytes(responseString ?? string.Empty),
       sequenceNumber: sequenceNumber.Value,
       destination: session.EncryptionBuffer
     );
@@ -325,7 +327,7 @@ partial class PseudoTapoDevice {
 
     try {
       response.StatusCode = (int)HttpStatusCode.OK;
-      response.ContentEncoding = contentEndcoding;
+      response.ContentEncoding = contentEncoding;
       response.ContentType = contentType;
     }
     catch (ObjectDisposedException) {

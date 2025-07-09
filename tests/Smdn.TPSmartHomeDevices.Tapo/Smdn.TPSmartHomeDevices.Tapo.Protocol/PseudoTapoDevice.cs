@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore SESSIONID,nobom
+
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -321,11 +323,11 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "text/plain";
-    var contentEndcoding = utf8nobom;
+    var contentEncoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
-      response.ContentEncoding = contentEndcoding;
+      response.ContentEncoding = contentEncoding;
       response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
@@ -333,7 +335,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
 
     using var buffer = new MemoryStream();
-    using var writer = new StreamWriter(buffer, contentEndcoding, 1024, leaveOpen: true);
+    using var writer = new StreamWriter(buffer, contentEncoding, 1024, leaveOpen: true);
 
     await writer.WriteLineAsync(content).ConfigureAwait(false);
     await writer.FlushAsync().ConfigureAwait(false);
@@ -574,11 +576,11 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "application/json";
-    var contentEndcoding = utf8nobom;
+    var contentEncoding = utf8nobom;
 
     try {
       response.StatusCode = (int)statusCode;
-      response.ContentEncoding = contentEndcoding;
+      response.ContentEncoding = contentEncoding;
       response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {
@@ -586,7 +588,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
 
     using var buffer = new MemoryStream();
-    using var writer = new StreamWriter(buffer, contentEndcoding, 1024, leaveOpen: true);
+    using var writer = new StreamWriter(buffer, contentEncoding, 1024, leaveOpen: true);
 
     await JsonSerializer.SerializeAsync(buffer, content).ConfigureAwait(false);
 
@@ -724,11 +726,11 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "application/json";
-    var contentEndcoding = utf8nobom;
+    var contentEncoding = utf8nobom;
 
     try {
       response.StatusCode = (int)HttpStatusCode.OK;
-      response.ContentEncoding = contentEndcoding;
+      response.ContentEncoding = contentEncoding;
       response.ContentType = ContentType;
     }
     catch (ObjectDisposedException) {

@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore SESSIONID
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

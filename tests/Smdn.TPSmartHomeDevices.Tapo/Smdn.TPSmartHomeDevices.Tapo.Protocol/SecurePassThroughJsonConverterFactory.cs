@@ -90,7 +90,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   private class ThrowExceptionJsonConverter : JsonConverter<object> {
-    public override bool CanConvert(Type typeToConvert) => true; // attemt to convert all object types
+    public override bool CanConvert(Type typeToConvert) => true; // attempt to convert all object types
 
     public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
       => throw new ThrowExceptionJsonConverterException();

@@ -129,9 +129,9 @@ partial class TapoClient {
     var encryptedKey = Convert.FromBase64String(base64EncryptedKey);
 
     if (encryptedKey.Length != KeyExchangeAlgorithmKeySizeInBytes) {
-      logger?.LogCritical("Exchanged unexpecting length of key");
+      logger?.LogCritical("Exchanged an unexpected length of key");
       throw new TapoAuthenticationException(
-        message: $"Exchanged unexpecting length of key from the device at '{endPointUri}'.",
+        message: $"Exchanged an unexpected length of key from the device at '{endPointUri}'.",
         endPoint: endPointUri
       );
     }

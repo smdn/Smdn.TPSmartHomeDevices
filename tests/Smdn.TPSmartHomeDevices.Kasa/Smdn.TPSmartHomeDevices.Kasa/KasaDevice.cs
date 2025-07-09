@@ -23,9 +23,9 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 [TestFixture]
 public partial class KasaDeviceTests {
-  private const int RertyMaxAttemptsForIncompleteResponse = 3;
+  private const int RetryMaxAttemptsForIncompleteResponse = 3;
 
-  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Create_ArgumentException(
     Type[] methodParameterTypes,
     object?[] methodParameters,
@@ -639,7 +639,7 @@ public partial class KasaDeviceTests {
       FuncEncryptResponse = responseDocument => {
         var resp = EncryptedResponseDocument(responseDocument);
 
-        if (++request < RertyMaxAttemptsForIncompleteResponse) {
+        if (++request < RetryMaxAttemptsForIncompleteResponse) {
           return resp.AsSpan(0, resp.Length - 1).ToArray(); // truncate response message body
         }
         else {
@@ -664,7 +664,7 @@ public partial class KasaDeviceTests {
     );
 
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
-    Assert.That(request, Is.EqualTo(RertyMaxAttemptsForIncompleteResponse), nameof(request));
+    Assert.That(request, Is.EqualTo(RetryMaxAttemptsForIncompleteResponse), nameof(request));
   }
 
   [Test]
@@ -698,7 +698,7 @@ public partial class KasaDeviceTests {
       )
     );
 
-    Assert.That(request, Is.EqualTo(RertyMaxAttemptsForIncompleteResponse), nameof(request));
+    Assert.That(request, Is.EqualTo(RetryMaxAttemptsForIncompleteResponse), nameof(request));
     Assert.That(device.IsConnected, Is.False, "inner client must be disposed");
   }
 

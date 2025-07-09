@@ -99,7 +99,7 @@ public class KasaJsonSerializerTests {
         Json = @"{""module"":{""method"":{}}}",
         Module = "module",
         Method = "method",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Object));
         })
       },
@@ -107,7 +107,7 @@ public class KasaJsonSerializerTests {
         Json = @"{""module"":{""method"":{""Foo"":""Bar""}}}",
         Module = "module",
         Method = "method",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           Assert.That(result.GetProperty("Foo").GetString(), Is.EqualTo("Bar"));
         })
       },
@@ -115,7 +115,7 @@ public class KasaJsonSerializerTests {
         Json = @"{""module"":{""method"":{""Foo"":42}}}",
         Module = "module",
         Method = "method",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           Assert.That(result.GetProperty("Foo").GetInt32(), Is.EqualTo(42));
         })
       },
@@ -123,7 +123,7 @@ public class KasaJsonSerializerTests {
         Json = @"{""module"":{""method"":{""Foo"":{""Bar"":""Baz""}}}}",
         Module = "module",
         Method = "method",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           var foo = result.GetProperty("Foo");
 
           Assert.That(foo.ValueKind, Is.EqualTo(JsonValueKind.Object));
@@ -134,7 +134,7 @@ public class KasaJsonSerializerTests {
         Json = @"{""module"":{""method"":null}}",
         Module = "module",
         Method = "method",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Null));
         })
       },
@@ -142,7 +142,7 @@ public class KasaJsonSerializerTests {
         Json = @"{"""":{"""":{}}}",
         Module = "",
         Method = "",
-        Assersion = new Action<JsonElement>(static result => {
+        Assertion = new Action<JsonElement>(static result => {
           Assert.That(result.ValueKind, Is.EqualTo(JsonValueKind.Object));
         })
       },
@@ -162,7 +162,7 @@ public class KasaJsonSerializerTests {
         buffer,
         JsonEncodedText.Encode(testCase.Module),
         JsonEncodedText.Encode(testCase.Method),
-        testCase.Assersion
+        testCase.Assertion
       };
     }
   }
@@ -216,12 +216,12 @@ public class KasaJsonSerializerTests {
       var bodyLengthIndicatedInHeader = BinaryPrimitives.ReadInt32BigEndian(input.AsSpan(0, 4));
 
       yield return new object[] {
-        CreateWrittenArrayBufferWritter(input),
+        CreateWrittenArrayBufferWriter(input),
         bodyLengthIndicatedInHeader
       };
     }
 
-    static ArrayBufferWriter<byte> CreateWrittenArrayBufferWritter(byte[] input)
+    static ArrayBufferWriter<byte> CreateWrittenArrayBufferWriter(byte[] input)
     {
       var buffer = new ArrayBufferWriter<byte>();
 
@@ -250,7 +250,7 @@ public class KasaJsonSerializerTests {
     Assert.That(ex.ActualLength, Is.EqualTo(buffer.WrittenCount - 4), nameof(ex.ActualLength));
   }
 
-  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageModuleUnmatch()
+  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageModuleMismatch()
   {
     foreach (var testCase in new[] {
       new { SerializingModuleName = "module", DeserializingModuleName = "Module" },
@@ -270,8 +270,8 @@ public class KasaJsonSerializerTests {
     }
   }
 
-  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageModuleUnmatch))]
-  public void Deserialize_MessageModuleUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
+  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageModuleMismatch))]
+  public void Deserialize_MessageModuleMismatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
     => Assert.Throws<KasaMessageException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,
@@ -280,7 +280,7 @@ public class KasaJsonSerializerTests {
       )
     );
 
-  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageMethodUnmatch()
+  private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageMethodMismatch()
   {
     foreach (var testCase in new[] {
       new { SerializingMethodName = "method", DeserializingMethodName = "Method" },
@@ -300,8 +300,8 @@ public class KasaJsonSerializerTests {
     }
   }
 
-  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageMethodUnmatch))]
-  public void Deserialize_MessageMethodUnmatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
+  [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageMethodMismatch))]
+  public void Deserialize_MessageMethodMismatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
     => Assert.Throws<KasaMessageException>(
       () => KasaJsonSerializer.Deserialize(
         buffer,

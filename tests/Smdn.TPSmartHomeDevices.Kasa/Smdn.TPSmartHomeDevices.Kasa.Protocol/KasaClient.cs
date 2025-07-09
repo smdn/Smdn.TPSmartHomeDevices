@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore smartlife,smartbulb,lightingservice
+
 using System;
 using System.Buffers.Binary;
 using System.Net;

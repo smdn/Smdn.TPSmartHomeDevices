@@ -32,7 +32,7 @@ public class P110MTests {
   public new void ToString()
     => ConcreteTapoDeviceCommonTests.TestToString<P110M>();
 
-  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<P110M>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 

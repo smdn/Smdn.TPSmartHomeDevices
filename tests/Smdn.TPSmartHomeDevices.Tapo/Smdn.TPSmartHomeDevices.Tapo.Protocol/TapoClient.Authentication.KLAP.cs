@@ -42,7 +42,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_KLAP_Handshake1_AuthHashMissmatch()
+  public async Task AuthenticateAsync_KLAP_Handshake1_AuthHashMismatch()
   {
     await using var device = new PseudoTapoDevice() {
       FuncGenerateKlapAuthHash = (_, _, authHash) => authHash.Span.Clear()

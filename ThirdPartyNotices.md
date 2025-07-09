@@ -4,7 +4,7 @@ This project incorporates material from the projects listed below or described i
 The attached notices are provided for information purposes only.
 
 
-## Licence notice for `TapoP100`
+## License notice for `TapoP100`
 - https://github.com/fishbigger/TapoP100
 - https://github.com/fishbigger/TapoP100/blob/main/LICENSE.txt
 
@@ -19,7 +19,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ```
 
 
-## Licence notice for `Tapo-plug-controller`
+## License notice for `Tapo-plug-controller`
 - https://github.com/europowergenerators/Tapo-plug-controller
 - https://github.com/europowergenerators/Tapo-plug-controller/blob/main/LICENSE.txt
 

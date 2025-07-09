@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore smartlife,smartbulb,lightingservice,sysinfo
 using System;
 using System.Net.NetworkInformation;
 using System.Text.Json;
@@ -17,7 +18,7 @@ public class KL130Tests {
   public new void ToString()
     => ConcreteKasaDeviceCommonTests.TestToString<KL130>();
 
-  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<KL130>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 

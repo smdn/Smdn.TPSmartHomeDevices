@@ -3,7 +3,7 @@
 namespace Smdn.TPSmartHomeDevices;
 
 /// <summary>
-/// Provides a mechanism for creating <see cref="IDeviceEndPoint"/> from the address respresented by <typeparamref name="TAddress"/>.
+/// Provides a mechanism for creating <see cref="IDeviceEndPoint"/> from the address represented by <typeparamref name="TAddress"/>.
 /// </summary>
 /// <remarks>
 /// <c>MacAddressDeviceEndPointFactory</c> class from the package <c>Smdn.TPSmartHomeDevices.MacAddressEndPoint</c> is one concrete implementation of this interface.

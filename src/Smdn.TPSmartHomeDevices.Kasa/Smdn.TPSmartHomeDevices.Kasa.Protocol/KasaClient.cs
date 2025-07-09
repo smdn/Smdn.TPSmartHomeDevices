@@ -38,7 +38,7 @@ public sealed partial class KasaClient : IDisposable {
   );
 #pragma warning restore SA1114
 
-  // Kasa device seems to automatically close connection within approx 30 secs since the lastest request.
+  // Kasa device seems to automatically close connection within approx 30 secs since the latest request.
   private static readonly TimeSpan ConnectionRefreshInterval = TimeSpan.FromSeconds(30);
 
   // The timeout for receiving the rest of the response when the device sends a split partial response.
@@ -213,7 +213,7 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken = default
   )
   {
-    // If some period of interval has elapsed since the lastest request,
+    // If some period of interval has elapsed since the latest request,
     // dispose the current connection since since it is likely that the
     // connection has already been disconnected.
     if (socket is not null && lastSentAt + ConnectionRefreshInterval <= DateTime.Now) {

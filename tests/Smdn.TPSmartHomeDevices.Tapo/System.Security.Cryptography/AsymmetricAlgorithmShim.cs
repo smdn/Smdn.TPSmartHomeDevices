@@ -15,7 +15,7 @@ public class AsymmetricAlgorithmShimTests {
     => Assert.Throws<ArgumentNullException>(() => AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm: null!));
 #endif
 
-  private static System.Collections.IEnumerable YeildTestCase_ExportSubjectPublicKeyInfoPem()
+  private static System.Collections.IEnumerable YieldTestCase_ExportSubjectPublicKeyInfoPem()
   {
     static IEnumerable<(Func<AsymmetricAlgorithm>, string)> YieldTestCases()
     {
@@ -49,7 +49,7 @@ public class AsymmetricAlgorithmShimTests {
     }
   }
 
-  [TestCaseSource(nameof(YeildTestCase_ExportSubjectPublicKeyInfoPem))]
+  [TestCaseSource(nameof(YieldTestCase_ExportSubjectPublicKeyInfoPem))]
   public void ExportSubjectPublicKeyInfoPem(AsymmetricAlgorithm algorithm, string label)
   {
     var expected = string.Concat(

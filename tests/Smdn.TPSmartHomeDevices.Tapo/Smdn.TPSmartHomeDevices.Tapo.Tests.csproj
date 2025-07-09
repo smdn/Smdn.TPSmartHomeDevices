@@ -24,7 +24,7 @@ SPDX-License-Identifier: MIT
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\NullMacAddressDeviceEndPointFactory.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\RequestCancellationAfterReturnDeviceEndPoint.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\StaticMacAddressDeviceEndPointFactory.cs" />
-    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\StringifiableNullDeviceEndPoint.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\StringifyableNullDeviceEndPoint.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ThrowExceptionDeviceEndPoint.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\TransitionalDeviceEndPoint.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\UnresolvedDeviceEndPoint.cs" />

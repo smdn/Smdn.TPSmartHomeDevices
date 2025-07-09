@@ -91,7 +91,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
   private readonly struct NullResult { }
 
   [Test]
-  public async Task AddTapoHttpClient_ConfigureClient_BaseAddressMustBeOverwriten()
+  public async Task AddTapoHttpClient_ConfigureClient_BaseAddressMustBeOverwritten()
   {
     var services = new ServiceCollection();
 

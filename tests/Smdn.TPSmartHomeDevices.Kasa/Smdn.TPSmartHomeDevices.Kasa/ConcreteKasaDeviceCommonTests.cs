@@ -15,7 +15,7 @@ internal class ConcreteKasaDeviceCommonTests {
   internal static void TestToString<TKasaDevice>()
     where TKasaDevice : KasaDevice
   {
-    var deviceEndPoint = new StringifiableNullDeviceEndPoint("<endpoint>");
+    var deviceEndPoint = new StringifyableNullDeviceEndPoint("<endpoint>");
 
     using var device = (KasaDevice)Activator.CreateInstance(
       type: typeof(TKasaDevice),
@@ -35,7 +35,7 @@ internal class ConcreteKasaDeviceCommonTests {
     Assert.That(device.ToString(), Is.EqualTo($"{typeof(TKasaDevice).Name} (disposed)"));
   }
 
-  internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
+  internal static System.Collections.IEnumerable YieldTestCases_Ctor_ArgumentException()
   {
     /*
      * (string host, IServiceProvider? serviceProvider)

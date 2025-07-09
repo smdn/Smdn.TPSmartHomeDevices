@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2024 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore sysinfo
 using System;
 using System.Text.Json;
 using System.Threading;

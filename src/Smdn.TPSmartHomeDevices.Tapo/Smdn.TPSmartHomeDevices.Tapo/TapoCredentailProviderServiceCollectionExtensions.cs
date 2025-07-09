@@ -9,6 +9,8 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
+// cSpell:ignore Credentail
+// TODO: fix naming Credentail->Credential
 public static class TapoCredentailProviderServiceCollectionExtensions {
   /// <summary>
   /// Adds <see cref="ITapoCredentialProvider"/> to <see cref="IServiceCollection"/>.

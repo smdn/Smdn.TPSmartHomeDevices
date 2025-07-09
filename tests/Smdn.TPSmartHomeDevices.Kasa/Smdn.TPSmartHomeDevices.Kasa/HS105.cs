@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore sysinfo
+
 using System;
 using System.Net.NetworkInformation;
 using System.Text.Json;
@@ -17,7 +19,7 @@ public class HS105Tests {
   public new void ToString()
     => ConcreteKasaDeviceCommonTests.TestToString<HS105>();
 
-  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteKasaDeviceCommonTests), nameof(ConcreteKasaDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteKasaDeviceCommonTests.TestCtor_ArgumentException<HS105>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 

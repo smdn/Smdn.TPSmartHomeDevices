@@ -14,7 +14,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 internal class ConcreteTapoDeviceCommonTests {
-  internal static System.Collections.IEnumerable YiledTestCases_Ctor_ArgumentException()
+  internal static System.Collections.IEnumerable YieldTestCases_Ctor_ArgumentException()
   {
     const string host = "localhost";
     const string email = "user@mail.test";
@@ -314,7 +314,7 @@ internal class ConcreteTapoDeviceCommonTests {
   internal static void TestToString<TTapoDevice>()
     where TTapoDevice : TapoDevice
   {
-    var deviceEndPoint = new StringifiableNullDeviceEndPoint("<endpoint>");
+    var deviceEndPoint = new StringifyableNullDeviceEndPoint("<endpoint>");
 
     using var device = (TapoDevice)Activator.CreateInstance(
       type: typeof(TTapoDevice),

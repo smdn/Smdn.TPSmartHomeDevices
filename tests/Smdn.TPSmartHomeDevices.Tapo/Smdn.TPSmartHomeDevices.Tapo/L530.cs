@@ -31,7 +31,7 @@ public class L530Tests {
   public new void ToString()
     => ConcreteTapoDeviceCommonTests.TestToString<L530>();
 
-  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Ctor_ArgumentException(Type[] ctorParameterTypes, object?[] ctorParameters, Type? expectedExceptionType, string expectedParamName)
     => ConcreteTapoDeviceCommonTests.TestCtor_ArgumentException<L530>(ctorParameterTypes, ctorParameters, expectedExceptionType, expectedParamName);
 

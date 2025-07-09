@@ -16,16 +16,16 @@ partial class TapoClientTests {
   [Test]
   public async Task PostRequestAsync_NullJsonResponse()
   {
-    var contentEndcoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    var contentEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
     await using var device = new PseudoTapoDevice() {
       FuncProcessRequest = context => {
         context.Response.StatusCode = (int)HttpStatusCode.OK;
-        context.Response.ContentEncoding = contentEndcoding;
+        context.Response.ContentEncoding = contentEncoding;
         context.Response.ContentType = "application/json";
 
         using var buffer = new MemoryStream();
-        using var writer = new StreamWriter(buffer, contentEndcoding, 1024, leaveOpen: true);
+        using var writer = new StreamWriter(buffer, contentEncoding, 1024, leaveOpen: true);
 
         writer.Write("null");
         writer.Close();

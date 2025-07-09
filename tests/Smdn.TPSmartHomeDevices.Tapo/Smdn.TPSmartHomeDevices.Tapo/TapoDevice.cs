@@ -50,7 +50,7 @@ public partial class TapoDeviceTests {
   public new void ToString()
     => ConcreteTapoDeviceCommonTests.TestToString<TapoDevice>();
 
-  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YiledTestCases_Ctor_ArgumentException))]
+  [TestCaseSource(typeof(ConcreteTapoDeviceCommonTests), nameof(ConcreteTapoDeviceCommonTests.YieldTestCases_Ctor_ArgumentException))]
   public void Create_ArgumentException(
     Type[] methodParameterTypes,
     object?[] methodParameters,

@@ -31,7 +31,7 @@ public class TapoErrorResponseException : TapoProtocolException {
   )
   {
     var informationalErrorMessage = rawErrorCode switch {
-      // make sure to include a space at the beginning of the informatonal message
+      // make sure to include a space at the beginning of the informational message
       TapoErrorCodes.DeviceBusy => " Device may be busy. Retry after a few moments.",
       TapoErrorCodes.InvalidCredentials => " Credentials may be invalid. Check your username and password.",
       TapoErrorCodes.RequestParameterError => " It may be an error in the request parameters. It is possible that the value may be out of range, etc.",

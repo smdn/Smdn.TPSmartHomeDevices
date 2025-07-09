@@ -11,34 +11,34 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// </summary>
 public readonly struct KasaDeviceExceptionHandling {
   /// <summary>
-  /// Throws the exception as it is occured without any other actions.
+  /// Throws the exception as it is occurred without any other actions.
   /// </summary>
   public static readonly KasaDeviceExceptionHandling Throw = default;
 
   /// <summary>
-  /// Invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and throws the occured exception.
+  /// Invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and throws the occurred exception.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
   public static readonly KasaDeviceExceptionHandling InvalidateEndPointAndThrow = new() { ShouldInvalidateEndPoint = true };
 
   /// <summary>
-  /// Ignores the occured exception and try again immediately.
+  /// Ignores the occurred exception and try again immediately.
   /// </summary>
   public static readonly KasaDeviceExceptionHandling Retry = new() { ShouldRetry = true };
 
   /// <summary>
-  /// Ignores the occured exception and try again after reconnect immediately.
+  /// Ignores the occurred exception and try again after reconnect immediately.
   /// </summary>
   public static readonly KasaDeviceExceptionHandling RetryAfterReconnect = new() { ShouldRetry = true, ShouldReconnect = true };
 
   /// <summary>
-  /// Ignores the occured exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
+  /// Ignores the occurred exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
   public static readonly KasaDeviceExceptionHandling InvalidateEndPointAndRetry = new() { ShouldRetry = true, ShouldInvalidateEndPoint = true, };
 
   /// <summary>
-  /// Creates a <see cref="KasaDeviceExceptionHandling"/> that ignores the occured exception and try again after the specified period of time.
+  /// Creates a <see cref="KasaDeviceExceptionHandling"/> that ignores the occurred exception and try again after the specified period of time.
   /// </summary>
   /// <param name="retryAfter">The <see cref="TimeSpan"/> that specifies the amount of time to wait before retry.</param>
   /// <param name="shouldReconnect">

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices;
 
-internal sealed class StringifiableNullDeviceEndPoint : IDeviceEndPoint {
+internal sealed class StringifyableNullDeviceEndPoint : IDeviceEndPoint {
   public string StringRepresentation { get; init; }
 
-  public StringifiableNullDeviceEndPoint(string stringRepresentation)
+  public StringifyableNullDeviceEndPoint(string stringRepresentation)
   {
     StringRepresentation = stringRepresentation;
   }

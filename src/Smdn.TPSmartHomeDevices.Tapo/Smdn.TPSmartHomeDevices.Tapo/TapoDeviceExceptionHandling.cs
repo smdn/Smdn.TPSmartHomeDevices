@@ -11,40 +11,40 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 /// </summary>
 public readonly struct TapoDeviceExceptionHandling {
   /// <summary>
-  /// Throws the exception as it is occured without any other actions.
+  /// Throws the exception as it is occurred without any other actions.
   /// </summary>
   public static readonly TapoDeviceExceptionHandling Throw = default;
 
   /// <summary>
-  /// Wraps the occured exception into <see cref="TapoProtocolException"/> and throw it.
+  /// Wraps the occurred exception into <see cref="TapoProtocolException"/> and throw it.
   /// </summary>
   /// <seealso cref="TapoProtocolException"/>
   public static readonly TapoDeviceExceptionHandling ThrowAsTapoProtocolException = new() { ShouldWrapIntoTapoProtocolException = true };
 
   /// <summary>
-  /// Invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and throws the occured exception.
+  /// Invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and throws the occurred exception.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
   public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndThrow = new() { ShouldInvalidateEndPoint = true };
 
   /// <summary>
-  /// Ignores the occured exception and try again immediately.
+  /// Ignores the occurred exception and try again immediately.
   /// </summary>
   public static readonly TapoDeviceExceptionHandling Retry = new() { ShouldRetry = true };
 
   /// <summary>
-  /// Ignores the occured exception and try again after re-establishing session immediately.
+  /// Ignores the occurred exception and try again after re-establishing session immediately.
   /// </summary>
   public static readonly TapoDeviceExceptionHandling RetryAfterReestablishSession = new() { ShouldRetry = true, ShouldReestablishSession = true };
 
   /// <summary>
-  /// Ignores the occured exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
+  /// Ignores the occurred exception, invokes <see cref="IDynamicDeviceEndPoint.Invalidate"/> and try again immediately.
   /// </summary>
   /// <seealso cref="IDynamicDeviceEndPoint.Invalidate"/>
   public static readonly TapoDeviceExceptionHandling InvalidateEndPointAndRetry = new() { ShouldRetry = true, ShouldInvalidateEndPoint = true, };
 
   /// <summary>
-  /// Creates a <see cref="TapoDeviceExceptionHandling"/> that ignores the occured exception and try again after the specified period of time.
+  /// Creates a <see cref="TapoDeviceExceptionHandling"/> that ignores the occurred exception and try again after the specified period of time.
   /// </summary>
   /// <param name="retryAfter">The <see cref="TimeSpan"/> that specifies the amount of time to wait before retry.</param>
   /// <param name="shouldReestablishSession">

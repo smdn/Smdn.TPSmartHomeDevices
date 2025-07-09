@@ -80,7 +80,7 @@ internal sealed class KasaDeviceDefaultExceptionHandler : KasaDeviceExceptionHan
         return KasaDeviceExceptionHandling.Throw;
 
       case KasaIncompleteResponseException ex:
-        // The peer has been in invalid state(?) and returnd incomplete response.
+        // The peer has been in invalid state(?) and returned incomplete response.
         const int MaxRetryIncompleteResponse = 3;
         var nextAttempt = attempt + 1;
 

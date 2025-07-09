@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+// cSpell:ignore TPSMARTHOMEDEVICES,KLAPLOCALAUTHHASH
 using System;
 using System.IO;
 using System.Text;
