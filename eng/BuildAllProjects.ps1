@@ -6,23 +6,27 @@ $RepositoryRootDirectory = [System.IO.Path]::GetFullPath(
   [System.IO.Path]::Join($PSScriptRoot, "../")
 )
 
-# download Smdn.MSBuild.ProjectAssets.* first
-dotnet restore $([System.IO.Path]::Join($RepositoryRootDirectory, 'eng', 'InstallProjectAssets.proj'))
-
-# create a solution for the build target projects
+# create a temporary solution for the build target projects
 Set-Location $RepositoryRootDirectory
 
-dotnet new sln
+$SolutionFile = [System.IO.Path]::GetFileName(
+  [System.IO.Path]::GetDirectoryName($RepositoryRootDirectory)
+) + ".temp.sln"
+
+dotnet new sln --force --name $([System.IO.Path]::GetFileNameWithoutExtension($SolutionFile))
 
 # add build target projects to the solution
 $ProjectFiles = Get-ChildItem -Path $([System.IO.Path]::Join($RepositoryRootDirectory, 'src', 'Smdn.*', '*')) -Filter '*.csproj'
 
 foreach ($ProjectFile in $ProjectFiles) {
-  dotnet sln add $ProjectFile
+  dotnet sln $SolutionFile add $ProjectFile
 }
 
 # restore dependencies
-dotnet restore
+dotnet restore $SolutionFile
 
 # then build all projects
-dotnet build --no-restore
+dotnet build --no-restore $SolutionFile
+
+# delete the temporary solution
+Remove-Item $SolutionFile

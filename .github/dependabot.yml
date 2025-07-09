@@ -7,6 +7,10 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    groups:
+      smdn-fundamentals-workflows:
+        patterns:
+          - "smdn/Smdn.Fundamentals/*"
     schedule:
       interval: "weekly"
       day: "wednesday"

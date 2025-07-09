@@ -49,6 +49,7 @@ on:
         type: string
 
       dotnet_test_options_verbosity_level:
+        # cSpell:disable-next-line
         description: "The argument to be set to the `--verbosity <LEVEL>` option of the `dotnet test` command. <LEVEL> := q[uiet], m[inimal], n[ormal], d[etailed], diag[nostic]"
         required: false
         type: string
@@ -66,12 +67,11 @@ on:
 jobs:
   run-test:
     name: Run tests
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.4.2
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.5.0
     with:
       project:                                ${{ inputs.project }}
       os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest' || inputs.os }}
       verbose:                                ${{ inputs.verbose == 'true' }}
-      path_proj_install_project_assets:       "eng/InstallProjectAssets.proj"
       dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '8.0.100' || inputs.dotnet_sdk_version }}
       timeout_minutes_test_job:               25 # Smdn.TPSmartHomeDevices.Tapo on macos-13 may exceed the 20 minutes limit.
       timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"

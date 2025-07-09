@@ -28,6 +28,7 @@ on:
   #   - cron: '07 20 03,16 * *'
   workflow_dispatch:
 
+# cSpell:ignore autobuild
 jobs:
   analyze:
     name: Analyze

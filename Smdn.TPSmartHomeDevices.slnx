@@ -1,0 +1,18 @@
+<!--
+SPDX-FileCopyrightText: 2025 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Smdn.TPSmartHomeDevices.Kasa/Smdn.TPSmartHomeDevices.Kasa.csproj" />
+    <Project Path="src/Smdn.TPSmartHomeDevices.MacAddressEndPoint/Smdn.TPSmartHomeDevices.MacAddressEndPoint.csproj" />
+    <Project Path="src/Smdn.TPSmartHomeDevices.Primitives/Smdn.TPSmartHomeDevices.Primitives.csproj" />
+    <Project Path="src/Smdn.TPSmartHomeDevices.Tapo/Smdn.TPSmartHomeDevices.Tapo.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Smdn.TPSmartHomeDevices.Kasa/Smdn.TPSmartHomeDevices.Kasa.Tests.csproj" />
+    <Project Path="tests/Smdn.TPSmartHomeDevices.MacAddressEndPoint/Smdn.TPSmartHomeDevices.MacAddressEndPoint.Tests.csproj" />
+    <Project Path="tests/Smdn.TPSmartHomeDevices.Primitives/Smdn.TPSmartHomeDevices.Primitives.Tests.csproj" />
+    <Project Path="tests/Smdn.TPSmartHomeDevices.Tapo/Smdn.TPSmartHomeDevices.Tapo.Tests.csproj" />
+  </Folder>
+</Solution>

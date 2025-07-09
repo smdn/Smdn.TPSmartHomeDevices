@@ -35,7 +35,7 @@ jobs:
     - name: Determine the release target tag
       id: release-target
       run: |
-        # If workflow is trigged by workflow_dispatch, the value of github.ref_name contains branch ref which workflow runs from.
+        # If workflow is triggered by workflow_dispatch, the value of github.ref_name contains branch ref which workflow runs from.
         # Due to the reason of above, github.event.inputs.release_target_tag_name must be tested before testing github.ref_name.
         if [[ -n '${{ github.event.inputs.release_target_tag_name }}' ]]; then
           # use dispatched tag name
@@ -61,7 +61,7 @@ jobs:
         exit 1
 
   run-generate-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target/v1.10.3
+    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target/v1.11.0
     needs: determine-release-target
     if: startsWith(needs.determine-release-target.outputs.tag_name, 'new-release/')
     with:

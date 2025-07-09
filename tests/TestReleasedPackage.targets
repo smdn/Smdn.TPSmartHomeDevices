@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
-<Project>
+<Project InitialTargets="ErrorIfTestTargetProjectNotResolvedOrNotExist">
   <PropertyGroup>
     <CanTestReleasedPackage Condition=" '$(CanTestReleasedPackage)' == '' ">true</CanTestReleasedPackage>
     <_RunTestWithReleasedPackage
@@ -39,6 +39,21 @@ SPDX-License-Identifier: MIT
     Condition=" '$(TestReleasedPackage)' == 'true' and '$(CanTestReleasedPackage)' != 'true' "
   >
     <Warning Text="cannot test with released package"/>
+  </Target>
+
+  <Target
+    Name="ErrorIfTestTargetProjectNotResolvedOrNotExist"
+    BeforeTargets="BeforeBuild"
+    Condition=" '$(IsTestProject)' == 'true' "
+  >
+    <Error
+      Condition=" '$(SmdnTestTargetProjectFullPath)' == '' "
+      Text="The path to the test target project could not be resolved."
+    />
+    <Error
+      Condition="!Exists('$(SmdnTestTargetProjectFullPath)')"
+      Text="The test target project '$(SmdnTestTargetProjectFullPath)' does not exist."
+    />
   </Target>
 
   <!--
