@@ -23,6 +23,7 @@
     "SYSLIB",
     "Tapo",
     "TPLink",
+    "trimmable",
   ],
   "ignoreWords": [
     "fishbigger",

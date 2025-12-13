@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- enable target framework net* (.NET >= 5.0) by default -->
     <EnableTargetFrameworkDotNet>true</EnableTargetFrameworkDotNet>
+    <EnableTargetFrameworkDotNet100>true</EnableTargetFrameworkDotNet100>
     <EnableTargetFrameworkDotNet80>true</EnableTargetFrameworkDotNet80>
     <!-- enable target framework net* (.NET Framework/Mono) by default -->
     <EnableTargetFrameworkNetFx>true</EnableTargetFrameworkNetFx>
@@ -35,6 +36,20 @@ SPDX-License-Identifier: MIT
     "
   >
     <!-- disable Mono on GitHub Actions Ubuntu 24.04 runner images -->
+    <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkNetFx>
+  </PropertyGroup>
+
+  <!-- On MacOS (arm64) -->
+  <PropertyGroup
+    Condition="
+      $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('osx-arm64')) or
+      (
+        $([System.OperatingSystem]::IsMacOS()) and
+        $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.StartsWith('Arm64'))
+      )
+    "
+  >
+    <!-- disable Mono on GitHub Actions osx-arm64 runner images -->
     <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 </Project>

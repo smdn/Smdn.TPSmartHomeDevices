@@ -67,12 +67,12 @@ on:
 jobs:
   run-test:
     name: Run tests
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.5.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.6.0
     with:
       project:                                ${{ inputs.project }}
       os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest' || inputs.os }}
       verbose:                                ${{ inputs.verbose == 'true' }}
-      dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '8.0.100' || inputs.dotnet_sdk_version }}
+      dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '10.0.100' || inputs.dotnet_sdk_version }}
       timeout_minutes_test_job:               25 # Smdn.TPSmartHomeDevices.Tapo on macos-13 may exceed the 20 minutes limit.
       timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'3min'}, {'OS':'','Timeout':'1min'} ]"
       timeout_vstest_connection:              "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"

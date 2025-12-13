@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
 <Project>
-  <Import Project="Sdk.props" Sdk="Smdn.MSBuild.ProjectAssets.Common" />
   <Import Project="Sdk.props" Sdk="Smdn.MSBuild.ProjectAssets.Library" />
 
   <Import
@@ -12,15 +11,14 @@ SPDX-License-Identifier: MIT
   />
 
   <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
-    <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference
       Include="Smdn.MSBuild.DefineConstants.NETSdkApi"
-      Version="[1.5.1]"
+      Version="[1.6.0]"
       PrivateAssets="all"
       IncludeAssets="build"
     />

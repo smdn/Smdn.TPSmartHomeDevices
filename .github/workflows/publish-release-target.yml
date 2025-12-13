@@ -15,7 +15,7 @@ on:
 
 jobs:
   run-publish-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/publish-release-target.yml@workflows/release-target/v1.11.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/publish-release-target.yml@workflows/release-target/v1.12.1
     if: |
       (github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/')) &&
       (contains(github.event.pull_request.labels.*.name, 'release-target'))
@@ -23,7 +23,7 @@ jobs:
       pr_number_request_for_release: ${{ github.event.pull_request.number }}
       pr_label_request_for_release:  'release-target'
       workflow_runs_on:              'ubuntu-24.04'
-      dotnet_sdk_version:            '8.0.100'
+      dotnet_sdk_version:            '10.0.100'
     secrets:
       token_repo:                 ${{ secrets.PUBLISH_NEW_RELEASE }}
       token_push_nuget_org:       ${{ secrets.PUBLISH_PACKAGE_NUGETORG }}

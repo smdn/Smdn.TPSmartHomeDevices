@@ -28,6 +28,11 @@ on:
   #   - cron: '07 20 03,16 * *'
   workflow_dispatch:
 
+env:
+  # cSpell:disable
+  MINIMAL_DOTNET_SDK_VERSION: 10.0.100
+  # cSpell:enable
+
 # cSpell:ignore autobuild
 jobs:
   analyze:
@@ -50,7 +55,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5.0.1
+      uses: actions/checkout@v6.0.1
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
@@ -65,6 +70,27 @@ jobs:
     - name: Autobuild
       if: ${{ (matrix.build-mode == 'autobuild') || (matrix.build-mode == '') }}
       uses: github/codeql-action/autobuild@v4
+
+    - name: Check .NET SDK ${{ env.MINIMAL_DOTNET_SDK_VERSION }} is installed
+      id: dotnet-sdk-version
+      if: ${{ (matrix.build-mode == 'manual') && (matrix.language == 'csharp') }}
+      shell: pwsh
+      run: |
+        $installed_version = [System.Version]::Parse($(dotnet --version))
+        $required_version  = [System.Version]::Parse('${{ env.MINIMAL_DOTNET_SDK_VERSION }}')
+
+        if ( $required_version -gt $installed_version ) {
+          # required SDK version is not installed
+          "::notice::.NET SDK version: installed ${installed_version}, required ${required_version}"
+
+          "install-dotnet-sdk-version=${required_version}" >> $Env:GITHUB_OUTPUT
+        }
+
+    - name: Install .NET SDK ${{ steps.dotnet-sdk-version.outputs.install-dotnet-sdk-version }}
+      if: ${{ (matrix.build-mode == 'manual') && (matrix.language == 'csharp') && (steps.dotnet-sdk-version.outputs.install-dotnet-sdk-version != '') }}
+      uses: actions/setup-dotnet@v5.0.1
+      with:
+        dotnet-version: '${{ steps.dotnet-sdk-version.outputs.install-dotnet-sdk-version }}'
 
     - name: Build all .NET projects
       if: ${{ (matrix.build-mode == 'manual') && (matrix.language == 'csharp') }}

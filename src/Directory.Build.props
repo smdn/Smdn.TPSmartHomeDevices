@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: 2021 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
 <Project>
-  <Import Project="Sdk.props" Sdk="Smdn.MSBuild.ProjectAssets.Common" />
   <Import Project="Sdk.props" Sdk="Smdn.MSBuild.ProjectAssets.Library" />
 
   <PropertyGroup Label="Configurations for Smdn.MSBuild.ProjectAssets.*">
@@ -26,7 +25,7 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <PackageReference
       Include="Smdn.MSBuild.DefineConstants.NETSdkApi"
-      Version="[1.5.1]"
+      Version="[1.6.0]"
       PrivateAssets="all"
       IncludeAssets="build"
     />

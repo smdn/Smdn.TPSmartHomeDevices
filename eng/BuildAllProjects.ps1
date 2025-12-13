@@ -11,12 +11,12 @@ Set-Location $RepositoryRootDirectory
 
 $SolutionFile = [System.IO.Path]::GetFileName(
   [System.IO.Path]::GetDirectoryName($RepositoryRootDirectory)
-) + ".temp.sln"
+) + ".temp.slnx"
 
-dotnet new sln --force --name $([System.IO.Path]::GetFileNameWithoutExtension($SolutionFile))
+dotnet new sln --force --format slnx --name $([System.IO.Path]::GetFileNameWithoutExtension($SolutionFile))
 
 # add build target projects to the solution
-$ProjectFiles = Get-ChildItem -Path $([System.IO.Path]::Join($RepositoryRootDirectory, 'src', 'Smdn.*', '*')) -Filter '*.csproj'
+$ProjectFiles = Get-ChildItem -Path $([System.IO.Path]::Join($RepositoryRootDirectory, 'src', 'Smdn.*', 'Smdn.*.csproj')) -File
 
 foreach ($ProjectFile in $ProjectFiles) {
   dotnet sln $SolutionFile add $ProjectFile
