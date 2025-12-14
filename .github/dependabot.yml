@@ -42,6 +42,11 @@ updates:
         update-types:
           - "version-update:semver-minor"
           - "version-update:semver-patch"
+      # For project SDK packages named with "Smdn.*", all updates should be reported.
+      - dependency-name: "Smdn.MSBuild.ProjectAssets.*"
+        update-types:
+          # Since the `ignore` cannot be overwritten with an empty array, use a workaround to ignore only major updates
+          - "version-update:semver-major"
       # For NUnit packages, only major updates should be reported.
       - dependency-name: "NUnit*"
         update-types: # major updates only
