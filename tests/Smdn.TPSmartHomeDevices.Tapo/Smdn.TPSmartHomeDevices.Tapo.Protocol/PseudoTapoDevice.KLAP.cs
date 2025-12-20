@@ -310,7 +310,7 @@ partial class PseudoTapoDevice {
 
     var requestJsonDocument = JsonDocument.Parse(session.DecryptionBuffer.WrittenMemory);
 
-    var contentEncoding = utf8nobom;
+    var contentEncoding = Utf8NoBom;
     var responseString = JsonSerializer.Serialize(
       FuncGenerateKlapRequestResponse?.Invoke(session, requestJsonDocument, sequenceNumber.Value)
     );

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -184,7 +183,7 @@ partial class TapoClientTests {
       if (!credentials.TryGetValue(identity, out var credential))
         throw new TapoCredentialNotFoundException();
 
-      return credential!;
+      return credential;
     }
 
     public ITapoCredential GetCredential(ITapoCredentialIdentity? identity)

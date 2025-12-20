@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -74,7 +73,7 @@ public partial class TapoDeviceTests {
       () => {
         using var device = TapoDevice.Create(
           deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
-          credential: services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>()
+          credential: services?.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>()
         );
       }
     );
@@ -166,7 +165,7 @@ public partial class TapoDeviceTests {
       macAddress: PhysicalAddress.None,
       "user@mail.test",
       "password",
-      serviceProvider: services!.BuildServiceProvider()
+      serviceProvider: services.BuildServiceProvider()
     );
 
     Assert.That(device.EndPoint, Is.Not.Null);
@@ -186,7 +185,7 @@ public partial class TapoDeviceTests {
         macAddress: PhysicalAddress.None,
       "user@mail.test",
       "password",
-        serviceProvider: services!.BuildServiceProvider()
+        serviceProvider: services.BuildServiceProvider()
       )
     );
   }

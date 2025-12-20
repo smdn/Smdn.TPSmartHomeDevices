@@ -41,8 +41,8 @@ public partial class TapoClientTests {
       );
     }
 
-    defaultCredentialProvider = services?.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
-    defaultHttpClientFactory = services?.BuildServiceProvider()!.GetService<IHttpClientFactory>();
+    defaultCredentialProvider = services?.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
+    defaultHttpClientFactory = services?.BuildServiceProvider().GetService<IHttpClientFactory>();
 
     var servicesForDefaultKlapCredentialProvider = new ServiceCollection();
 
@@ -51,7 +51,7 @@ public partial class TapoClientTests {
       password: "pass"
     );
 
-    defaultKlapCredentialProvider = servicesForDefaultKlapCredentialProvider.BuildServiceProvider()!.GetRequiredService<ITapoCredentialProvider>();
+    defaultKlapCredentialProvider = servicesForDefaultKlapCredentialProvider.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
   }
 
   [Test]

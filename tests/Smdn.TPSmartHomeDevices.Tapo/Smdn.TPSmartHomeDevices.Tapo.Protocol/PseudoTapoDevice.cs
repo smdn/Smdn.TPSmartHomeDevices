@@ -123,7 +123,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
   }
 
-  private static readonly Encoding utf8nobom = new UTF8Encoding(false);
+  private static readonly Encoding Utf8NoBom = new UTF8Encoding(false);
 
   private static string CreateEndPointHttpUrl(IPEndPoint endPoint)
     => endPoint.AddressFamily == AddressFamily.InterNetworkV6
@@ -250,7 +250,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     taskProcessListener = Task.Run(ProcessListenerAsync);
 
-    return EndPoint!;
+    return EndPoint;
   }
 
   public IDeviceEndPoint GetEndPoint()
@@ -269,7 +269,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
         HttpListenerContext? context = null;
 
         try {
-          context = await listener!.GetContextAsync().ConfigureAwait(false);
+          context = await listener.GetContextAsync().ConfigureAwait(false);
         }
         catch (ArgumentException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
           return; // disposed
@@ -324,7 +324,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "text/plain";
-    var contentEncoding = utf8nobom;
+    var contentEncoding = Utf8NoBom;
 
     try {
       response.StatusCode = (int)statusCode;
@@ -581,7 +581,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "application/json";
-    var contentEncoding = utf8nobom;
+    var contentEncoding = Utf8NoBom;
 
     try {
       response.StatusCode = (int)statusCode;
@@ -657,7 +657,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
     var session = UnauthorizedSession.Create(
       state: State,
-      remoteEndPoint: remoteEndPoint!,
+      remoteEndPoint: remoteEndPoint,
       sessionId: sessionId,
       expiresOn: sessionExpiresOn,
       key: keyAndIv.AsSpan(0, 16).ToArray(),
@@ -731,7 +731,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
   )
   {
     const string ContentType = "application/json";
-    var contentEncoding = utf8nobom;
+    var contentEncoding = Utf8NoBom;
 
     try {
       response.StatusCode = (int)HttpStatusCode.OK;
@@ -759,9 +759,9 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       type: typeOfSecurePassThroughResponse,
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       binder: null,
-      args: new object[] { errorCode, passThroughResponse },
+      args: [ errorCode, passThroughResponse ],
       culture: null
-    )!;
+    );
 
     await JsonSerializer.SerializeAsync(
       utf8Json: buffer,
