@@ -2,16 +2,21 @@
 //   Name: Smdn.TPSmartHomeDevices.Primitives
 //   AssemblyVersion: 1.3.0.0
 //   InformationalVersion: 1.3.0+e58bc6bee6febbc600cd838faa9a8fe7ae61d369
-//   TargetFramework: .NETStandard,Version=v2.1
+//   TargetFramework: .NETCoreApp,Version=v10.0
 //   Configuration: Release
+//   Metadata: IsTrimmable=True
 //   Metadata: RepositoryUrl=https://github.com/smdn/Smdn.TPSmartHomeDevices
 //   Metadata: RepositoryBranch=main
 //   Metadata: RepositoryCommit=e58bc6bee6febbc600cd838faa9a8fe7ae61d369
 //   Referenced assemblies:
 //     Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Smdn.Fundamental.PrintableEncoding.Hexadecimal, Version=3.0.1.0, Culture=neutral
-//     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.ComponentModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Memory, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Net.NetworkInformation, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Net.Primitives, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Text.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 #nullable enable annotations
 
 using System;
@@ -49,6 +54,9 @@ namespace Smdn.TPSmartHomeDevices {
   public interface IMulticolorSmartLight : ISmartLight {
     ValueTask SetColorAsync(int hue, int saturation, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
     ValueTask SetColorTemperatureAsync(int colorTemperature, int? brightness, TimeSpan transitionPeriod, CancellationToken cancellationToken);
+    virtual ValueTask SetOnOffStateAsync(bool newOnOffState, TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    virtual ValueTask TurnOffAsync(TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
+    virtual ValueTask TurnOnAsync(TimeSpan transitionPeriod, CancellationToken cancellationToken) {}
   }
 
   public interface ISmartDevice {
@@ -57,6 +65,8 @@ namespace Smdn.TPSmartHomeDevices {
     ValueTask<IDeviceInfo> GetDeviceInfoAsync(CancellationToken cancellationToken = default);
     ValueTask<bool> GetOnOffStateAsync(CancellationToken cancellationToken);
     ValueTask SetOnOffStateAsync(bool newOnOffState, CancellationToken cancellationToken);
+    virtual ValueTask TurnOffAsync(CancellationToken cancellationToken = default) {}
+    virtual ValueTask TurnOnAsync(CancellationToken cancellationToken = default) {}
   }
 
   public interface ISmartLight : ISmartDevice {
