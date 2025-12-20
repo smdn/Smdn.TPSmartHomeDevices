@@ -130,7 +130,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       ? $"http://[{endPoint.Address}]:{endPoint.Port}/"
       : $"http://{endPoint.Address}:{endPoint.Port}/";
 
-  public object? State { get; }
+  public object? State { get; set; }
   public IPEndPoint? EndPoint { get; private set; }
   public Uri? EndPointUri => EndPoint is null ? null : new Uri(CreateEndPointHttpUrl(EndPoint));
   private HttpListener? listener;
@@ -198,6 +198,15 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     taskProcessListener = null;
   }
 
+  public void ClearSessions()
+  {
+    unauthorizedSessions.Clear();
+    authorizedSessions.Clear();
+
+    unauthorizedKlapSessions.Clear();
+    authorizedKlapSessions.Clear();
+  }
+
   public EndPoint Start(
     int? exceptPort = 0
   )
@@ -246,6 +255,9 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
 
   public IDeviceEndPoint GetEndPoint()
     => new StaticDeviceEndPoint(EndPoint ?? throw new InvalidOperationException("not started"));
+
+  public EndPoint GetListenerEndPoint()
+    => EndPoint ?? throw new InvalidOperationException("not started");
 
   private async Task ProcessListenerAsync()
   {
@@ -392,6 +404,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       // validate request method
       if (!string.Equals("POST", request.HttpMethod, StringComparison.Ordinal)) {
         response.KeepAlive = false;
+        response.Headers.Add("Connection", "close");
 
         await WriteBadRequestPlainTextContentAsync(
           response,
@@ -429,6 +442,7 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
       }
 
       response.KeepAlive = false;
+      response.Headers.Add("Connection", "close");
 
       await WriteBadRequestPlainTextContentAsync(
         response,
@@ -437,7 +451,9 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     }
     finally {
       try {
+        context?.Response?.OutputStream?.Flush();
         context?.Response?.OutputStream?.Close();
+        context?.Response?.Close();
       }
       catch (InvalidOperationException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
         // swallow

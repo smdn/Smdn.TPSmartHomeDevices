@@ -35,9 +35,9 @@ partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceUsageAsync()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -57,9 +57,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -85,9 +83,9 @@ partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceUsageAsync_MissingTimeUsageInResponse()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -103,9 +101,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -127,9 +123,9 @@ partial class TapoDeviceTests {
     bool respondValueForPast30days
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -149,9 +145,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -171,9 +165,9 @@ partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceUsageAsync_MissingEnergyUsageInResponse()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -189,9 +183,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -213,9 +205,9 @@ partial class TapoDeviceTests {
     bool respondValueForPast30days
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -235,9 +227,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -257,9 +247,9 @@ partial class TapoDeviceTests {
   [Test]
   public async Task GetTotalOperatingTimeAsync()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -280,9 +270,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -303,9 +291,9 @@ partial class TapoDeviceTests {
   [Test]
   public async Task GetCumulativeEnergyUsageAsync()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCumulativeUsageResult>() {
@@ -326,9 +314,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),

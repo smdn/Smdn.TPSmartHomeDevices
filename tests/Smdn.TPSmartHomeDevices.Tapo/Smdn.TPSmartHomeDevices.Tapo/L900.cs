@@ -13,6 +13,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
+[NonParallelizable]
 public class L900Tests {
   private ServiceCollection? services;
 
@@ -62,9 +63,9 @@ public class L900Tests {
     [Values(1, 100)] int newBrightness
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
@@ -77,9 +78,7 @@ public class L900Tests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -130,9 +129,9 @@ public class L900Tests {
     int? newBrightness
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
@@ -150,9 +149,7 @@ public class L900Tests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -197,9 +194,9 @@ public class L900Tests {
     int? newBrightness
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
@@ -216,9 +213,7 @@ public class L900Tests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -263,9 +258,9 @@ public class L900Tests {
     int? newBrightness
   )
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         Assert.That(requestParams.GetProperty("device_on")!.GetBoolean(), Is.True);
         Assert.That(requestParams.GetProperty("lighting_effect")!.GetProperty("enable")!.GetInt32(), Is.Zero);
@@ -282,9 +277,7 @@ public class L900Tests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new L900(
       deviceEndPoint: pseudoDevice.GetEndPoint(),

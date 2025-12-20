@@ -30,13 +30,12 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.That(client.Session, Is.Null);
@@ -65,13 +64,12 @@ partial class TapoClientTests {
     const TapoSessionProtocol InvalidProtocol = (TapoSessionProtocol)(-9999);
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
 #pragma warning disable CA2012
@@ -92,13 +90,12 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -121,13 +118,12 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_AccessTokenNotIssued()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => null,
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => null
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -146,11 +142,9 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-    };
-
-    device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token
+    );
 
     using var client = new TapoClient(
       endPoint: new DnsEndPoint(device.EndPoint!.Address.ToString(), device.EndPoint!.Port, AddressFamily.Unspecified)
@@ -254,8 +248,8 @@ partial class TapoClientTests {
     Type? typeOfExpectedException
   )
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = (_, param) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateLoginDeviceResponse: (_, param) => {
         var username = param.GetProperty("username").GetString();
 
         Assert.That(username, Is.Not.Null, nameof(username));
@@ -266,12 +260,11 @@ partial class TapoClientTests {
             Token = username!, // return login username as token
           },
         };
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     await Assert.ThatAsync(
@@ -296,16 +289,15 @@ partial class TapoClientTests {
   {
     const int HandshakeErrorCode = -9999;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateHandshakeResponse: static (_, _) => new HandshakeResponse() {
         ErrorCode = HandshakeErrorCode,
         Result = new() { Key = null },
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -330,16 +322,15 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_Handshake_SuccessResponseWithoutKey()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateHandshakeResponse = static (_, _) => new HandshakeResponse() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateHandshakeResponse: static (_, _) => new HandshakeResponse() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new() { Key = null },
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -358,16 +349,15 @@ partial class TapoClientTests {
     [Values(64, 256)] int keyLength
   )
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateHandshakeResponse = (_, _) => new HandshakeResponse() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateHandshakeResponse: (_, _) => new HandshakeResponse() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new() { Key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(keyLength)) },
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -391,14 +381,13 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-      FuncGenerateCookieValue = session => tpSessionIdCookieValue
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token,
+      funcGenerateCookieValue: session => tpSessionIdCookieValue
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -427,14 +416,13 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-      FuncGenerateCookieValue = session => $"TP_SESSIONID={session.SessionId}{timeoutAttribute}"
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token,
+      funcGenerateCookieValue: session => $"TP_SESSIONID={session.SessionId}{timeoutAttribute}"
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -455,18 +443,13 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_Handshake_Timeout()
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-      Assert.Ignore("disabled this test case because the test runner process crashes");
-      return;
-    }
-
     const string Token = "token";
 
     using var cts = new CancellationTokenSource();
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-      FuncGenerateHandshakeResponse = (_, _) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token,
+      funcGenerateHandshakeResponse: (_, _) => {
         // perform latency
         DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
@@ -474,13 +457,11 @@ partial class TapoClientTests {
           ErrorCode = 9999,
           Result = new() { Key = null },
         };
-      },
-    };
-
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     client.Timeout = TimeSpan.FromMilliseconds(1);
@@ -538,8 +519,8 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = (session, param) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateLoginDeviceResponse: (session, param) => {
         Assert.That(param.TryGetProperty("username", out var propUsername), Is.True, $"{nameof(param)} must have 'username' property");
         Assert.That(param.TryGetProperty("password", out var propPassword), Is.True, $"{nameof(param)} must have 'password' property");
 
@@ -550,12 +531,11 @@ partial class TapoClientTests {
           ErrorCode = KnownErrorCodes.Success,
           Result = new() { Token = Token },
         };
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -643,8 +623,8 @@ partial class TapoClientTests {
     var credential = new DisposableCredential(Username, Password);
     var credentialProvider = new DisposableCredentialProvider(credential);
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = (session, param) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateLoginDeviceResponse: (session, param) => {
         Assert.That(credential.IsDisposed, Is.True, "ITapoCredential.Dispose must be called up to this point");
 
         Assert.That(param.TryGetProperty("username", out var propUsername), Is.True, $"{nameof(param)} must have 'username' property");
@@ -657,12 +637,11 @@ partial class TapoClientTests {
           ErrorCode = KnownErrorCodes.Minus1501,
           Result = new() { Token = Token },
         };
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       logger: logger // ILogger should not affect the operation
     );
 
@@ -681,16 +660,15 @@ partial class TapoClientTests {
   {
     const int LoginDeviceErrorCode = -9999;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateLoginDeviceResponse: static (_, _) => new LoginDeviceResponse() {
         ErrorCode = LoginDeviceErrorCode,
         Result = new() { Token = string.Empty },
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -715,16 +693,15 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_LoginDevice_ResponseWithErrorCodeMinus1501()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateLoginDeviceResponse = static (_, _) => new LoginDeviceResponse() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateLoginDeviceResponse: static (_, _) => new LoginDeviceResponse() {
         ErrorCode = KnownErrorCodes.Minus1501,
         Result = new() { Token = string.Empty },
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -751,13 +728,12 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_LoginDevice_SuccessResponseWithoutToken()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => null,
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => null
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -774,18 +750,13 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_LoginDevice_Timeout()
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-      Assert.Ignore("disabled this test case because the test runner process crashes");
-      return;
-    }
-
     const string Token = "token";
 
     var cts = new CancellationTokenSource();
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-      FuncGenerateLoginDeviceResponse = (_, _) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token,
+      funcGenerateLoginDeviceResponse: (_, _) => {
         // perform latency
         DelayUtils.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
@@ -795,13 +766,11 @@ partial class TapoClientTests {
             Token = Token,
           }
         };
-      },
-    };
-
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     client.Timeout = TimeSpan.FromMilliseconds(1);
@@ -847,18 +816,17 @@ partial class TapoClientTests {
   {
     const string Token = "token";
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => Token,
-    };
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => Token
+    );
 
-    var endPoint = device.Start();
     var logger = new Logger();
 
     const string Username = "<username>";
     const string Password = "<password>";
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       logger: logger
     );
 

@@ -15,13 +15,12 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_KLAP()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span)
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     Assert.DoesNotThrowAsync(
@@ -44,13 +43,12 @@ partial class TapoClientTests {
   [Test]
   public async Task AuthenticateAsync_KLAP_Handshake1_AuthHashMismatch()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => authHash.Span.Clear()
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => authHash.Span.Clear()
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -72,14 +70,13 @@ partial class TapoClientTests {
   {
     const HttpStatusCode Handshake2NonSuccessStatusCode = HttpStatusCode.Unauthorized;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-      FuncGenerateKlapHandshake2Response = _ => (Handshake2NonSuccessStatusCode, Handshake2NonSuccessStatusCode.ToString()),
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
+      funcGenerateKlapHandshake2Response: _ => (Handshake2NonSuccessStatusCode, Handshake2NonSuccessStatusCode.ToString())
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
@@ -113,13 +110,12 @@ partial class TapoClientTests {
     Type? typeOfExpectedException
   )
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => credentialForKlapAuthHash.WriteLocalAuthHash(authHash.Span)
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => credentialForKlapAuthHash.WriteLocalAuthHash(authHash.Span)
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     await Assert.ThatAsync(

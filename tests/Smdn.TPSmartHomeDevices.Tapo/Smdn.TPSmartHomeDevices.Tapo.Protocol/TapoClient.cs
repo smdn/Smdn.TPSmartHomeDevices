@@ -136,13 +136,12 @@ public partial class TapoClientTests {
   [Test]
   public async Task Dispose_AuthenticatedState()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-    };
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token"
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     await client.AuthenticateAsync(

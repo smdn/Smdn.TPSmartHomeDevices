@@ -11,17 +11,16 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync_KLAP()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-      FuncGenerateKlapRequestResponse = (_, _, _) => new PassThroughResponse<NullResult>() {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
+      funcGenerateKlapRequestResponse: (_, _, _) => new PassThroughResponse<NullResult>() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new(),
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: defaultHttpClientFactory
     );
 
@@ -55,21 +54,20 @@ partial class TapoClientTests {
     const int ErrorCode = 9999;
     int? sequenceNumber = null;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateKlapAuthHash = (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-      FuncGenerateKlapRequestResponse = (_, _, seq) => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
+      funcGenerateKlapRequestResponse: (_, _, seq) => {
         sequenceNumber = seq;
 
         return new PassThroughResponse<NullResult>() {
           ErrorCode = ErrorCode,
           Result = new(),
         };
-      },
-    };
-    var endPoint = device.Start();
+      }
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: defaultHttpClientFactory
     );
 

@@ -18,8 +18,8 @@ partial class TapoClientTests {
   {
     var contentEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
-    await using var device = new PseudoTapoDevice() {
-      FuncProcessRequest = context => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcProcessRequest: context => {
         context.Response.StatusCode = (int)HttpStatusCode.OK;
         context.Response.ContentEncoding = contentEncoding;
         context.Response.ContentType = "application/json";
@@ -36,12 +36,10 @@ partial class TapoClientTests {
 
         buffer.CopyTo(context.Response.OutputStream);
       }
-    };
-
-    var endPoint = device.Start();
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     // Confirm that at least an exception other than NullReferenceException is thrown,
@@ -73,16 +71,14 @@ partial class TapoClientTests {
 
   private async Task PostRequestAsync_HttpErrorResponse(HttpStatusCode statusCode)
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncProcessRequest = context => {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcProcessRequest: context => {
         context.Response.StatusCode = (int)statusCode;
       }
-    };
-
-    var endPoint = device.Start();
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint
+      endPoint: device.GetListenerEndPoint()
     );
 
     var ex = Assert.ThrowsAsync<HttpRequestException>(
@@ -118,15 +114,13 @@ partial class TapoClientTests {
   [Test]
   public async Task PostRequestAsync_CancellationRequested()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncProcessRequest = static context => throw new InvalidOperationException("request must not be performed"),
-    };
-
-    var endPoint = device.Start();
+    var device = CommonPseudoTapoDevice.Configure(
+      funcProcessRequest: static context => throw new InvalidOperationException("request must not be performed")
+    );
 
     using var cts = new CancellationTokenSource();
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: new RequestCancellationHttpClientFactory(cts)
     );
 

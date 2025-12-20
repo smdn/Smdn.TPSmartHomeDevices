@@ -14,6 +14,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
+[NonParallelizable]
 public class P110MTests {
   private ServiceCollection? services;
 
@@ -45,9 +46,9 @@ public class P110MTests {
   [TestCase(1, 1)]
   public async Task GetCurrentPowerConsumptionAsync(int currentPower, decimal expectedValueInWatt)
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetCurrentPowerResult>() {
@@ -56,9 +57,7 @@ public class P110MTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new P110M(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -97,9 +96,9 @@ public class P110MTests {
   [Test]
   public async Task GetMonitoringDataAsync()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetEnergyUsageResult>() {
@@ -115,9 +114,7 @@ public class P110MTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = new P110M(
       deviceEndPoint: pseudoDevice.GetEndPoint(),

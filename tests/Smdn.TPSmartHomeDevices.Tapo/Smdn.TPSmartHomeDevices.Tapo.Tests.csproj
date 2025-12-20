@@ -4,11 +4,6 @@ SPDX-License-Identifier: MIT
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- disable parallel test execution on GitHub Actions macOS runners -->
-    <TestTfmsInParallel
-      Condition="'$(GITHUB_ACTIONS)' == 'true' and $([System.OperatingSystem]::IsMacOS())"
-    >false</TestTfmsInParallel>
-
     <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet100)' == 'true' ">net10.0;$(TargetFrameworks)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(EnableTargetFrameworkDotNet80)' == 'true' ">net8.0;$(TargetFrameworks)</TargetFrameworks>
     <TargetFrameworks Condition=" '$(EnableTargetFrameworkNetFx)' == 'true' ">$(TargetFrameworks)</TargetFrameworks>

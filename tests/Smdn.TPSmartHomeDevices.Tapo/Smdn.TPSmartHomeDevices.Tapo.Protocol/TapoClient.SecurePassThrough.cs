@@ -12,20 +12,19 @@ partial class TapoClientTests {
   [Test]
   public async Task SendRequestAsync()
   {
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => (
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
       )
-    };
-    var endPoint = device.Start();
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: defaultHttpClientFactory
     );
 
@@ -72,20 +71,19 @@ partial class TapoClientTests {
   {
     const int ErrorCode = 9999;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => (
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = ErrorCode,
           Result = new(),
         }
       )
-    };
-    var endPoint = device.Start();
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: defaultHttpClientFactory
     );
 
@@ -110,20 +108,19 @@ partial class TapoClientTests {
   {
     const int ErrorCode = 9999;
 
-    await using var device = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => (
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
         ErrorCode,
         new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
       )
-    };
-    var endPoint = device.Start();
+    );
 
     using var client = new TapoClient(
-      endPoint: endPoint,
+      endPoint: device.GetListenerEndPoint(),
       httpClientFactory: defaultHttpClientFactory
     );
 

@@ -24,6 +24,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
+[NonParallelizable]
 public partial class TapoDeviceTests {
   private ServiceCollection? services;
 
@@ -477,12 +478,10 @@ public partial class TapoDeviceTests {
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGenerateKlapAuthHash = (_, _, authHash) => credentialProvider.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-    };
-
-    pseudoDevice.Start();
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGenerateKlapAuthHash: (_, _, authHash) => credentialProvider.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span)
+    );
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -498,11 +497,6 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_SocketException()
   {
-    if (new Version(7, 0) <= Environment.Version && RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-      Assert.Ignore("SocketException is not thrown and a timeout occurs on MacOS + .NET 7.x");
-      return;
-    }
-
     await using var pseudoDevice = new PseudoTapoDevice() {
       FuncGenerateToken = static _ => "token",
     };
@@ -707,18 +701,16 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_UnexpectedException()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, _, _) => (
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = new ConcreteTapoDevice(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -744,18 +736,16 @@ public partial class TapoDeviceTests {
     const int GetDeviceInfoErrorCode = 1234;
     var request = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = _ => $"token-request{request}",
-      FuncGeneratePassThroughResponse = (_, _, _) => (
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: _ => $"token-request{request}",
+      funcGeneratePassThroughResponse: (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = request++ == 0 ? GetDeviceInfoErrorCode : KnownErrorCodes.Success,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -777,9 +767,9 @@ public partial class TapoDeviceTests {
     const int GetDeviceInfoErrorCode = 1234;
     var request = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = _ => $"token-request{request}",
-      FuncGeneratePassThroughResponse = (_, _, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: _ => $"token-request{request}",
+      funcGeneratePassThroughResponse: (_, _, _) => {
         request++;
 
         return (
@@ -789,10 +779,8 @@ public partial class TapoDeviceTests {
             Result = new(),
           }
         );
-      },
-    };
-
-    pseudoDevice.Start();
+      }
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -813,18 +801,16 @@ public partial class TapoDeviceTests {
   {
     var request = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = _ => $"token-request{request}",
-      FuncGeneratePassThroughResponse = (_, _, _) => (
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: _ => $"token-request{request}",
+      funcGeneratePassThroughResponse: (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = request++ == 0 ? KnownErrorCodes.Minus1301 : KnownErrorCodes.Success,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -845,9 +831,9 @@ public partial class TapoDeviceTests {
   {
     var request = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = _ => $"token-request{request}",
-      FuncGeneratePassThroughResponse = (_, _, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: _ => $"token-request{request}",
+      funcGeneratePassThroughResponse: (_, _, _) => {
         request++;
 
         return (
@@ -857,10 +843,8 @@ public partial class TapoDeviceTests {
             Result = new(),
           }
         );
-      },
-    };
-
-    pseudoDevice.Start();
+      }
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -882,9 +866,9 @@ public partial class TapoDeviceTests {
   {
     var request = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = _ => $"token-request{request}",
-      FuncGeneratePassThroughResponse = (_, _, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: _ => $"token-request{request}",
+      funcGeneratePassThroughResponse: (_, _, _) => {
         request++;
 
         return (
@@ -894,10 +878,8 @@ public partial class TapoDeviceTests {
             Result = new(),
           }
         );
-      },
-    };
-
-    pseudoDevice.Start();
+      }
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -924,9 +906,14 @@ public partial class TapoDeviceTests {
 
   private async Task SendRequestAsync_Timeout_RetrySuccess(bool setTimeoutViaIHttpClientFactory)
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-      Assert.Ignore("disabled this test case because the test runner process crashes");
+    if (TestEnvironment.IsRunningOnGitHubActionsMacOSRunner && setTimeoutViaIHttpClientFactory) {
+      Assert.Ignore("Skip this test case on GitHub Actions macOS runners because it takes about 2 minutes for the timeout to trigger.");
       return;
+      // [dotnet test output]
+      // passed SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory (2m 15s 399ms)
+      //   from /Users/runner/work/Smdn.TPSmartHomeDevices/Smdn.TPSmartHomeDevices/tests/Smdn.TPSmartHomeDevices.Tapo/bin/Debug/net8.0/Smdn.TPSmartHomeDevices.Tapo.Tests.dll (net8.0|arm64)
+      // passed SendRequestAsync_Timeout_RetrySuccess_SetTimeoutWithIHttpClientFactory (2m 15s 236ms)
+      //   from /Users/runner/work/Smdn.TPSmartHomeDevices/Smdn.TPSmartHomeDevices/tests/Smdn.TPSmartHomeDevices.Tapo/bin/Debug/net10.0/Smdn.TPSmartHomeDevices.Tapo.Tests.dll (net10.0|arm64)
     }
 
     const int MaxRetry = 3;
@@ -964,9 +951,7 @@ public partial class TapoDeviceTests {
     }
 
     static TimeSpan GetTimeout()
-      => TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
-        ? TimeSpan.FromSeconds(20)
-        : TimeSpan.FromMilliseconds(200);
+      => TimeSpan.FromMilliseconds(200);
 
     if (setTimeoutViaIHttpClientFactory) {
       services!.AddTapoHttpClient(
@@ -1004,11 +989,6 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task SendRequestAsync_Timeout_RetryFailedWithTimeout()
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-      Assert.Ignore("disabled this test case because the test runner process crashes");
-      return;
-    }
-
     const int MaxRetry = 3;
 
     using var cts = new CancellationTokenSource();
@@ -1048,9 +1028,7 @@ public partial class TapoDeviceTests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-    device.Timeout = TestEnvironment.IsRunningOnGitHubActionsMacOSRunner
-      ? TimeSpan.FromSeconds(20)
-      : TimeSpan.FromMilliseconds(200);
+    device.Timeout = TimeSpan.FromMilliseconds(200);
 
     try {
       Assert.That(device.Session, Is.Null, nameof(device.Session));
@@ -1089,9 +1067,9 @@ public partial class TapoDeviceTests {
   {
     var ctsRequest = new CancellationTokenSource();
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, passThroughMethod, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, passThroughMethod, _) => {
         ctsRequest.Cancel();
 
         return new(
@@ -1101,10 +1079,8 @@ public partial class TapoDeviceTests {
             Result = new(),
           }
         );
-      },
-    };
-
-    pseudoDevice.Start();
+      }
+    );
 
     services!.AddSingleton<TapoDeviceExceptionHandler>(
       // asserts that the OperationCanceledException must not be handled
@@ -1140,9 +1116,9 @@ public partial class TapoDeviceTests {
   {
     var requestSequenceNumber = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, _) => {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
@@ -1156,9 +1132,7 @@ public partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1186,9 +1160,9 @@ public partial class TapoDeviceTests {
     const string DeviceId = "device-id";
     const bool IsOn = true;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, _) => {
         Assert.That(method, Is.EqualTo("get_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
@@ -1201,9 +1175,7 @@ public partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1221,11 +1193,9 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceInfoAsync_ComposeResult_Null()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-    };
-
-    pseudoDevice.Start();
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token"
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1249,9 +1219,9 @@ public partial class TapoDeviceTests {
   [Test]
   public async Task GetDeviceInfoAsync_ResponseWithExtraData()
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetDeviceInfoResult>() {
@@ -1263,9 +1233,7 @@ public partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1280,18 +1248,16 @@ public partial class TapoDeviceTests {
   {
     const int GetDeviceInfoErrorCode = 1234;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => (
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = GetDeviceInfoErrorCode,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1313,9 +1279,9 @@ public partial class TapoDeviceTests {
   {
     var requestSequenceNumber = 0;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
 
         switch (requestSequenceNumber++) {
@@ -1339,9 +1305,7 @@ public partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -1368,9 +1332,9 @@ public partial class TapoDeviceTests {
   {
     const int SetDeviceInfoErrorCode = 1234;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, _) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, _) => {
         Assert.That(method, Is.EqualTo("set_device_info"), "received request method");
         return (
           KnownErrorCodes.Success,
@@ -1379,10 +1343,8 @@ public partial class TapoDeviceTests {
             Result = default,
           }
         );
-      },
-    };
-
-    pseudoDevice.Start();
+      }
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),

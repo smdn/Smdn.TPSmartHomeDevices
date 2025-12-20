@@ -73,8 +73,8 @@ jobs:
       os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest' || inputs.os }}
       verbose:                                ${{ inputs.verbose == 'true' }}
       dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '10.0.100' || inputs.dotnet_sdk_version }}
-      timeout_minutes_test_job:               25 # Smdn.TPSmartHomeDevices.Tapo on macos-13 may exceed the 20 minutes limit.
-      timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'10min'}, {'OS':'','Timeout':'1min'} ]"
+      timeout_minutes_test_job:               10
+      timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'6min'}, {'OS':'','Timeout':'1min'} ]"
       timeout_vstest_connection:              "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
       extra_options_common:                   ${{ inputs.extra_options_common }}
       dotnet_test_options_verbosity_level:    ${{ inputs.dotnet_test_options_verbosity_level }}

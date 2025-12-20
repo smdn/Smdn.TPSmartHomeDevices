@@ -13,6 +13,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 [TestFixture]
+[NonParallelizable]
 public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
   [Test]
   public void AddTapoHttpClient()
@@ -105,18 +106,16 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       }
     );
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => new(
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => new(
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -140,18 +139,16 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       configureClient: client => throw new NotImplementedException(message: exceptionMessage)
     );
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = static (_, _, _) => new(
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => new(
         KnownErrorCodes.Success,
         new PassThroughResponse<NullResult>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
-      ),
-    };
-
-    pseudoDevice.Start();
+      )
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),

@@ -39,9 +39,9 @@ partial class TapoDeviceTests {
     const string DeviceHardwareVersion = "1.0";
     const string DeviceMacAddress = "00:00:5E:00:53:42";
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<TapoCommonDeviceInfoResult>() {
@@ -56,9 +56,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -100,9 +98,9 @@ partial class TapoDeviceTests {
     const int DeviceTimeZoneOffsetInMinutes = +9 /*hours*/ * 60;
     const int DeviceGeolocationScaledLongitude = 1397666;
 
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<TapoDeviceInfoResult>() {
@@ -117,9 +115,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
@@ -146,9 +142,9 @@ partial class TapoDeviceTests {
   [TestCase(false)]
   public async Task GetOnOffStateAsync(bool currentState)
   {
-    await using var pseudoDevice = new PseudoTapoDevice() {
-      FuncGenerateToken = static _ => "token",
-      FuncGeneratePassThroughResponse = (_, method, requestParams) => {
+    var pseudoDevice = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: (_, method, requestParams) => {
         return (
           KnownErrorCodes.Success,
           new PassThroughResponse<GetDeviceInfoResponseGetOnOffStateResult>() {
@@ -157,9 +153,7 @@ partial class TapoDeviceTests {
           }
         );
       }
-    };
-
-    pseudoDevice.Start();
+    );
 
     using var device = TapoDevice.Create(
       deviceEndPoint: pseudoDevice.GetEndPoint(),
