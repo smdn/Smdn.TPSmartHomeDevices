@@ -1,23 +1,27 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.0.0)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.1.0)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
-//   AssemblyVersion: 2.0.0.0
-//   InformationalVersion: 2.0.0+b94237e3ade205b0c2874616f6f9c9259586dcbd
-//   TargetFramework: .NETCoreApp,Version=v6.0
+//   AssemblyVersion: 2.1.0.0
+//   InformationalVersion: 2.1.0+66f3966f8c2864562a16625b12052994056bc7d3
+//   TargetFramework: .NETCoreApp,Version=v10.0
 //   Configuration: Release
+//   Metadata: IsTrimmable=True
+//   Metadata: RepositoryUrl=https://github.com/smdn/Smdn.TPSmartHomeDevices
+//   Metadata: RepositoryBranch=main
+//   Metadata: RepositoryCommit=66f3966f8c2864562a16625b12052994056bc7d3
 //   Referenced assemblies:
 //     Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Microsoft.Extensions.Logging.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
-//     Microsoft.Win32.Primitives, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     Smdn.TPSmartHomeDevices.Primitives, Version=1.1.0.0, Culture=neutral
-//     System.Collections, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.ComponentModel, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.Memory, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     System.Net.NetworkInformation, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.Net.Primitives, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.Net.Sockets, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-//     System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     Microsoft.Win32.Primitives, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     Smdn.TPSmartHomeDevices.Primitives, Version=1.1.1.0, Culture=neutral
+//     System.Collections, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.ComponentModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Memory, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Net.NetworkInformation, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Net.Primitives, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Net.Sockets, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+//     System.Text.Encodings.Web, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Text.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 #nullable enable annotations
 
 using System;
@@ -97,8 +101,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
 
     public IDeviceEndPoint EndPoint { get; }
     public bool IsConnected { get; }
-    [MemberNotNullWhen(false, "deviceEndPoint")]
-    protected bool IsDisposed { [MemberNotNullWhen(false, "deviceEndPoint")] get; }
+    protected bool IsDisposed { get; }
 
     protected virtual void Dispose(bool disposing) {}
     public void Dispose() {}
@@ -140,26 +143,6 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     [JsonConverter(typeof(Base16ByteArrayJsonConverter))]
     [JsonPropertyName("deviceId")]
     public byte[]? Id { get; init; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'Description' to get the value.")]
-    [JsonPropertyName("description")]
-    public string? JsonPropertyDescription { get; set; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'Description' to get the value.")]
-    [JsonPropertyName("dev_name")]
-    public string? JsonPropertyDevName { get; set; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'MacAddress' to get the value.")]
-    [JsonConverter(typeof(MacAddressJsonConverter))]
-    [JsonPropertyName("mac")]
-    public PhysicalAddress? JsonPropertyMac { get; init; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'MacAddress' to get the value.")]
-    [JsonConverter(typeof(MacAddressJsonConverter))]
-    [JsonPropertyName("mic_mac")]
-    public PhysicalAddress? JsonPropertyMicMac { get; init; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'TypeName' to get the value.")]
-    [JsonPropertyName("mic_type")]
-    public string? JsonPropertyMicType { get; set; }
-    [Obsolete("This property is intended to be used only for JSON deserialization. Refer 'TypeName' to get the value.")]
-    [JsonPropertyName("type")]
-    public string? JsonPropertyType { get; set; }
     public PhysicalAddress? MacAddress { get; }
     [JsonPropertyName("model")]
     public string? ModelName { get; init; }
@@ -286,5 +269,5 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
     public KasaMessageHeaderTooShortException(string message) {}
   }
 }
-// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.3.2.0.
-// Smdn.Reflection.ReverseGenerating.ListApi.Core v1.2.0.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
+// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.7.1.0.
+// Smdn.Reflection.ReverseGenerating.ListApi.Core v1.5.0.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
