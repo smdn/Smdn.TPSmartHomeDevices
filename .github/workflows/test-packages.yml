@@ -56,7 +56,7 @@ jobs:
 
   run-test:
     name: Run tests with released packages
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.6.0
+    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.6.1
     needs: await-package-publishing
     if: ${{ always() && !failure() && !cancelled() }} # run tests even if await-package-publishing is skipped
     with:
