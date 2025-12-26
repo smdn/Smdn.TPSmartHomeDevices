@@ -27,7 +27,7 @@ on:
 
 jobs:
   determine-release-target:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       tag_name: ${{ steps.release-target.outputs.tag_name }}
       dry_run: ${{ steps.release-target.outputs.dry_run }}
@@ -61,7 +61,7 @@ jobs:
         exit 1
 
   run-generate-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/generate-release-target.yml@workflows/release-target/v1.12.1
+    uses: smdn/workflows-dotnet/.github/workflows/generate-release-target.yml@release-target/v1.13.1
     needs: determine-release-target
     if: startsWith(needs.determine-release-target.outputs.tag_name, 'new-release/')
     with:

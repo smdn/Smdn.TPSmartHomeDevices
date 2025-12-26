@@ -16,10 +16,15 @@ updates:
       GitHub-Actions-Workflows:
         patterns:
           - "actions/*"
-      Smdn-Fundamentals-Workflows:
+      smdn-workflows-dotnet:
         patterns:
-          - "smdn/Smdn.Fundamentals/*"
+          - "smdn/workflows-dotnet/*"
     ignore:
+      # smdn/workflows-dotnet/*: report major and minor updates only
+      - dependency-name: "smdn/workflows-dotnet/*"
+        update-types:
+          - "version-update:semver-patch"
+      # actions/checkout: report major updates only
       - dependency-name: "actions/checkout"
         update-types:
           - "version-update:semver-minor"

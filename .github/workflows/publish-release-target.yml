@@ -15,7 +15,7 @@ on:
 
 jobs:
   run-publish-release-target:
-    uses: smdn/Smdn.Fundamentals/.github/workflows/publish-release-target.yml@workflows/release-target/v1.12.1
+    uses: smdn/workflows-dotnet/.github/workflows/publish-release-target.yml@release-target/v1.13.1
     if: |
       (github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/')) &&
       (contains(github.event.pull_request.labels.*.name, 'release-target'))

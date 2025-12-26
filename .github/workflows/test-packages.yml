@@ -46,17 +46,23 @@ on:
         required: false
         type: string
 
+      dotnet_test_options_output_verbosity_level:
+        description: "The argument to be set to the `--output <VERBOSITY_LEVEL>` option of the `dotnet test` command."
+        required: false
+        type: string
+        default: ''
+
 jobs:
   await-package-publishing:
     name: Wait for publishing of released package
     if: ${{ github.event_name == 'release' }}
-    uses: smdn/Smdn.Fundamentals/.github/workflows/nuget-await-package-publishing.yml@workflows/nuget/v1.0.0
+    uses: smdn/workflows-dotnet/.github/workflows/nuget-await-package-publishing.yml@nuget/v1.1.1
     with:
       release_tag: ${{ github.event.release.tag_name }}
 
   run-test:
     name: Run tests with released packages
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.6.0
+    uses: smdn/workflows-dotnet/.github/workflows/test.yml@test/v1.8.0
     needs: await-package-publishing
     if: ${{ always() && !failure() && !cancelled() }} # run tests even if await-package-publishing is skipped
     with:
@@ -67,9 +73,9 @@ jobs:
       dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '10.0.100' || inputs.dotnet_sdk_version }}
       timeout_minutes_test_job:               10
       timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'6min'}, {'OS':'','Timeout':'1min'} ]"
-      timeout_vstest_connection:              "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
       dotnet_test_options_verbosity_level:    ${{ inputs.dotnet_test_options_verbosity_level }}
       dotnet_test_options_framework:          ${{ inputs.dotnet_test_options_framework }}
       dotnet_test_options_filter_expression:  ${{ inputs.dotnet_test_options_filter_expression }}
+      dotnet_test_options_output_verbosity_level: ${{ inputs.dotnet_test_options_output_verbosity_level }}
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}

@@ -64,10 +64,16 @@ on:
         required: false
         type: string
 
+      dotnet_test_options_output_verbosity_level:
+        description: "The argument to be set to the `--output <VERBOSITY_LEVEL>` option of the `dotnet test` command."
+        required: false
+        type: string
+        default: ''
+
 jobs:
   run-test:
     name: Run tests
-    uses: smdn/Smdn.Fundamentals/.github/workflows/test.yml@workflows/test/v1.6.0
+    uses: smdn/workflows-dotnet/.github/workflows/test.yml@test/v1.8.0
     with:
       project:                                ${{ inputs.project }}
       os:                                     ${{ inputs.os == '' && 'ubuntu-24.04, ubuntu-22.04, windows-latest, macos-latest' || inputs.os }}
@@ -75,10 +81,10 @@ jobs:
       dotnet_sdk_version:                     ${{ inputs.dotnet_sdk_version == '' && '10.0.100' || inputs.dotnet_sdk_version }}
       timeout_minutes_test_job:               10
       timeout_hang:                           "[ {'OS':'windows','Timeout':'6min'}, {'OS':'macos','Timeout':'6min'}, {'OS':'','Timeout':'1min'} ]"
-      timeout_vstest_connection:              "[ {'OS':'windows','Timeout':360}, {'OS':'macos','Timeout':180}, {'OS':'','Timeout':60} ]"
       extra_options_common:                   ${{ inputs.extra_options_common }}
       dotnet_test_options_verbosity_level:    ${{ inputs.dotnet_test_options_verbosity_level }}
       dotnet_test_options_framework:          ${{ inputs.dotnet_test_options_framework }}
       dotnet_test_options_filter_expression:  ${{ inputs.dotnet_test_options_filter_expression }}
+      dotnet_test_options_output_verbosity_level: ${{ inputs.dotnet_test_options_output_verbosity_level }}
     secrets:
       token_repo: ${{ secrets.GITHUB_TOKEN }}
