@@ -1,5 +1,11 @@
+[Issue]:https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/ "GitHub issues"
+[Open an Issue]:https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new "GitHub issues"
+[Pull Request]:https://github.com/smdn/Smdn.TPSmartHomeDevices/pulls/ "GitHub pull requests"
+[General Bug Report]:https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=01_bug-report.yml "GitHub issue template"
+[Feature Request]:https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=02_feature-request.yml "GitHub issue template"
+
 # Contribution guidelines
-Contributions are welcome! You can contribute to this project by submitting [Issues](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/) or [Pull Requests](https://github.com/smdn/Smdn.TPSmartHomeDevices/pulls/).
+Contributions are welcome! You can contribute to this project by submitting [Issue]s or [Pull Request]s.
 
 Please follow the descriptions in the relevant sections below according to what you would like to contribute.
 
@@ -8,29 +14,29 @@ IssueやPull Requestを送る際は、可能なら英語が望ましいですが
 ## How to contribute
 
 ### Reporting issues / 不具合の報告
-**Did you find a bug?** Please use the ['General Bug Report' issue template](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=01_bug-report.yml) to submit a bug report.
+**Did you find a bug?** Please use the [General Bug Report] issue template to submit a bug report.
 
 Please fill out the necessary items listed in the template as much as possible so that owner and collaborators can respond quickly and accurately.
 
 
 ### Feature requests and improvements / 機能追加・改善の提案
-**Do you intend to add a new feature or improving existing feature?** Please use the ['Feature Request' issue template](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=02_feature-request.yml).
+**Do you intend to add a new feature or improving existing feature?** Please use the [Feature Request] issue template.
 
 If you have any feature requests including API suggestions, or an implementation improvements, please feel free to suggest them. If you can clarify what you want to achieve and what is lacking to achieve it, it will make it easier to proceed with the discussion.
 
 
 ### Contributing changes to the codes / コードに対する変更
-**Did you write a patch that improves feature or fixes a bug?** Please create a [Pull Request](https://github.com/smdn/Smdn.TPSmartHomeDevices/pulls).
+**Did you write a patch that improves feature or fixes a bug?** Please create a [Pull Request].
 
 If possible, it would be helpful if you could also write a test case that corresponds to the change, but it is not required.
 
 Small improvements and modifications can also be made through pull requests.
 
-On the other hand, if it involves major changes, such as across multiple files, please send it as a [Feature Request](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=02_feature-request.yml) in advance instead of a pull request.
+On the other hand, if it involves major changes, such as across multiple files, please send it as a [Feature Request] in advance instead of a pull request.
 
 
 ### Contributing changes to English texts / 英文に対する変更
-**Do you have any corrections for incorrect or strange English texts?** Please create a [Pull Request](https://github.com/smdn/Smdn.TPSmartHomeDevices/pulls).
+**Do you have any corrections for incorrect or strange English texts?** Please create a [Pull Request].
 
 Corrections from English speakers are welcome!
 
@@ -44,16 +50,16 @@ This project is open source and its artifacts are free. To continue and sustain 
 
 
 ### Other Contributions / その他
-If you would like to make other contributions, please [open an issue](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new) and submit it.
+If you would like to make other contributions, please [open an issue] and submit it.
 
 
 ### ❌Unacceptable changes / 受け入れられない変更
 Changes such as the following examples may not be acceptable:
 
 - ❌Performance improvements without benchmarks.
-  - ✅Please include evidence in the pull request at least, or propose it as the [Feature Request](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=02_feature-request.yml).
+  - ✅Please include evidence in the pull request at least, or propose it as the [Feature Request].
 - ❌Changes that add dependencies, such as the use of third-party packages.
-  - ✅If you would like to make such a change, please create a [Feature Request](https://github.com/smdn/Smdn.TPSmartHomeDevices/issues/new?template=02_feature-request.yml) first.
+  - ✅If you would like to make such a change, please create a [Feature Request] first.
 - ❌Changes using *tricky* codes, like one-liners or shortcoding-oriented codes.<br/>❌Changes using the codes that are difficult to understand its intention, like too short naming of variables, etc.
   - ✅Try to write self-documenting codes. Code that is clear in its intentions, even if somewhat verbose, is preferable.
 
