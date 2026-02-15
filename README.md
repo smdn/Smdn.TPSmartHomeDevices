@@ -216,7 +216,7 @@ The software provided by this project is intended only for operations within the
 
 [Tapo](https://www.tapo.com/), [Kasa](https://www.kasasmart.com/) and all respective product names are copyright of [TP-Link](https://www.tp-link.com/).
 
-## Credit
+## Credits
 This project incorporates implementations partially ported from the following projects. See also [ThirdPartyNotices.md](./ThirdPartyNotices.md) for detail.
 
 - [fishbigger/TapoP100](https://github.com/fishbigger/TapoP100)
