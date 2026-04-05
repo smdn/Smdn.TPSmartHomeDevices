@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
   <PropertyGroup Label="Configurations for Smdn.MSBuild.ProjectAssets.*">
     <SmdnBuildAssetRootDirectory>$(MSBuildThisFileDirectory)..\</SmdnBuildAssetRootDirectory>
     <APIListOutputBaseDirectory>$(MSBuildThisFileDirectory)..\doc\api-list\</APIListOutputBaseDirectory>
-    <!-- <APIListPackageVersion>1.6.0</APIListPackageVersion> -->
+    <APIListMinPackageVersion>1.8.1</APIListMinPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="package properties">
@@ -25,7 +25,7 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <PackageReference
       Include="Smdn.MSBuild.DefineConstants.NETSdkApi"
-      Version="[1.6.2]"
+      Version="[1.8.2]"
       PrivateAssets="all"
       IncludeAssets="build"
     />
