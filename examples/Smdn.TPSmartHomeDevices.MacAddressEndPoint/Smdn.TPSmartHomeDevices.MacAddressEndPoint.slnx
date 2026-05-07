@@ -1,0 +1,12 @@
+﻿<!--
+SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Solution>
+  <Folder Name="/GettingStarted/">
+    <Project Path="GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/MacAddressResolution/">
+    <Project Path="MacAddressResolution/Program.csproj" />
+  </Folder>
+</Solution>

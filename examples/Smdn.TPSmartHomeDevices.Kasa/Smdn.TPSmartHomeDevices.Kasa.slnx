@@ -1,0 +1,27 @@
+﻿<!--
+SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Solution>
+  <Folder Name="/ConfigureTimeout/">
+    <Project Path="ConfigureTimeout/Program.csproj" />
+  </Folder>
+  <Folder Name="/CustomExceptionHandling/">
+    <Project Path="CustomExceptionHandling/Program.csproj" />
+  </Folder>
+  <Folder Name="/DisplayDeviceInfo/">
+    <Project Path="DisplayDeviceInfo/Program.csproj" />
+  </Folder>
+  <Folder Name="/GettingStarted/">
+    <Project Path="GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/HS105Plug/">
+    <Project Path="HS105Plug/Program.csproj" />
+  </Folder>
+  <Folder Name="/KL130MulticolorBulb/">
+    <Project Path="KL130MulticolorBulb/Program.csproj" />
+  </Folder>
+  <Folder Name="/Logging/">
+    <Project Path="Logging/Program.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,45 @@
+﻿<!--
+SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Solution>
+  <Folder Name="/ConfigureTimeout/">
+    <Project Path="ConfigureTimeout/Program.csproj" />
+  </Folder>
+  <Folder Name="/Credentials/">
+    <Project Path="Credentials/Program.csproj" />
+  </Folder>
+  <Folder Name="/CredentialsEnvVar/">
+    <Project Path="CredentialsEnvVar/Program.csproj" />
+  </Folder>
+  <Folder Name="/CustomExceptionHandling/">
+    <Project Path="CustomExceptionHandling/Program.csproj" />
+  </Folder>
+  <Folder Name="/DeviceUsage/">
+    <Project Path="DeviceUsage/Program.csproj" />
+  </Folder>
+  <Folder Name="/DisplayDeviceInfo/">
+    <Project Path="DisplayDeviceInfo/Program.csproj" />
+  </Folder>
+  <Folder Name="/GettingStarted/">
+    <Project Path="GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/L530MulticolorBulb/">
+    <Project Path="L530MulticolorBulb/Program.csproj" />
+  </Folder>
+  <Folder Name="/L900MulticolorLightStrip/">
+    <Project Path="L900MulticolorLightStrip/Program.csproj" />
+  </Folder>
+  <Folder Name="/Logging/">
+    <Project Path="Logging/Program.csproj" />
+  </Folder>
+  <Folder Name="/P105Plug/">
+    <Project Path="P105Plug/Program.csproj" />
+  </Folder>
+  <Folder Name="/P110MPlug/">
+    <Project Path="P110MPlug/Program.csproj" />
+  </Folder>
+  <Folder Name="/SelectProtocol/">
+    <Project Path="SelectProtocol/Program.csproj" />
+  </Folder>
+</Solution>

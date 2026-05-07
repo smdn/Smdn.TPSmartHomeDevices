@@ -1,0 +1,75 @@
+﻿<!--
+SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Solution>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/" />
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/CustomExceptionHandling/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/DisplayDeviceInfo/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/DisplayDeviceInfo/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/GettingStarted/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/HS105Plug/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/HS105Plug/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/KL130MulticolorBulb/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/Logging/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/Logging/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/" />
+  <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/GettingStarted/">
+    <Project Path="Smdn.TPSmartHomeDevices.MacAddressEndPoint/GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/">
+    <Project Path="Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/" />
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/Credentials/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/Credentials/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/CustomExceptionHandling/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/DeviceUsage/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/DeviceUsage/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/DisplayDeviceInfo/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/DisplayDeviceInfo/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/GettingStarted/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/GettingStarted/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/Logging/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/Logging/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/P105Plug/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/P105Plug/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/P110MPlug/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/P110MPlug/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/SelectProtocol/Program.csproj" />
+  </Folder>
+</Solution>
