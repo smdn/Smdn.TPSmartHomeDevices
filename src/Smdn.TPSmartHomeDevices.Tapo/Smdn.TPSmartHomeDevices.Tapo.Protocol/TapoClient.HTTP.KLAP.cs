@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: GPL-3.0-or-later
+#pragma warning disable CA1873
+
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
