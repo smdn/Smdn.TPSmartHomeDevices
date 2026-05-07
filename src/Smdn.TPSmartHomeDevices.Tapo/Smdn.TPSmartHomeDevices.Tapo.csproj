@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
@@ -12,7 +12,8 @@ SPDX-License-Identifier: MIT
       Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '7.0.0'))"
     >$(DefineConstants);LANG_VERSION_11_OR_GREATER</DefineConstants> <!-- required to use the UTF-8 string literals and the extended nameof scope in C# 11 -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>

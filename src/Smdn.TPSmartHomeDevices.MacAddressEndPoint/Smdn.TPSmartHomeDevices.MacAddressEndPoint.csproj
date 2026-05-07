@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
     <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
+    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
