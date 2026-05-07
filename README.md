@@ -36,6 +36,7 @@ The following devices have been confirmed to work on the actual devices:
 
 |Model|Device type|Hardware version|Hardware specs|Firmware version|Usage example|
 |-|-|-|-|-|-|
+|Tapo L535<br/>(See [issue #60](../../issues/8))|Bulb|1.0|JP|1.4.1 Build 251016 Rel.204554|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)|
 |Tapo L530|Bulb|1.0.0<br/>1.20|JP<br/>JP|1.3.0 Build 20230831 Rel. 75926<br/>1.1.0 Build 230823 Rel.162531|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/L530MulticolorBulb/)|
 |Tapo L900|Light strip|1.0|-|1.1.0 Build 230905 Rel.184939|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/L900MulticolorLightStrip/)|
 |Tapo P105|Plug|1.0.0|JP|1.4.1 Build 20231103 Rel. 36519|[example](./examples/Smdn.TPSmartHomeDevices.Tapo/P105Plug/)|
