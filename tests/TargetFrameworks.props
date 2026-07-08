@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 SPDX-FileCopyrightText: 2022 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
@@ -28,14 +28,16 @@ SPDX-License-Identifier: MIT
     <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' != 'true' ">false</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 
-  <!-- On Ubuntu 24.04 -->
+  <!-- On Ubuntu 24.04/26.04 -->
   <PropertyGroup
     Condition="
       $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.24.04')) or
-      $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 24.04'))
+      $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 24.04')) or
+      $([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier.StartsWith('ubuntu.26.04')) or
+      $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription.StartsWith('Ubuntu 26.04'))
     "
   >
-    <!-- disable Mono on GitHub Actions Ubuntu 24.04 runner images -->
+    <!-- disable Mono on GitHub Actions Ubuntu 24.04/26.04 runner images -->
     <EnableTargetFrameworkNetFx Condition=" '$(GITHUB_ACTIONS)' == 'true' ">false</EnableTargetFrameworkNetFx>
   </PropertyGroup>
 
