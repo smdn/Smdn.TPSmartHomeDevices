@@ -516,7 +516,12 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
 
       cancellationToken.ThrowIfCancellationRequested();
 
-      client!.Timeout = Timeout;
+#if DEBUG
+      client
+#else
+      client!
+#endif
+        .Timeout = Timeout;
 
       using var loggerScopeSendRequest = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
 

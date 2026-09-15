@@ -348,9 +348,11 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken
   )
   {
+    var sock = socket
 #if DEBUG
-    if (socket is null)
-      throw new InvalidOperationException($"{nameof(socket)} is null");
+      ?? throw new InvalidOperationException($"{nameof(socket)} is null");
+#else
+      !;
 #endif
 
     CancellationTokenSource? cancellationTokenSourceForReceiveRestOfBody = null;
@@ -366,7 +368,7 @@ public sealed partial class KasaClient : IDisposable {
         int len = default;
 
         try {
-          len = await socket!.ReceiveAsync(
+          len = await sock.ReceiveAsync(
             buf,
             ReceiveSocketFlags,
             cancellationToken: cancellationToken
