@@ -29,10 +29,6 @@ This library does not provide any specific implementations to operate Kasa and T
     <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
-  <PropertyGroup Label="StyleCop code analysis">
-    <StyleCopAnalyzersConfigurationFile>..\stylecop.json</StyleCopAnalyzersConfigurationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />

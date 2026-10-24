@@ -32,10 +32,6 @@ SPDX-License-Identifier: MIT
     <GenerateNupkgReadmeFileDependsOnTargets>$(GenerateNupkgReadmeFileDependsOnTargets);GenerateReadmeFileContent</GenerateNupkgReadmeFileDependsOnTargets>
   </PropertyGroup>
 
-  <PropertyGroup Label="StyleCop code analysis">
-    <StyleCopAnalyzersConfigurationFile>..\stylecop.json</StyleCopAnalyzersConfigurationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
