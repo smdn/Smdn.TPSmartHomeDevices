@@ -31,7 +31,6 @@ internal static class MulticolorLightUtils {
     "The value for saturation must be in range of {ColorTemperatureMinValue}~{ColorTemperatureMaxValue}";
 #endif
 
-#pragma warning disable SA1114
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
   [return: NotNullIfNotNull(
 #if LANG_VERSION_11_OR_GREATER
@@ -41,7 +40,6 @@ internal static class MulticolorLightUtils {
 #endif
   )]
 #endif
-#pragma warning restore SA1114
   public static int? ValidateBrightnessValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -58,7 +56,6 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#pragma warning disable SA1114
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
   [return: NotNullIfNotNull(
 #if LANG_VERSION_11_OR_GREATER
@@ -68,7 +65,6 @@ internal static class MulticolorLightUtils {
 #endif
   )]
 #endif
-#pragma warning restore SA1114
   public static int? ValidateHueValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -85,7 +81,6 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#pragma warning disable SA1114
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
   [return: NotNullIfNotNull(
 #if LANG_VERSION_11_OR_GREATER
@@ -95,7 +90,6 @@ internal static class MulticolorLightUtils {
 #endif
   )]
 #endif
-#pragma warning restore SA1114
   public static int? ValidateSaturationValue(int? newValue, string paramName)
   {
     if (newValue == null)
@@ -112,7 +106,6 @@ internal static class MulticolorLightUtils {
     return newValue;
   }
 
-#pragma warning disable SA1114
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
   [return: NotNullIfNotNull(
 #if LANG_VERSION_11_OR_GREATER
@@ -122,7 +115,6 @@ internal static class MulticolorLightUtils {
 #endif
   )]
 #endif
-#pragma warning restore SA1114
   public static int ValidateColorTemperatureValue(int newValue, string paramName)
   {
 #if false // TODO

@@ -94,13 +94,13 @@ partial class TapoClient {
     // ref:
     //   https://github.com/dotnet/runtime/issues/49357
     //   https://github.com/dotnet/runtime/issues/70793
-#pragma warning disable SA1112,SA1114
-    await requestContent.LoadIntoBufferAsync(
+    await requestContent
 #if NET9_0_OR_GREATER
-      cancellationToken: cancellationToken
+      .LoadIntoBufferAsync(cancellationToken: cancellationToken)
+#else
+      .LoadIntoBufferAsync()
 #endif
-    ).ConfigureAwait(false);
-#pragma warning restore SA1112,SA1114
+      .ConfigureAwait(false);
 
     var (requestAbsoluteUri, (response, httpResponse)) = await PostAsync(
       requestUri: requestPathAndQuery,

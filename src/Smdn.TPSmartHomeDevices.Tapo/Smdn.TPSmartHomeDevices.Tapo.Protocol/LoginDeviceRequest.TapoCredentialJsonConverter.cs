@@ -11,7 +11,6 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 #pragma warning disable IDE0040
 partial struct LoginDeviceRequest {
 #pragma warning restore IDE0040
-#pragma warning disable SA1114
   private static readonly JsonEncodedText PropertyNamePassword = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "password"u8
@@ -26,7 +25,6 @@ partial struct LoginDeviceRequest {
     "username"
 #endif
   );
-#pragma warning restore SA1114
 
   internal sealed class TapoCredentialJsonConverter : JsonConverter<ITapoCredentialProvider> {
     private readonly ITapoCredentialIdentity? identity;

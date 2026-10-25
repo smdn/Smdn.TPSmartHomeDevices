@@ -44,7 +44,6 @@ partial class TapoClient {
     );
 
     if (logContentAsKlapProtocol) {
-#pragma warning disable SA1114
       logger?.LogTrace(
         "HTTP Request content (Base64): {RequestContent}",
         Convert.ToBase64String(
@@ -55,7 +54,6 @@ partial class TapoClient {
 #endif
         )
       );
-#pragma warning restore SA1114
     }
     else {
       logger?.LogTrace(
@@ -95,7 +93,6 @@ partial class TapoClient {
     );
 
     if (logContentAsKlapProtocol) {
-#pragma warning disable SA1114
       logger?.LogTrace(
         "HTTP Response content (Base64): {ResponseContent}",
         Convert.ToBase64String(
@@ -106,7 +103,6 @@ partial class TapoClient {
 #endif
         )
       );
-#pragma warning restore SA1114
     }
     else {
       logger?.LogTrace(

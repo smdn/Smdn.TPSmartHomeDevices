@@ -30,7 +30,6 @@ public sealed partial class KasaClient : IDisposable {
   public const int DefaultPort = 9999;
   internal const int DefaultBufferCapacity = 1536; // 1.5 [kB]
 
-#pragma warning disable SA1114
   private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "err_code"u8
@@ -38,7 +37,6 @@ public sealed partial class KasaClient : IDisposable {
     "err_code"
 #endif
   );
-#pragma warning restore SA1114
 
   // Kasa device seems to automatically close connection within approx 30 secs since the latest request.
   private static readonly TimeSpan ConnectionRefreshInterval = TimeSpan.FromSeconds(30);
@@ -157,7 +155,6 @@ public sealed partial class KasaClient : IDisposable {
     try {
       logger?.LogDebug("Connecting");
 
-#pragma warning disable SA1114
       await s.ConnectAsync(
 #if SYSTEM_NET_SOCKETS_SOCKET_CONNECTASYNC_REMOTEEP_CANCELLATIONTOKEN
         remoteEP: endPoint,
@@ -166,7 +163,6 @@ public sealed partial class KasaClient : IDisposable {
         remoteEP: endPoint
 #endif
       ).ConfigureAwait(false);
-#pragma warning restore SA1114
 
       logger?.LogDebug("Connected");
 

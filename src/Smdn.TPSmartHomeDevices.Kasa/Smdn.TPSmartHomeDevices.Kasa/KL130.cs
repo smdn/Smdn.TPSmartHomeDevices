@@ -24,7 +24,6 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// <seealso href="https://www.tp-link.com/jp/home-networking/smart-bulb/kl130/">Kasa KL130 product information (ja)</seealso>
 /// <seealso href="https://www.kasasmart.com/us/products/smart-lighting/kasa-smart-light-bulb-multicolor-kl130">Kasa KL130 product information (en)</seealso>
 public class KL130 : KasaDevice, IMulticolorSmartLight {
-#pragma warning disable SA1114
   private static readonly JsonEncodedText ModuleTextLightingService = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "smartlife.iot.smartbulb.lightingservice"u8
@@ -39,7 +38,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     "transition_light_state"
 #endif
   );
-#pragma warning restore SA1114
 
   /// <summary>
   /// Initializes a new instance of the <see cref="KL130"/> class with specifying the device endpoint by host name.

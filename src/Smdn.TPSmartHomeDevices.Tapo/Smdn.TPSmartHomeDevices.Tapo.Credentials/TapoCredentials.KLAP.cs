@@ -47,7 +47,6 @@ partial class TapoCredentials {
       authHashInput = ArrayPool<byte>.Shared.Rent(2 * SHA1HashSizeInBytes);
 
       // SHA1(username)
-#pragma warning disable SA1114
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
       {
         var retUsernameHash = SHA1.TryHashData(
@@ -59,7 +58,6 @@ partial class TapoCredentials {
           authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes),
           out var bytesWrittenByUsernameHash
         );
-#pragma warning restore SA1114
 
         if (!retUsernameHash)
           return false;
@@ -70,7 +68,6 @@ partial class TapoCredentials {
       }
 
       // SHA1(password)
-#pragma warning disable SA1114
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA1_TRYHASHDATA
       {
         var retPasswordHash = SHA1.TryHashData(
@@ -82,7 +79,6 @@ partial class TapoCredentials {
           authHashInput.AsSpan(bytesWrittenAuthHashInput, SHA1HashSizeInBytes),
           out var bytesWrittenByPasswordHash
         );
-#pragma warning restore SA1114
 
         if (!retPasswordHash)
           return false;
@@ -93,7 +89,6 @@ partial class TapoCredentials {
       }
 
       // SHA256(authHashInput) = SHA256(SHA1(username) + SHA1(password))
-#pragma warning disable SA1114
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA256_TRYHASHDATA
       return SHA256.TryHashData(
 #else
@@ -105,7 +100,6 @@ partial class TapoCredentials {
         destination,
         out bytesWritten
       );
-#pragma warning restore SA1114
     }
     finally {
       if (authHashInput is not null)

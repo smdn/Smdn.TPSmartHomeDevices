@@ -250,7 +250,6 @@ partial class TapoClient {
       }
       catch (HttpRequestException ex) {
         // TODO: exception message
-#pragma warning disable SA1114
         throw new TapoAuthenticationException(
 #if NET6_0_OR_GREATER
           message: $"Handshake with the device at '{endPointUri}' failed by status code {(int?)ex.StatusCode:D3}.",
@@ -260,7 +259,6 @@ partial class TapoClient {
           endPoint: endPointUri,
           innerException: ex
         );
-#pragma warning restore SA1114
       }
     }
     finally {

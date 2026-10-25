@@ -10,7 +10,6 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 #pragma warning disable IDE0040
 partial class KasaDevice {
-#pragma warning disable SA1114
   protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
 #if NETCOREAPP3_0_OR_GREATER && NET5_0_OR_GREATER && LANG_VERSION_11_OR_GREATER
     "system"u8
@@ -25,7 +24,6 @@ partial class KasaDevice {
     "get_sysinfo"
 #endif
   );
-#pragma warning restore SA1114
 
   /// <summary>
   /// Gets the system info of the device.

@@ -23,7 +23,6 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// <seealso href="https://www.tp-link.com/jp/home-networking/smart-plug/hs105/">Kasa HS105 product information (ja)</seealso>
 /// <seealso href="https://www.kasasmart.com/us/products/smart-plugs/kasa-smart-wifi-plug-mini">Kasa HS105 product information (en)</seealso>
 public class HS105 : KasaDevice, ISmartDevice {
-#pragma warning disable SA1114
   private static readonly JsonEncodedText MethodTextSetRelayState = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "set_relay_state"u8
@@ -31,7 +30,6 @@ public class HS105 : KasaDevice, ISmartDevice {
     "set_relay_state"
 #endif
   );
-#pragma warning restore SA1114
 
   /// <summary>
   /// Initializes a new instance of the <see cref="HS105"/> class with specifying the device endpoint by host name.
