@@ -159,7 +159,7 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
       serviceProvider: serviceProvider
     );
 
-#pragma warning disable SA1313, CA1822
+#pragma warning disable CA1822
   private readonly record struct SetBrightnessParameter(
     [property: JsonPropertyName("brightness")] int Brightness
   ) {
@@ -183,7 +183,7 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     [JsonPropertyName("device_on")]
     public bool DeviceOn => true;
   }
-#pragma warning restore SA1313, CA1822
+#pragma warning restore CA1822
 
   /// <summary>
   /// Turns the light on and sets the light brightness.

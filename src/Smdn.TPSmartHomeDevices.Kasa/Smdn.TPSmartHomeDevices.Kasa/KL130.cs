@@ -126,7 +126,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
     => await GetDeviceInfoAsync(cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Could not retrieve device information since it was null.");
 
-#pragma warning disable SA1313
   private readonly record struct SetOnOffStateParameter(
     [property: JsonPropertyName("on_off")]
     [property: JsonConverter(typeof(KasaNumericalBooleanJsonConverter))]
@@ -134,7 +133,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     [property: JsonPropertyName("transition_period")]
     int TransitionPeriodInMilliseconds
   ) {
-#pragma warning restore SA1313
 #pragma warning disable CA1822
     [JsonPropertyName("ignore_default")]
     public int IgnoreDefault => 0; // turn on/off with the default configuration
@@ -269,7 +267,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken: cancellationToken
     );
 
-#pragma warning disable SA1313
   private readonly record struct SetColorTemperatureParameter(
     [property: JsonPropertyName("color_temp")]
     int ColorTemperature,
@@ -278,7 +275,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     [property: JsonPropertyName("transition_period")]
     int TransitionPeriodInMilliseconds
   ) {
-#pragma warning restore SA1313
 #pragma warning disable CA1822
     [JsonPropertyName("on_off")]
     [JsonConverter(typeof(KasaNumericalBooleanJsonConverter))]
@@ -323,7 +319,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken
     );
 
-#pragma warning disable SA1313
   private readonly record struct SetColorParameter(
     [property: JsonPropertyName("hue")]
     int? Hue,
@@ -334,7 +329,6 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     [property: JsonPropertyName("transition_period")]
     int TransitionPeriodInMilliseconds
   ) {
-#pragma warning restore SA1313
 #pragma warning disable CA1822
     [JsonPropertyName("color_temp")]
     public int ColorTemperature => 0; // set color with hue and saturation
