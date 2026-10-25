@@ -8,9 +8,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-#pragma warning disable IDE0040
 partial class TapoDevice {
-#pragma warning restore IDE0040
   /// <inheritdoc cref="TapoDevice(string, string, string, IServiceProvider?)"/>
   public static TapoDevice Create(
     string host,

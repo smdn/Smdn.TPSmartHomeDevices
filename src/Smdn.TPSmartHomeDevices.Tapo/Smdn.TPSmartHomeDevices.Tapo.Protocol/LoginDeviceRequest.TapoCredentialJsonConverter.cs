@@ -8,9 +8,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial struct LoginDeviceRequest {
-#pragma warning restore IDE0040
   private static readonly JsonEncodedText PropertyNamePassword = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER
     "password"u8

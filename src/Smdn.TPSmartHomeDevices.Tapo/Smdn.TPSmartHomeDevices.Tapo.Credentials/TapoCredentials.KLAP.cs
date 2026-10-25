@@ -6,9 +6,7 @@ using System.Security.Cryptography;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
-#pragma warning disable IDE0040
 partial class TapoCredentials {
-#pragma warning restore IDE0040
   private const int SHA256HashSizeInBytes =
 #if SYSTEM_SECURITY_CRYPTOGRAPHY_SHA256_HASHSIZEINBYTES
     SHA256.HashSizeInBytes;

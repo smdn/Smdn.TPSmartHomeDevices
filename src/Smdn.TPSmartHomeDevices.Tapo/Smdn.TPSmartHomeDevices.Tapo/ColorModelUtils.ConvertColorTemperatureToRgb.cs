@@ -6,9 +6,7 @@ using System;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-#pragma warning disable IDE0040
 partial class ColorModelUtils {
-#pragma warning restore IDE0040
   /// <summary>
   /// Converts a color that is represented by color temperature to the equivalent color in the RGB model.
   /// </summary>

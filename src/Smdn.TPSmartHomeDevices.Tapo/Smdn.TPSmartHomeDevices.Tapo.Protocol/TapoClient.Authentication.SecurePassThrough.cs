@@ -13,9 +13,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial class TapoClient {
-#pragma warning restore IDE0040
   private async ValueTask AuthenticateSecurePassThroughAsync(
     ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credentialProvider,

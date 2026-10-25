@@ -13,9 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial class TapoClient {
-#pragma warning restore IDE0040
   private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
     TapoSecurePassThroughSession securePassThroughSession,
     TRequest request,

@@ -6,9 +6,7 @@ using System.Net.NetworkInformation;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
-#pragma warning disable IDE0040
 partial class KasaDevice {
-#pragma warning restore IDE0040
   /// <inheritdoc cref="KasaDevice(string, IServiceProvider?)" />
   public static KasaDevice Create(
     string host,

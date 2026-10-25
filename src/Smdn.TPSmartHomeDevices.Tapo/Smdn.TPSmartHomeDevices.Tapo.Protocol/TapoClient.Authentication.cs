@@ -9,9 +9,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial class TapoClient {
-#pragma warning restore IDE0040
   // TODO: logger
   private static ValueTask<(string? SessionId, int? SessionTimeout)> ParseSessionCookieAsync(HttpResponseMessage response)
     => TapoSessionCookieUtils.TryGetCookie(response, out var sessionId, out var sessionTimeout)

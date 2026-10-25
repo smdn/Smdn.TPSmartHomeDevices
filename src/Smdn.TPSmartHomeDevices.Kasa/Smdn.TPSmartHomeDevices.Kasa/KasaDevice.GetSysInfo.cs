@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices.Kasa;
 
-#pragma warning disable IDE0040
 partial class KasaDevice {
   protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
 #if NETCOREAPP3_0_OR_GREATER && NET5_0_OR_GREATER && LANG_VERSION_11_OR_GREATER

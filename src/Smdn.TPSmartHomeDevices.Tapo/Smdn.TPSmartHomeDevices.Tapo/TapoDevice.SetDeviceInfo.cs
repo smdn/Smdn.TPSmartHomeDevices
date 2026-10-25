@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-#pragma warning disable IDE0040
 partial class TapoDevice {
-#pragma warning restore IDE0040
 #pragma warning disable CA1822
   private readonly struct TurnOnParameter {
     [JsonPropertyName("device_on")]

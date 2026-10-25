@@ -11,9 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial class TapoClient {
-#pragma warning restore IDE0040
   /// <summary>
   /// A C# implementation of transmission process with Tapo's KLAP protocol.
   /// </summary>

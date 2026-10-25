@@ -8,9 +8,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
-#pragma warning disable IDE0040
 partial struct LoginDeviceRequest {
-#pragma warning restore IDE0040
   internal sealed class TapoCredentialMaskingJsonConverter : JsonConverter<ITapoCredentialProvider> {
     private static readonly JsonEncodedText PropertyValueMaskedCredential = JsonEncodedText.Encode(
 #if LANG_VERSION_11_OR_GREATER

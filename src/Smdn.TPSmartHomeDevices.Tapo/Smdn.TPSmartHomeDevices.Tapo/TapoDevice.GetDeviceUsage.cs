@@ -8,9 +8,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
-#pragma warning disable IDE0040
 partial class TapoDevice {
-#pragma warning restore IDE0040
   private readonly struct GetDeviceUsageResult {
     [JsonPropertyName("time_usage")]
     public TapoDeviceOperatingTime? TimeUsage { get; init; }
