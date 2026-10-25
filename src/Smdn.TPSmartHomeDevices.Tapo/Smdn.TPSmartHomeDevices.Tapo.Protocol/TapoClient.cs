@@ -74,7 +74,6 @@ public sealed partial class TapoClient : IDisposable {
 
   private IHttpClientFactory httpClientFactory; // if null, it indicates a 'disposed' state.
   private readonly Uri endPointUri;
-  private readonly EndPoint endPoint;
   private readonly ILogger? logger;
   private TapoSession? session;
 
@@ -95,7 +94,7 @@ public sealed partial class TapoClient : IDisposable {
   internal EndPoint EndPoint {
     get {
       ThrowIfDisposed();
-      return endPoint;
+      return field;
     }
   }
 
@@ -112,7 +111,7 @@ public sealed partial class TapoClient : IDisposable {
     ILogger? logger = null
   )
   {
-    this.endPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
+    EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
     this.logger = logger;
 
     endPointUri = GetEndPointUri(endPoint);
