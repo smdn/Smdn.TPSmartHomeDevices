@@ -24,7 +24,10 @@ public class StaticDeviceEndPointTests {
 
   [Test]
   public void Ctor_EndPointNull()
-    => Assert.Throws<ArgumentNullException>(() => new StaticDeviceEndPoint(endPoint: null!));
+    => Assert.That(
+      () => new StaticDeviceEndPoint(endPoint: null!),
+      Throws.ArgumentNullException
+    );
 
   [TestCaseSource(nameof(YieldTestCases_EndPoints))]
   public async Task ResolveAsync(EndPoint endPoint)
@@ -44,8 +47,9 @@ public class StaticDeviceEndPointTests {
 
     cts.Cancel();
 
-    Assert.ThrowsAsync<TaskCanceledException>(
-      async () => await deviceEndPoint.ResolveAsync(cts.Token)
+    Assert.That(
+      async () => await deviceEndPoint.ResolveAsync(cts.Token),
+      Throws.TypeOf<TaskCanceledException>()
     );
   }
 

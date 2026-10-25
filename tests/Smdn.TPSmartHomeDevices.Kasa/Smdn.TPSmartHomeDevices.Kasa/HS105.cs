@@ -82,7 +82,10 @@ public class HS105Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync());
+    Assert.That(
+      async () => await device.TurnOnAsync(),
+      Throws.Nothing
+    );
   }
 
   [Test]
@@ -106,7 +109,10 @@ public class HS105Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync());
+    Assert.That(
+      async () => await device.TurnOffAsync(),
+      Throws.Nothing
+    );
   }
 
   [TestCase(true)]
@@ -131,7 +137,10 @@ public class HS105Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState));
+    Assert.That(
+      async () => await device.SetOnOffStateAsync(newOnOffState: newState),
+      Throws.Nothing
+    );
   }
 
   private static System.Collections.IEnumerable YieldTestCases_GetOnOffStateAsync()
@@ -174,8 +183,16 @@ public class HS105Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => {
-      Assert.That(await device.GetOnOffStateAsync(), Is.EqualTo(expectedState), nameof(expectedState));
-    });
+    bool actualState = default;
+
+    Assert.That(
+      async () => actualState = await device.GetOnOffStateAsync(),
+      Throws.Nothing
+    );
+    Assert.That(
+      actualState,
+      Is.EqualTo(expectedState),
+      nameof(expectedState)
+    );
   }
 }

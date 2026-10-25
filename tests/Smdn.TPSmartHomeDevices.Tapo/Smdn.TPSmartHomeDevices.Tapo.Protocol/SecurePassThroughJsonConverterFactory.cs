@@ -179,9 +179,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     factory.Dispose();
 
-    Assert.Throws<ObjectDisposedException>(() => encryptor.TransformBlock(Array.Empty<byte>(), 0, 0, Array.Empty<byte>(), 0), nameof(encryptor.TransformBlock));
+    Assert.That(() => encryptor.TransformBlock(Array.Empty<byte>(), 0, 0, Array.Empty<byte>(), 0), Throws.TypeOf<ObjectDisposedException>(), nameof(encryptor.TransformBlock));
 
-    Assert.Throws<ObjectDisposedException>(() => JsonSerializer.Serialize(new LoginDeviceRequest(), options));
+    Assert.That(() => JsonSerializer.Serialize(new LoginDeviceRequest(), options), Throws.TypeOf<ObjectDisposedException>());
   }
 
   [Test]
@@ -198,9 +198,9 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     factory.Dispose();
 
-    Assert.Throws<ObjectDisposedException>(() => decryptor.TransformBlock(Array.Empty<byte>(), 0, 0, Array.Empty<byte>(), 0), nameof(decryptor.TransformBlock));
+    Assert.That(() => decryptor.TransformBlock(Array.Empty<byte>(), 0, 0, Array.Empty<byte>(), 0), Throws.TypeOf<ObjectDisposedException>(), nameof(decryptor.TransformBlock));
 
-    Assert.Throws<ObjectDisposedException>(() => JsonSerializer.Deserialize<LoginDeviceResponse>("\"\"", options));
+    Assert.That(() => JsonSerializer.Deserialize<LoginDeviceResponse>("\"\"", options), Throws.TypeOf<ObjectDisposedException>());
   }
 
 #pragma warning disable IDE1006

@@ -98,11 +98,17 @@ public class MacAddressDeviceEndPointFactoryTests {
 
   [Test]
   public void Ctor_ArgumentNull_IAddressResolver()
-    => Assert.Throws<ArgumentNullException>(() => new IAddressResolverMacAddressDeviceEndPointFactory(resolver: null!, shouldDisposeResolver: false));
+    => Assert.That(
+      () => new IAddressResolverMacAddressDeviceEndPointFactory(resolver: null!, shouldDisposeResolver: false),
+      Throws.ArgumentNullException
+    );
 
   [Test]
   public void Ctor_ArgumentNull_MacAddressResolver([Values] bool shouldDisposeResolver)
-    => Assert.Throws<ArgumentNullException>(() => new MacAddressDeviceEndPointFactory(null!, shouldDisposeResolver: shouldDisposeResolver));
+    => Assert.That(
+      () => new MacAddressDeviceEndPointFactory(null!, shouldDisposeResolver: shouldDisposeResolver),
+      Throws.ArgumentNullException
+    );
 
   [TestCase(true)]
   [TestCase(false)]
@@ -131,7 +137,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.DoesNotThrow(factory.Dispose, "Dispose #1");
     Assert.DoesNotThrow(factory.Dispose, "Dispose #2");
 
-    Assert.Throws<ObjectDisposedException>(() => factory.Create(PhysicalAddress.None));
+    Assert.That(() => factory.Create(PhysicalAddress.None), Throws.TypeOf<ObjectDisposedException>());
   }
 
   [TestCase(true)]
@@ -146,7 +152,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.DoesNotThrow(factory.Dispose, "Dispose #1");
     Assert.DoesNotThrow(factory.Dispose, "Dispose #2");
 
-    Assert.Throws<ObjectDisposedException>(() => factory.Create(PhysicalAddress.None));
+    Assert.That(() => factory.Create(PhysicalAddress.None), Throws.TypeOf<ObjectDisposedException>());
   }
 
   [Test]
@@ -158,7 +164,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
     Assert.That(endPoint, Is.InstanceOf<IDynamicDeviceEndPoint>(), nameof(endPoint));
-    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.That(
+      async () => await endPoint.ResolveAsync(),
+      Throws.Nothing
+    );
     Assert.That(await endPoint.ResolveAsync(), Is.EqualTo(new IPEndPoint(TestIPAddress, port: 0)));
   }
 
@@ -171,7 +180,10 @@ public class MacAddressDeviceEndPointFactoryTests {
       serviceProvider: null
     );
 
-    Assert.Throws<ArgumentNullException>(() => factory.Create(address: null!));
+    Assert.That(
+      () => factory.Create(address: null!),
+      Throws.ArgumentNullException
+    );
   }
 
   private class ConcreteMacAddressDeviceEndPointFactory : MacAddressDeviceEndPointFactory {
@@ -242,7 +254,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
 
-    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.That(
+      async () => await endPoint.ResolveAsync(),
+      Throws.Nothing
+    );
     Assert.That(await endPoint.ResolveAsync(), Is.EqualTo(new IPEndPoint(TestIPAddress, 0)));
   }
 
@@ -260,7 +275,10 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     Assert.That(endPoint, Is.Not.Null, nameof(endPoint));
 
-    Assert.DoesNotThrowAsync(async () => await endPoint.ResolveAsync());
+    Assert.That(
+      async () => await endPoint.ResolveAsync(),
+      Throws.Nothing
+    );
     Assert.That(await endPoint.ResolveAsync(), Is.Null);
   }
 
@@ -283,8 +301,9 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     EndPoint? resolvedEndPointAddress = null;
 
-    Assert.DoesNotThrowAsync(
-      async () => resolvedEndPointAddress = await endPoint.ResolveAsync()
+    Assert.That(
+      async () => resolvedEndPointAddress = await endPoint.ResolveAsync(),
+      Throws.Nothing
     );
     Assert.That(resolvedEndPointAddress, Is.Not.Null, nameof(resolvedEndPointAddress));
     Assert.That(new IPEndPoint(TestIPAddress, 0), Is.EqualTo(resolvedEndPointAddress), nameof(resolvedEndPointAddress));
@@ -294,8 +313,9 @@ public class MacAddressDeviceEndPointFactoryTests {
 
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 
-    Assert.DoesNotThrowAsync(
-      async () => resolvedEndPointAddressAfterInvalidation = await endPoint.ResolveAsync()
+    Assert.That(
+      async () => resolvedEndPointAddressAfterInvalidation = await endPoint.ResolveAsync(),
+      Throws.Nothing
     );
     Assert.That(resolvedEndPointAddressAfterInvalidation, Is.Null, nameof(resolvedEndPointAddressAfterInvalidation));
   }

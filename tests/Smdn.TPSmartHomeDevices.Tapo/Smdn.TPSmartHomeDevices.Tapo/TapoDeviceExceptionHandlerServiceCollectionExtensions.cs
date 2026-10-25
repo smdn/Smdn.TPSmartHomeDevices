@@ -37,8 +37,9 @@ public class TapoDeviceExceptionHandlerServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
-      () => services.AddTapoDeviceExceptionHandler(exceptionHandler: null!)
+    Assert.That(
+      () => services.AddTapoDeviceExceptionHandler(exceptionHandler: null!),
+      Throws.ArgumentNullException
     );
   }
 

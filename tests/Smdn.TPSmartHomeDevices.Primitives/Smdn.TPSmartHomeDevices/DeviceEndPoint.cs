@@ -30,7 +30,10 @@ public class DeviceEndPointTests {
 
   [Test]
   public void Create_FromHostName_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => DeviceEndPoint.Create(host: null!));
+    => Assert.That(
+      () => DeviceEndPoint.Create(host: null!),
+      Throws.ArgumentNullException
+    );
 
   [Test]
   public async Task Create_FromHostName()
@@ -53,7 +56,10 @@ public class DeviceEndPointTests {
 
   [Test]
   public void Create_FromIPAddress_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => DeviceEndPoint.Create(ipAddress: null!));
+    => Assert.That(
+      () => DeviceEndPoint.Create(ipAddress: null!),
+      Throws.ArgumentNullException
+    );
 
   [Test]
   public async Task Create_FromIPAddress_V4()
@@ -107,7 +113,10 @@ public class DeviceEndPointTests {
 
   [Test]
   public void Create_FromMacAddress_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => DeviceEndPoint.Create(address: null!, new MacAddressDeviceEndPointPseudoFactory()));
+    => Assert.That(
+      () => DeviceEndPoint.Create(address: null!, new MacAddressDeviceEndPointPseudoFactory()),
+      Throws.ArgumentNullException
+    );
 
   [Test]
   public async Task Create_FromCustomAddressType()
@@ -123,7 +132,10 @@ public class DeviceEndPointTests {
 
   [Test]
   public void Create_FromCustomAddressType_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => DeviceEndPoint.Create(address: null!, new CustomAddressDeviceEndPointPseudoFactory()));
+    => Assert.That(
+      () => DeviceEndPoint.Create(address: null!, new CustomAddressDeviceEndPointPseudoFactory()),
+      Throws.ArgumentNullException
+    );
 
   private static System.Collections.IEnumerable YieldTestCases_IDeviceEndPoint_ResolveAsync_WithCancelledToken()
   {
@@ -139,8 +151,9 @@ public class DeviceEndPointTests {
 
     cts.Cancel();
 
-    Assert.ThrowsAsync<TaskCanceledException>(
-      async () => await endPoint.ResolveAsync(cts.Token)
+    Assert.That(
+      async () => await endPoint.ResolveAsync(cts.Token),
+      Throws.TypeOf<TaskCanceledException>()
     );
   }
 }

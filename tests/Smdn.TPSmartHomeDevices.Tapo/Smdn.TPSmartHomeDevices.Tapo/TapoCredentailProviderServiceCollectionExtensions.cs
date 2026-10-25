@@ -129,11 +129,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
+    Assert.That(
       () => services.AddTapoCredential(
         email: email!,
         password: password!
-      )
+      ),
+      Throws.ArgumentNullException
     );
   }
 
@@ -191,11 +192,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
+    Assert.That(
       () => services.AddTapoBase64EncodedCredential(
         base64UserNameSHA1Digest: base64UserNameSHA1Digest!,
         base64Password: base64Password!
-      )
+      ),
+      Throws.ArgumentNullException
     );
   }
 
@@ -259,12 +261,14 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
       Environment.SetEnvironmentVariable(EnvVarUsername, username);
       Environment.SetEnvironmentVariable(EnvVarPassword, password);
 
-      Assert.Throws<InvalidOperationException>(
-        () => GetEncodedCredential(credentialProvider, identity: null)
+      Assert.That(
+        () => GetEncodedCredential(credentialProvider, identity: null),
+        Throws.InvalidOperationException
       );
 
-      Assert.Throws<InvalidOperationException>(
-        () => GetKlapLocalAuthHash(credentialProvider, identity: null)
+      Assert.That(
+        () => GetKlapLocalAuthHash(credentialProvider, identity: null),
+        Throws.InvalidOperationException
       );
     }
     finally {
@@ -324,11 +328,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentException>(
+    Assert.That(
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: envVarUsername!,
         envVarPassword: envVarPassword!
-      )
+      ),
+      Throws.ArgumentException
     );
   }
 
@@ -431,10 +436,11 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentException>(
+    Assert.That(
       () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
         envVarBase64KlapLocalAuthHash: envVarBase64KlapLocalAuthHash!
-      )
+      ),
+      Throws.ArgumentException
     );
   }
 
@@ -487,10 +493,11 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
+    Assert.That(
       () => services.AddTapoCredentialProvider(
         credentialProvider: null!
-      )
+      ),
+      Throws.ArgumentNullException
     );
   }
 }

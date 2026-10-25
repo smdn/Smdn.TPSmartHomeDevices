@@ -12,7 +12,10 @@ public class AsymmetricAlgorithmShimTests {
 #if !SYSTEM_SECURITY_CRYPTOGRAPHY_ASYMMETRICALGORITHM_EXPORTSUBJECTPUBLICKEYINFOPEM
   [Test]
   public void ExportSubjectPublicKeyInfoPem_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(() => AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm: null!));
+    => Assert.That(
+      () => AsymmetricAlgorithmShim.ExportSubjectPublicKeyInfoPem(algorithm: null!),
+      Throws.ArgumentNullException
+    );
 #endif
 
   private static System.Collections.IEnumerable YieldTestCase_ExportSubjectPublicKeyInfoPem()

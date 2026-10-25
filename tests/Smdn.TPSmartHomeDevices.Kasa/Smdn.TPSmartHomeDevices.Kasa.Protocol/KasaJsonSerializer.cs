@@ -83,13 +83,14 @@ public class KasaJsonSerializerTests {
 
   [Test]
   public void Serialize_ArgumentNull_Buffer()
-    => Assert.Throws<ArgumentNullException>(
+    => Assert.That(
       () => KasaJsonSerializer.Serialize(
         buffer: null!,
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         (object)null!
-      )
+      ),
+      Throws.ArgumentNullException
     );
 
   private static System.Collections.IEnumerable YieldTestCases_Deserialize()
@@ -178,12 +179,13 @@ public class KasaJsonSerializerTests {
 
   [Test]
   public void Deserialize_ArgumentNull_Buffer()
-    => Assert.Throws<ArgumentNullException>(
+    => Assert.That(
       () => KasaJsonSerializer.Deserialize(
         buffer: null!,
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.ArgumentNullException
     );
 
   [Test]

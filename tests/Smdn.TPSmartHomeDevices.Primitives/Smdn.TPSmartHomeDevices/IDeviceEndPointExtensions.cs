@@ -16,30 +16,29 @@ public class IDeviceEndPointExtensionsTests {
   {
     IDeviceEndPoint? nullDeviceEndPoint = null;
 
-    Assert.ThrowsAsync<ArgumentNullException>(
-      async () => await nullDeviceEndPoint!.ResolveOrThrowAsync(defaultPort: 12345)
+    Assert.That(
+      async () => await nullDeviceEndPoint!.ResolveOrThrowAsync(defaultPort: 12345),
+      Throws.ArgumentNullException
     );
-
-#pragma warning disable CA2012
-    Assert.Throws<ArgumentNullException>(
-      () => nullDeviceEndPoint!.ResolveOrThrowAsync(defaultPort: 12345)
+    Assert.That(
+      () => nullDeviceEndPoint!.ResolveOrThrowAsync(defaultPort: 12345),
+      Throws.ArgumentNullException
     );
-#pragma warning restore CA2012
   }
 
   [TestCase(-1)]
   [TestCase(int.MinValue)]
   public void ResolveOrThrowAsync_DefaultPortNegative(int defaultPort)
   {
-    Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-      async () => await new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)).ResolveOrThrowAsync(defaultPort: defaultPort)
+    Assert.That(
+      async () => await new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)).ResolveOrThrowAsync(defaultPort: defaultPort),
+      Throws.TypeOf<ArgumentOutOfRangeException>()
     );
 
-#pragma warning disable CA2012
-    Assert.Throws<ArgumentOutOfRangeException>(
-      () => new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)).ResolveOrThrowAsync(defaultPort: defaultPort)
+    Assert.That(
+      () => new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)).ResolveOrThrowAsync(defaultPort: defaultPort),
+      Throws.TypeOf<ArgumentOutOfRangeException>()
     );
-#pragma warning restore CA2012
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
@@ -69,26 +68,32 @@ public class IDeviceEndPointExtensionsTests {
   public void ResolveOrThrowAsync_FailedToResolve()
   {
     var deviceEndPoint = new UnresolvedDeviceEndPoint();
-    var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(
-      async () => await deviceEndPoint.ResolveOrThrowAsync(defaultPort: 80)
-    );
 
-    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
-    Assert.That(ex.DeviceEndPoint, Is.SameAs(deviceEndPoint), nameof(ex.DeviceEndPoint));
+    Assert.That(
+      async () => await deviceEndPoint.ResolveOrThrowAsync(defaultPort: 80),
+      Throws
+        .TypeOf<DeviceEndPointResolutionException>()
+        .With
+        .Property(nameof(DeviceEndPointResolutionException.DeviceEndPoint))
+        .SameAs(deviceEndPoint)
+    );
   }
 
   [Test]
   public void ResolveOrThrowAsync_FailedToResolve_IDynamicDeviceEndPoint()
   {
     var dynamicDeviceEndPoint = new DynamicDeviceEndPoint(endPoint: null);
-    var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(
-      async () => await dynamicDeviceEndPoint.ResolveOrThrowAsync(defaultPort: 80)
+
+    Assert.That(
+      async () => await dynamicDeviceEndPoint.ResolveOrThrowAsync(defaultPort: 80),
+      Throws
+        .TypeOf<DeviceEndPointResolutionException>()
+        .With
+        .Property(nameof(DeviceEndPointResolutionException.DeviceEndPoint))
+        .SameAs(dynamicDeviceEndPoint)
     );
 
     Assert.That(dynamicDeviceEndPoint.HasInvalidated, Is.True, nameof(dynamicDeviceEndPoint.HasInvalidated));
-
-    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
-    Assert.That(ex.DeviceEndPoint, Is.SameAs(dynamicDeviceEndPoint), nameof(ex.DeviceEndPoint));
   }
 
   [Test]
@@ -99,8 +104,9 @@ public class IDeviceEndPointExtensionsTests {
 
     cts.Cancel();
 
-    Assert.ThrowsAsync<TaskCanceledException>(
-      async () => await deviceEndPoint.ResolveOrThrowAsync(defaultPort: 80, cancellationToken: cts.Token)
+    Assert.That(
+      async () => await deviceEndPoint.ResolveOrThrowAsync(defaultPort: 80, cancellationToken: cts.Token),
+      Throws.TypeOf<TaskCanceledException>()
     );
   }
 }

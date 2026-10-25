@@ -99,11 +99,12 @@ public partial class KasaDeviceTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<InvalidOperationException>(
+    Assert.That(
       () => KasaDevice.Create(
         macAddress: PhysicalAddress.None,
         serviceProvider: services.BuildServiceProvider()
-      )
+      ),
+      Throws.InvalidOperationException
     );
   }
 
@@ -133,13 +134,11 @@ public partial class KasaDeviceTests {
     Assert.DoesNotThrow(device.Dispose, "dispose");
     Assert.DoesNotThrow(device.Dispose, "dispose again");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.EndPoint, Is.Not.Null), nameof(device.EndPoint));
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.IsConnected, Is.False), nameof(device.IsConnected));
+    Assert.That(() => device.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(device.EndPoint));
+    Assert.That(() => device.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(device.IsConnected));
 
-    Assert.ThrowsAsync<ObjectDisposedException>(async () => await device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
-#pragma warning disable CA2012
-    Assert.Throws<ObjectDisposedException>(() => device.ResolveEndPointAsync(), nameof(device.ResolveEndPointAsync));
-#pragma warning restore CA2012
+    Assert.That(async () => await device.ResolveEndPointAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.ResolveEndPointAsync));
+    Assert.That(() => device.ResolveEndPointAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.ResolveEndPointAsync));
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ResolveEndPointAsync_ResolveToDefaultPort()
@@ -171,10 +170,13 @@ public partial class KasaDeviceTests {
       deviceEndPoint: endPoint
     );
 
-    var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(async () => await device.ResolveEndPointAsync());
-
-    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
-    Assert.That(ex.DeviceEndPoint, Is.SameAs(endPoint), nameof(ex.DeviceEndPoint));
+    Assert.That(
+      async () => await device.ResolveEndPointAsync(),
+      Throws
+        .TypeOf<DeviceEndPointResolutionException>()
+        .With
+        .Property(nameof(DeviceEndPointResolutionException.DeviceEndPoint)).SameAs(endPoint)
+    );
   }
 
   [Test]
@@ -187,8 +189,9 @@ public partial class KasaDeviceTests {
 
     cts.Cancel();
 
-    Assert.ThrowsAsync<TaskCanceledException>(
-      async () => await device.ResolveEndPointAsync(cts.Token)
+    Assert.That(
+      async () => await device.ResolveEndPointAsync(cts.Token),
+      Throws.TypeOf<TaskCanceledException>()
     );
   }
 
@@ -254,11 +257,12 @@ public partial class KasaDeviceTests {
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
@@ -273,19 +277,20 @@ public partial class KasaDeviceTests {
 
     device.Dispose();
 
-#pragma warning disable CA2012
-    Assert.Throws<ObjectDisposedException>(
+    Assert.That(
       () => device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.TypeOf<ObjectDisposedException>()
     );
-#pragma warning restore CA2012
-    Assert.ThrowsAsync<ObjectDisposedException>(
+
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.TypeOf<ObjectDisposedException>()
     );
   }
 
@@ -298,15 +303,17 @@ public partial class KasaDeviceTests {
       deviceEndPoint: endPoint
     );
 
-    var ex = Assert.ThrowsAsync<DeviceEndPointResolutionException>(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws
+        .TypeOf<DeviceEndPointResolutionException>()
+        .With
+        .Property(nameof(DeviceEndPointResolutionException.DeviceEndPoint)).SameAs(endPoint)
     );
 
-    Assert.That(ex!.DeviceEndPoint, Is.Not.Null, nameof(ex.DeviceEndPoint));
-    Assert.That(ex.DeviceEndPoint, Is.SameAs(endPoint), nameof(ex.DeviceEndPoint));
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
   }
 
@@ -319,17 +326,15 @@ public partial class KasaDeviceTests {
       )
     );
 
-    var ex = Assert.ThrowsAsync<SocketException>(
-      async() => await device.SendRequestAsync(
+    Assert.That(
+      async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
-    );
-
-    Assert.That(
-      ex!.SocketErrorCode,
-      Is.AnyOf(SocketError.HostNotFound, SocketError.TryAgain),
-      nameof(ex.SocketErrorCode)
+      ),
+      Throws
+        .TypeOf<SocketException>()
+        .With
+        .Property(nameof(SocketException.SocketErrorCode)).AnyOf(SocketError.HostNotFound, SocketError.TryAgain)
     );
 
     Assert.That(device.IsConnected, Is.False, "inner client must be disposed");
@@ -346,12 +351,13 @@ public partial class KasaDeviceTests {
       )
     );
 
-    Assert.ThrowsAsync<OperationCanceledException>(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
         cancellationToken: cts.Token
-      )
+      ),
+      Throws.InstanceOf<OperationCanceledException>()
     );
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
@@ -472,21 +478,23 @@ public partial class KasaDeviceTests {
       serviceProvider: services.BuildServiceProvider()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
         composeResult: static _ => 0
-      )
+      ),
+      Throws.Nothing
     );
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
 
-    Assert.CatchAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
         composeResult: static _ => 0
-      )
+      ),
+      Throws.Exception
     );
 
     Assert.That(device.IsConnected, Is.False, "inner client must be disposed");
@@ -551,12 +559,13 @@ public partial class KasaDeviceTests {
       serviceProvider: services.BuildServiceProvider()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module1"),
         method: JsonEncodedText.Encode("method"),
         composeResult: static _ => 0
       ),
+      Throws.Nothing,
       "request #1"
     );
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
@@ -572,12 +581,13 @@ public partial class KasaDeviceTests {
     };
 
     if (caseWhenRetrySuccess) {
-      Assert.DoesNotThrowAsync(
+      Assert.That(
         async () => await device.SendRequestAsync(
           module: JsonEncodedText.Encode("module2"),
           method: JsonEncodedText.Encode("method"),
           composeResult: static _ => 0
         ),
+        Throws.Nothing,
         "request #2"
       );
       Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
@@ -587,12 +597,13 @@ public partial class KasaDeviceTests {
       Assert.That(invalidatedEndPoints[0], Is.EqualTo(pseudoDeviceEndPoint1.EndPoint), nameof(invalidatedEndPoints) + "[0]");
     }
     else {
-      Assert.CatchAsync(
+      Assert.That(
         async () => await device.SendRequestAsync(
           module: JsonEncodedText.Encode("module2"),
           method: JsonEncodedText.Encode("method"),
           composeResult: static _ => 0
         ),
+        Throws.Exception,
         "request #2"
       );
       Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
@@ -656,11 +667,12 @@ public partial class KasaDeviceTests {
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(device.IsConnected, Is.True, nameof(device.IsConnected));
@@ -691,11 +703,12 @@ public partial class KasaDeviceTests {
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
 
-    Assert.ThrowsAsync<KasaIncompleteResponseException>(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.TypeOf<KasaIncompleteResponseException>()
     );
 
     Assert.That(request, Is.EqualTo(RetryMaxAttemptsForIncompleteResponse), nameof(request));
@@ -743,15 +756,14 @@ public partial class KasaDeviceTests {
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
 
-    var ex = Assert.CatchAsync(
+    Assert.That(
       async () => await device.SendRequestAsync(
         module: JsonEncodedText.Encode("module"),
         method: JsonEncodedText.Encode("method"),
         cancellationToken: ctsRequest.Token
-      )
+      ),
+      Throws.InstanceOf<OperationCanceledException>()
     );
-
-    Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
     Assert.That(device.IsConnected, Is.False, nameof(device.IsConnected));
   }

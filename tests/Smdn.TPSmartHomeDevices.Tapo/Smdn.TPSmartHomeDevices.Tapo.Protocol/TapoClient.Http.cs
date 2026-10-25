@@ -14,7 +14,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClientTests {
   [Test]
-  public async Task PostRequestAsync_NullJsonResponse()
+  public void PostRequestAsync_NullJsonResponse()
   {
     var contentEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
@@ -44,32 +44,31 @@ partial class TapoClientTests {
 
     // Confirm that at least an exception other than NullReferenceException is thrown,
     // since the case where JsonSerializer returns null cannot be reproduced.
-    var ex = Assert.CatchAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Exception.Not.InstanceOf<NullReferenceException>()
     );
-
-    Assert.That(ex, Is.Not.InstanceOf<NullReferenceException>());
 
     Assert.That(client.Session, Is.Null);
   }
 
   [Test]
-  public Task PostRequestAsync_Http3xxResponse()
+  public void PostRequestAsync_Http3xxResponse()
     // default http handler must not allow auto redirect
     => PostRequestAsync_HttpErrorResponse(HttpStatusCode.MovedPermanently);
 
   [Test]
-  public Task PostRequestAsync_Http4xxResponse()
+  public void PostRequestAsync_Http4xxResponse()
     => PostRequestAsync_HttpErrorResponse(HttpStatusCode.Forbidden);
 
   [Test]
-  public Task PostRequestAsync_Http5xxResponse()
+  public void PostRequestAsync_Http5xxResponse()
     => PostRequestAsync_HttpErrorResponse(HttpStatusCode.InternalServerError);
 
-  private async Task PostRequestAsync_HttpErrorResponse(HttpStatusCode statusCode)
+  private void PostRequestAsync_HttpErrorResponse(HttpStatusCode statusCode)
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcProcessRequest: context => {
@@ -81,14 +80,16 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<HttpRequestException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<HttpRequestException>()
+        .With
+        .Property(nameof(HttpRequestException.StatusCode)).EqualTo(statusCode)
     );
-
-    Assert.That(statusCode, Is.EqualTo(ex!.StatusCode), nameof(ex.StatusCode));
 
     Assert.That(client.Session, Is.Null);
   }
@@ -112,7 +113,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task PostRequestAsync_CancellationRequested()
+  public void PostRequestAsync_CancellationRequested()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcProcessRequest: static context => throw new InvalidOperationException("request must not be performed")
@@ -124,17 +125,16 @@ partial class TapoClientTests {
       httpClientFactory: new RequestCancellationHttpClientFactory(cts)
     );
 
-    var ex = Assert.CatchAsync(
+    Assert.That(
       // RequestCancellationHttpClientFactory will make a cancel request immediately after creating the HttpClient.
       // This will cause a cancellation request to be made before the request is sent.
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!,
         cancellationToken: cts.Token
-      )
+      ),
+      Throws.InstanceOf<OperationCanceledException>()
     );
-
-    Assert.That(ex, Is.InstanceOf<OperationCanceledException>().Or.InstanceOf<TaskCanceledException>());
 
     Assert.That(client.Session, Is.Null);
   }

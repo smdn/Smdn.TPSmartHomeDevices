@@ -92,7 +92,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
   private readonly struct NullResult { }
 
   [Test]
-  public async Task AddTapoHttpClient_ConfigureClient_BaseAddressMustBeOverwritten()
+  public void AddTapoHttpClient_ConfigureClient_BaseAddressMustBeOverwritten()
   {
     var services = new ServiceCollection();
 
@@ -122,13 +122,16 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       serviceProvider: services.BuildServiceProvider()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.GetDeviceInfoAsync());
+    Assert.That(
+      async () => await device.GetDeviceInfoAsync(),
+      Throws.Nothing
+    );
   }
 
   [Test]
-  public async Task AddTapoHttpClient_ConfigureClient_ExceptionMustBeWrappedIntoInvalidOperationException()
+  public void AddTapoHttpClient_ConfigureClient_ExceptionMustBeWrappedIntoInvalidOperationException()
   {
-    const string exceptionMessage = "configuring HTTP client is not implemented";
+    const string ExceptionMessage = "configuring HTTP client is not implemented";
     var services = new ServiceCollection();
 
     services.AddTapoCredential(
@@ -136,7 +139,7 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       "pass"
     );
     services.AddTapoHttpClient(
-      configureClient: client => throw new NotImplementedException(message: exceptionMessage)
+      configureClient: client => throw new NotImplementedException(message: ExceptionMessage)
     );
 
     var pseudoDevice = CommonPseudoTapoDevice.Configure(
@@ -155,10 +158,12 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
       serviceProvider: services.BuildServiceProvider()
     );
 
-    var ex = Assert.ThrowsAsync<InvalidOperationException>(async () => await device.GetDeviceInfoAsync());
-
-    Assert.That(ex!.InnerException, Is.Not.Null, nameof(ex.InnerException));
-    Assert.That(ex.InnerException, Is.InstanceOf<NotImplementedException>(), nameof(ex.InnerException));
-    Assert.That(ex.InnerException!.Message, Is.EqualTo(exceptionMessage));
+    Assert.That(
+      async () => await device.GetDeviceInfoAsync(),
+      Throws
+        .InvalidOperationException
+        .With.InnerException.TypeOf<NotImplementedException>()
+        .With.InnerException.Message.EqualTo(ExceptionMessage)
+    );
   }
 }

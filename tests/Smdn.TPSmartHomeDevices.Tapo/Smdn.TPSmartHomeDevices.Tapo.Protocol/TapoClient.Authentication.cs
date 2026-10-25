@@ -25,7 +25,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClientTests {
   [Test]
-  public async Task AuthenticateAsync_ArgumentNull()
+  public void AuthenticateAsync_ArgumentNull()
   {
     const string Token = "token";
 
@@ -39,26 +39,26 @@ partial class TapoClientTests {
 
     Assert.That(client.Session, Is.Null);
 
-#pragma warning disable CA2012
-    Assert.Throws<ArgumentNullException>(
+    Assert.That(
       () => client.AuthenticateAsync(
         identity: null,
         credential: null!
-      )
+      ),
+      Throws.ArgumentNullException
     );
-#pragma warning restore CA2012
-    Assert.ThrowsAsync<ArgumentNullException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: null!
-      )
+      ),
+      Throws.ArgumentNullException
     );
 
     Assert.That(client.Session, Is.Null);
   }
 
   [Test]
-  public async Task AuthenticateAsync_InvalidProtocol()
+  public void AuthenticateAsync_InvalidProtocol()
   {
     const TapoSessionProtocol InvalidProtocol = (TapoSessionProtocol)(-9999);
     const string Token = "token";
@@ -71,21 +71,20 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-#pragma warning disable CA2012
-    Assert.Throws<ArgumentException>(
+    Assert.That(
       () => client.AuthenticateAsync(
         protocol: InvalidProtocol,
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.ArgumentException
     );
-#pragma warning restore CA2012
 
     Assert.That(client.Session, Is.Null);
   }
 
   [Test]
-  public async Task AuthenticateAsync()
+  public void AuthenticateAsync()
   {
     const string Token = "token";
 
@@ -97,11 +96,12 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -115,7 +115,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_AccessTokenNotIssued()
+  public void AuthenticateAsync_AccessTokenNotIssued()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateToken: static _ => null
@@ -125,19 +125,23 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
     );
 
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_DnsEndPointWithUnspecifiedAddressType()
+  public void AuthenticateAsync_DnsEndPointWithUnspecifiedAddressType()
   {
     const string Token = "token";
 
@@ -151,11 +155,12 @@ partial class TapoClientTests {
 
     Assert.That(client.EndPointUri, Is.EqualTo(device.EndPointUri), nameof(client.EndPointUri));
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -284,7 +289,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_Handshake_ErrorResponse()
+  public void AuthenticateAsync_Handshake_ErrorResponse()
   {
     const int HandshakeErrorCode = -9999;
 
@@ -299,27 +304,25 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With.Property(nameof(TapoAuthenticationException.EndPoint)).EqualTo(device.EndPointUri)
+        .And.InnerException.TypeOf<TapoErrorResponseException>()
+        .And.InnerException.Property(nameof(TapoErrorResponseException.EndPoint)).EqualTo(new Uri(device.EndPointUri!, "/app"))
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RequestMethod)).EqualTo("handshake")
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RawErrorCode)).EqualTo(HandshakeErrorCode)
     );
 
-    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
-
-    var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
-
-    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
-    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("handshake"), nameof(innerErrorResponseException.RequestMethod));
-    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(HandshakeErrorCode), nameof(innerErrorResponseException.RawErrorCode));
-
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_Handshake_SuccessResponseWithoutKey()
+  public void AuthenticateAsync_Handshake_SuccessResponseWithoutKey()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateHandshakeResponse: static (_, _) => new HandshakeResponse() {
@@ -332,19 +335,23 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
     );
 
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_Handshake_UnexpectedLengthOfExchangedKey(
+  public void AuthenticateAsync_Handshake_UnexpectedLengthOfExchangedKey(
     [Values(64, 256)] int keyLength
   )
   {
@@ -359,22 +366,26 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
     );
 
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [TestCase("")]
   [TestCase("TP_UNKNOWN=XXXX")]
   [TestCase("TP_SESSIONID=")]
   [TestCase("TP_SESSIONID=;TIMEOUT=1440")]
-  public async Task AuthenticateAsync_Handshake_TpSessionIdCookie_InvalidOrNotAdvertised(
+  public void AuthenticateAsync_Handshake_TpSessionIdCookie_InvalidOrNotAdvertised(
     string? tpSessionIdCookieValue
   )
   {
@@ -389,11 +400,12 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -409,7 +421,7 @@ partial class TapoClientTests {
   [TestCase(";")]
   [TestCase(";TIMEOUT=")]
   [TestCase(";TIMEOUT=-1")]
-  public async Task AuthenticateAsync_Handshake_TpSessionIdCookie_TimeoutAttributeInvalidOrNotAdvertised(
+  public void AuthenticateAsync_Handshake_TpSessionIdCookie_TimeoutAttributeInvalidOrNotAdvertised(
     string timeoutAttribute
   )
   {
@@ -424,11 +436,12 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -440,7 +453,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_Handshake_Timeout()
+  public void AuthenticateAsync_Handshake_Timeout()
   {
     const string Token = "token";
 
@@ -466,17 +479,18 @@ partial class TapoClientTests {
     client.Timeout = TimeSpan.FromMilliseconds(1);
 
     try {
-      var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+      Assert.That(
         async () => await client.AuthenticateAsync(
           identity: null,
           credential: defaultCredentialProvider!
-        )
+        ),
+        Throws
+          .TypeOf<TapoAuthenticationException>()
+          .With.Property(nameof(TapoAuthenticationException.EndPoint)).EqualTo(device.EndPointUri)
+          .And.InnerException.TypeOf<TimeoutException>()
       );
 
-      Assert.That(ex!.InnerException, Is.InstanceOf<TimeoutException>(), nameof(ex.InnerException));
-
       Assert.That(client.Session, Is.Null);
-      Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
     }
     finally {
       cts.Cancel();
@@ -510,7 +524,7 @@ partial class TapoClientTests {
   }
 
   [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeConverted))]
-  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeConverted(
+  public void AuthenticateAsync_LoginDevice_CredentialMustBeConverted(
     ITapoCredentialProvider credential,
     string expectedUsernamePropertyValue,
     string expectedPasswordPropertyValue
@@ -537,11 +551,12 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: credential
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -611,7 +626,7 @@ partial class TapoClientTests {
   }
 
   [TestCaseSource(nameof(YieldTestCases_AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten))]
-  public async Task AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten(ILogger? logger)
+  public void AuthenticateAsync_LoginDevice_CredentialMustBeDisposedAfterRequestWritten(ILogger? logger)
   {
     const string Username = "user";
     const string Password = "pass";
@@ -644,18 +659,19 @@ partial class TapoClientTests {
       logger: logger // ILogger should not affect the operation
     );
 
-    Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: credentialProvider
-      )
+      ),
+      Throws.TypeOf<TapoAuthenticationException>()
     );
 
     Assert.That(credential.IsDisposed, Is.True, "ITapoCredential.Dispose must be called");
   }
 
   [Test]
-  public async Task AuthenticateAsync_LoginDevice_ErrorResponse()
+  public void AuthenticateAsync_LoginDevice_ErrorResponse()
   {
     const int LoginDeviceErrorCode = -9999;
 
@@ -670,27 +686,25 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With.Property(nameof(TapoAuthenticationException.EndPoint)).EqualTo(device.EndPointUri)
+        .And.InnerException.TypeOf<TapoErrorResponseException>()
+        .And.InnerException.Property(nameof(TapoErrorResponseException.EndPoint)).EqualTo(new Uri(device.EndPointUri!, "/app"))
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RequestMethod)).EqualTo("login_device")
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RawErrorCode)).EqualTo(LoginDeviceErrorCode)
     );
 
-    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
-
-    var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
-
-    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
-    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("login_device"), nameof(innerErrorResponseException.RequestMethod));
-    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(LoginDeviceErrorCode), nameof(innerErrorResponseException.RawErrorCode));
-
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_LoginDevice_ResponseWithErrorCodeMinus1501()
+  public void AuthenticateAsync_LoginDevice_ResponseWithErrorCodeMinus1501()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateLoginDeviceResponse: static (_, _) => new LoginDeviceResponse() {
@@ -703,29 +717,26 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Message.Match("(C|c)redential.*(I|i)nvalid")
+        .And.InnerException.TypeOf<TapoErrorResponseException>()
+        .And.InnerException.Property(nameof(TapoErrorResponseException.EndPoint)).EqualTo(new Uri(device.EndPointUri!, "/app"))
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RequestMethod)).EqualTo("login_device")
+        .And.InnerException.Property(nameof(TapoErrorResponseException.RawErrorCode)).EqualTo(KnownErrorCodes.Minus1501)
     );
 
-    Assert.That(ex!.Message, Does.Match("(C|c)redential.*(I|i)nvalid"), nameof(ex.Message));
-
-    Assert.That(ex!.InnerException, Is.InstanceOf<TapoErrorResponseException>(), nameof(ex.InnerException));
-
-    var innerErrorResponseException = (TapoErrorResponseException)ex.InnerException!;
-
-    Assert.That(innerErrorResponseException.EndPoint, Is.EqualTo(new Uri(device.EndPointUri!, "/app")), nameof(innerErrorResponseException.EndPoint));
-    Assert.That(innerErrorResponseException.RequestMethod, Is.EqualTo("login_device"), nameof(innerErrorResponseException.RequestMethod));
-    Assert.That(innerErrorResponseException.RawErrorCode, Is.EqualTo(KnownErrorCodes.Minus1501), nameof(innerErrorResponseException.RawErrorCode));
-
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_LoginDevice_SuccessResponseWithoutToken()
+  public void AuthenticateAsync_LoginDevice_SuccessResponseWithoutToken()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateToken: static _ => null
@@ -735,19 +746,23 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
     );
 
     Assert.That(client.Session, Is.Null);
-    Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
   }
 
   [Test]
-  public async Task AuthenticateAsync_LoginDevice_Timeout()
+  public void AuthenticateAsync_LoginDevice_Timeout()
   {
     const string Token = "token";
 
@@ -775,17 +790,18 @@ partial class TapoClientTests {
     client.Timeout = TimeSpan.FromMilliseconds(1);
 
     try {
-      var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+      Assert.That(
         async () => await client.AuthenticateAsync(
           identity: null,
           credential: defaultCredentialProvider!
-        )
+        ),
+        Throws
+          .TypeOf<TapoAuthenticationException>()
+          .With.Property(nameof(TapoAuthenticationException.EndPoint)).EqualTo(device.EndPointUri)
+          .And.InnerException.TypeOf<TimeoutException>()
       );
 
-      Assert.That(ex!.InnerException, Is.InstanceOf<TimeoutException>(), nameof(ex.InnerException));
-
       Assert.That(client.Session, Is.Null);
-      Assert.That(device.EndPointUri, Is.EqualTo(ex!.EndPoint));
     }
     finally {
       cts.Cancel();
@@ -811,7 +827,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_LoginDevice_MaskedCredentialMustBeOutputToLogger()
+  public void AuthenticateAsync_LoginDevice_MaskedCredentialMustBeOutputToLogger()
   {
     const string Token = "token";
 
@@ -829,11 +845,12 @@ partial class TapoClientTests {
       logger: logger
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         identity: null,
         credential: defaultCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(logger.Logs.Any(static line => line.Contains("\"username\":\"****\"")), Is.True, "contains masked username");

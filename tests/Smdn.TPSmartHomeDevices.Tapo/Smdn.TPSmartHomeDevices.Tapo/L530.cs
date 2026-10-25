@@ -48,14 +48,13 @@ public class L530Tests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-#pragma warning disable CA2012
-    var ex = Assert.Throws<ArgumentOutOfRangeException>(
-      () => device.SetBrightnessAsync(brightness: newBrightness)
-    )!;
-#pragma warning restore CA2012
-
-    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
-    Assert.That(ex.ActualValue, Is.EqualTo(newBrightness), nameof(ex.ActualValue));
+    Assert.That(
+      () => device.SetBrightnessAsync(brightness: newBrightness),
+      Throws
+        .TypeOf<ArgumentOutOfRangeException>()
+        .ParamName.EqualTo(expectedParamName)
+        .With.Property(nameof(ArgumentOutOfRangeException.ActualValue)).EqualTo(newBrightness)
+    );
   }
 
   [Test]
@@ -102,14 +101,13 @@ public class L530Tests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-#pragma warning disable CA2012
-    var ex = Assert.Throws<ArgumentOutOfRangeException>(
-      () => device.SetColorTemperatureAsync(colorTemperature: newColorTemperature, brightness: newBrightness)
-    )!;
-#pragma warning restore CA2012
-
-    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
-    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
+    Assert.That(
+      () => device.SetColorTemperatureAsync(colorTemperature: newColorTemperature, brightness: newBrightness),
+      Throws
+        .TypeOf<ArgumentOutOfRangeException>()
+        .ParamName.EqualTo(expectedParamName)
+        .With.Property(nameof(ArgumentOutOfRangeException.ActualValue)).EqualTo(expectedActualValue)
+    );
   }
 
   [Test]
@@ -165,14 +163,13 @@ public class L530Tests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-#pragma warning disable CA2012
-    var ex = Assert.Throws<ArgumentOutOfRangeException>(
-      () => device.SetColorAsync(hue: newHue, saturation: newSaturation, brightness: newBrightness)
-    )!;
-#pragma warning restore CA2012
-
-    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
-    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
+    Assert.That(
+      () => device.SetColorAsync(hue: newHue, saturation: newSaturation, brightness: newBrightness),
+      Throws
+        .TypeOf<ArgumentOutOfRangeException>()
+        .ParamName.EqualTo(expectedParamName)
+        .With.Property(nameof(ArgumentOutOfRangeException.ActualValue)).EqualTo(expectedActualValue)
+    );
   }
 
   [TestCase(0, 0, null)]
@@ -232,14 +229,13 @@ public class L530Tests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-#pragma warning disable CA2012
-    var ex = Assert.Throws<ArgumentOutOfRangeException>(
-      () => device.SetColorHueAsync(hue: newHue, brightness: newBrightness)
-    )!;
-#pragma warning restore CA2012
-
-    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
-    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
+    Assert.That(
+      () => device.SetColorHueAsync(hue: newHue, brightness: newBrightness),
+      Throws
+        .TypeOf<ArgumentOutOfRangeException>()
+        .ParamName.EqualTo(expectedParamName)
+        .With.Property(nameof(ArgumentOutOfRangeException.ActualValue)).EqualTo(expectedActualValue)
+    );
   }
 
   [TestCase(0, null)]
@@ -295,14 +291,13 @@ public class L530Tests {
       serviceProvider: services!.BuildServiceProvider()
     );
 
-#pragma warning disable CA2012
-    var ex = Assert.Throws<ArgumentOutOfRangeException>(
-      () => device.SetColorSaturationAsync(saturation: newSaturation, brightness: newBrightness)
-    )!;
-#pragma warning restore CA2012
-
-    Assert.That(ex.ParamName, Is.EqualTo(expectedParamName), nameof(ex.ParamName));
-    Assert.That(ex.ActualValue, Is.EqualTo(expectedActualValue), nameof(ex.ActualValue));
+    Assert.That(
+      () => device.SetColorSaturationAsync(saturation: newSaturation, brightness: newBrightness),
+      Throws
+        .TypeOf<ArgumentOutOfRangeException>()
+        .ParamName.EqualTo(expectedParamName)
+        .With.Property(nameof(ArgumentOutOfRangeException.ActualValue)).EqualTo(expectedActualValue)
+    );
   }
 
   [TestCase(0, null)]

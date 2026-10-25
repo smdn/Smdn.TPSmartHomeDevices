@@ -88,7 +88,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync());
+    Assert.That(
+      async () => await device.TurnOnAsync(),
+      Throws.Nothing
+    );
   }
 
   [TestCaseSource(nameof(YieldTestCases_TransitionPeriod))]
@@ -115,7 +118,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOnAsync(transitionPeriod: transitionPeriod));
+    Assert.That(
+      async () => await device.TurnOnAsync(transitionPeriod: transitionPeriod),
+      Throws.Nothing
+    );
   }
 
   [Test]
@@ -139,7 +145,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync());
+    Assert.That(
+      async () => await device.TurnOffAsync(),
+      Throws.Nothing
+    );
   }
 
   [TestCaseSource(nameof(YieldTestCases_TransitionPeriod))]
@@ -166,7 +175,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.TurnOffAsync(transitionPeriod: transitionPeriod));
+    Assert.That(
+      async () => await device.TurnOffAsync(transitionPeriod: transitionPeriod),
+      Throws.Nothing
+    );
   }
 
   [TestCase(true)]
@@ -193,7 +205,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState));
+    Assert.That(
+      async () => await device.SetOnOffStateAsync(newOnOffState: newState),
+      Throws.Nothing
+    );
   }
 
   private static System.Collections.IEnumerable YieldTestCases_SetOnOffStateAsync_WithTransitionPeriod()
@@ -231,7 +246,10 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(async () => await device.SetOnOffStateAsync(newOnOffState: newState, transitionPeriod: transitionPeriod));
+    Assert.That(
+      async () => await device.SetOnOffStateAsync(newOnOffState: newState, transitionPeriod: transitionPeriod),
+      Throws.Nothing
+    );
   }
 
   private static System.Collections.IEnumerable YieldTestCases_SetColorTemperatureAsync()
@@ -270,12 +288,13 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SetColorTemperatureAsync(
         colorTemperature: colorTemperature,
         brightness: brightness,
         transitionPeriod: transitionPeriod
-      )
+      ),
+      Throws.Nothing
     );
   }
 
@@ -317,13 +336,14 @@ public class KL130Tests {
       deviceEndPoint: pseudoDevice.GetEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await device.SetColorAsync(
         hue: hue,
         saturation: saturation,
         brightness: brightness,
         transitionPeriod: transitionPeriod
-      )
+      ),
+      Throws.Nothing
     );
   }
 
@@ -402,7 +422,10 @@ public class KL130Tests {
 
     KL130LightState lightState = default;
 
-    Assert.DoesNotThrowAsync(async () => lightState = await device.GetLightStateAsync());
+    Assert.That(
+      async () => lightState = await device.GetLightStateAsync(),
+      Throws.Nothing
+    );
 
     assertLightState(lightState);
   }
@@ -454,7 +477,10 @@ public class KL130Tests {
 
     bool? state = null;
 
-    Assert.DoesNotThrowAsync(async () => state = await device.GetOnOffStateAsync());
+    Assert.That(
+      async () => state = await device.GetOnOffStateAsync(),
+      Throws.Nothing
+    );
     Assert.That(state, Is.EqualTo(expectedState), nameof(expectedState));
   }
 }

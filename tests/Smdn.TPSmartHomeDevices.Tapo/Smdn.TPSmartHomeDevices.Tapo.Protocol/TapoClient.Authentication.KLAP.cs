@@ -13,7 +13,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClientTests {
   [Test]
-  public async Task AuthenticateAsync_KLAP()
+  public void AuthenticateAsync_KLAP()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span)
@@ -23,12 +23,13 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
         credential: defaultKlapCredentialProvider!
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.Session, Is.Not.Null);
@@ -41,7 +42,7 @@ partial class TapoClientTests {
   }
 
   [Test]
-  public async Task AuthenticateAsync_KLAP_Handshake1_AuthHashMismatch()
+  public void AuthenticateAsync_KLAP_Handshake1_AuthHashMismatch()
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateKlapAuthHash: (_, _, authHash) => authHash.Span.Clear()
@@ -51,22 +52,26 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
         credential: defaultKlapCredentialProvider!
-      )
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
+        .And
+        .InnerException.Null
     );
-
-    Assert.That(ex!.EndPoint, Is.EqualTo(device.EndPointUri), nameof(ex.EndPoint));
-    Assert.That(ex.InnerException, Is.Null, nameof(ex.InnerException));
 
     Assert.That(client.Session, Is.Null, nameof(client.Session));
   }
 
   [Test]
-  public async Task AuthenticateAsync_KLAP_Handshake2_HttpNonSuccessStatusCode()
+  public void AuthenticateAsync_KLAP_Handshake2_HttpNonSuccessStatusCode()
   {
     const HttpStatusCode Handshake2NonSuccessStatusCode = HttpStatusCode.Unauthorized;
 
@@ -79,24 +84,19 @@ partial class TapoClientTests {
       endPoint: device.GetListenerEndPoint()
     );
 
-    var ex = Assert.ThrowsAsync<TapoAuthenticationException>(
+    Assert.That(
       async () => await client.AuthenticateAsync(
         protocol: TapoSessionProtocol.Klap,
         identity: null,
         credential: defaultKlapCredentialProvider!
-      )
-    );
-
-    Assert.That(ex!.EndPoint, Is.EqualTo(device.EndPointUri), nameof(ex.EndPoint));
-
-    Assert.That(ex.InnerException, Is.InstanceOf<HttpRequestException>(), nameof(ex.InnerException));
-
-    var httpRequestException = ex.InnerException as HttpRequestException;
-
-    Assert.That(
-      httpRequestException!.StatusCode,
-      Is.EqualTo(Handshake2NonSuccessStatusCode),
-      nameof(httpRequestException.StatusCode)
+      ),
+      Throws
+        .TypeOf<TapoAuthenticationException>()
+        .With
+        .Property(nameof(TapoAuthenticationException.EndPoint))
+        .EqualTo(device.EndPointUri)
+        .And.InnerException.TypeOf<HttpRequestException>()
+        .And.InnerException.Property(nameof(HttpRequestException.StatusCode)).EqualTo(Handshake2NonSuccessStatusCode)
     );
 
     Assert.That(client.Session, Is.Null, nameof(client.Session));

@@ -38,12 +38,14 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
-      () => services.AddTapoProtocolSelector(selector: null!)
+    Assert.That(
+      () => services.AddTapoProtocolSelector(selector: null!),
+      Throws.ArgumentNullException
     );
 
-    Assert.Throws<InvalidOperationException>(
-      () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    Assert.That(
+      () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>(),
+      Throws.InvalidOperationException
     );
   }
 
@@ -69,12 +71,14 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
-      () => services.AddTapoProtocolSelector(selectProtocol: null!)
+    Assert.That(
+      () => services.AddTapoProtocolSelector(selectProtocol: null!),
+      Throws.ArgumentNullException
     );
 
-    Assert.Throws<InvalidOperationException>(
-      () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    Assert.That(
+      () => services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>(),
+      Throws.InvalidOperationException
     );
   }
 

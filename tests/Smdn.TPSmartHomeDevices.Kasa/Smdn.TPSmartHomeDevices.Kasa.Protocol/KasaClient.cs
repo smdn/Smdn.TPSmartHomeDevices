@@ -21,11 +21,14 @@ public class KasaClientTests {
   [Test]
   public void Ctor_ArgumentNull_EndPoint()
   {
-    Assert.Throws<ArgumentNullException>(() => {
-      using var client = new KasaClient(
-        endPoint: null!
-      );
-    });
+    Assert.That(
+      () => {
+        using var client = new KasaClient(
+          endPoint: null!
+        );
+      },
+      Throws.ArgumentNullException
+    );
   }
 
   [Test]
@@ -43,26 +46,28 @@ public class KasaClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.IsConnected, Is.False), nameof(client.IsConnected));
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(endPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint)));
-#pragma warning disable CA2012
-    Assert.Throws<ObjectDisposedException>(
+    Assert.That(() => _ = client.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(client.IsConnected));
+    Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
+
+    Assert.That(
       () => client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
         composeResult: static _ => _
       ),
+      Throws.TypeOf<ObjectDisposedException>(),
       nameof(client.SendAsync)
     );
-#pragma warning restore CA2012
-    Assert.ThrowsAsync<ObjectDisposedException>(
+
+    Assert.That(
       async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
         composeResult: static _ => _
       ),
+      Throws.TypeOf<ObjectDisposedException>(),
       nameof(client.SendAsync)
     );
   }
@@ -92,26 +97,28 @@ public class KasaClientTests {
     Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
     Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
 
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(client.IsConnected, Is.False), nameof(client.IsConnected));
-    Assert.Throws<ObjectDisposedException>(() => Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint)));
-#pragma warning disable CA2012
-    Assert.Throws<ObjectDisposedException>(
+    Assert.That(() => _ = client.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(client.IsConnected));
+    Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
+
+    Assert.That(
       () => client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
         composeResult: static _ => _
       ),
+      Throws.TypeOf<ObjectDisposedException>(),
       nameof(client.SendAsync)
     );
-#pragma warning restore CA2012
-    Assert.ThrowsAsync<ObjectDisposedException>(
+
+    Assert.That(
       async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
         composeResult: static _ => _
       ),
+      Throws.TypeOf<ObjectDisposedException>(),
       nameof(client.SendAsync)
     );
   }
@@ -240,13 +247,14 @@ public class KasaClientTests {
     Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
     Assert.That(client.EndPoint.AddressFamily, Is.EqualTo(AddressFamily.Unspecified), nameof(client.EndPoint.AddressFamily));
 
-    Assert.DoesNotThrowAsync(
+    Assert.That(
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
         parameter: new { },
         composeResult: static _ => true
-      )
+      ),
+      Throws.Nothing
     );
 
     Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
@@ -276,18 +284,18 @@ public class KasaClientTests {
 
     static bool ThrowExceptionComposeResult(JsonElement _) => throw new NotImplementedException();
 
-    var ex = Assert.ThrowsAsync<KasaUnexpectedResponseException>(
+    Assert.That(
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
         parameter: new { },
         composeResult: ThrowExceptionComposeResult
-      )
+      ),
+      Throws
+        .TypeOf<KasaUnexpectedResponseException>()
+        .With
+        .InnerException.TypeOf<NotImplementedException>()
     );
-
-    Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
-    Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
-    Assert.That(ex!.InnerException, Is.InstanceOf<NotImplementedException>());
   }
 
   [Test]
@@ -330,29 +338,27 @@ json: @"{
 
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
 
-    var ex = Assert.CatchAsync(
-      async () => await client.SendAsync(
-        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
-        method: JsonEncodedText.Encode("get_light_state"),
-        parameter: new { },
-        composeResult: static json => JsonDocument.Parse(json.ToString()),
-        cancellationToken: cts.Token
-      )
+    Assert.That(
+      async () => {
+        try {
+          await client.SendAsync(
+            module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+            method: JsonEncodedText.Encode("get_light_state"),
+            parameter: new { },
+            composeResult: static json => JsonDocument.Parse(json.ToString()),
+            cancellationToken: cts.Token
+          );
+        }
+        catch (OperationCanceledException) {
+          Assert.Inconclusive("test timed out");
+        }
+      },
+      Throws
+        .InstanceOf<KasaDisconnectedException>()
+        .With
+        .Property(nameof(KasaDisconnectedException.DeviceEndPoint))
+        .EqualTo(device.EndPoint)
     );
-
-    switch (ex) {
-      case KasaDisconnectedException disconnectedException:
-        Assert.That(device.EndPoint, Is.EqualTo(disconnectedException.DeviceEndPoint), nameof(disconnectedException.DeviceEndPoint));
-        break;
-
-      case OperationCanceledException:
-        Assert.Inconclusive("test timed out");
-        break;
-
-      default: // unexpected exception
-        Assert.That(ex, Is.InstanceOf<KasaDisconnectedException>());
-        break;
-    }
   }
 
   [Test]
@@ -398,29 +404,26 @@ json: @"{
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20.0));
 
     // device will close connection
-    var ex = Assert.CatchAsync(
-      async () => await client.SendAsync(
-        module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
-        method: JsonEncodedText.Encode("get_light_state"),
-        parameter: new { },
-        composeResult: static json => JsonDocument.Parse(json.ToString())
-      )
+    Assert.That(
+      async () => {
+        try {
+          await client.SendAsync(
+            module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
+            method: JsonEncodedText.Encode("get_light_state"),
+            parameter: new { },
+            composeResult: static json => JsonDocument.Parse(json.ToString())
+          );
+        }
+        catch (OperationCanceledException) {
+          Assert.Inconclusive("test timed out");
+        }
+      },
+      Throws
+        .InstanceOf<KasaDisconnectedException>()
+        .With
+        .Property(nameof(KasaDisconnectedException.DeviceEndPoint))
+        .EqualTo(device.EndPoint)
     );
-
-
-    switch (ex) {
-      case KasaDisconnectedException disconnectedException:
-        Assert.That(device.EndPoint, Is.EqualTo(disconnectedException.DeviceEndPoint), nameof(disconnectedException.DeviceEndPoint));
-        break;
-
-      case OperationCanceledException:
-        Assert.Inconclusive("test timed out");
-        break;
-
-      default: // unexpected exception
-        Assert.That(ex, Is.InstanceOf<KasaDisconnectedException>());
-        break;
-    }
   }
 
   [TestCase(1, 0)]
@@ -449,22 +452,21 @@ json: @"{
     Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
     Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
-    var ex = Assert.ThrowsAsync<KasaIncompleteResponseException>(
+    Assert.That(
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
         parameter: new { },
         composeResult: static _ => 0
-      )
+      ),
+      Throws
+        .TypeOf<KasaIncompleteResponseException>()
+        .With.InnerException.TypeOf<KasaMessageBodyTooShortException>()
+        .With.InnerException.Property(nameof(KasaMessageBodyTooShortException.ActualLength)).EqualTo(actualBodyLength)
+        .With.InnerException.Property(nameof(KasaMessageBodyTooShortException.IndicatedLength)).EqualTo(bodyLengthIndicatedInHeader)
     );
 
     // Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
     Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
-    Assert.That(ex!.InnerException, Is.InstanceOf<KasaMessageBodyTooShortException>());
-
-    var exBodyTooShortException = (ex.InnerException as KasaMessageBodyTooShortException)!;
-
-    Assert.That(exBodyTooShortException.ActualLength, Is.EqualTo(actualBodyLength), nameof(exBodyTooShortException.ActualLength));
-    Assert.That(exBodyTooShortException.IndicatedLength, Is.EqualTo(bodyLengthIndicatedInHeader), nameof(exBodyTooShortException.IndicatedLength));
   }
 }

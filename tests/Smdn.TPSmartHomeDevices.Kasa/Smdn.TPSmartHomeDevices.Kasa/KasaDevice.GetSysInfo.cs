@@ -111,7 +111,10 @@ public partial class KasaDeviceTests {
 
     KasaDeviceInfo? info = null;
 
-    Assert.DoesNotThrowAsync(async () => info = await device.GetDeviceInfoAsync());
+    Assert.That(
+      async () => info = await device.GetDeviceInfoAsync(),
+      Throws.Nothing
+    );
 
     Assert.That(info, Is.Not.Null);
 

@@ -90,7 +90,7 @@ public class HashAlgorithmExtensionsTests {
 
   [Test]
   public void TryComputeHash_3Sources_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(
+    => Assert.That(
       () => HashAlgorithmExtensions.TryComputeHash(
         algorithm: null!,
         destination: default,
@@ -98,7 +98,8 @@ public class HashAlgorithmExtensionsTests {
         source1: default,
         source2: default,
         bytesWritten: out _
-      )
+      ),
+      Throws.ArgumentNullException
     );
 
   private static System.Collections.IEnumerable YieldTestCases_TryComputeHash_4Sources()
@@ -206,7 +207,7 @@ public class HashAlgorithmExtensionsTests {
 
   [Test]
   public void TryComputeHash_4Sources_ArgumentNull()
-    => Assert.Throws<ArgumentNullException>(
+    => Assert.That(
       () => HashAlgorithmExtensions.TryComputeHash(
         algorithm: null!,
         destination: default,
@@ -215,6 +216,7 @@ public class HashAlgorithmExtensionsTests {
         source2: default,
         source3: default,
         bytesWritten: out _
-      )
+      ),
+      Throws.ArgumentNullException
     );
 }

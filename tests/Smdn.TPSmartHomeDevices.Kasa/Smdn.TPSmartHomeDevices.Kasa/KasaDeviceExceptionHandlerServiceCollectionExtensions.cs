@@ -37,8 +37,9 @@ public class KasaDeviceExceptionHandlerServiceCollectionExtensionsTests {
   {
     var services = new ServiceCollection();
 
-    Assert.Throws<ArgumentNullException>(
-      () => services.AddKasaDeviceExceptionHandler(exceptionHandler: null!)
+    Assert.That(
+      () => services.AddKasaDeviceExceptionHandler(exceptionHandler: null!),
+      Throws.ArgumentNullException
     );
   }
 
