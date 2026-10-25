@@ -220,18 +220,17 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled(cancellationToken)
+      ? ValueTask.FromCanceled(cancellationToken)
 #else
-        ValueTaskShim.FromCanceled(cancellationToken)
+      ? ValueTaskShim.FromCanceled(cancellationToken)
 #endif
       : SendRequestAsyncCore(
-        module: module,
-        method: method,
-        parameters: parameters,
-        cancellationToken: cancellationToken
-      );
+          module: module,
+          method: method,
+          parameters: parameters,
+          cancellationToken: cancellationToken
+        );
   }
 
   protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(
@@ -247,19 +246,18 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<TMethodResult>(cancellationToken)
+      ? ValueTask.FromCanceled<TMethodResult>(cancellationToken)
 #else
-        ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
+      ? ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
 #endif
       : SendRequestAsyncCore<NullParameter, TMethodResult>(
-        module: module,
-        method: method,
-        parameters: default,
-        composeResult: composeResult,
-        cancellationToken: cancellationToken
-      );
+          module: module,
+          method: method,
+          parameters: default,
+          composeResult: composeResult,
+          cancellationToken: cancellationToken
+        );
   }
 
   protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(
@@ -278,19 +276,18 @@ public partial class KasaDevice : IDisposable {
     ThrowIfDisposed();
 
     return cancellationToken.IsCancellationRequested
-      ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<TMethodResult>(cancellationToken)
+      ? ValueTask.FromCanceled<TMethodResult>(cancellationToken)
 #else
-        ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
+      ? ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
 #endif
       : SendRequestAsyncCore(
-        module: module,
-        method: method,
-        parameters: parameters,
-        composeResult: composeResult,
-        cancellationToken: cancellationToken
-      );
+          module: module,
+          method: method,
+          parameters: parameters,
+          composeResult: composeResult,
+          cancellationToken: cancellationToken
+        );
   }
 
   private async ValueTask SendRequestAsyncCore<TMethodParameter>(
@@ -397,6 +394,7 @@ public partial class KasaDevice : IDisposable {
         ).ConfigureAwait(false);
       }
       catch (Exception ex) {
+#pragma warning disable SA1143
         // OperationCanceledException and TaskCanceledException due to a cancel
         // request triggered by a given CancellationToken must not be handled
         // by exception handler, just rethrow instead.
@@ -406,6 +404,7 @@ public partial class KasaDevice : IDisposable {
         )
           ? KasaDeviceExceptionHandling.Throw
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
+#pragma warning restore SA1143
 
         static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
           => logger.LogError(

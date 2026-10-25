@@ -20,11 +20,10 @@ public sealed class StaticDeviceEndPoint : IDeviceEndPoint {
 
   public ValueTask<EndPoint?> ResolveAsync(CancellationToken cancellationToken = default)
     => cancellationToken.IsCancellationRequested
-      ?
 #if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
-        ValueTask.FromCanceled<EndPoint?>(cancellationToken)
+      ? ValueTask.FromCanceled<EndPoint?>(cancellationToken)
 #else
-        ValueTaskShim.FromCanceled<EndPoint?>(cancellationToken)
+      ? ValueTaskShim.FromCanceled<EndPoint?>(cancellationToken)
 #endif
       : new(endPoint);
 

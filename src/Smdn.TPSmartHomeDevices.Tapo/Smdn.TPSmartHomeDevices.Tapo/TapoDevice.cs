@@ -537,12 +537,14 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
         // OperationCanceledException and TaskCanceledException due to a cancel
         // request triggered by a given CancellationToken must not be handled
         // by exception handler, just rethrow instead.
+#pragma warning disable SA1143
         var handling = (
           ex is OperationCanceledException exOperationCanceled &&
           exOperationCanceled.CancellationToken.Equals(cancellationToken)
         )
           ? TapoDeviceExceptionHandling.Throw
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
+#pragma warning restore SA1143
 
         static void LogRequest(ILogger logger, TRequest req)
           => logger.LogError("{Request}", JsonSerializer.Serialize(req));

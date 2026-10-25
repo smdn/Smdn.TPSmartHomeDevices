@@ -98,15 +98,15 @@ public sealed partial class KasaClient : IDisposable {
       null => throw new ArgumentNullException(nameof(endPoint)),
       DnsEndPoint dnsEndPoint => dnsEndPoint.Port == 0
         ? new DnsEndPoint(
-          host: dnsEndPoint.Host,
-          port: DefaultPort
-        )
+            host: dnsEndPoint.Host,
+            port: DefaultPort
+          )
         : dnsEndPoint,
       IPEndPoint ipEndPoint => ipEndPoint.Port == 0
         ? new IPEndPoint(
-          address: ipEndPoint.Address,
-          port: DefaultPort
-        )
+            address: ipEndPoint.Address,
+            port: DefaultPort
+          )
         : ipEndPoint,
       _ => endPoint, // TODO: should throw exception?
     };

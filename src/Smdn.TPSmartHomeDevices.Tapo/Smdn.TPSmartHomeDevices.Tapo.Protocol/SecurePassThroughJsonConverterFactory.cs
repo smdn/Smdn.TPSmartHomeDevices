@@ -98,21 +98,21 @@ public sealed class SecurePassThroughJsonConverterFactory :
     => disposed
       ? throw new ObjectDisposedException(GetType().FullName)
       : new CryptoStream(
-        stream: stream ?? throw new ArgumentNullException(nameof(stream)),
-        transform: encryptorForPassThroughRequest ?? throw new NotSupportedException("encryption not supported"),
-        mode: CryptoStreamMode.Write,
-        leaveOpen: true
-      );
+          stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+          transform: encryptorForPassThroughRequest ?? throw new NotSupportedException("encryption not supported"),
+          mode: CryptoStreamMode.Write,
+          leaveOpen: true
+        );
 
   private CryptoStream CreateDecryptingStream(Stream stream)
     => disposed
       ? throw new ObjectDisposedException(GetType().FullName)
       : new CryptoStream(
-        stream: stream ?? throw new ArgumentNullException(nameof(stream)),
-        transform: decryptorForPassThroughResponse ?? throw new NotSupportedException("decryption not supported"),
-        mode: CryptoStreamMode.Read,
-        leaveOpen: true
-      );
+          stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+          transform: decryptorForPassThroughResponse ?? throw new NotSupportedException("decryption not supported"),
+          mode: CryptoStreamMode.Read,
+          leaveOpen: true
+        );
 
   public override bool CanConvert(Type typeToConvert)
     =>
