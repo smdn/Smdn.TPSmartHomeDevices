@@ -239,7 +239,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   /// <param name="serviceProvider">
   /// A <see cref="IServiceProvider"/>.
   /// <see cref="ITapoCredentialProvider"/> must be registered in order to retrieve the credentials required for authentication.
-  /// <see cref="IDeviceEndPointFactory&lt;PhysicalAddress&gt;"/> must also be registered to create an <see cref="IDeviceEndPoint" />, corresponding to the <paramref name="macAddress"/>.
+  /// <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> must also be registered to create an <see cref="IDeviceEndPoint" />, corresponding to the <paramref name="macAddress"/>.
   /// </param>
   /// <exception cref="InvalidOperationException">No service for type <see cref="ITapoCredentialProvider"/> and/or <see cref="IDeviceEndPointFactory{PhysicalAddress}"/> has been registered for <paramref name="serviceProvider"/>.</exception>
   protected TapoDevice(
