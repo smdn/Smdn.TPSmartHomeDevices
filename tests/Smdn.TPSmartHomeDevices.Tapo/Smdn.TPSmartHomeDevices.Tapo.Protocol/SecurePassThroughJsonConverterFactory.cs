@@ -357,7 +357,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
       )
     );
 
-    Assert.Throws<ThrowExceptionJsonConverterException>(() => JsonSerializer.Serialize(request, request.GetType(), options));
+    Assert.That(() => JsonSerializer.Serialize(request, request.GetType(), options), Throws.TypeOf<ThrowExceptionJsonConverterException>());
   }
 
   private readonly struct SetDeviceInfoResponseResult {
@@ -572,12 +572,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
     inputStream.WriteByte((byte)'"');
     inputStream.Position = 0L;
 
-    Assert.Throws<SecurePassThroughInvalidPaddingException>(
+    Assert.That(
       () => JsonSerializer.Deserialize(
         inputStream,
         returnType,
         options
-      )
+      ),
+      Throws.TypeOf<SecurePassThroughInvalidPaddingException>()
     );
   }
 
@@ -602,13 +603,14 @@ public class SecurePassThroughJsonConverterFactoryTests {
       )
     );
 
-    Assert.Throws<ThrowExceptionJsonConverterException>(() => {
-      JsonSerializer.Deserialize(
+    Assert.That(
+      () => JsonSerializer.Deserialize(
         "\"" + Convert.ToBase64String(Encoding.UTF8.GetBytes(rawJsonExpression)) + "\"",
         returnType,
         options
-      );
-    });
+      ),
+      Throws.TypeOf<ThrowExceptionJsonConverterException>()
+    );
   }
 
   private static System.Collections.IEnumerable YieldTestCases_ConverterForITapoPassThroughResponse_Decrypting_Null()
@@ -673,14 +675,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
     // Confirm that at least an exception other than CryptographicException is thrown,
     // since the case where JsonSerializer returns null cannot be reproduced.
-    var ex = Assert.Catch(
+    Assert.That(
       () => JsonSerializer.Deserialize(
         inputStream,
         returnType,
         options
-      )
+      ),
+      Throws.Exception.Not.InstanceOf<CryptographicException>()
     );
-
-    Assert.That(ex, Is.Not.InstanceOf<CryptographicException>());
   }
 }

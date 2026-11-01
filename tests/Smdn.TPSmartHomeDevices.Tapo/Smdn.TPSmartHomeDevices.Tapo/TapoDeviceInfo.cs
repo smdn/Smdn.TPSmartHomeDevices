@@ -18,8 +18,9 @@ public class TapoDeviceInfoTests {
   {
     TapoDeviceInfo? info = null;
 
-    Assert.DoesNotThrow(
-      () => info = JsonSerializer.Deserialize<TapoDeviceInfo>("{}")
+    Assert.That(
+      () => info = JsonSerializer.Deserialize<TapoDeviceInfo>("{}"),
+      Throws.Nothing
     );
 
     Assert.That(info, Is.Not.Null);

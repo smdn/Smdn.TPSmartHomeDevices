@@ -209,11 +209,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: EnvVarUsername,
         envVarPassword: EnvVarPassword
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
@@ -246,11 +247,12 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: EnvVarUsername,
         envVarPassword: EnvVarPassword
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
@@ -285,18 +287,20 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: EnvVarUsername,
         envVarPassword: EnvVarPassword
-      )
+      ),
+      Throws.Nothing
     );
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoCredentialFromEnvironmentVariable(
         envVarUsername: "this_must_not_be_selected",
         envVarPassword: "this_must_not_be_selected"
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
@@ -344,10 +348,11 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
         envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
@@ -373,10 +378,11 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
         envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();
@@ -388,7 +394,7 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
       Assert.That(() => GetEncodedCredential(credentialProvider, identity: null), Throws.TypeOf<NotSupportedException>());
 
-      Assert.That(() => GetKlapLocalAuthHash(credentialProvider, identity: null), Throws.TypeOf<InvalidOperationException>());
+      Assert.That(() => GetKlapLocalAuthHash(credentialProvider, identity: null), Throws.InvalidOperationException);
     }
     finally {
       Environment.SetEnvironmentVariable(EnvVarKlapLocalAuthHash, null);
@@ -402,16 +408,18 @@ public class TapoCredentailProviderServiceCollectionExtensionsTests {
 
     var services = new ServiceCollection();
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
         envVarBase64KlapLocalAuthHash: EnvVarKlapLocalAuthHash
-      )
+      ),
+      Throws.Nothing
     );
 
-    Assert.DoesNotThrow(
+    Assert.That(
       () => services.AddTapoBase64EncodedKlapCredentialFromEnvironmentVariable(
         envVarBase64KlapLocalAuthHash: "this_must_not_be_selected"
-      )
+      ),
+      Throws.Nothing
     );
 
     var credentialProvider = services.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>();

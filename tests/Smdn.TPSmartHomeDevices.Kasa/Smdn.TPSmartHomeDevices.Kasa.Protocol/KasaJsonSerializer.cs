@@ -200,12 +200,13 @@ public class KasaJsonSerializerTests {
       buffer.Advance(length);
     }
 
-    Assert.Throws<KasaMessageHeaderTooShortException>(
+    Assert.That(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws.TypeOf<KasaMessageHeaderTooShortException>()
     );
   }
 
@@ -239,18 +240,19 @@ public class KasaJsonSerializerTests {
 
   [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageBodyTooShort))]
   public void Deserialize_MessageBodyTooShort(ArrayBufferWriter<byte> buffer, int bodyLengthIndicatedInHeader)
-  {
-    var ex = Assert.Throws<KasaMessageBodyTooShortException>(
+    => Assert.That(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method")
-      )
+      ),
+      Throws
+        .TypeOf<KasaMessageBodyTooShortException>()
+        .With
+        .Property(nameof(KasaMessageBodyTooShortException.IndicatedLength)).EqualTo(bodyLengthIndicatedInHeader)
+        .And
+        .Property(nameof(KasaMessageBodyTooShortException.ActualLength)).EqualTo(buffer.WrittenCount - 4)
     );
-
-    Assert.That(ex!.IndicatedLength, Is.EqualTo(bodyLengthIndicatedInHeader), nameof(ex.IndicatedLength));
-    Assert.That(ex.ActualLength, Is.EqualTo(buffer.WrittenCount - 4), nameof(ex.ActualLength));
-  }
 
   private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageModuleMismatch()
   {
@@ -274,12 +276,13 @@ public class KasaJsonSerializerTests {
 
   [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageModuleMismatch))]
   public void Deserialize_MessageModuleMismatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
-    => Assert.Throws<KasaMessageException>(
+    => Assert.That(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         module,
         method
-      )
+      ),
+      Throws.TypeOf<KasaMessageException>()
     );
 
   private static System.Collections.IEnumerable YieldTestCases_Deserialize_MessageMethodMismatch()
@@ -304,11 +307,12 @@ public class KasaJsonSerializerTests {
 
   [TestCaseSource(nameof(YieldTestCases_Deserialize_MessageMethodMismatch))]
   public void Deserialize_MessageMethodMismatch(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method)
-    => Assert.Throws<KasaMessageException>(
+    => Assert.That(
       () => KasaJsonSerializer.Deserialize(
         buffer,
         module,
         method
-      )
+      ),
+      Throws.TypeOf<KasaMessageException>()
     );
 }

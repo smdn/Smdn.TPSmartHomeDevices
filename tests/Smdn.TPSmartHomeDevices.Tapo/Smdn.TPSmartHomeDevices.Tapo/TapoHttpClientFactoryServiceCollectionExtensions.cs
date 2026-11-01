@@ -24,8 +24,9 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
 
     IHttpClientFactory? factory = null;
 
-    Assert.DoesNotThrow(
-      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+    Assert.That(
+      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(),
+      Throws.Nothing
     );
     Assert.That(factory, Is.Not.Null, nameof(factory));
   }
@@ -46,8 +47,9 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
 
     IHttpClientFactory? factory = null;
 
-    Assert.DoesNotThrow(
-      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+    Assert.That(
+      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(),
+      Throws.Nothing
     );
     Assert.That(factory, Is.Not.Null, nameof(factory));
 
@@ -77,8 +79,9 @@ public class TapoHttpClientFactoryServiceCollectionExtensionsTests {
 
     IHttpClientFactory? factory = null;
 
-    Assert.DoesNotThrow(
-      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>()
+    Assert.That(
+      () => factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(),
+      Throws.Nothing
     );
     Assert.That(factory, Is.Not.Null, nameof(factory));
 

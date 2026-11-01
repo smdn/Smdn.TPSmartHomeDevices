@@ -117,7 +117,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     using var resolver = new DisposableMacAddressResolver();
     using var factory = new MacAddressDeviceEndPointFactory(resolver, shouldDisposeResolver: shouldDisposeResolver);
 
-    Assert.DoesNotThrow(factory.Dispose);
+    Assert.That(factory.Dispose, Throws.Nothing);
 
     if (shouldDisposeResolver)
       Assert.That(resolver.HasDisposed, Is.True, nameof(resolver.HasDisposed));
@@ -134,8 +134,8 @@ public class MacAddressDeviceEndPointFactoryTests {
       serviceProvider: null
     );
 
-    Assert.DoesNotThrow(factory.Dispose, "Dispose #1");
-    Assert.DoesNotThrow(factory.Dispose, "Dispose #2");
+    Assert.That(factory.Dispose, Throws.Nothing, "Dispose #1");
+    Assert.That(factory.Dispose, Throws.Nothing, "Dispose #2");
 
     Assert.That(() => factory.Create(PhysicalAddress.None), Throws.TypeOf<ObjectDisposedException>());
   }
@@ -149,8 +149,8 @@ public class MacAddressDeviceEndPointFactoryTests {
       shouldDisposeResolver: shouldDisposeResolver
     );
 
-    Assert.DoesNotThrow(factory.Dispose, "Dispose #1");
-    Assert.DoesNotThrow(factory.Dispose, "Dispose #2");
+    Assert.That(factory.Dispose, Throws.Nothing, "Dispose #1");
+    Assert.That(factory.Dispose, Throws.Nothing, "Dispose #2");
 
     Assert.That(() => factory.Create(PhysicalAddress.None), Throws.TypeOf<ObjectDisposedException>());
   }
@@ -309,7 +309,7 @@ public class MacAddressDeviceEndPointFactoryTests {
     Assert.That(new IPEndPoint(TestIPAddress, 0), Is.EqualTo(resolvedEndPointAddress), nameof(resolvedEndPointAddress));
 
     // invalidate
-    Assert.DoesNotThrow(() => (endPoint as IDynamicDeviceEndPoint)!.Invalidate());
+    Assert.That(() => (endPoint as IDynamicDeviceEndPoint)!.Invalidate(), Throws.Nothing);
 
     EndPoint? resolvedEndPointAddressAfterInvalidation = null;
 

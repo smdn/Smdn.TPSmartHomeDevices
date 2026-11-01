@@ -26,8 +26,9 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
 
     TapoSessionProtocolSelector? addedSelector = null;
 
-    Assert.DoesNotThrow(
-      () => addedSelector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    Assert.That(
+      () => addedSelector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>(),
+      Throws.Nothing
     );
     Assert.That(addedSelector, Is.Not.Null);
     Assert.That(addedSelector, Is.SameAs(selector));
@@ -60,8 +61,9 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
 
     TapoSessionProtocolSelector? selector = null;
 
-    Assert.DoesNotThrow(
-      () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    Assert.That(
+      () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>(),
+      Throws.Nothing
     );
     Assert.That(selector, Is.Not.Null, nameof(selector));
   }
@@ -96,8 +98,9 @@ public class TapoSessionProtocolSelectorServiceCollectionExtensionsTests {
 
     TapoSessionProtocolSelector? selector = null;
 
-    Assert.DoesNotThrow(
-      () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>()
+    Assert.That(
+      () => selector = services.BuildServiceProvider().GetRequiredService<TapoSessionProtocolSelector>(),
+      Throws.Nothing
     );
     Assert.That(selector, Is.Not.Null, nameof(selector));
   }

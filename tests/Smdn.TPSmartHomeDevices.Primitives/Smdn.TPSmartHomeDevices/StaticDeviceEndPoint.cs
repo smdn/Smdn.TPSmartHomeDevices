@@ -20,7 +20,7 @@ public class StaticDeviceEndPointTests {
 
   [TestCaseSource(nameof(YieldTestCases_EndPoints))]
   public void Ctor(EndPoint endPoint)
-    => Assert.DoesNotThrow(() => new StaticDeviceEndPoint(endPoint));
+    => Assert.That(() => new StaticDeviceEndPoint(endPoint), Throws.Nothing);
 
   [Test]
   public void Ctor_EndPointNull()

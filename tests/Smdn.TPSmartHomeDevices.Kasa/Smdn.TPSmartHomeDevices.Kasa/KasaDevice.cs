@@ -131,8 +131,8 @@ public partial class KasaDeviceTests {
       ipAddress: IPAddress.Loopback
     );
 
-    Assert.DoesNotThrow(device.Dispose, "dispose");
-    Assert.DoesNotThrow(device.Dispose, "dispose again");
+    Assert.That(device.Dispose, Throws.Nothing, "dispose");
+    Assert.That(device.Dispose, Throws.Nothing, "dispose again");
 
     Assert.That(() => device.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(device.EndPoint));
     Assert.That(() => device.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(device.IsConnected));

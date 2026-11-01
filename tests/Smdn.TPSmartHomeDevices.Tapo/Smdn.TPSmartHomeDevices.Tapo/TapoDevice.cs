@@ -69,26 +69,28 @@ public partial class TapoDeviceTests {
   [Test]
   public void Create_WithCredentialProvider_ByICredentialProvider()
   {
-    Assert.DoesNotThrow(
+    Assert.That(
       () => {
         using var device = TapoDevice.Create(
           deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           credential: services?.BuildServiceProvider().GetRequiredService<ITapoCredentialProvider>()
         );
-      }
+      },
+      Throws.Nothing
     );
   }
 
   [Test]
   public void Create_WithCredentialProvider_ViaIServiceProvider()
   {
-    Assert.DoesNotThrow(
+    Assert.That(
       () => {
         using var device = TapoDevice.Create(
           deviceEndPoint: new StaticDeviceEndPoint(new IPEndPoint(IPAddress.Loopback, 0)),
           serviceProvider: services?.BuildServiceProvider()
         );
-      }
+      },
+      Throws.Nothing
     );
   }
 
@@ -253,8 +255,8 @@ public partial class TapoDeviceTests {
       "password"
     );
 
-    Assert.DoesNotThrow(device.Dispose, "dispose");
-    Assert.DoesNotThrow(device.Dispose, "dispose again");
+    Assert.That(device.Dispose, Throws.Nothing, "dispose");
+    Assert.That(device.Dispose, Throws.Nothing, "dispose again");
 
     Assert.That(device.Session, Is.Null, nameof(device.Session));
 

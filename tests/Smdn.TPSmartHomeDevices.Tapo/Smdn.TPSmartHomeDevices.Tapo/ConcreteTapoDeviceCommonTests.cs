@@ -8,6 +8,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -275,32 +276,24 @@ internal class ConcreteTapoDeviceCommonTests {
     string expectedParamName
   )
   {
-    if (expectedExceptionType is null) {
-      Assert.DoesNotThrow(
-        () => {
-          if (method is ConstructorInfo ctor)
-            ctor.Invoke(methodParameters);
-          else
-            method.Invoke(null, methodParameters);
-        }
-      );
-    }
-    else {
-      var ex = Assert.Throws<TargetInvocationException>(
-        () => {
-          if (method is ConstructorInfo ctor)
-            ctor.Invoke(methodParameters);
-          else
-            method.Invoke(null, methodParameters);
-        }
-      );
-      var actualException = ex!.InnerException;
+    Constraint constraint = expectedExceptionType is null
+      ? Throws.Nothing
+      : Throws
+        .TypeOf<TargetInvocationException>()
+        .With
+        .InnerException.InstanceOf(expectedExceptionType);
 
-      Assert.That(actualException, Is.InstanceOf(expectedExceptionType));
-
-      if (actualException is ArgumentException argumentException)
-        Assert.That(argumentException.ParamName, Is.EqualTo(expectedParamName), nameof(argumentException.ParamName));
-    }
+    Assert.That(
+      () => {
+        if (method is ConstructorInfo ctor)
+          ctor.Invoke(methodParameters);
+        else
+          method.Invoke(null, methodParameters);
+      },
+      typeof(ArgumentException).IsAssignableTo(expectedExceptionType)
+        ? constraint.And.Property(nameof(ArgumentException.ParamName)).EqualTo(expectedParamName)
+        : constraint
+    );
   }
 
   private sealed class NullCredentialProvider : ITapoCredentialProvider {

@@ -52,6 +52,6 @@ public class TimeSpanInSecondsJsonConverterTests {
     if (typeOfExpectedException is null)
       Assert.That(JsonSerializer.Serialize(obj), Is.EqualTo(expected));
     else
-      Assert.Throws(typeOfExpectedException, () => JsonSerializer.Serialize(obj));
+      Assert.That(() => JsonSerializer.Serialize(obj), Throws.TypeOf(typeOfExpectedException));
   }
 }

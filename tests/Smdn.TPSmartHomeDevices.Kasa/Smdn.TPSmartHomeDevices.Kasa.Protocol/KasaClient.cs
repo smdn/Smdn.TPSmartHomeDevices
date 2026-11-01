@@ -43,8 +43,8 @@ public class KasaClientTests {
     Assert.That(client.IsConnected, Is.False, nameof(client.IsConnected));
     Assert.That(endPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
-    Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
-    Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose not-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose already-disposed");
 
     Assert.That(() => _ = client.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(client.IsConnected));
     Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
@@ -94,8 +94,8 @@ public class KasaClientTests {
     Assert.That(client.IsConnected, Is.True, nameof(client.IsConnected));
     Assert.That(device.EndPoint, Is.EqualTo(client.EndPoint), nameof(client.EndPoint));
 
-    Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
-    Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose not-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose already-disposed");
 
     Assert.That(() => _ = client.IsConnected, Throws.TypeOf<ObjectDisposedException>(), nameof(client.IsConnected));
     Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
@@ -140,7 +140,7 @@ public class KasaClientTests {
   {
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => {
-        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument));
+        Assert.That(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument), Throws.Nothing);
 
         return JsonDocument.Parse(json: @"{
   ""smartlife.iot.smartbulb.lightingservice"": {
@@ -180,7 +180,7 @@ public class KasaClientTests {
   {
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => {
-        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument));
+        Assert.That(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument), Throws.Nothing);
 
         return JsonDocument.Parse(json: @"{
   ""smartlife.iot.smartbulb.lightingservice"": {
@@ -228,7 +228,7 @@ public class KasaClientTests {
   {
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => {
-        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument));
+        Assert.That(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument), Throws.Nothing);
 
         return JsonDocument.Parse(json: @"{
   ""smartlife.iot.smartbulb.lightingservice"": {
@@ -265,7 +265,7 @@ public class KasaClientTests {
   {
     await using var device = new PseudoKasaDevice() {
       FuncGenerateResponse = static (EndPoint _, JsonDocument requestJsonDocument) => {
-        Assert.DoesNotThrow(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument));
+        Assert.That(() => JsonSerializer.Deserialize<PseudoRequest>(requestJsonDocument), Throws.Nothing);
 
         return JsonDocument.Parse(json: @"{
   ""smartlife.iot.smartbulb.lightingservice"": {

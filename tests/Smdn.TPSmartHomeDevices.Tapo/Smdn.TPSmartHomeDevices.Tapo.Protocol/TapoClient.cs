@@ -115,8 +115,8 @@ public partial class TapoClientTests {
       endPoint: new IPEndPoint(IPAddress.Loopback, 80)
     );
 
-    Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
-    Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose not-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose already-disposed");
 
     Assert.That(() => _ = client.Session, Throws.TypeOf<ObjectDisposedException>());
 
@@ -155,8 +155,8 @@ public partial class TapoClientTests {
 
     Assert.That(client.Session, Is.Not.Null, "Session before dispose");
 
-    Assert.DoesNotThrow(client.Dispose, "Dispose not-disposed");
-    Assert.DoesNotThrow(client.Dispose, "Dispose already-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose not-disposed");
+    Assert.That(client.Dispose, Throws.Nothing, "Dispose already-disposed");
 
     Assert.That(() => _ = client.Session, Throws.TypeOf<ObjectDisposedException>());
 
