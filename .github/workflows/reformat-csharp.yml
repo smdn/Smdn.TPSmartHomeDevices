@@ -50,7 +50,7 @@ on:
 jobs:
   run-reformat-csharp:
     name: Reformat C# code
-    uses: smdn/workflows-dotnet/.github/workflows/reformat-csharp.yml@297a9476c9ae4c8fc3ff846e60c181c8ca53a51a # reformat-csharp/v1.0.2
+    uses: smdn/workflows-dotnet/.github/workflows/reformat-csharp.yml@704e8cfb4ef5320690bf93e9ddcb0a7eb1d6e28a # reformat-csharp/v1.0.5
     permissions:
       contents: write
       pull-requests: write
