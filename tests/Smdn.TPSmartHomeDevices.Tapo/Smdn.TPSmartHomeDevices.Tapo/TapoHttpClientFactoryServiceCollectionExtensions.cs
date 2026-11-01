@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 

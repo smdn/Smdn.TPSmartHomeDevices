@@ -391,10 +391,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
           Assert.That(deserialized, Is.InstanceOf<PassThroughResponse<GetDeviceInfoResponseResult>>());
 
           var resp = (PassThroughResponse<GetDeviceInfoResponseResult>)deserialized;
+
+#pragma warning disable IDE0340
           Assert.That(resp.ErrorCode, Is.EqualTo(-1), nameof(PassThroughResponse<GetDeviceInfoResponseResult>.ErrorCode));
           Assert.That(resp.Result.Id, Is.EqualTo("<device-id>"), nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.Id));
           Assert.That(resp.Result.IsOn, Is.True, nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.IsOn));
           Assert.That(resp.Result.NickName, Is.Null, nameof(PassThroughResponse<GetDeviceInfoResponseResult>.Result.NickName));
+#pragma warning restore IDE0340
         }
       )
     };
@@ -409,9 +412,11 @@ public class SecurePassThroughJsonConverterFactoryTests {
 
           var resp = (PassThroughResponse<SetDeviceInfoResponseResult>)deserialized;
 
+#pragma warning disable IDE0340
           Assert.That(resp.ErrorCode, Is.EqualTo(1), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.ErrorCode));
           Assert.That(resp.Result.Foo, Is.Zero, nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Foo));
           Assert.That(resp.Result.Bar, Is.EqualTo("baz"), nameof(PassThroughResponse<SetDeviceInfoResponseResult>.Result.Bar));
+#pragma warning restore IDE0340
         }
       )
     };
