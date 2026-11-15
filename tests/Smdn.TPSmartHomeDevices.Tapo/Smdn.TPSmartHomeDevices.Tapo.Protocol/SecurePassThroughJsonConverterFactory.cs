@@ -511,7 +511,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   private class NullLogger : ILogger {
-    public IDisposable BeginScope<TState>(TState state) => NullLoggerScope.Instance; // do nothing
+#if NET11_0_OR_GREATER
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+#else
+    public IDisposable BeginScope<TState>(TState state)
+#endif
+       => NullLoggerScope.Instance; // do nothing
+
     public bool IsEnabled(LogLevel logLevel) => true; // enable all log level
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { } // do nothing
   }
