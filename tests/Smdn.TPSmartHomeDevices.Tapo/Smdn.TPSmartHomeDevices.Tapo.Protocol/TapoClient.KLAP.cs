@@ -14,7 +14,9 @@ partial class TapoClientTests {
   {
     yield return new object[] {
       new SendRequestKlapSessionAsyncFunc(
+#pragma warning disable CS0618 // CS0618: SendRequestAsync without JsonTypeInfo<T> is obsolete.
         static client => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>()
+#pragma warning restore CS0618
       )
     };
 

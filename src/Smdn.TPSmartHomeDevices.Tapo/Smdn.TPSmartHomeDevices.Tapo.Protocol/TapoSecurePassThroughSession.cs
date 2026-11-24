@@ -33,7 +33,9 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
   private string? token;
   private Aes? aes;
   private PassThroughMessageTransform passThroughMessageTransform;
+#pragma warning disable CS0618 // CS0618: SecurePassThroughJsonConverterFactory is obsolete.
   private SecurePassThroughJsonConverterFactory securePassThroughJsonConverterFactory;
+#pragma warning restore CS0618
 
   internal JsonSerializerOptions SecurePassThroughJsonSerializerOptions {
 #if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE

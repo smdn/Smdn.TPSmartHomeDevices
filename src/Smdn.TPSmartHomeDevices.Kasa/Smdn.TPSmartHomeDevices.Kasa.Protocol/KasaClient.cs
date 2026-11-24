@@ -180,6 +180,7 @@ public sealed partial class KasaClient : IDisposable {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,

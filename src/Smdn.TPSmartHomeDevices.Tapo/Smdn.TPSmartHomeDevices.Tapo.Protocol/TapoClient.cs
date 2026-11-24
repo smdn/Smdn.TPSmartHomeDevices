@@ -201,6 +201,7 @@ public sealed partial class TapoClient : IDisposable {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )
@@ -215,6 +216,7 @@ public sealed partial class TapoClient : IDisposable {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken = default

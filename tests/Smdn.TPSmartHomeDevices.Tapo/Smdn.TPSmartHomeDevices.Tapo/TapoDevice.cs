@@ -9,6 +9,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -243,8 +244,8 @@ public partial class TapoDeviceTests {
     Assert.That(device.TerminalUuidString, Does.Match(ExpectedTerminalUuidRegexPattern), nameof(device.TerminalUuidString));
   }
 
-  private readonly struct NullParameters { }
-  private readonly struct NullResult { }
+  internal readonly struct NullParameters { }
+  internal readonly struct NullResult { }
 
   [Test]
   public void Dispose()
@@ -265,11 +266,19 @@ public partial class TapoDeviceTests {
     Assert.That(async () => await device.ResolveEndPointAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.ResolveEndPointAsync));
     Assert.That(() => device.ResolveEndPointAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.ResolveEndPointAsync));
 
+#pragma warning disable CS0618
     Assert.That(async () => await device.GetDeviceInfoAsync<NullResult>(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.GetDeviceInfoAsync));
     Assert.That(() => device.GetDeviceInfoAsync<NullResult>(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.GetDeviceInfoAsync));
 
     Assert.That(async () => await device.SetDeviceInfoAsync(default(NullParameters)), Throws.TypeOf<ObjectDisposedException>(), nameof(device.SetDeviceInfoAsync));
     Assert.That(() => device.SetDeviceInfoAsync(default(NullParameters)), Throws.TypeOf<ObjectDisposedException>(), nameof(device.SetDeviceInfoAsync));
+#pragma warning restore CS0618
+
+    Assert.That(async () => await device.GetDeviceInfoAsync(TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsNullResult), Throws.TypeOf<ObjectDisposedException>(), nameof(device.GetDeviceInfoAsync));
+    Assert.That(() => device.GetDeviceInfoAsync(TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsNullResult), Throws.TypeOf<ObjectDisposedException>(), nameof(device.GetDeviceInfoAsync));
+
+    Assert.That(async () => await device.SetDeviceInfoAsync(default, TapoDeviceTestsJsonSerializerContext.Default.SetDeviceInfoRequestOfTapoDeviceTestsNullParameters), Throws.TypeOf<ObjectDisposedException>(), nameof(device.SetDeviceInfoAsync));
+    Assert.That(() => device.SetDeviceInfoAsync(default, TapoDeviceTestsJsonSerializerContext.Default.SetDeviceInfoRequestOfTapoDeviceTestsNullParameters), Throws.TypeOf<ObjectDisposedException>(), nameof(device.SetDeviceInfoAsync));
 
     Assert.That(async () => await device.TurnOnAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.TurnOnAsync));
     Assert.That(() => device.TurnOnAsync(), Throws.TypeOf<ObjectDisposedException>(), nameof(device.TurnOnAsync));
@@ -359,7 +368,20 @@ public partial class TapoDeviceTests {
     )
       where TRequest : ITapoPassThroughRequest
       where TResponse : ITapoPassThroughResponse
+#pragma warning disable CS0618
       => base.SendRequestAsync(request, composeResult, cancellationToken);
+#pragma warning restore CS0618
+
+    public new ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
+      TRequest request,
+      JsonTypeInfo<TRequest> requestJsonTypeInfo,
+      JsonTypeInfo<TResponse> responseJsonTypeInfo,
+      Func<TResponse, TResult> composeResult,
+      CancellationToken cancellationToken = default
+    )
+      where TRequest : ITapoPassThroughRequest
+      where TResponse : ITapoPassThroughResponse
+      => base.SendRequestAsync(request, requestJsonTypeInfo, responseJsonTypeInfo, composeResult, cancellationToken);
   }
 
   [Test]
@@ -751,8 +773,21 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.That(
+#pragma warning disable CS0618
       async () => await device.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>, int>(
         request: new GetDeviceInfoRequest(),
+        composeResult: static resp => throw new NotSupportedException("unexpected exception"),
+        cancellationToken: default
+      ),
+#pragma warning restore CS0618
+      Throws.TypeOf<NotSupportedException>()
+    );
+
+    Assert.That(
+      async () => await device.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>, int>(
+        request: new GetDeviceInfoRequest(),
+        requestJsonTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        responseJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsNullResult,
         composeResult: static resp => throw new NotSupportedException("unexpected exception"),
         cancellationToken: default
       ),
@@ -1172,7 +1207,7 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
-  private readonly struct GetDeviceInfoResult {
+  internal readonly struct GetDeviceInfoResult {
     [JsonPropertyName("device_on")]
     public bool IsOn { get; init; }
 
@@ -1211,13 +1246,17 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     // call GetDeviceInfoAsync in the state that the session has not been established
-    var deviceInfo0 = await device.GetDeviceInfoAsync<GetDeviceInfoResult>();
+    var deviceInfo0 = await device.GetDeviceInfoAsync(
+      TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsGetDeviceInfoResult
+    );
 
     Assert.That(deviceInfo0.IsOn, Is.True, nameof(deviceInfo0.IsOn));
     Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
 
     // call GetDeviceInfoAsync in the state that the session has been established
-    var deviceInfo1 = await device.GetDeviceInfoAsync<GetDeviceInfoResult>();
+    var deviceInfo1 = await device.GetDeviceInfoAsync(
+      TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsGetDeviceInfoResult
+    );
 
     Assert.That(deviceInfo1.IsOn, Is.False, nameof(deviceInfo1.IsOn));
     Assert.That(device.Session, Is.Not.Null, nameof(device.Session));
@@ -1252,6 +1291,7 @@ public partial class TapoDeviceTests {
     );
 
     var (resultIsOn, resultId) = await device.GetDeviceInfoAsync<GetDeviceInfoResult, (bool, string?)>(
+      responseJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsGetDeviceInfoResult,
       composeResult: result => (result.IsOn, result.Id)
     );
 
@@ -1274,14 +1314,17 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, nameof(device.Session));
 
     Assert.That(
-      async () => await device.GetDeviceInfoAsync<GetDeviceInfoResult, bool>(composeResult: null!),
+      async () => await device.GetDeviceInfoAsync<GetDeviceInfoResult, bool>(
+        responseJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsGetDeviceInfoResult,
+        composeResult: null!
+      ),
       Throws.ArgumentNullException
     );
 
     Assert.That(device.Session, Is.Null, nameof(device.Session));
   }
 
-  private readonly struct GetDeviceInfoOnOffStateResult {
+  internal readonly struct GetDeviceInfoOnOffStateResult {
     [JsonPropertyName("device_on")]
     public bool IsOn { get; init; }
   }
@@ -1311,7 +1354,9 @@ public partial class TapoDeviceTests {
     );
 
     Assert.That(
-      async () => await device.GetDeviceInfoAsync<GetDeviceInfoOnOffStateResult>(),
+      async () => await device.GetDeviceInfoAsync(
+        TapoDeviceTestsJsonSerializerContext.Default.PassThroughResponseOfTapoDeviceTestsGetDeviceInfoOnOffStateResult
+      ),
       Throws.Nothing
     );
   }
@@ -1352,6 +1397,11 @@ public partial class TapoDeviceTests {
     );
 
     Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} after GetDeviceInfoAsync");
+  }
+
+  internal readonly struct SetDeviceInfoOnOffStateParameter {
+    [JsonPropertyName("device_on")]
+    public bool IsOn { get; init; }
   }
 
   [Test]
@@ -1395,12 +1445,18 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} before SetDeviceInfoAsync");
 
     // call SetDeviceInfoAsync in the state that the session has not been established
-    await device.SetDeviceInfoAsync(new { device_on = true });
+    await device.SetDeviceInfoAsync(
+      deviceInfo: new SetDeviceInfoOnOffStateParameter() { IsOn = true },
+      deviceInfoJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.SetDeviceInfoRequestOfTapoDeviceTestsSetDeviceInfoOnOffStateParameter
+    );
 
     Assert.That(device.Session, Is.Not.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync #1");
 
     // call SetDeviceInfoAsync in the state that the session has been established
-    await device.SetDeviceInfoAsync(new { device_on = false });
+    await device.SetDeviceInfoAsync(
+      deviceInfo: new SetDeviceInfoOnOffStateParameter() { IsOn = false },
+      deviceInfoJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.SetDeviceInfoRequestOfTapoDeviceTestsSetDeviceInfoOnOffStateParameter
+    );
 
     Assert.That(device.Session, Is.Not.Null, $"{nameof(device.Session)} after SetDeviceInfoAsync #2");
 
@@ -1434,7 +1490,10 @@ public partial class TapoDeviceTests {
     Assert.That(device.Session, Is.Null, $"{nameof(device.Session)} before SetDeviceInfoAsync");
 
     Assert.That(
-      async () => await device.SetDeviceInfoAsync(new { device_on = true }),
+      async () => await device.SetDeviceInfoAsync(
+        deviceInfo: new SetDeviceInfoOnOffStateParameter() { IsOn = true },
+        deviceInfoJsonTypeInfo: TapoDeviceTestsJsonSerializerContext.Default.SetDeviceInfoRequestOfTapoDeviceTestsSetDeviceInfoOnOffStateParameter
+      ),
       Throws
         .TypeOf<TapoErrorResponseException>()
         .With

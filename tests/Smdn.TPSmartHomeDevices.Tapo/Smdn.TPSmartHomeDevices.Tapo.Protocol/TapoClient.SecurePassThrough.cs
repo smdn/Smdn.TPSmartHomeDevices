@@ -38,7 +38,10 @@ partial class TapoClientTests {
     PassThroughResponse<None>? nullableResponse = null;
 
     Assert.That(
-      async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
+      async () => nullableResponse = await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
       Throws.Nothing
     );
 
@@ -101,6 +104,7 @@ partial class TapoClientTests {
       httpClientFactory: defaultHttpClientFactory
     );
 
+#pragma warning disable CS0618 // CS0618: SendRequestAsync without JsonTypeInfo<T> is obsolete
     Assert.That(
       async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws.InvalidOperationException
@@ -109,6 +113,7 @@ partial class TapoClientTests {
       () => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws.InvalidOperationException
     );
+#pragma warning restore CS0618
 
     Assert.That(
       async () => await client.SendRequestAsync(
@@ -156,7 +161,10 @@ partial class TapoClientTests {
     );
 
     Assert.That(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
       Throws
         .TypeOf<TapoErrorResponseException>()
         .With
@@ -247,7 +255,10 @@ partial class TapoClientTests {
     );
 
     Assert.That(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
       Throws
         .TypeOf<TapoErrorResponseException>()
         .With

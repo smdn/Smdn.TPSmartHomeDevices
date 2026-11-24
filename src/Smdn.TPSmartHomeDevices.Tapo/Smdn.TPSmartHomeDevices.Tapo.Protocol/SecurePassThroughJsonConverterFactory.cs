@@ -31,6 +31,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInType)]
 [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInType)]
 #endif
+[Obsolete("This type is deprecated, and its removal in a future major version release is under consideration. Avoid using it directly.")]
 #pragma warning disable IDE0055
 public sealed class SecurePassThroughJsonConverterFactory :
   JsonConverterFactory,

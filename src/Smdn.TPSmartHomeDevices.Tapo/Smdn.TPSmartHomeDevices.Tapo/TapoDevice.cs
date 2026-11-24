@@ -453,6 +453,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   protected ValueTask SendRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken = default
@@ -518,6 +519,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
     TRequest request,
     Func<TResponse, TResult> composeResult,
@@ -623,10 +625,12 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
               responseTypeInfo: responseInfo,
               cancellationToken: cancellationToken
             ).ConfigureAwait(false)
+#pragma warning disable CS0618 // CS0618: SendRequestAsync without JsonTypeInfo<T> is obsolete.
           : await client.SendRequestAsync<TRequest, TResponse>(
               request: request,
               cancellationToken: cancellationToken
             ).ConfigureAwait(false);
+#pragma warning restore CS0618
 
         return composeResult(response);
       }
@@ -746,6 +750,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TDeviceInfo> GetDeviceInfoAsync<TDeviceInfo>(
     CancellationToken cancellationToken = default
   )
@@ -791,6 +796,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TResult> GetDeviceInfoAsync<TDeviceInfo, TResult>(
     Func<TDeviceInfo, TResult> composeResult,
     CancellationToken cancellationToken = default
@@ -848,6 +854,7 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask SetDeviceInfoAsync<TDeviceInfo>(
     TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default

@@ -212,6 +212,7 @@ public partial class KasaDevice : IDisposable {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   protected ValueTask SendRequestAsync<TMethodParameter>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -309,6 +310,7 @@ public partial class KasaDevice : IDisposable {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -447,6 +449,7 @@ public partial class KasaDevice : IDisposable {
 
       try {
         return parametersJsonTypeInfo is null
+#pragma warning disable CS0618 // CS0618: SendAsync without JsonTypeInfo<T> is obsolete.
           ? await client.SendAsync(
               module: module,
               method: method,
@@ -454,6 +457,7 @@ public partial class KasaDevice : IDisposable {
               composeResult: composeResult,
               cancellationToken: cancellationToken
             ).ConfigureAwait(false)
+#pragma warning restore CS0618
           : await client.SendAsync(
               module: module,
               method: method,

@@ -39,6 +39,7 @@ public static class KasaJsonSerializer {
   [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
   [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
 #endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public static void Serialize<TMethodParameter>(
     ArrayBufferWriter<byte> buffer,
     JsonEncodedText module,

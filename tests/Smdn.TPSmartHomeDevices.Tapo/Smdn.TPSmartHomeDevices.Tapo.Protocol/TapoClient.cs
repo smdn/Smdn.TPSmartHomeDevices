@@ -158,8 +158,10 @@ public partial class TapoClientTests {
 
     Assert.That(() => _ = client.Session, Throws.TypeOf<ObjectDisposedException>());
 
+#pragma warning disable CS0618 // CS0618: SendRequestAsync without JsonTypeInfo<T> is obsolete.
     Assert.That(() => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(), Throws.TypeOf<ObjectDisposedException>());
     Assert.That(async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(), Throws.TypeOf<ObjectDisposedException>());
+#pragma warning restore CS0618
 
     Assert.That(
       () => client.SendRequestAsync(

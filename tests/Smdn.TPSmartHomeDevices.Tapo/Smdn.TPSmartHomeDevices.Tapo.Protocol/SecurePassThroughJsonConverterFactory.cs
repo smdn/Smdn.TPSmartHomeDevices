@@ -99,13 +99,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
       => throw new ThrowExceptionJsonConverterException();
   }
 
+#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
   private static SecurePassThroughJsonConverterFactory CreateFactory(
     ICryptoTransform? encryptorForPassThroughRequest = null,
     ICryptoTransform? decryptorForPassThroughResponse = null,
     JsonSerializerOptions? baseJsonSerializerOptions = null,
     ILogger? logger = null
   )
-#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
     => new(
       identity: null,
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
