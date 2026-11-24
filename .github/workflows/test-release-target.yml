@@ -6,25 +6,30 @@ name: Run tests with release target
 permissions: {}
 
 on:
-  push:
-    # Triggered by a push to the release working branch.
-    # The prefix for the release working branch is determined by the `release_tag_prefix`
-    # parameter in `generate-release-target.yml`. Therefore, the branch name filter must
-    # match this prefix.
-    branches: "releases/**"
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 jobs:
   determine-release-target:
     name: Determine the release target
     runs-on: ubuntu-slim
+    # The prefix for the release working branch and label for the release target are
+    # determined by the `release_tag_prefix` and `release_target_pr_label` parameter
+    # in `generate-release-target.yml`. Therefore, the branch name and label filter
+    # must match these values.
+    if: >-
+      startsWith(github.head_ref, 'releases/') &&
+      contains(github.event.pull_request.labels.*.name, 'release-target')
     outputs:
       package_id: ${{ steps.release-target.outputs.package_id }}
     steps:
       - name: Determine the release target
         id: release-target
+        env:
+          INPUT_RELEASE_WORKING_BRANCH: ${{ github.head_ref }}
         shell: bash
         run: |
-          release_working_branch="${GITHUB_REF_NAME}"
+          release_working_branch=$INPUT_RELEASE_WORKING_BRANCH
           package_id_with_version="${release_working_branch##*/}"
           package_id="${package_id_with_version%%-*}"
 
@@ -57,9 +62,12 @@ jobs:
   post-tests-dotnet:
     # This job is intended to be referenced by the branch protection rules (Status Checks).
     # Do not change the 'name' or job ID, as doing so will break the status check validation.
-    # Avoid adding 'if: always()', otherwise this job will report success even if previous tests fail.
+    # Only run when preceding job succeeds or is skipped (such as when branch/label conditions
+    # do not match); avoid 'if: always()' so failures or cancellations in preceding job is
+    # not masked as success.
     name: .NET test status
     needs: run-tests-dotnet
+    if: ${{ always() && (needs.run-tests-dotnet.result == 'success' || needs.run-tests-dotnet.result == 'skipped') }}
     runs-on: ubuntu-slim
     steps:
       - name: .NET test status
