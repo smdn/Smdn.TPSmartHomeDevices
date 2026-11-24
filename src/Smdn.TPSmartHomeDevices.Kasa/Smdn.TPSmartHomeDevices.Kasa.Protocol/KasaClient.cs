@@ -340,11 +340,13 @@ public sealed partial class KasaClient : IDisposable {
     CancellationToken cancellationToken
   )
   {
-    var sock = socket
+    var sock =
 #if DEBUG
-      ?? throw new InvalidOperationException($"{nameof(socket)} is null");
+      socket ?? throw new InvalidOperationException($"{nameof(socket)} is null");
+#elif SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+      socket!;
 #else
-      !;
+      socket;
 #endif
 
     CancellationTokenSource? cancellationTokenSourceForReceiveRestOfBody = null;

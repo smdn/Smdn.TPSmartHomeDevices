@@ -123,7 +123,11 @@ partial class TapoClient {
     TapoErrorResponseException.ThrowIfError(
       requestAbsoluteUri,
       request.Method,
+#if DEBUG
       response.ErrorCode
+#else
+      response!.ErrorCode
+#endif
     );
 
     return (
