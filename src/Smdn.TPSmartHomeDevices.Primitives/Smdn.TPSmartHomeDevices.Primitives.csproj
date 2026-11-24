@@ -5,10 +5,9 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net11.0;net10.0;netstandard2.1;netstandard2.0</TargetFrameworks>
-    <VersionPrefix>1.3.0</VersionPrefix>
+    <VersionPrefix>1.4.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
-    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -32,7 +31,21 @@ This library does not provide any specific implementations to operate Kasa and T
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.0.1" />
+    <!-- Used as shim for Convert.FromHexString(source, destination, out charsConsumed, out bytesWritten); NET9_0_OR_GREATER -->
+    <PackageReference
+      Include="Smdn.Fundamental.PrintableEncoding.Hexadecimal"
+      Version="3.0.1"
+      Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))"
+    />
+  </ItemGroup>
+
+  <ItemGroup
+    Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))"
+    Label="Update to AOT-ready package version"
+  >
+    <PackageReference Update="System.Text.Json" Version="10.0.0" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Update="Smdn.Fundamental.PrintableEncoding.Hexadecimal" Version="3.1.1" />
   </ItemGroup>
 
   <ItemGroup>

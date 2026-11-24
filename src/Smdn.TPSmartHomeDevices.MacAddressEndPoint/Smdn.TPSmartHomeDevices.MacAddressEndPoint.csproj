@@ -5,15 +5,16 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net11.0;net10.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net11.0-windows7.0;net10.0-windows7.0;$(TargetFrameworks)</TargetFrameworks>
     <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
-    <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
-    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
+    <!-- Suppress assembly AOT compatibility warning in the CI/CD environment (packaging and testing) -->
+    <NoWarn Condition="'$(ContinuousIntegrationBuild)' == 'true'">$(NoWarn);IL3058</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
@@ -33,6 +34,14 @@ SPDX-License-Identifier: MIT
     <ProjectOrPackageReference ReferencePackageVersion="[1.1.1,2.0.0)" Include="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
   </ItemGroup>
 
+  <ItemGroup
+    Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))"
+    Label="Update to AOT-ready package version"
+  >
+    <PackageReference Update="Smdn.Net.AddressResolution" Version="1.4.0" />
+    <ProjectOrPackageReference ReferencePackageVersion="[1.4.0,2.0.0)" Update="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Third party notice -->
     <None
@@ -50,6 +59,9 @@ SPDX-License-Identifier: MIT
 that enables to use MAC addresses to specify the device endpoints, instead of IP addresses or host names.
 
 This library also enables to support following changes of the device endpoint in network where IP addresses are dynamic, such as networks using DHCP.
+
+Note: Although this package is marked with `IsAotCompatible=true`, some of the dependency libraries are not yet AOT-compatible.
+As a result, warnings such as `IL3058` may be reported during AOT-enabled compilation.
 
 ## Usage
 Add `MacAddressDeviceEndPointFactory` to the `ServiceCollection` and pass it as an `IServiceProvider` to the constructor of the [Tapo](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Tapo/) or [Kasa](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Kasa/) device class.
