@@ -16,7 +16,8 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// the message <c>"Padding is invalid and cannot be removed."</c> during the response decryption.
 /// <see cref="SecurePassThroughInvalidPaddingException"/> is thrown when such a condition occurs.
 /// </remarks>
-/// <see cref="SecurePassThroughJsonConverterFactory"/>
+/// <seealso cref="PassThroughMessageTransform"/>
+/// <seealso cref="SecurePassThroughJsonConverterFactory"/>
 public class SecurePassThroughInvalidPaddingException : SystemException {
   public SecurePassThroughInvalidPaddingException(
     string message,

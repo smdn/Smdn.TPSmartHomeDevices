@@ -105,6 +105,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
     JsonSerializerOptions? baseJsonSerializerOptions = null,
     ILogger? logger = null
   )
+#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
     => new(
       identity: null,
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
@@ -112,6 +113,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
       baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,
       logger: logger
     );
+#pragma warning restore CS0618
 
   private readonly struct NullResult { }
 

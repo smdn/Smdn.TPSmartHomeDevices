@@ -746,12 +746,14 @@ public sealed partial class PseudoTapoDevice : IDisposable, IAsyncDisposable {
     var options = new JsonSerializerOptions();
 
     options.Converters.Add(
+#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
       new SecurePassThroughJsonConverterFactory(
         identity: null,
         encryptorForPassThroughRequest: session.Encryptor,
         decryptorForPassThroughResponse: null,
         baseJsonSerializerOptionsForPassThroughMessage: null
       )
+#pragma warning restore CS0618
     );
 
     var typeOfSecurePassThroughResponse = typeof(SecurePassThroughResponse<>).MakeGenericType(passThroughResponse.GetType());

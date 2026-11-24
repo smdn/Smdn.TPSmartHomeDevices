@@ -1,12 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
-#pragma warning disable CA1873
-
 using System;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -25,8 +22,8 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
+/// <seealso cref="PassThroughMessageTransform"/>
 /// <seealso cref="SecurePassThroughInvalidPaddingException"/>
-#pragma warning disable IDE0055
 public sealed class SecurePassThroughJsonConverterFactory :
   JsonConverterFactory,
   IDisposable,
@@ -38,22 +35,26 @@ public sealed class SecurePassThroughJsonConverterFactory :
       Utf8JsonWriter writer,
       TValue value
     );
+
     TValue ReadDecryptedValue<TValue>(
       ref Utf8JsonReader reader,
       Type typeToConvert
-    );
+    ) where TValue : notnull;
   }
 
-  private ICryptoTransform? encryptorForPassThroughRequest;
-  private ICryptoTransform? decryptorForPassThroughResponse;
+  private PassThroughMessageTransform PassThroughMessageTransform {
+    get {
+      if (field is null)
+        throw new ObjectDisposedException(GetType().FullName);
 
-  // used for avoiding JsonSerializer to (de)serialize recursively
-  private readonly JsonSerializerOptions jsonSerializerOptionsForPassThroughMessage;
-  private readonly JsonSerializerOptions? jsonSerializerOptionsForPassThroughMessageLogger;
+      return field;
+    }
+    set;
+  }
 
-  private readonly ILogger? logger;
-  private bool disposed;
+  private readonly bool shouldDisposePassThroughMessageTransform;
 
+  [Obsolete("This constructor overload is exposed for testing purposes only. Avoid using it directly.")]
   public SecurePassThroughJsonConverterFactory(
     ITapoCredentialIdentity? identity,
     ICryptoTransform? encryptorForPassThroughRequest,
@@ -61,58 +62,35 @@ public sealed class SecurePassThroughJsonConverterFactory :
     JsonSerializerOptions? baseJsonSerializerOptionsForPassThroughMessage,
     ILogger? logger = null
   )
+    : this(
+      passThroughMessageTransform: new(
+        identity: identity,
+        encryptorForPassThroughRequest: encryptorForPassThroughRequest!,
+        decryptorForPassThroughResponse: decryptorForPassThroughResponse!,
+        baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptionsForPassThroughMessage,
+        logger: logger
+      ),
+      shouldDisposePassThroughMessageTransform: true
+    )
   {
-    this.encryptorForPassThroughRequest = encryptorForPassThroughRequest;
-    this.decryptorForPassThroughResponse = decryptorForPassThroughResponse;
-    this.logger = logger;
+  }
 
-    jsonSerializerOptionsForPassThroughMessage = baseJsonSerializerOptionsForPassThroughMessage is null
-      ? new()
-      : new(baseJsonSerializerOptionsForPassThroughMessage);
-    jsonSerializerOptionsForPassThroughMessage.Converters.Add(
-      new LoginDeviceRequest.TapoCredentialJsonConverter(identity: identity)
-    );
-
-    if (logger is not null) {
-      jsonSerializerOptionsForPassThroughMessageLogger = baseJsonSerializerOptionsForPassThroughMessage is null
-        ? new()
-        : new(baseJsonSerializerOptionsForPassThroughMessage);
-      jsonSerializerOptionsForPassThroughMessageLogger.Converters.Add(
-        LoginDeviceRequest.TapoCredentialMaskingJsonConverter.Instance // mask credentials for logger output
-      );
-    }
+  internal SecurePassThroughJsonConverterFactory(
+    PassThroughMessageTransform passThroughMessageTransform,
+    bool shouldDisposePassThroughMessageTransform
+  )
+  {
+    PassThroughMessageTransform = passThroughMessageTransform ?? throw new ArgumentNullException(nameof(passThroughMessageTransform));
+    this.shouldDisposePassThroughMessageTransform = shouldDisposePassThroughMessageTransform;
   }
 
   public void Dispose()
   {
-    encryptorForPassThroughRequest?.Dispose();
-    encryptorForPassThroughRequest = null;
+    if (shouldDisposePassThroughMessageTransform)
+      PassThroughMessageTransform?.Dispose();
 
-    decryptorForPassThroughResponse?.Dispose();
-    decryptorForPassThroughResponse = null;
-
-    disposed = true;
+    PassThroughMessageTransform = null!;
   }
-
-  private CryptoStream CreateEncryptingStream(Stream stream)
-    => disposed
-      ? throw new ObjectDisposedException(GetType().FullName)
-      : new CryptoStream(
-          stream: stream ?? throw new ArgumentNullException(nameof(stream)),
-          transform: encryptorForPassThroughRequest ?? throw new NotSupportedException("encryption not supported"),
-          mode: CryptoStreamMode.Write,
-          leaveOpen: true
-        );
-
-  private CryptoStream CreateDecryptingStream(Stream stream)
-    => disposed
-      ? throw new ObjectDisposedException(GetType().FullName)
-      : new CryptoStream(
-          stream: stream ?? throw new ArgumentNullException(nameof(stream)),
-          transform: decryptorForPassThroughResponse ?? throw new NotSupportedException("decryption not supported"),
-          mode: CryptoStreamMode.Read,
-          leaveOpen: true
-        );
 
   public override bool CanConvert(Type typeToConvert)
     =>
@@ -128,7 +106,7 @@ public sealed class SecurePassThroughJsonConverterFactory :
           type: typeof(PassThroughObjectJsonConverter<>).MakeGenericType(typeToConvert),
           bindingAttr: BindingFlags.Instance | BindingFlags.Public,
           binder: null,
-          args: new object[] { this },
+          args: [this],
           culture: null
         )!
       // should throw exception?
@@ -139,30 +117,10 @@ public sealed class SecurePassThroughJsonConverterFactory :
     Utf8JsonWriter writer,
     TValue value
   )
-  {
-    logger?.LogTrace(
-      "PassThroughRequest: {RawJson} ({TypeFullName})",
-      JsonSerializer.Serialize(value: value, options: jsonSerializerOptionsForPassThroughMessageLogger),
-      typeof(TValue).FullName
+    => PassThroughMessageTransform.WriteEncryptedValue(
+      writer: writer,
+      value: value
     );
-
-    var stream = new MemoryStream(capacity: 256); // TODO: IMemoryAllocator
-
-    using var encryptingStream = CreateEncryptingStream(stream);
-
-    JsonSerializer.Serialize(
-      utf8Json: encryptingStream,
-      value: value,
-      options: jsonSerializerOptionsForPassThroughMessage
-    );
-
-    encryptingStream.Close();
-
-    if (!stream.TryGetBuffer(out var buffer))
-      throw new InvalidOperationException("cannot get buffer from MemoryStream");
-
-    writer.WriteBase64StringValue(buffer.AsSpan());
-  }
 
   TValue IPassThroughObjectJsonConverter.ReadDecryptedValue<TValue>(
     ref Utf8JsonReader reader,
@@ -172,59 +130,19 @@ public sealed class SecurePassThroughJsonConverterFactory :
     if (!reader.TryGetBytesFromBase64(out var base64))
       throw new JsonException("could not read base64 string");
 
-    var cryptographicExceptionThrown = false;
+    using var encryptedValueStream = new MemoryStream(base64, writable: false);
 
-    try {
-      using var stream = new MemoryStream(base64, writable: false);
-      using var decryptingStream = CreateDecryptingStream(stream);
-
-      try {
-        var ret = JsonSerializer.Deserialize(
-          utf8Json: decryptingStream,
-          returnType: typeToConvert,
-          options: jsonSerializerOptionsForPassThroughMessage
-        );
-
-        return ret is null
-          ? throw new InvalidOperationException($"Object {typeToConvert.FullName} was decrypted as null.")
-          : (TValue)ret;
-      }
-      catch (CryptographicException ex) when (IsInvalidPaddingException(ex)) {
-        cryptographicExceptionThrown = true;
-        throw new SecurePassThroughInvalidPaddingException("Invalid padding detected in encrypted JSON", ex);
-      }
-      catch (CryptographicException) {
-        cryptographicExceptionThrown = true;
-        throw;
-      }
-
-      static bool IsInvalidPaddingException(CryptographicException ex)
-      {
-        // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Security.Cryptography/src/Resources/Strings.resx
-        const string SR_Cryptography_InvalidPadding = "Padding is invalid and cannot be removed.";
-
-        return SR_Cryptography_InvalidPadding.AsSpan().SequenceEqual(ex.Message); // TODO: consider localized message strings
-      }
-    }
-    finally {
-      if (!cryptographicExceptionThrown && logger is not null) {
-        using var stream = new MemoryStream(base64, writable: false);
-        using var decryptingStream = CreateDecryptingStream(stream);
-        using var decryptingReader = new StreamReader(decryptingStream, Encoding.UTF8);
-
-        logger.LogTrace(
-          "PassThroughResponse: {RawJson} ({TypeFullName})",
-          decryptingReader.ReadToEnd(),
-          typeof(TValue).FullName
-        );
-      }
-    }
+    return PassThroughMessageTransform.ReadDecryptedValue<TValue>(
+      encryptedValueStream: encryptedValueStream,
+      typeToConvert: typeToConvert
+    );
   }
 
 #pragma warning disable IDE0055, CA1812
   private sealed class PassThroughObjectJsonConverter<TPassThroughObject>
     : JsonConverter<TPassThroughObject>
     // where TPassThroughObject : ITapoPassThroughRequest or ITapoPassThroughResponse
+    where TPassThroughObject : notnull
 #pragma warning restore IDE0055, CA1812
   {
     private readonly IPassThroughObjectJsonConverter converter;

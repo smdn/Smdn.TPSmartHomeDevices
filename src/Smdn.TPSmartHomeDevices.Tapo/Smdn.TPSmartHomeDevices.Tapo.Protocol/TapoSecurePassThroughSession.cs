@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Security.Cryptography;
 using System.Text.Json;
 
@@ -27,7 +30,8 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
 
   private string? token;
   private Aes? aes;
-  private SecurePassThroughJsonConverterFactory? securePassThroughJsonConverterFactory;
+  private PassThroughMessageTransform passThroughMessageTransform;
+  private SecurePassThroughJsonConverterFactory securePassThroughJsonConverterFactory;
 
   internal JsonSerializerOptions SecurePassThroughJsonSerializerOptions { get; }
 
@@ -51,25 +55,46 @@ internal sealed class TapoSecurePassThroughSession : TapoSession {
     aes.Key = key.ToArray();
     aes.IV = iv.ToArray();
 
-#pragma warning disable CA5401
-    securePassThroughJsonConverterFactory = new(
+    passThroughMessageTransform = new(
       identity: identity,
+#pragma warning disable CA5401
       encryptorForPassThroughRequest: aes.CreateEncryptor(),
       decryptorForPassThroughResponse: aes.CreateDecryptor(),
+#pragma warning restore CA5401
       baseJsonSerializerOptionsForPassThroughMessage: baseJsonSerializerOptions,
       logger: logger
     );
-#pragma warning restore CA5401
+    securePassThroughJsonConverterFactory = new(
+      passThroughMessageTransform: passThroughMessageTransform,
+      shouldDisposePassThroughMessageTransform: false
+    );
 
     SecurePassThroughJsonSerializerOptions = new(baseJsonSerializerOptions);
     SecurePassThroughJsonSerializerOptions.Converters.Add(securePassThroughJsonConverterFactory);
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE
+  [MemberNotNull(nameof(passThroughMessageTransform))]
+  [MemberNotNull(nameof(securePassThroughJsonConverterFactory))]
+#endif
+  private protected override void ThrowIfDisposed()
+  {
+    if (passThroughMessageTransform is null)
+      throw new ObjectDisposedException(GetType().FullName);
+    if (securePassThroughJsonConverterFactory is null)
+      throw new ObjectDisposedException(GetType().FullName);
+
+    base.ThrowIfDisposed();
   }
 
   protected override void Dispose(bool disposing)
   {
     if (!disposing) {
       securePassThroughJsonConverterFactory?.Dispose();
-      securePassThroughJsonConverterFactory = null;
+      securePassThroughJsonConverterFactory = null!;
+
+      passThroughMessageTransform?.Dispose();
+      passThroughMessageTransform = null!;
 
       aes?.Dispose();
       aes = null;

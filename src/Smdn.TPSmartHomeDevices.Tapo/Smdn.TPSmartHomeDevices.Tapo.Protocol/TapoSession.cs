@@ -39,7 +39,7 @@ public abstract class TapoSession : IDisposable {
     GC.SuppressFinalize(this);
   }
 
-  private protected void ThrowIfDisposed()
+  private protected virtual void ThrowIfDisposed()
   {
     if (disposed)
       throw new ObjectDisposedException(GetType().FullName);

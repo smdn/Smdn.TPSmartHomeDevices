@@ -6,6 +6,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// The interface that represents that the type is an object representation of the result property
 /// encapsulated in a JSON response for 'method: securePassthrough'.
 /// </summary>
+/// <seealso cref="PassThroughMessageTransform"/>
 /// <seealso cref="SecurePassThroughJsonConverterFactory"/>
 /// <seealso cref="SecurePassThroughResponse{TPassThroughResponse}"/>
 public interface ITapoPassThroughResponse : ITapoResponse {

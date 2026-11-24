@@ -39,6 +39,7 @@ public interface ITapoCredentialProvider {
   /// <seealso cref="Protocol.TapoClient.AuthenticateAsync(ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/>
   /// <seealso cref="Protocol.TapoClient.AuthenticateAsync(Protocol.TapoSessionProtocol, ITapoCredentialIdentity?, ITapoCredentialProvider, System.Threading.CancellationToken)"/>
   /// <seealso cref="Protocol.LoginDeviceRequest"/>
+  /// <seealso cref="Protocol.PassThroughMessageTransform"/>
   /// <seealso cref="Protocol.SecurePassThroughJsonConverterFactory"/>
   /// <seealso cref="TapoDevice"/>
   ITapoCredential GetCredential(ITapoCredentialIdentity? identity);
