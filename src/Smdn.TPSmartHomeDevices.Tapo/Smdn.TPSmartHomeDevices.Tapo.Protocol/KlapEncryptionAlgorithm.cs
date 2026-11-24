@@ -42,7 +42,7 @@ public class KlapEncryptionAlgorithm {
 
     _ = sha256.TryComputeHash(
       destination: key.AsSpan(),
-      source0: stackalloc byte[3] { (byte)'l', (byte)'s', (byte)'k' }, // TODO: use UTF-8 strings
+      source0: "lsk"u8,
       source1: localSeed,
       source2: remoteSeed,
       source3: userHash,
@@ -63,7 +63,7 @@ public class KlapEncryptionAlgorithm {
 
     _ = sha256.TryComputeHash(
       destination: iv.AsSpan(),
-      source0: stackalloc byte[2] { (byte)'i', (byte)'v' }, // TODO: use UTF-8 strings
+      source0: "iv"u8,
       source1: localSeed,
       source2: remoteSeed,
       source3: userHash,
@@ -90,7 +90,7 @@ public class KlapEncryptionAlgorithm {
 
     _ = sha256.TryComputeHash(
       destination: hash.AsSpan(),
-      source0: stackalloc byte[3] { (byte)'l', (byte)'d', (byte)'k' }, // TODO: use UTF-8 strings
+      source0: "ldk"u8,
       source1: localSeed,
       source2: remoteSeed,
       source3: userHash,
