@@ -1,76 +1,76 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyDescription</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyDevName</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyMac</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyMicMac</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyMicType</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.get_JsonPropertyType</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyDescription(System.String)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyDevName(System.String)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyMac(System.Net.NetworkInformation.PhysicalAddress)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyMicMac(System.Net.NetworkInformation.PhysicalAddress)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyMicType(System.String)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Smdn.TPSmartHomeDevices.Kasa.KasaDeviceInfo.set_JsonPropertyType(System.String)</Target>
     <Left>lib/netstandard2.1/Smdn.TPSmartHomeDevices.Kasa.dll</Left>
-    <Right>lib/net8.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
+    <Right>lib/net10.0/Smdn.TPSmartHomeDevices.Kasa.dll</Right>
   </Suppression>
 </Suppressions>
