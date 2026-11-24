@@ -11,11 +11,7 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 partial struct LoginDeviceRequest {
   internal sealed class TapoCredentialMaskingJsonConverter : JsonConverter<ITapoCredentialProvider> {
     private static readonly JsonEncodedText PropertyValueMaskedCredential = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
       "****"u8
-#else
-      "****"
-#endif
     );
 
     public static readonly JsonConverter<ITapoCredentialProvider> Instance = new TapoCredentialMaskingJsonConverter();

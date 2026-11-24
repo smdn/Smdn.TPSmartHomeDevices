@@ -10,18 +10,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 
 partial class KasaDevice {
   protected static readonly JsonEncodedText ModuleTextSystem = JsonEncodedText.Encode(
-#if NETCOREAPP3_0_OR_GREATER && NET5_0_OR_GREATER && LANG_VERSION_11_OR_GREATER
     "system"u8
-#else
-    "system"
-#endif
   );
   protected static readonly JsonEncodedText MethodTextGetSysInfo = JsonEncodedText.Encode(
-#if NETCOREAPP3_0_OR_GREATER && NET5_0_OR_GREATER && LANG_VERSION_11_OR_GREATER
     "get_sysinfo"u8
-#else
-    "get_sysinfo"
-#endif
   );
 
   /// <summary>

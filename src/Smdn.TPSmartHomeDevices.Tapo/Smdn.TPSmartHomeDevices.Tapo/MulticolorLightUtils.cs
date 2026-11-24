@@ -32,13 +32,7 @@ internal static class MulticolorLightUtils {
 #endif
 
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(
-#if LANG_VERSION_11_OR_GREATER
-    nameof(newValue)
-#else
-    "newValue"
-#endif
-  )]
+  [return: NotNullIfNotNull(nameof(newValue))]
 #endif
   public static int? ValidateBrightnessValue(int? newValue, string paramName)
   {
@@ -57,13 +51,7 @@ internal static class MulticolorLightUtils {
   }
 
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(
-#if LANG_VERSION_11_OR_GREATER
-    nameof(newValue)
-#else
-    "newValue"
-#endif
-  )]
+  [return: NotNullIfNotNull(nameof(newValue))]
 #endif
   public static int? ValidateHueValue(int? newValue, string paramName)
   {
@@ -82,13 +70,7 @@ internal static class MulticolorLightUtils {
   }
 
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(
-#if LANG_VERSION_11_OR_GREATER
-    nameof(newValue)
-#else
-    "newValue"
-#endif
-  )]
+  [return: NotNullIfNotNull(nameof(newValue))]
 #endif
   public static int? ValidateSaturationValue(int? newValue, string paramName)
   {
@@ -107,13 +89,7 @@ internal static class MulticolorLightUtils {
   }
 
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
-  [return: NotNullIfNotNull(
-#if LANG_VERSION_11_OR_GREATER
-    nameof(newValue)
-#else
-    "newValue"
-#endif
-  )]
+  [return: NotNullIfNotNull(nameof(newValue))]
 #endif
   public static int ValidateColorTemperatureValue(int newValue, string paramName)
   {

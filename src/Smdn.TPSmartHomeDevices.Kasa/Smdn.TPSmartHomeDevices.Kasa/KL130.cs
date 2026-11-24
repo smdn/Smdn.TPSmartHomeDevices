@@ -25,18 +25,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// <seealso href="https://www.kasasmart.com/us/products/smart-lighting/kasa-smart-light-bulb-multicolor-kl130">Kasa KL130 product information (en)</seealso>
 public class KL130 : KasaDevice, IMulticolorSmartLight {
   private static readonly JsonEncodedText ModuleTextLightingService = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
     "smartlife.iot.smartbulb.lightingservice"u8
-#else
-    "smartlife.iot.smartbulb.lightingservice"
-#endif
   );
   private static readonly JsonEncodedText MethodTextTransitionLightState = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
     "transition_light_state"u8
-#else
-    "transition_light_state"
-#endif
   );
 
   /// <summary>

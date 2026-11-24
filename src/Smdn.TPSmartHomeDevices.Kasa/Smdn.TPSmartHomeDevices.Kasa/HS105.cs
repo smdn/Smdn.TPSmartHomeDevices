@@ -24,11 +24,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa;
 /// <seealso href="https://www.kasasmart.com/us/products/smart-plugs/kasa-smart-wifi-plug-mini">Kasa HS105 product information (en)</seealso>
 public class HS105 : KasaDevice, ISmartDevice {
   private static readonly JsonEncodedText MethodTextSetRelayState = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
     "set_relay_state"u8
-#else
-    "set_relay_state"
-#endif
   );
 
   /// <summary>

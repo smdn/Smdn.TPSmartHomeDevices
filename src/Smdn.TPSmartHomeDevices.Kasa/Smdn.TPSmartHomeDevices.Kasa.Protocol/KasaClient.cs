@@ -31,11 +31,7 @@ public sealed partial class KasaClient : IDisposable {
   internal const int DefaultBufferCapacity = 1536; // 1.5 [kB]
 
   private static readonly JsonEncodedText PropertyNameForErrorCode = JsonEncodedText.Encode(
-#if LANG_VERSION_11_OR_GREATER
     "err_code"u8
-#else
-    "err_code"
-#endif
   );
 
   // Kasa device seems to automatically close connection within approx 30 secs since the latest request.
