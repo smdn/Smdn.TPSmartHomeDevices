@@ -812,13 +812,7 @@ partial class TapoClientTests {
     private readonly List<string> logs = new();
     public IReadOnlyList<string> Logs => logs;
 
-#if NET11_0_OR_GREATER
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-#else
-    public IDisposable BeginScope<TState>(TState state)
-#endif
-      => NullLoggerScope.Instance; // do nothing
-
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullLoggerScope.Instance; // do nothing
     public bool IsEnabled(LogLevel logLevel) => true;
     public void Log<TState>(
       LogLevel logLevel,
@@ -853,6 +847,7 @@ partial class TapoClientTests {
 
     Assert.That(
       async () => await client.AuthenticateAsync(
+        protocol: TapoSessionProtocol.SecurePassThrough,
         identity: null,
         credential: defaultCredentialProvider!
       ),

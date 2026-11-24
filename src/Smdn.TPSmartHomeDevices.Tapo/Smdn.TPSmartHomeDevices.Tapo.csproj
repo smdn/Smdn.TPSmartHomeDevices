@@ -56,8 +56,10 @@ SPDX-License-Identifier: MIT
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\FeatureRequirementMessages.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\None.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ServiceProviderExtensions.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\UnconditionalSuppressMessages.cs" />
     <Compile Include="..\Common\System.Runtime.CompilerServices\IsExternalInit.cs" />
     <Compile Include="..\Common\System.Security.Cryptography\AsymmetricAlgorithmShim.cs" />
   </ItemGroup>

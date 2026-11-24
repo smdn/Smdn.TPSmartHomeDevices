@@ -160,14 +160,14 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     );
 
 #pragma warning disable CA1822
-  private readonly record struct SetBrightnessParameter(
+  internal readonly record struct SetBrightnessParameter(
     [property: JsonPropertyName("brightness")] int Brightness
   ) {
     [JsonPropertyName("device_on")]
     public bool DeviceOn => true;
   }
 
-  private readonly record struct SetColorTemperatureParameter(
+  internal readonly record struct SetColorTemperatureParameter(
     [property: JsonPropertyName("color_temp")] int Temperature,
     [property: JsonPropertyName("brightness")] int? Brightness
   ) {
@@ -175,7 +175,7 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     public bool DeviceOn => true;
   }
 
-  private readonly record struct SetColorParameter(
+  internal readonly record struct SetColorParameter(
     [property: JsonPropertyName("hue")] int? Hue,
     [property: JsonPropertyName("saturation")] int? Saturation,
     [property: JsonPropertyName("brightness")] int? Brightness
@@ -200,7 +200,7 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetBrightnessParameter(
+      deviceInfo: new SetBrightnessParameter(
         Brightness:
 #if NULL_STATE_STATIC_ANALYSIS_ATTRIBUTES
           MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness)).Value
@@ -208,7 +208,8 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
           MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))!.Value
 #endif
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L530JsonSerializerContext.Default.SetDeviceInfoRequestSetBrightnessParameter,
+      cancellationToken: cancellationToken
     );
 
 #pragma warning disable IDE0060
@@ -242,11 +243,12 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorTemperatureParameter(
+      deviceInfo: new SetColorTemperatureParameter(
         Temperature: MulticolorLightUtils.ValidateColorTemperatureValue(colorTemperature, nameof(colorTemperature)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L530JsonSerializerContext.Default.SetDeviceInfoRequestSetColorTemperatureParameter,
+      cancellationToken: cancellationToken
     );
 
 #pragma warning disable IDE0060
@@ -286,12 +288,13 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: MulticolorLightUtils.ValidateHueValue(hue, nameof(hue)),
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L530JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 
 #pragma warning disable IDE0060
@@ -329,12 +332,13 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: MulticolorLightUtils.ValidateHueValue(hue, nameof(hue)),
         Saturation: null,
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L530JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 
   /// <summary>
@@ -356,11 +360,12 @@ public class L530 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: null,
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L530JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 }

@@ -9,7 +9,9 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
+#pragma warning disable CA1506 // TODO: reduce complexity
 partial class TapoClient {
+#pragma warning restore CA1506
   // TODO: logger
   private static ValueTask<(string? SessionId, int? SessionTimeout)> ParseSessionCookieAsync(HttpResponseMessage response)
     => TapoSessionCookieUtils.TryGetCookie(response, out var sessionId, out var sessionTimeout)
@@ -30,7 +32,7 @@ partial class TapoClient {
     try {
       switch (protocol) {
         case TapoSessionProtocol.Klap:
-          await AuthenticateKlapAsync(
+          await AuthenticateKlapAsyncCore(
             identity,
             credential,
             cancellationToken
@@ -38,7 +40,7 @@ partial class TapoClient {
           break;
 
         case TapoSessionProtocol.SecurePassThrough:
-          await AuthenticateSecurePassThroughAsync(
+          await AuthenticateSecurePassThroughAsyncCore(
             identity,
             credential,
             cancellationToken
@@ -76,7 +78,7 @@ partial class TapoClient {
     // try 'handshake' method first, then fallback to KLAP protocol
     // if that fails with the error code 1003
     try {
-      await AuthenticateSecurePassThroughAsync(
+      await AuthenticateSecurePassThroughAsyncCore(
         identity,
         credential,
         cancellationToken
@@ -87,7 +89,7 @@ partial class TapoClient {
       "handshake".Equals(errorResponseException.RequestMethod, StringComparison.Ordinal) &&
       errorResponseException.RawErrorCode == 1003
     ) {
-      await AuthenticateKlapAsync(
+      await AuthenticateKlapAsyncCore(
         identity,
         credential,
         cancellationToken

@@ -34,7 +34,7 @@ partial class TapoClient {
   /// <see href="https://github.com/petretiandrea/plugp100">petretiandrea/plugp100</see>, published under the GPL-3.0 license,
   /// forked from <see href="https://github.com/K4CZP3R/tapo-p100-python">K4CZP3R/tapo-p100-python</see>.
   /// </remarks>
-  private async ValueTask AuthenticateKlapAsync(
+  private async ValueTask AuthenticateKlapAsyncCore(
     ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credentialProvider,
     CancellationToken cancellationToken

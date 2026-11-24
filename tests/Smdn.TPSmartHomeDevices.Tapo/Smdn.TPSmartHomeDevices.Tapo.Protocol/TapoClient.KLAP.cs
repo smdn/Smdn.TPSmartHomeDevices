@@ -1,18 +1,39 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClientTests {
-  [Test]
-  public void SendRequestAsync_KLAP()
+  public delegate ValueTask<PassThroughResponse<None>> SendRequestKlapSessionAsyncFunc(TapoClient client);
+
+  private static System.Collections.IEnumerable YieldTestCases_SendRequestAsync_KLAP()
+  {
+    yield return new object[] {
+      new SendRequestKlapSessionAsyncFunc(
+        static client => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>()
+      )
+    };
+
+    yield return new object[] {
+      new SendRequestKlapSessionAsyncFunc(
+        static client => client.SendRequestAsync(
+          TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+          TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+        )
+      )
+    };
+  }
+
+  [TestCaseSource(nameof(YieldTestCases_SendRequestAsync_KLAP))]
+  public void SendRequestAsync_KLAP(SendRequestKlapSessionAsyncFunc sendRequestAsyncFunc)
   {
     var device = CommonPseudoTapoDevice.Configure(
       funcGenerateKlapAuthHash: (_, _, authHash) => defaultKlapCredentialProvider!.GetKlapCredential(null).WriteLocalAuthHash(authHash.Span),
-      funcGenerateKlapRequestResponse: (_, _, _) => new PassThroughResponse<NullResult>() {
+      funcGenerateKlapRequestResponse: (_, _, _) => new PassThroughResponse<None>() {
         ErrorCode = KnownErrorCodes.Success,
         Result = new(),
       }
@@ -32,11 +53,11 @@ partial class TapoClientTests {
       Throws.Nothing
     );
 
-    PassThroughResponse<NullResult>? nullableResponse = null;
+    PassThroughResponse<None>? nullableResponse = null;
 
     for (var i = 0; i < 3; i++) {
       Assert.That(
-        async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+        async () => nullableResponse = await sendRequestAsyncFunc(client),
         Throws.Nothing,
         $"attempt #{i}"
       );
@@ -49,8 +70,8 @@ partial class TapoClientTests {
     }
   }
 
-  [Test]
-  public void SendRequestAsync_KLAP_ErrorResponse()
+  [TestCaseSource(nameof(YieldTestCases_SendRequestAsync_KLAP))]
+  public void SendRequestAsync_KLAP_ErrorResponse(SendRequestKlapSessionAsyncFunc sendRequestAsyncFunc)
   {
     const int ErrorCode = 9999;
     int? sequenceNumber = null;
@@ -60,7 +81,7 @@ partial class TapoClientTests {
       funcGenerateKlapRequestResponse: (_, _, seq) => {
         sequenceNumber = seq;
 
-        return new PassThroughResponse<NullResult>() {
+        return new PassThroughResponse<None>() {
           ErrorCode = ErrorCode,
           Result = new(),
         };
@@ -89,7 +110,7 @@ partial class TapoClientTests {
       Assert.That(
         async () => {
           try {
-            await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>();
+            await sendRequestAsyncFunc(client);
           }
           catch (TapoErrorResponseException ex) {
             endPointInThrownException = ex.EndPoint;

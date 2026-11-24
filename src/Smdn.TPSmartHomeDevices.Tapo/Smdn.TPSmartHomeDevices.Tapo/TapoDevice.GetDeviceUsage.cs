@@ -9,7 +9,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Protocol;
 namespace Smdn.TPSmartHomeDevices.Tapo;
 
 partial class TapoDevice {
-  private readonly struct GetDeviceUsageResult {
+  internal readonly struct GetDeviceUsageResult {
     [JsonPropertyName("time_usage")]
     public TapoDeviceOperatingTime? TimeUsage { get; init; }
     [JsonPropertyName("power_usage")]
@@ -41,6 +41,8 @@ partial class TapoDevice {
       (TapoDeviceOperatingTime?, TapoDeviceEnergyUsage?)
     >(
       request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetDeviceUsageRequest,
+      responseTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseGetDeviceUsageResult,
       composeResult: static result => (
         result.Result.TimeUsage,
         result.Result.EnergyUsage
@@ -63,12 +65,10 @@ partial class TapoDevice {
   public virtual ValueTask<TapoDeviceOperatingTime?> GetTotalOperatingTimeAsync(
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<
-      GetDeviceUsageRequest,
-      PassThroughResponse<GetDeviceUsageResult>,
-      TapoDeviceOperatingTime?
-    >(
+    => SendRequestAsync(
       request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetDeviceUsageRequest,
+      responseTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseGetDeviceUsageResult,
       composeResult: static result => result.Result.TimeUsage,
       cancellationToken: cancellationToken
     );
@@ -88,12 +88,10 @@ partial class TapoDevice {
   public virtual ValueTask<TapoDeviceEnergyUsage?> GetCumulativeEnergyUsageAsync(
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<
-      GetDeviceUsageRequest,
-      PassThroughResponse<GetDeviceUsageResult>,
-      TapoDeviceEnergyUsage?
-    >(
+    => SendRequestAsync(
       request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetDeviceUsageRequest,
+      responseTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseGetDeviceUsageResult,
       composeResult: static result => result.Result.EnergyUsage,
       cancellationToken: cancellationToken
     );

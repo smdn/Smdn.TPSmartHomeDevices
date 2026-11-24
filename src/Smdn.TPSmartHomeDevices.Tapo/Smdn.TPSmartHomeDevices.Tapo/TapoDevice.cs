@@ -6,13 +6,14 @@ using System;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
-#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -448,6 +449,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
     }
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   protected ValueTask SendRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken = default
@@ -470,6 +475,49 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
       ).ConfigureAwait(false);
   }
 
+  protected ValueTask SendRequestAsync<TRequest, TResponse>(
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : notnull, ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+  {
+    if (request is null)
+      throw new ArgumentNullException(nameof(request));
+    if (requestTypeInfo is null)
+      throw new ArgumentNullException(nameof(requestTypeInfo));
+    if (responseTypeInfo is null)
+      throw new ArgumentNullException(nameof(responseTypeInfo));
+
+    ThrowIfDisposed();
+
+    return SendRequestAsyncCore(request, requestTypeInfo, responseTypeInfo, cancellationToken);
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+    async ValueTask SendRequestAsyncCore(
+      TRequest req,
+      JsonTypeInfo<TRequest> reqTypeInfo,
+      JsonTypeInfo<TResponse> respTypeInfo,
+      CancellationToken ct
+    )
+      => await SendRequestAsyncCore<TRequest, TResponse, None /* as an alternative to System.Void */>(
+        request: req,
+        requestTypeInfo: reqTypeInfo,
+        responseTypeInfo: respTypeInfo,
+        composeResult: static _ => default,
+        cancellationToken: ct
+      ).ConfigureAwait(false);
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
     TRequest request,
     Func<TResponse, TResult> composeResult,
@@ -487,13 +535,55 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
 
     return SendRequestAsyncCore(
       request: request,
+      requestTypeInfo: null,
+      responseTypeInfo: null,
       composeResult: composeResult,
       cancellationToken: cancellationToken
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  protected ValueTask<TResult> SendRequestAsync<TRequest, TResponse, TResult>(
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    Func<TResponse, TResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : notnull, ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+  {
+    if (request is null)
+      throw new ArgumentNullException(nameof(request));
+    if (requestTypeInfo is null)
+      throw new ArgumentNullException(nameof(requestTypeInfo));
+    if (responseTypeInfo is null)
+      throw new ArgumentNullException(nameof(responseTypeInfo));
+    if (composeResult is null)
+      throw new ArgumentNullException(nameof(composeResult));
+
+    ThrowIfDisposed();
+
+    return SendRequestAsyncCore(
+      request: request,
+      requestTypeInfo: requestTypeInfo,
+      responseTypeInfo: responseTypeInfo,
+      composeResult: composeResult,
+      cancellationToken: cancellationToken
+    );
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask<TResult> SendRequestAsyncCore<TRequest, TResponse, TResult>(
     TRequest request,
+    JsonTypeInfo<TRequest>? requestTypeInfo,
+    JsonTypeInfo<TResponse>? responseTypeInfo,
     Func<TResponse, TResult> composeResult,
     CancellationToken cancellationToken = default
   )
@@ -526,10 +616,17 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
       using var loggerScopeSendRequest = client.Logger?.BeginScope(new LoggerScopeEndPointState(client.EndPoint, deviceEndPoint));
 
       try {
-        var response = await client.SendRequestAsync<TRequest, TResponse>(
-          request: request,
-          cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
+        var response = requestTypeInfo is { } requestInfo && responseTypeInfo is { } responseInfo
+          ? await client.SendRequestAsync(
+              request: request,
+              requestTypeInfo: requestInfo,
+              responseTypeInfo: responseInfo,
+              cancellationToken: cancellationToken
+            ).ConfigureAwait(false)
+          : await client.SendRequestAsync<TRequest, TResponse>(
+              request: request,
+              cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
         return composeResult(response);
       }
@@ -645,10 +742,25 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
   /// </returns>
   /// <seealso cref="TapoDeviceInfo"/>
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   public ValueTask<TDeviceInfo> GetDeviceInfoAsync<TDeviceInfo>(
     CancellationToken cancellationToken = default
   )
     => GetDeviceInfoAsync<TDeviceInfo, TDeviceInfo>(
+      composeResult: static resp => resp,
+      cancellationToken: cancellationToken
+    );
+
+  /// <inheritdoc cref="GetDeviceInfoAsync{TDeviceInfo}(CancellationToken)"/>
+  public ValueTask<TDeviceInfo> GetDeviceInfoAsync<TDeviceInfo>(
+    JsonTypeInfo<PassThroughResponse<TDeviceInfo>> responseJsonTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    => GetDeviceInfoAsync(
+      responseJsonTypeInfo: responseJsonTypeInfo ?? throw new ArgumentNullException(nameof(responseJsonTypeInfo)),
       composeResult: static resp => resp,
       cancellationToken: cancellationToken
     );
@@ -675,6 +787,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   /// A <see cref="ValueTask{TResult}"/> representing the result of method.
   /// </returns>
   /// <seealso cref="TapoDeviceInfo"/>
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   public ValueTask<TResult> GetDeviceInfoAsync<TDeviceInfo, TResult>(
     Func<TDeviceInfo, TResult> composeResult,
     CancellationToken cancellationToken = default
@@ -685,6 +801,27 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
 
     return SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<TDeviceInfo>, TResult>(
       request: default,
+      composeResult: result => composeResult(result.Result),
+      cancellationToken: cancellationToken
+    );
+  }
+
+  /// <inheritdoc cref="GetDeviceInfoAsync{TDeviceInfo, TResult}(Func{TDeviceInfo, TResult}, CancellationToken)"/>
+  public ValueTask<TResult> GetDeviceInfoAsync<TDeviceInfo, TResult>(
+    JsonTypeInfo<PassThroughResponse<TDeviceInfo>> responseJsonTypeInfo,
+    Func<TDeviceInfo, TResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (responseJsonTypeInfo is null)
+      throw new ArgumentNullException(nameof(responseJsonTypeInfo));
+    if (composeResult is null)
+      throw new ArgumentNullException(nameof(composeResult));
+
+    return SendRequestAsync(
+      request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+      responseTypeInfo: responseJsonTypeInfo,
       composeResult: result => composeResult(result.Result),
       cancellationToken: cancellationToken
     );
@@ -707,6 +844,10 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
   /// The default value is <see langword="default" />.
   /// </param>
   /// <seealso cref="TapoDeviceInfo"/>
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   public ValueTask SetDeviceInfoAsync<TDeviceInfo>(
     TDeviceInfo deviceInfo,
     CancellationToken cancellationToken = default
@@ -716,6 +857,22 @@ public partial class TapoDevice : ITapoCredentialIdentity, ISmartDevice, IDispos
         terminalUuid: TerminalUuidString,
         parameters: deviceInfo
       ),
+      cancellationToken: cancellationToken
+    );
+
+  /// <inheritdoc cref="SetDeviceInfoAsync{TDeviceInfo}(TDeviceInfo, CancellationToken)"/>
+  public ValueTask SetDeviceInfoAsync<TDeviceInfo>(
+    TDeviceInfo deviceInfo,
+    JsonTypeInfo<SetDeviceInfoRequest<TDeviceInfo>> deviceInfoJsonTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    => SendRequestAsync(
+      request: new(
+        terminalUuid: TerminalUuidString,
+        parameters: deviceInfo
+      ),
+      requestTypeInfo: deviceInfoJsonTypeInfo ?? throw new ArgumentNullException(nameof(deviceInfoJsonTypeInfo)),
+      responseTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseNone,
       cancellationToken: cancellationToken
     );
 

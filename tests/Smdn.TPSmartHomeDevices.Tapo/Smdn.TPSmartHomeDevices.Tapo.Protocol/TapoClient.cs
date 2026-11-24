@@ -21,8 +21,6 @@ public partial class TapoClientTests {
   private ITapoCredentialProvider? defaultKlapCredentialProvider;
   private IHttpClientFactory? defaultHttpClientFactory;
 
-  private readonly struct NullResult { }
-
   [OneTimeSetUp]
   public void SetUp()
   {
@@ -160,8 +158,23 @@ public partial class TapoClientTests {
 
     Assert.That(() => _ = client.Session, Throws.TypeOf<ObjectDisposedException>());
 
-    Assert.That(() => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(), Throws.TypeOf<ObjectDisposedException>());
-    Assert.That(async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(), Throws.TypeOf<ObjectDisposedException>());
+    Assert.That(() => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(), Throws.TypeOf<ObjectDisposedException>());
+    Assert.That(async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(), Throws.TypeOf<ObjectDisposedException>());
+
+    Assert.That(
+      () => client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws.TypeOf<ObjectDisposedException>()
+    );
+    Assert.That(
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws.TypeOf<ObjectDisposedException>()
+    );
 
     Assert.That(
       () => client.AuthenticateAsync(

@@ -4,13 +4,14 @@
 
 using System;
 using System.Buffers;
-#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -175,6 +176,10 @@ public sealed partial class KasaClient : IDisposable {
     }
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -194,15 +199,53 @@ public sealed partial class KasaClient : IDisposable {
       module: module,
       method: method,
       parameter: parameter,
+      parameterJsonTypeInfo: null,
       composeResult: composeResult,
       cancellationToken: cancellationToken
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter parameter,
+    JsonTypeInfo<TMethodParameter> parameterJsonTypeInfo,
+    Func<JsonElement, TMethodResult> composeResult,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (parameter is null)
+      throw new ArgumentNullException(nameof(parameter));
+    if (parameterJsonTypeInfo is null)
+      throw new ArgumentNullException(nameof(parameterJsonTypeInfo));
+    if (composeResult is null)
+      throw new ArgumentNullException(nameof(composeResult));
+
+    ThrowIfDisposed();
+
+    return SendAsyncCore(
+      module: module,
+      method: method,
+      parameter: parameter,
+      parameterJsonTypeInfo: parameterJsonTypeInfo,
+      composeResult: composeResult,
+      cancellationToken: cancellationToken
+    );
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask<TMethodResult> SendAsyncCore<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameter,
+    JsonTypeInfo<TMethodParameter>? parameterJsonTypeInfo,
     Func<JsonElement, TMethodResult> composeResult,
     CancellationToken cancellationToken = default
   )
@@ -234,7 +277,7 @@ public sealed partial class KasaClient : IDisposable {
     try {
       const SocketFlags SendSocketFlags = default;
 
-      KasaJsonSerializer.Serialize(buffer, module, method, parameter, logger);
+      KasaJsonSerializer.SerializeCore(buffer, module, method, parameter, parameterJsonTypeInfo, logger);
 
       logger?.LogTrace("Sending request {RequestSize} bytes", buffer.WrittenCount);
 

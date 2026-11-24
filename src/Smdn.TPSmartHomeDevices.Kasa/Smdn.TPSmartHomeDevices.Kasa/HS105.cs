@@ -106,7 +106,7 @@ public class HS105 : KasaDevice, ISmartDevice {
   async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
     => await GetDeviceInfoAsync(cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Could not retrieve device information since it was null.");
 
-  private readonly struct SetRelayStateParameter {
+  internal readonly struct SetRelayStateParameter {
     public static readonly SetRelayStateParameter SetOff = new(false);
     public static readonly SetRelayStateParameter SetOn = new(true);
 
@@ -132,6 +132,7 @@ public class HS105 : KasaDevice, ISmartDevice {
       module: ModuleTextSystem,
       method: MethodTextSetRelayState,
       parameters: SetRelayStateParameter.SetOn,
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.HS105SetRelayStateParameter,
       cancellationToken: cancellationToken
     );
 
@@ -147,6 +148,7 @@ public class HS105 : KasaDevice, ISmartDevice {
       module: ModuleTextSystem,
       method: MethodTextSetRelayState,
       parameters: SetRelayStateParameter.SetOff,
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.HS105SetRelayStateParameter,
       cancellationToken: cancellationToken
     );
 
@@ -168,10 +170,11 @@ public class HS105 : KasaDevice, ISmartDevice {
       module: ModuleTextSystem,
       method: MethodTextSetRelayState,
       parameters: newOnOffState ? SetRelayStateParameter.SetOn : SetRelayStateParameter.SetOff,
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.HS105SetRelayStateParameter,
       cancellationToken: cancellationToken
     );
 
-  private readonly struct GetSysInfoRelayStateParameter {
+  internal readonly struct GetSysInfoRelayStateParameter {
     [JsonPropertyName("relay_state")]
     [JsonConverter(typeof(KasaNumericalBooleanJsonConverter))]
     public bool RelayState { get; init; }
@@ -190,7 +193,10 @@ public class HS105 : KasaDevice, ISmartDevice {
     => SendRequestAsync(
       module: ModuleTextSystem,
       method: MethodTextGetSysInfo,
-      composeResult: static result => JsonSerializer.Deserialize<GetSysInfoRelayStateParameter>(result).RelayState,
+      composeResult: static result => JsonSerializer.Deserialize(
+        element: result,
+        jsonTypeInfo: KasaDeviceJsonSerializerContext.Default.HS105GetSysInfoRelayStateParameter
+      ).RelayState,
       cancellationToken: cancellationToken
     );
 }

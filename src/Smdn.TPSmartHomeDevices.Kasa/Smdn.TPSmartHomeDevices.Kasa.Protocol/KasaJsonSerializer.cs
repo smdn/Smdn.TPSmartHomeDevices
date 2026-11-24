@@ -5,10 +5,14 @@
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 using Microsoft.Extensions.Logging;
 
@@ -31,11 +35,57 @@ public static class KasaJsonSerializer {
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
   };
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   public static void Serialize<TMethodParameter>(
     ArrayBufferWriter<byte> buffer,
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter? parameter,
+    ILogger? logger = null
+  )
+    => SerializeCore(
+      buffer: buffer,
+      module: module,
+      method: method,
+      parameter: parameter,
+      parameterJsonTypeInfo: null,
+      logger: logger
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  public static void Serialize<TMethodParameter>(
+    ArrayBufferWriter<byte> buffer,
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter? parameter,
+    JsonTypeInfo<TMethodParameter> parameterJsonTypeInfo,
+    ILogger? logger = null
+  )
+    => SerializeCore(
+      buffer: buffer,
+      module: module,
+      method: method,
+      parameter: parameter,
+      parameterJsonTypeInfo: parameterJsonTypeInfo ?? throw new ArgumentNullException(nameof(parameterJsonTypeInfo)),
+      logger: logger
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
+  internal static void SerializeCore<TMethodParameter>(
+    ArrayBufferWriter<byte> buffer,
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter? parameter,
+    JsonTypeInfo<TMethodParameter>? parameterJsonTypeInfo,
     ILogger? logger = null
   )
   {
@@ -53,11 +103,23 @@ public static class KasaJsonSerializer {
     writer.WriteStartObject(module);
     writer.WritePropertyName(method);
 
-    JsonSerializer.Serialize(
-      writer,
-      parameter,
-      options: SerializerOptions
-    );
+    if (parameter is null) {
+      writer.WriteNullValue();
+    }
+    else if (parameterJsonTypeInfo is null) {
+      JsonSerializer.Serialize(
+        writer,
+        parameter,
+        options: SerializerOptions
+      );
+    }
+    else {
+      JsonSerializer.Serialize(
+        writer,
+        parameter,
+        jsonTypeInfo: parameterJsonTypeInfo
+      );
+    }
 
     writer.WriteEndObject(); // method
     writer.WriteEndObject(); // module

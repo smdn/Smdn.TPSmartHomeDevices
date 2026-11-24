@@ -118,7 +118,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
   async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
     => await GetDeviceInfoAsync(cancellationToken).ConfigureAwait(false) ?? throw new InvalidOperationException("Could not retrieve device information since it was null.");
 
-  private readonly record struct SetOnOffStateParameter(
+  internal readonly record struct SetOnOffStateParameter(
     [property: JsonPropertyName("on_off")]
     [property: JsonConverter(typeof(KasaNumericalBooleanJsonConverter))]
     bool OnOff,
@@ -153,6 +153,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         OnOff: true, // on
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetOnOffStateParameter,
       cancellationToken: cancellationToken
     );
 
@@ -178,6 +179,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         OnOff: false, // off
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetOnOffStateParameter,
       cancellationToken: cancellationToken
     );
 
@@ -207,6 +209,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         OnOff: newOnOffState,
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetOnOffStateParameter,
       cancellationToken: cancellationToken
     );
 
@@ -220,7 +223,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
       cancellationToken: cancellationToken
     );
 
-  private readonly struct GetSysInfoLightStateParameter {
+  internal readonly struct GetSysInfoLightStateParameter {
     [JsonPropertyName("light_state")]
     public KL130LightState LightState { get; init; }
   }
@@ -238,7 +241,10 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     => SendRequestAsync(
       module: ModuleTextSystem,
       method: MethodTextGetSysInfo,
-      composeResult: static result => JsonSerializer.Deserialize<GetSysInfoLightStateParameter>(result).LightState,
+      composeResult: static result => JsonSerializer.Deserialize(
+        element: result,
+        jsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130GetSysInfoLightStateParameter
+      ).LightState,
       cancellationToken: cancellationToken
     );
 
@@ -255,11 +261,14 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
     => SendRequestAsync(
       module: ModuleTextSystem,
       method: MethodTextGetSysInfo,
-      composeResult: static result => JsonSerializer.Deserialize<GetSysInfoLightStateParameter>(result).LightState.IsOn,
+      composeResult: static result => JsonSerializer.Deserialize(
+        element: result,
+        jsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130GetSysInfoLightStateParameter
+      ).LightState.IsOn,
       cancellationToken: cancellationToken
     );
 
-  private readonly record struct SetColorTemperatureParameter(
+  internal readonly record struct SetColorTemperatureParameter(
     [property: JsonPropertyName("color_temp")]
     int ColorTemperature,
     [property: JsonPropertyName("brightness")]
@@ -308,10 +317,11 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetColorTemperatureParameter,
       cancellationToken
     );
 
-  private readonly record struct SetColorParameter(
+  internal readonly record struct SetColorParameter(
     [property: JsonPropertyName("hue")]
     int? Hue,
     [property: JsonPropertyName("saturation")]
@@ -370,6 +380,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetColorParameter,
       cancellationToken
     );
 
@@ -401,6 +412,7 @@ public class KL130 : KasaDevice, IMulticolorSmartLight {
         Brightness: brightness, // TODO: validation
         TransitionPeriodInMilliseconds: (int)ValidateTransitionPeriod(transitionPeriod, nameof(transitionPeriod)).TotalMilliseconds
       ),
+      parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KL130SetColorParameter,
       cancellationToken
     );
 }

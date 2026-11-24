@@ -8,12 +8,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 partial class TapoDevice {
 #pragma warning disable CA1822
-  private readonly struct TurnOnParameter {
+  internal readonly struct TurnOnParameter {
     [JsonPropertyName("device_on")]
     public bool DeviceOn => true;
   }
 
-  private readonly struct TurnOffParameter {
+  internal readonly struct TurnOffParameter {
     [JsonPropertyName("device_on")]
     public bool DeviceOn => false;
   }
@@ -28,8 +28,9 @@ partial class TapoDevice {
   /// </param>
   public ValueTask TurnOnAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
-      default(TurnOnParameter),
-      cancellationToken
+      deviceInfo: default,
+      deviceInfoJsonTypeInfo: TapoDeviceJsonSerializerContext.Default.SetDeviceInfoRequestTurnOnParameter,
+      cancellationToken: cancellationToken
     );
 
   /// <summary>
@@ -41,8 +42,9 @@ partial class TapoDevice {
   /// </param>
   public ValueTask TurnOffAsync(CancellationToken cancellationToken = default)
     => SetDeviceInfoAsync(
-      default(TurnOffParameter),
-      cancellationToken
+      deviceInfo: default,
+      deviceInfoJsonTypeInfo: TapoDeviceJsonSerializerContext.Default.SetDeviceInfoRequestTurnOffParameter,
+      cancellationToken: cancellationToken
     );
 
   /// <summary>

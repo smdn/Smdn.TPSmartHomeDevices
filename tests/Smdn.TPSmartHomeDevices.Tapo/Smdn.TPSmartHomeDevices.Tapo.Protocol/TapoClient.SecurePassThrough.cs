@@ -15,9 +15,9 @@ partial class TapoClientTests {
       funcGenerateToken: static _ => "token",
       funcGeneratePassThroughResponse: static (_, _, _) => (
         KnownErrorCodes.Success,
-        new PassThroughResponse<NullResult>() {
+        new PassThroughResponse<None>() {
           ErrorCode = KnownErrorCodes.Success,
-          Result = new(),
+          Result = default,
         }
       )
     );
@@ -35,10 +35,54 @@ partial class TapoClientTests {
       Throws.Nothing
     );
 
-    PassThroughResponse<NullResult>? nullableResponse = null;
+    PassThroughResponse<None>? nullableResponse = null;
 
     Assert.That(
-      async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+      async () => nullableResponse = await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
+      Throws.Nothing
+    );
+
+    Assert.That(nullableResponse, Is.Not.Null);
+
+    var response = nullableResponse!.Value;
+
+    Assert.That(response.ErrorCode, Is.EqualTo(KnownErrorCodes.Success), nameof(response.ErrorCode));
+  }
+
+  [Test]
+  public void SendRequestAsync_WithJsonTypeInfo()
+  {
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
+        KnownErrorCodes.Success,
+        new PassThroughResponse<None>() {
+          ErrorCode = KnownErrorCodes.Success,
+          Result = default,
+        }
+      )
+    );
+
+    using var client = new TapoClient(
+      endPoint: device.GetListenerEndPoint(),
+      httpClientFactory: defaultHttpClientFactory
+    );
+
+    Assert.That(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      ),
+      Throws.Nothing
+    );
+
+    PassThroughResponse<None>? nullableResponse = null;
+
+    Assert.That(
+      async () => nullableResponse = await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
       Throws.Nothing
     );
 
@@ -58,12 +102,27 @@ partial class TapoClientTests {
     );
 
     Assert.That(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws.InvalidOperationException
     );
     Assert.That(
-      () => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+      () => client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws.InvalidOperationException
+    );
+
+    Assert.That(
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws.TypeOf<InvalidOperationException>()
+    );
+    Assert.That(
+      () => client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws.TypeOf<InvalidOperationException>()
     );
   }
 
@@ -76,7 +135,7 @@ partial class TapoClientTests {
       funcGenerateToken: static _ => "token",
       funcGeneratePassThroughResponse: static (_, _, _) => (
         KnownErrorCodes.Success,
-        new PassThroughResponse<NullResult>() {
+        new PassThroughResponse<None>() {
           ErrorCode = ErrorCode,
           Result = new(),
         }
@@ -97,7 +156,7 @@ partial class TapoClientTests {
     );
 
     Assert.That(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws
         .TypeOf<TapoErrorResponseException>()
         .With
@@ -113,6 +172,52 @@ partial class TapoClientTests {
   }
 
   [Test]
+  public void SendRequestAsync_WithJsonTypeInfo_ErrorResponse_PassThroughResponse()
+  {
+    const int ErrorCode = 9999;
+
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
+        KnownErrorCodes.Success,
+        new PassThroughResponse<None>() {
+          ErrorCode = ErrorCode,
+          Result = new(),
+        }
+      )
+    );
+
+    using var client = new TapoClient(
+      endPoint: device.GetListenerEndPoint(),
+      httpClientFactory: defaultHttpClientFactory
+    );
+
+    Assert.That(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      ),
+      Throws.Nothing
+    );
+
+    Assert.That(
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws
+        .TypeOf<TapoErrorResponseException>()
+        .With
+        .Property(nameof(TapoErrorResponseException.RawErrorCode)).EqualTo(ErrorCode)
+        .And
+        .Property(nameof(TapoErrorResponseException.RequestMethod)).EqualTo(new GetDeviceInfoRequest().Method)
+        .And
+        .Property(nameof(TapoErrorResponseException.EndPoint))
+        .EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"))
+    );
+  }
+
+  [Test]
   public void SendRequestAsync_ErrorResponse_SecurePassThroughResponse()
   {
     const int ErrorCode = 9999;
@@ -121,7 +226,7 @@ partial class TapoClientTests {
       funcGenerateToken: static _ => "token",
       funcGeneratePassThroughResponse: static (_, _, _) => (
         ErrorCode,
-        new PassThroughResponse<NullResult>() {
+        new PassThroughResponse<None>() {
           ErrorCode = KnownErrorCodes.Success,
           Result = new(),
         }
@@ -142,7 +247,7 @@ partial class TapoClientTests {
     );
 
     Assert.That(
-      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<NullResult>>(),
+      async () => await client.SendRequestAsync<GetDeviceInfoRequest, PassThroughResponse<None>>(),
       Throws
         .TypeOf<TapoErrorResponseException>()
         .With
@@ -151,6 +256,52 @@ partial class TapoClientTests {
         .And
         .Property(nameof(TapoErrorResponseException.RequestMethod))
         .EqualTo("securePassthrough")
+        .And
+        .Property(nameof(TapoErrorResponseException.EndPoint))
+        .EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"))
+    );
+  }
+
+  [Test]
+  public void SendRequestAsync_WithJsonTypeInfo_ErrorResponse_SecurePassThroughResponse()
+  {
+    const int ErrorCode = 9999;
+
+    var device = CommonPseudoTapoDevice.Configure(
+      funcGenerateToken: static _ => "token",
+      funcGeneratePassThroughResponse: static (_, _, _) => (
+        ErrorCode,
+        new PassThroughResponse<None>() {
+          ErrorCode = KnownErrorCodes.Success,
+          Result = new(),
+        }
+      )
+    );
+
+    using var client = new TapoClient(
+      endPoint: device.GetListenerEndPoint(),
+      httpClientFactory: defaultHttpClientFactory
+    );
+
+    Assert.That(
+      async () => await client.AuthenticateAsync(
+        identity: null,
+        credential: defaultCredentialProvider!
+      ),
+      Throws.Nothing
+    );
+
+    Assert.That(
+      async () => await client.SendRequestAsync(
+        TapoPassThroughJsonSerializerContext.Default.GetDeviceInfoRequest,
+        TapoClientTestsJsonSerializerContext.Default.PassThroughResponseOfNone
+      ),
+      Throws
+        .TypeOf<TapoErrorResponseException>()
+        .With
+        .Property(nameof(TapoErrorResponseException.RawErrorCode)).EqualTo(ErrorCode)
+        .And
+        .Property(nameof(TapoErrorResponseException.RequestMethod)).EqualTo("securePassthrough")
         .And
         .Property(nameof(TapoErrorResponseException.EndPoint))
         .EqualTo(new Uri(device.EndPointUri!, $"/app?token={client.Session!.Token}"))

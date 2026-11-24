@@ -14,7 +14,7 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClient {
-  private async ValueTask AuthenticateSecurePassThroughAsync(
+  private async ValueTask AuthenticateSecurePassThroughAsyncCore(
     ITapoCredentialIdentity? identity,
     ITapoCredentialProvider credentialProvider,
     CancellationToken cancellationToken
@@ -37,7 +37,11 @@ partial class TapoClient {
      */
     logger?.LogDebug("Login starting: {EndPointUri}", endPointUri);
 
-    var token = await LoginDeviceAsync(credentialProvider, cancellationToken).ConfigureAwait(false);
+    var token = await LoginDeviceAsync(
+      securePassThroughSession,
+      credentialProvider,
+      cancellationToken
+    ).ConfigureAwait(false);
 
     logger?.LogDebug("Login completed, access token has issued: {Token}", token);
 
@@ -90,7 +94,8 @@ partial class TapoClient {
       >(
         requestPathAndQuery: TapoSecurePassThroughSession.RequestPath,
         request: new(key: publicKeyInfoPem),
-        jsonSerializerOptions: CommonJsonSerializerOptions,
+        requestTypeInfo: TapoPlainTextJsonSerializerContext.Default.HandshakeRequest,
+        responseTypeInfo: TapoPlainTextJsonSerializerContext.Default.HandshakeResponse,
         processHttpResponseAsync: ParseSessionCookieAsync,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
@@ -177,6 +182,7 @@ partial class TapoClient {
   }
 
   private async ValueTask<string> LoginDeviceAsync(
+    TapoSecurePassThroughSession session,
     ITapoCredentialProvider credential,
     CancellationToken cancellationToken
   )
@@ -186,8 +192,11 @@ partial class TapoClient {
     string token;
 
     try {
-      var loginDeviceResponse = await SendRequestAsync<LoginDeviceRequest, LoginDeviceResponse>(
+      var loginDeviceResponse = await SendRequestAsync(
         request: new(credential: credential),
+        requestTypeInfo: session.LoginDeviceJsonContext.LoginDeviceRequest,
+        requestTypeInfoForLogging: LoginDeviceMaskingJsonSerializerContext.Default.LoginDeviceRequest,
+        responseTypeInfo: session.LoginDeviceJsonContext.LoginDeviceResponse,
         cancellationToken: cancellationToken
       ).ConfigureAwait(false);
 

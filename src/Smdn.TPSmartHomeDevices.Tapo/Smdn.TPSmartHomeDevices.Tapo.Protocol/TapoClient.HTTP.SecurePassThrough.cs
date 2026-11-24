@@ -3,9 +3,13 @@
 #pragma warning disable CA1873
 
 using System;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,6 +18,10 @@ using Microsoft.Extensions.Logging;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial class TapoClient {
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
     TapoSecurePassThroughSession securePassThroughSession,
     TRequest request,
@@ -34,6 +42,8 @@ partial class TapoClient {
     >(
       requestPathAndQuery: securePassThroughSession.RequestPathAndQuery ?? TapoSecurePassThroughSession.RequestPath,
       request: new(passThroughRequest: request),
+      requestTypeInfo: null,
+      responseTypeInfo: null,
       jsonSerializerOptions: jsonSerializerOptions,
       processHttpResponseAsync: static _ => default,
       cancellationToken: cancellationToken
@@ -52,6 +62,94 @@ partial class TapoClient {
     return response;
   }
 
+  private async ValueTask<TResponse> PostSecurePassThroughRequestAsync<TRequest, TResponse>(
+    TapoSecurePassThroughSession securePassThroughSession,
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TRequest> requestTypeInfoForLogging,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    CancellationToken cancellationToken
+  )
+    where TRequest : notnull, ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+  {
+    if (requestTypeInfo is null)
+      throw new ArgumentNullException(nameof(requestTypeInfo));
+    if (responseTypeInfo is null)
+      throw new ArgumentNullException(nameof(responseTypeInfo));
+
+    cancellationToken.ThrowIfCancellationRequested();
+
+    logger?.LogDebug("Request method: {RequestMethod}", request.Method);
+
+    var (requestUri, securePassThroughResponse, _) = await PostPlainTextRequestAsync<
+      SecurePassThroughRequest,
+      SecurePassThroughResponse,
+      None
+    >(
+      requestPathAndQuery: securePassThroughSession.RequestPathAndQuery ?? TapoSecurePassThroughSession.RequestPath,
+      request: new SecurePassThroughRequest(
+        securePassThroughSession.EncryptPassThroughRequest(
+          request,
+          requestTypeInfo,
+          requestTypeInfoForLogging
+        )
+      ),
+      requestTypeInfo: TapoPlainTextJsonSerializerContext.Default.SecurePassThroughRequest,
+      responseTypeInfo: TapoPlainTextJsonSerializerContext.Default.SecurePassThroughResponse,
+      processHttpResponseAsync: static _ => default,
+      cancellationToken: cancellationToken
+    ).ConfigureAwait(false);
+
+    var response = securePassThroughSession.DecryptPassThroughResponse(
+      securePassThroughResponse,
+      responseTypeInfo
+    );
+
+    logger?.LogDebug("Response error code: {ErrorCode} ({RequestMethod})", response.ErrorCode, request.Method);
+
+    TapoErrorResponseException.ThrowIfError(
+      requestUri,
+      request.Method,
+      response.ErrorCode
+    );
+
+    return response;
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  private ValueTask<(
+    Uri RequestUri,
+    TResponse Response,
+    THttpResult? HttpResult
+  )>
+  PostPlainTextRequestAsync<TRequest, TResponse, THttpResult>(
+    Uri requestPathAndQuery,
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    Func<HttpResponseMessage, ValueTask<THttpResult?>> processHttpResponseAsync,
+    CancellationToken cancellationToken
+  )
+    where TRequest : ITapoRequest
+    where TResponse : ITapoResponse
+    => PostPlainTextRequestAsync(
+      requestPathAndQuery: requestPathAndQuery,
+      request: request,
+      requestTypeInfo: requestTypeInfo ?? throw new ArgumentNullException(nameof(requestTypeInfo)),
+      responseTypeInfo: responseTypeInfo ?? throw new ArgumentNullException(nameof(responseTypeInfo)),
+      jsonSerializerOptions: null,
+      processHttpResponseAsync: processHttpResponseAsync,
+      cancellationToken: cancellationToken
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask<(
     Uri RequestUri,
     TResponse Response,
@@ -60,7 +158,9 @@ partial class TapoClient {
   PostPlainTextRequestAsync<TRequest, TResponse, THttpResult>(
     Uri requestPathAndQuery,
     TRequest request,
-    JsonSerializerOptions jsonSerializerOptions,
+    JsonTypeInfo<TRequest>? requestTypeInfo,
+    JsonTypeInfo<TResponse>? responseTypeInfo,
+    JsonSerializerOptions? jsonSerializerOptions,
     Func<HttpResponseMessage, ValueTask<THttpResult?>> processHttpResponseAsync,
     CancellationToken cancellationToken
   )
@@ -71,11 +171,18 @@ partial class TapoClient {
 
     logger?.LogDebug("HTTP Transaction: Session={SessionId}, Token={Token}", session?.SessionId, session?.Token);
 
-    using var requestContent = JsonContent.Create(
-      inputValue: request,
-      mediaType: MediaTypeJson,
-      options: jsonSerializerOptions
-    );
+    using var requestContent =
+      requestTypeInfo is { } typeInfo
+        ? JsonContent.Create(
+            inputValue: request,
+            mediaType: MediaTypeJson,
+            jsonTypeInfo: typeInfo
+          )
+        : JsonContent.Create(
+            inputValue: request,
+            mediaType: MediaTypeJson,
+            options: jsonSerializerOptions
+          );
 
     if (session?.SessionId is not null) {
       requestContent.Headers.Add(
@@ -105,10 +212,15 @@ partial class TapoClient {
       requestContent: requestContent,
       processHttpResponseAsync: async httpResponse =>
         (
-          await httpResponse.Content.ReadFromJsonAsync<TResponse>(
-            cancellationToken: cancellationToken,
-            options: jsonSerializerOptions
-          ).ConfigureAwait(false),
+          responseTypeInfo is { } typeInfo
+            ? await httpResponse.Content.ReadFromJsonAsync(
+                cancellationToken: cancellationToken,
+                jsonTypeInfo: typeInfo
+              ).ConfigureAwait(false)
+            : await httpResponse.Content.ReadFromJsonAsync<TResponse>(
+                cancellationToken: cancellationToken,
+                options: jsonSerializerOptions
+              ).ConfigureAwait(false),
           await processHttpResponseAsync(httpResponse).ConfigureAwait(false)
         ),
       logContentAsKlapProtocol: false,

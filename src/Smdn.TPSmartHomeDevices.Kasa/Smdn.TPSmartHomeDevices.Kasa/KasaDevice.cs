@@ -7,12 +7,13 @@ using System.Buffers;
 #if SYSTEM_DIAGNOSTICS_UNREACHABLEEXCEPTION
 using System.Diagnostics;
 #endif
-#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,7 +49,7 @@ public partial class KasaDevice : IDisposable {
         : $"{CurrentEndPoint} ({DeviceEndPoint})";
   }
 
-  protected readonly struct NullParameter { }
+  protected internal readonly struct NullParameter { }
 
   private IDeviceEndPoint deviceEndPoint; // if null, it indicates a 'disposed' state.
 
@@ -207,6 +208,10 @@ public partial class KasaDevice : IDisposable {
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   protected ValueTask SendRequestAsync<TMethodParameter>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -229,10 +234,49 @@ public partial class KasaDevice : IDisposable {
           module: module,
           method: method,
           parameters: parameters,
+          parametersJsonTypeInfo: null,
           cancellationToken: cancellationToken
         );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  protected ValueTask SendRequestAsync<TMethodParameter>(
+    JsonEncodedText module,
+    JsonEncodedText method,
+    TMethodParameter parameters,
+    JsonTypeInfo<TMethodParameter> parametersJsonTypeInfo,
+    CancellationToken cancellationToken
+  )
+  {
+    if (parameters is null)
+      throw new ArgumentNullException(nameof(parameters));
+    if (parametersJsonTypeInfo is null)
+      throw new ArgumentNullException(nameof(parametersJsonTypeInfo));
+
+    ThrowIfDisposed();
+
+    return cancellationToken.IsCancellationRequested
+#if SYSTEM_THREADING_TASKS_VALUETASK_FROMCANCELED
+      ? ValueTask.FromCanceled(cancellationToken)
+#else
+      ? ValueTaskShim.FromCanceled(cancellationToken)
+#endif
+      : SendRequestAsyncCore(
+          module: module,
+          method: method,
+          parameters: parameters,
+          parametersJsonTypeInfo: parametersJsonTypeInfo,
+          cancellationToken: cancellationToken
+        );
+  }
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
   protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -251,15 +295,20 @@ public partial class KasaDevice : IDisposable {
 #else
       ? ValueTaskShim.FromCanceled<TMethodResult>(cancellationToken)
 #endif
-      : SendRequestAsyncCore<NullParameter, TMethodResult>(
+      : SendRequestAsyncCore(
           module: module,
           method: method,
           parameters: default,
+          parametersJsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KasaDeviceNullParameter,
           composeResult: composeResult,
           cancellationToken: cancellationToken
         );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
@@ -285,21 +334,28 @@ public partial class KasaDevice : IDisposable {
           module: module,
           method: method,
           parameters: parameters,
+          parametersJsonTypeInfo: null,
           composeResult: composeResult,
           cancellationToken: cancellationToken
         );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask SendRequestAsyncCore<TMethodParameter>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameters,
+    JsonTypeInfo<TMethodParameter>? parametersJsonTypeInfo,
     CancellationToken cancellationToken
   )
     => await SendRequestAsyncCore<TMethodParameter, None /* as an alternative to System.Void */>(
       module: module,
       method: method,
       parameters: parameters,
+      parametersJsonTypeInfo: parametersJsonTypeInfo,
       composeResult: static _ => default,
       cancellationToken: cancellationToken
     ).ConfigureAwait(false);
@@ -328,10 +384,15 @@ public partial class KasaDevice : IDisposable {
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
   private async ValueTask<TMethodResult> SendRequestAsyncCore<TMethodParameter, TMethodResult>(
     JsonEncodedText module,
     JsonEncodedText method,
     TMethodParameter parameters,
+    JsonTypeInfo<TMethodParameter>? parametersJsonTypeInfo,
     Func<JsonElement, TMethodResult> composeResult,
     CancellationToken cancellationToken
   )
@@ -385,13 +446,22 @@ public partial class KasaDevice : IDisposable {
         ?.BeginScope(new LoggerScopeEndPointState(endPoint, deviceEndPoint));
 
       try {
-        return await client.SendAsync(
-          module: module,
-          method: method,
-          parameter: parameters,
-          composeResult: composeResult,
-          cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
+        return parametersJsonTypeInfo is null
+          ? await client.SendAsync(
+              module: module,
+              method: method,
+              parameter: parameters,
+              composeResult: composeResult,
+              cancellationToken: cancellationToken
+            ).ConfigureAwait(false)
+          : await client.SendAsync(
+              module: module,
+              method: method,
+              parameter: parameters,
+              parameterJsonTypeInfo: parametersJsonTypeInfo,
+              composeResult: composeResult,
+              cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
       }
       catch (Exception ex) {
 #pragma warning disable SA1143
@@ -406,12 +476,14 @@ public partial class KasaDevice : IDisposable {
           : exceptionHandler.DetermineHandling(this, ex, attempt, client.Logger);
 #pragma warning restore SA1143
 
-        static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param)
+        static void LogRequest(ILogger logger, JsonEncodedText mod, JsonEncodedText meth, TMethodParameter param, JsonTypeInfo<TMethodParameter>? paramJsonTypeInfo)
           => logger.LogError(
             "{{{Module}:{{{Method}:{{{Param}}}}}}}",
             mod,
             meth,
-            JsonSerializer.Serialize(param)
+            paramJsonTypeInfo is null
+              ? JsonSerializer.Serialize(param)
+              : JsonSerializer.Serialize(param, jsonTypeInfo: paramJsonTypeInfo)
           );
 
         client.Logger?.LogTrace(
@@ -421,7 +493,7 @@ public partial class KasaDevice : IDisposable {
         );
 
         if (client.Logger is not null && !handling.ShouldRetry)
-          LogRequest(client.Logger, module, method, parameters);
+          LogRequest(client.Logger, module, method, parameters, parametersJsonTypeInfo);
 
         if (handling.ShouldInvalidateEndPoint) {
           if (deviceEndPoint is IDynamicDeviceEndPoint dynamicEndPoint) {
