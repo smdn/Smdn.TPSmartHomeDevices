@@ -60,8 +60,8 @@ The library supports performing the following device functions:
 #### Confirmed to work
 The library has been tested and confirmed to work with actual devices, on the following environments:
 - Windows 10
-- Ubuntu 22.04 LTS
-- Raspbian GNU/Linux 9.13 (stretch); Raspberry Pi 3 Model B+
+- Ubuntu 26.04 LTS (x64)
+- Ubuntu 26.04 LTS (ARM64); Raspberry Pi 3 Model B+
 
 
 ### More library features
