@@ -1,0 +1,12 @@
+﻿<!--
+SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+SPDX-License-Identifier: MIT
+-->
+<Project>
+  <PropertyGroup
+    Label="Configurations for enabling Runtime Async"
+    Condition="'$(TargetFramework)' == 'net11.0' or $(TargetFramework.StartsWith('net11.0-'))"
+  >
+    <Features>$(Features);runtime-async=on</Features>
+  </PropertyGroup>
+</Project>

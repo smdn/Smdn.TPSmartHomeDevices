@@ -3,6 +3,8 @@ SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)..\RuntimeAsync.props" />
+
   <PropertyGroup>
     <TargetFrameworks>net11.0;net10.0;netstandard2.1</TargetFrameworks>
     <VersionPrefix>2.1.0</VersionPrefix>
