@@ -109,6 +109,7 @@ Supports specifying device endpoint by MAC address. This is useful in networks w
 - Supports dependency injection (`Microsoft.Extensions.DependencyInjection`)
   - Logging (`Microsoft.Extensions.Logging`) - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/Logging/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/Logging/)
   - HTTP (`Microsoft.Extensions.Http`) - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/)
+- Supports [Native AOT compilation](https://learn.microsoft.com/dotnet/core/deploying/native-aot/) - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/NativeAOT/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/NativeAOT/)
 - Providing Tapo credentials via environment variables - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/CredentialsEnvVar/)
 - Customizable Tapo credential provider - [example](./examples/Smdn.TPSmartHomeDevices.Tapo/Credentials/)
 - Configuring timeout and cancellation - [Tapo example](./examples/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/), [Kasa example](./examples/Smdn.TPSmartHomeDevices.Kasa/ConfigureTimeout/)
@@ -170,6 +171,14 @@ When adding support for a new device, I would like to purchase and perform testi
 See [this example](./examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/) for using MAC addresses to identify the Tapo and Kasa devices.
 
 This library relies on [Smdn.Net.AddressResolution](https://www.nuget.org/packages/Smdn.Net.AddressResolution) [![Smdn.Net.AddressResolution](https://img.shields.io/nuget/v/Smdn.Net.AddressResolution.svg)](https://www.nuget.org/packages/Smdn.Net.AddressResolution/) for MAC address resolution. For further details such as functions and supported platforms, refer [smdn/Smdn.Net.AddressResolution](https://github.com/smdn/Smdn.Net.AddressResolution) repository.
+
+<details>
+
+<summary>Native AOT Compatibility and Considerations</summary>
+
+While `Smdn.TPSmartHomeDevices.MacAddressEndPoint` and its dependencies including `Smdn.Net.AddressResolution` are designed to be AOT compatible, the AOT support status of underlying backend libraries for address resolution varies. For comprehensive notes on Native AOT compilation, potential compilation warnings (such as `IL3058`), and configuration guidelines, refer to the [Native AOT sample README](examples/Smdn.TPSmartHomeDevices.MacAddressEndPoint/NativeAOT/README.md).
+
+</details>
 
 ## Smdn.TPSmartHomeDevices.Primitives
 [![NuGet](https://img.shields.io/nuget/v/Smdn.TPSmartHomeDevices.Primitives.svg)](https://www.nuget.org/packages/Smdn.TPSmartHomeDevices.Primitives/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
