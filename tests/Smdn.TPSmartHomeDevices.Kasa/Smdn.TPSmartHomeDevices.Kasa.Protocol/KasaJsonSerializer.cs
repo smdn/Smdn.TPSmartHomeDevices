@@ -57,12 +57,14 @@ public class KasaJsonSerializerTests {
   {
     var buffer = new ArrayBufferWriter<byte>();
 
+#pragma warning disable CS0618 // CS0618 KasaJsonSerializer.Serialize without JsonTypeInfo<T> is obsolete
     KasaJsonSerializer.Serialize(
       buffer,
       JsonEncodedText.Encode(module),
       JsonEncodedText.Encode(method),
       parameters
     );
+#pragma warning restore CS0618
 
     var length = BinaryPrimitives.ReadInt32BigEndian(buffer.WrittenSpan.Slice(0, 4));
 
@@ -84,11 +86,26 @@ public class KasaJsonSerializerTests {
   [Test]
   public void Serialize_ArgumentNull_Buffer()
     => Assert.That(
+#pragma warning disable CS0618 // CS0618 KasaJsonSerializer.Serialize without JsonTypeInfo<T> is obsolete
       () => KasaJsonSerializer.Serialize(
         buffer: null!,
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         (object)null!
+      ),
+#pragma warning restore CS0618
+      Throws.ArgumentNullException
+    );
+
+  [Test]
+  public void Serialize_ArgumentNull_JsonTypeInfo()
+    => Assert.That(
+      () => KasaJsonSerializer.Serialize(
+        buffer: new ArrayBufferWriter<byte>(),
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameterJsonTypeInfo: null!,
+        parameter: new { Foo = "Bar" }
       ),
       Throws.ArgumentNullException
     );
@@ -267,7 +284,8 @@ public class KasaJsonSerializerTests {
         buffer,
         JsonEncodedText.Encode(testCase.SerializingModuleName),
         methodName,
-        parameter: new { }
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter
       );
 
       yield return new object[] { buffer, JsonEncodedText.Encode(testCase.DeserializingModuleName), methodName };
@@ -298,7 +316,8 @@ public class KasaJsonSerializerTests {
         buffer,
         moduleName,
         JsonEncodedText.Encode(testCase.SerializingMethodName),
-        parameter: new { }
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter
       );
 
       yield return new object[] { buffer, moduleName, JsonEncodedText.Encode(testCase.DeserializingMethodName) };

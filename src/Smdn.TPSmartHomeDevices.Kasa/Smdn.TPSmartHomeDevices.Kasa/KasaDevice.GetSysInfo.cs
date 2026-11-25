@@ -53,7 +53,10 @@ partial class KasaDevice {
     CancellationToken cancellationToken = default
   )
     => GetSysInfoAsync(
-      composeResult: static result => JsonSerializer.Deserialize<KasaDeviceInfo>(result),
+      composeResult: static result => JsonSerializer.Deserialize(
+        element: result,
+        jsonTypeInfo: KasaDeviceJsonSerializerContext.Default.KasaDeviceInfo
+      ),
       cancellationToken: cancellationToken
     );
 }

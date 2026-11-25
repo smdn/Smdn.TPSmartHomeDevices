@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 SPDX-License-Identifier: MIT
 -->
@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
   <ItemGroup>
     <PackageReference Include="Smdn.TPSmartHomeDevices.Tapo" Version="*" />
     <PackageReference Include="Smdn.TPSmartHomeDevices.MacAddressEndPoint" Version="*" />
-    <PackageReference Include="Smdn.Net.AddressResolution" Version="1.0.1" />
+    <PackageReference Include="Smdn.Net.AddressResolution" Version="[1.4.0,2.0.0)" />
   </ItemGroup>
 
 </Project>

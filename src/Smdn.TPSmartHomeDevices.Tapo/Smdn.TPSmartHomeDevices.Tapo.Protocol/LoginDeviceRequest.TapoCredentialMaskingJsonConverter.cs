@@ -9,16 +9,13 @@ using Smdn.TPSmartHomeDevices.Tapo.Credentials;
 namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 
 partial struct LoginDeviceRequest {
+  /// <seealso cref="LoginDeviceMaskingJsonSerializerContext"/>
   internal sealed class TapoCredentialMaskingJsonConverter : JsonConverter<ITapoCredentialProvider> {
     private static readonly JsonEncodedText PropertyValueMaskedCredential = JsonEncodedText.Encode(
       "****"u8
     );
 
     public static readonly JsonConverter<ITapoCredentialProvider> Instance = new TapoCredentialMaskingJsonConverter();
-
-    private TapoCredentialMaskingJsonConverter()
-    {
-    }
 
     public override ITapoCredentialProvider? Read(
       ref Utf8JsonReader reader,

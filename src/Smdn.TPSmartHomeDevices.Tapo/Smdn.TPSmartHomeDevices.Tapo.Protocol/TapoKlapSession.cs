@@ -4,8 +4,12 @@
 
 using System;
 using System.Buffers;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 using Microsoft.Extensions.Logging;
 
@@ -118,9 +122,46 @@ internal sealed class TapoKlapSession : TapoSession {
     return httpRequestContentBuffer;
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   internal (Uri RequestPathAndQuery, int SequenceNumber) Encrypt<TRequest>(
     TRequest request,
-    JsonSerializerOptions jsonSerializerOptions,
+    JsonSerializerOptions? jsonSerializerOptions,
+    IBufferWriter<byte> destination
+  ) where TRequest : notnull, ITapoPassThroughRequest
+    => EncryptCore(
+      request: request,
+      jsonTypeInfo: null,
+      jsonSerializerOptions: jsonSerializerOptions,
+      destination: destination
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  internal (Uri RequestPathAndQuery, int SequenceNumber) Encrypt<TRequest>(
+    TRequest request,
+    JsonTypeInfo<TRequest> jsonTypeInfo,
+    IBufferWriter<byte> destination
+  ) where TRequest : notnull, ITapoPassThroughRequest
+    => EncryptCore(
+      request: request,
+      jsonTypeInfo: jsonTypeInfo ?? throw new ArgumentNullException(nameof(jsonTypeInfo)),
+      jsonSerializerOptions: null,
+      destination: destination
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
+  private (Uri RequestPathAndQuery, int SequenceNumber) EncryptCore<TRequest>(
+    TRequest request,
+    JsonTypeInfo<TRequest>? jsonTypeInfo,
+    JsonSerializerOptions? jsonSerializerOptions,
     IBufferWriter<byte> destination
   ) where TRequest : notnull, ITapoPassThroughRequest
   {
@@ -130,11 +171,20 @@ internal sealed class TapoKlapSession : TapoSession {
 
     using var rawTextWriter = new Utf8JsonWriter(jsonWriterBuffer, options: default);
 
-    JsonSerializer.Serialize(
-      rawTextWriter,
-      request,
-      jsonSerializerOptions
-    );
+    if (jsonTypeInfo is { } typeInfo) {
+      JsonSerializer.Serialize(
+        rawTextWriter,
+        request,
+        typeInfo
+      );
+    }
+    else {
+      JsonSerializer.Serialize(
+        rawTextWriter,
+        request,
+        jsonSerializerOptions
+      );
+    }
 
     var seq = klap.Encrypt(jsonWriterBuffer.WrittenSpan, destination);
 
@@ -151,10 +201,51 @@ internal sealed class TapoKlapSession : TapoSession {
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
   internal TResponse? Decrypt<TResponse>(
     ReadOnlySpan<byte> encryptedText,
     int sequenceNumber,
-    JsonSerializerOptions jsonSerializerOptions,
+    JsonSerializerOptions? jsonSerializerOptions,
+    ILogger? logger
+  ) where TResponse : ITapoPassThroughResponse
+    => DecryptCore<TResponse>(
+      encryptedText: encryptedText,
+      sequenceNumber: sequenceNumber,
+      jsonTypeInfo: null,
+      jsonSerializerOptions: jsonSerializerOptions,
+      logger: logger
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+  [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = UnconditionalSuppressMessages.IL3050JustificationAotCompatibleCodePathUsingJsonTypeInfo)]
+  [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = UnconditionalSuppressMessages.IL2026JustificationReflectionFreeCodePathUsingJsonTypeInfo)]
+#endif
+  internal TResponse? Decrypt<TResponse>(
+    ReadOnlySpan<byte> encryptedText,
+    int sequenceNumber,
+    JsonTypeInfo<TResponse> jsonTypeInfo,
+    ILogger? logger
+  ) where TResponse : ITapoPassThroughResponse
+    => DecryptCore(
+      encryptedText: encryptedText,
+      sequenceNumber: sequenceNumber,
+      jsonTypeInfo: jsonTypeInfo ?? throw new ArgumentNullException(nameof(jsonTypeInfo)),
+      jsonSerializerOptions: null,
+      logger: logger
+    );
+
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeConditionalJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeConditionalJsonSerializeInMethodOverload)]
+#endif
+  private TResponse? DecryptCore<TResponse>(
+    ReadOnlySpan<byte> encryptedText,
+    int sequenceNumber,
+    JsonTypeInfo<TResponse>? jsonTypeInfo,
+    JsonSerializerOptions? jsonSerializerOptions,
     ILogger? logger
   ) where TResponse : ITapoPassThroughResponse
   {
@@ -174,9 +265,14 @@ internal sealed class TapoKlapSession : TapoSession {
       Encoding.UTF8.GetString(decryptionBuffer.WrittenSpan)
     );
 
-    return JsonSerializer.Deserialize<TResponse>(
-      decryptionBuffer.WrittenSpan,
-      jsonSerializerOptions
-    );
+    return jsonTypeInfo is { } typeInfo
+      ? JsonSerializer.Deserialize(
+          decryptionBuffer.WrittenSpan,
+          typeInfo
+        )
+      : JsonSerializer.Deserialize<TResponse>(
+          decryptionBuffer.WrittenSpan,
+          jsonSerializerOptions
+        );
   }
 }

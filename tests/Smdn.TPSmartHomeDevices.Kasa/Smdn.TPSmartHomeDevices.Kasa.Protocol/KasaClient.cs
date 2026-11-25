@@ -18,6 +18,8 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol;
 
 [TestFixture]
 public class KasaClientTests {
+  internal readonly struct NullParameter { }
+
   [Test]
   public void Ctor_ArgumentNull_EndPoint()
   {
@@ -50,10 +52,37 @@ public class KasaClientTests {
     Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
 
     Assert.That(
+#pragma warning disable CS0618 // CS0618: SendAsync without JsonTypeInfo<T> is obsolete
       () => client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
+        composeResult: static _ => _
+      ),
+#pragma warning restore CS0618
+      Throws.TypeOf<ObjectDisposedException>(),
+      nameof(client.SendAsync)
+    );
+
+    Assert.That(
+#pragma warning disable CS0618 // CS0618: SendAsync without JsonTypeInfo<T> is obsolete
+      async () => await client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: new { },
+        composeResult: static _ => _
+      ),
+#pragma warning restore CS0618
+      Throws.TypeOf<ObjectDisposedException>(),
+      nameof(client.SendAsync)
+    );
+
+    Assert.That(
+      () => client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => _
       ),
       Throws.TypeOf<ObjectDisposedException>(),
@@ -64,7 +93,8 @@ public class KasaClientTests {
       async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
-        parameter: new { },
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => _
       ),
       Throws.TypeOf<ObjectDisposedException>(),
@@ -87,7 +117,8 @@ public class KasaClientTests {
     await client.SendAsync(
       JsonEncodedText.Encode("module"),
       JsonEncodedText.Encode("method"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static _ => _
     );
 
@@ -101,10 +132,37 @@ public class KasaClientTests {
     Assert.That(() => _ = client.EndPoint, Throws.TypeOf<ObjectDisposedException>(), nameof(client.EndPoint));
 
     Assert.That(
+#pragma warning disable CS0618 // CS0618: SendAsync without JsonTypeInfo<T> is obsolete
       () => client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
         parameter: new { },
+        composeResult: static _ => _
+      ),
+#pragma warning restore CS0618
+      Throws.TypeOf<ObjectDisposedException>(),
+      nameof(client.SendAsync)
+    );
+
+    Assert.That(
+#pragma warning disable CS0618 // CS0618: SendAsync without JsonTypeInfo<T> is obsolete
+      async () => await client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: new { },
+        composeResult: static _ => _
+      ),
+#pragma warning restore CS0618
+      Throws.TypeOf<ObjectDisposedException>(),
+      nameof(client.SendAsync)
+    );
+
+    Assert.That(
+      () => client.SendAsync(
+        JsonEncodedText.Encode("module"),
+        JsonEncodedText.Encode("method"),
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => _
       ),
       Throws.TypeOf<ObjectDisposedException>(),
@@ -115,7 +173,8 @@ public class KasaClientTests {
       async () => await client.SendAsync(
         JsonEncodedText.Encode("module"),
         JsonEncodedText.Encode("method"),
-        parameter: new { },
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => _
       ),
       Throws.TypeOf<ObjectDisposedException>(),
@@ -163,7 +222,8 @@ public class KasaClientTests {
     var result = await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
       method: JsonEncodedText.Encode("get_light_state"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
@@ -203,7 +263,8 @@ public class KasaClientTests {
     await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
       method: JsonEncodedText.Encode("get_light_state"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
@@ -213,7 +274,8 @@ public class KasaClientTests {
     var result = await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
       method: JsonEncodedText.Encode("get_light_state"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
@@ -251,7 +313,8 @@ public class KasaClientTests {
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
-        parameter: new { },
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => true
       ),
       Throws.Nothing
@@ -288,7 +351,8 @@ public class KasaClientTests {
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
-        parameter: new { },
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: ThrowExceptionComposeResult
       ),
       Throws
@@ -326,7 +390,8 @@ json: @"{
     await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
       method: JsonEncodedText.Encode("get_light_state"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
@@ -344,7 +409,8 @@ json: @"{
           await client.SendAsync(
             module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
             method: JsonEncodedText.Encode("get_light_state"),
-            parameter: new { },
+            parameter: default,
+            parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
             composeResult: static json => JsonDocument.Parse(json.ToString()),
             cancellationToken: cts.Token
           );
@@ -394,7 +460,8 @@ json: @"{
     await client.SendAsync(
       module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
       method: JsonEncodedText.Encode("get_light_state"),
-      parameter: new { },
+      parameter: default,
+      parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
       composeResult: static json => JsonDocument.Parse(json.ToString())
     );
 
@@ -410,7 +477,8 @@ json: @"{
           await client.SendAsync(
             module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
             method: JsonEncodedText.Encode("get_light_state"),
-            parameter: new { },
+            parameter: default,
+            parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
             composeResult: static json => JsonDocument.Parse(json.ToString())
           );
         }
@@ -456,7 +524,8 @@ json: @"{
       async () => await client.SendAsync(
         module: JsonEncodedText.Encode("smartlife.iot.smartbulb.lightingservice"),
         method: JsonEncodedText.Encode("get_light_state"),
-        parameter: new { },
+        parameter: default,
+        parameterJsonTypeInfo: KasaClientTestsJsonSerializerContext.Default.KasaClientTestsNullParameter,
         composeResult: static _ => 0
       ),
       Throws

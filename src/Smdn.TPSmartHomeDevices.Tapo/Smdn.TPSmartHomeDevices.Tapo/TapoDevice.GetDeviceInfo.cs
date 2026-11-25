@@ -8,7 +8,10 @@ namespace Smdn.TPSmartHomeDevices.Tapo;
 
 partial class TapoDevice {
   async ValueTask<IDeviceInfo> ISmartDevice.GetDeviceInfoAsync(CancellationToken cancellationToken)
-    => await GetDeviceInfoAsync<TapoDeviceInfo>(cancellationToken).ConfigureAwait(false);
+    => await GetDeviceInfoAsync(
+      responseJsonTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseTapoDeviceInfo,
+      cancellationToken: cancellationToken
+    ).ConfigureAwait(false);
 
   /// <summary>
   /// Gets the Tapo device information including current device status.
@@ -24,11 +27,12 @@ partial class TapoDevice {
   public ValueTask<TapoDeviceInfo> GetDeviceInfoAsync(
     CancellationToken cancellationToken = default
   )
-    => GetDeviceInfoAsync<TapoDeviceInfo>(
+    => GetDeviceInfoAsync(
+      responseJsonTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseTapoDeviceInfo,
       cancellationToken: cancellationToken
     );
 
-  private readonly struct GetDeviceInfoOnOffStateResult {
+  internal readonly struct GetDeviceInfoOnOffStateResult {
     [JsonPropertyName("device_on")]
     public bool DeviceOn { get; init; }
   }
@@ -43,7 +47,8 @@ partial class TapoDevice {
   public ValueTask<bool> GetOnOffStateAsync(
     CancellationToken cancellationToken = default
   )
-    => GetDeviceInfoAsync<GetDeviceInfoOnOffStateResult, bool>(
+    => GetDeviceInfoAsync(
+      responseJsonTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseGetDeviceInfoOnOffStateResult,
       composeResult: static resp => resp.DeviceOn,
       cancellationToken: cancellationToken
     );

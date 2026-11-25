@@ -168,7 +168,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     public static readonly LightingEffectParameter Disabled = new(0);
   }
 
-  private readonly record struct SetBrightnessParameter(
+  internal readonly record struct SetBrightnessParameter(
     [property: JsonPropertyName("brightness")] int Brightness
   ) {
     [JsonPropertyName("device_on")]
@@ -178,7 +178,7 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     public LightingEffectParameter LightingEffect => LightingEffectParameter.Disabled;
   }
 
-  private readonly record struct SetColorParameter(
+  internal readonly record struct SetColorParameter(
     [property: JsonPropertyName("hue")] int? Hue,
     [property: JsonPropertyName("saturation")] int? Saturation,
     [property: JsonPropertyName("brightness")] int? Brightness
@@ -206,10 +206,11 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetBrightnessParameter(
+      deviceInfo: new SetBrightnessParameter(
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness)).Value
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L900JsonSerializerContext.Default.SetDeviceInfoRequestSetBrightnessParameter,
+      cancellationToken: cancellationToken
     );
 
 #pragma warning disable IDE0060
@@ -247,12 +248,13 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: MulticolorLightUtils.ValidateHueValue(hue, nameof(hue)),
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L900JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 
 #pragma warning disable IDE0060
@@ -290,12 +292,13 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: MulticolorLightUtils.ValidateHueValue(hue, nameof(hue)),
         Saturation: null,
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L900JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 
   /// <summary>
@@ -317,12 +320,13 @@ public class L900 : TapoDevice, IMulticolorSmartLight {
     CancellationToken cancellationToken = default
   )
     => SetDeviceInfoAsync(
-      new SetColorParameter(
+      deviceInfo: new SetColorParameter(
         Hue: null,
         Saturation: MulticolorLightUtils.ValidateSaturationValue(saturation, nameof(saturation)),
         Brightness: MulticolorLightUtils.ValidateBrightnessValue(brightness, nameof(brightness))
       ),
-      cancellationToken
+      deviceInfoJsonTypeInfo: L900JsonSerializerContext.Default.SetDeviceInfoRequestSetColorParameter,
+      cancellationToken: cancellationToken
     );
 
   /// <summary>

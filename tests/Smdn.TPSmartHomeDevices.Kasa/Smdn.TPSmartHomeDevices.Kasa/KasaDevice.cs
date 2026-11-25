@@ -195,6 +195,8 @@ public partial class KasaDeviceTests {
     );
   }
 
+  internal readonly struct NullParameter { }
+
   private class ConcreteKasaDevice : KasaDevice {
     public ConcreteKasaDevice(
       IDeviceEndPoint deviceEndPoint,
@@ -215,7 +217,8 @@ public partial class KasaDeviceTests {
       => SendRequestAsync(
         module: module,
         method: method,
-        parameters: default(NullParameter),
+        parameters: default,
+        parametersJsonTypeInfo: KasaDeviceTestsJsonSerializerContext.Default.KasaDeviceTestsNullParameter,
         cancellationToken: cancellationToken
       );
 
@@ -225,10 +228,9 @@ public partial class KasaDeviceTests {
       Func<JsonElement, TMethodResult> composeResult,
       CancellationToken cancellationToken = default
     )
-      => SendRequestAsync(
+      => base.SendRequestAsync(
         module: module,
         method: method,
-        parameters: default(NullParameter),
         composeResult: composeResult,
         cancellationToken: cancellationToken
       );

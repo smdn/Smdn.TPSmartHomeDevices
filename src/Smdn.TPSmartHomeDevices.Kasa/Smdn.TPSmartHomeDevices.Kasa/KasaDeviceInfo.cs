@@ -48,7 +48,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonPropertyName("description")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(Description)}' to get the value.")]
   public
@@ -58,7 +58,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonPropertyName("dev_name")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(Description)}' to get the value.")]
   public
@@ -77,7 +77,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonPropertyName("mic_type")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(TypeName)}' to get the value.")]
   public
@@ -87,7 +87,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonPropertyName("type")]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(TypeName)}' to get the value.")]
   public
@@ -145,7 +145,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonConverter(typeof(MacAddressJsonConverter))]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(MacAddress)}' to get the value.")]
   public
@@ -156,7 +156,7 @@ public class KasaDeviceInfo : IDeviceInfo {
   [JsonConverter(typeof(MacAddressJsonConverter))]
 #if SYSTEM_JSON_TEXT_SERIALIZE_NON_PUBLIC_ACCESSORS
   [JsonInclude]
-  private
+  internal
 #else
   [Obsolete($"This property is intended to be used only for JSON deserialization. Refer '{nameof(MacAddress)}' to get the value.")]
   public

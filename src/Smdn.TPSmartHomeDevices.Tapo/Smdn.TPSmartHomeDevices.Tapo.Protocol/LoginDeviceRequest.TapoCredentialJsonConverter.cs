@@ -16,6 +16,7 @@ partial struct LoginDeviceRequest {
     "username"u8
   );
 
+  /// <seealso cref="LoginDevicePlainTextJsonSerializerContext"/>
   internal sealed class TapoCredentialJsonConverter : JsonConverter<ITapoCredentialProvider> {
     private readonly ITapoCredentialIdentity? identity;
 

@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
 using System;
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -24,6 +27,12 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// </remarks>
 /// <seealso cref="PassThroughMessageTransform"/>
 /// <seealso cref="SecurePassThroughInvalidPaddingException"/>
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+[RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInType)]
+[RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInType)]
+#endif
+[Obsolete("This type is deprecated, and its removal in a future major version release is under consideration. Avoid using it directly.")]
+#pragma warning disable IDE0055
 public sealed class SecurePassThroughJsonConverterFactory :
   JsonConverterFactory,
   IDisposable,
@@ -31,11 +40,19 @@ public sealed class SecurePassThroughJsonConverterFactory :
 #pragma warning restore IDE0055
 {
   private interface IPassThroughObjectJsonConverter {
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+    [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInMethod)]
+    [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInMethod)]
+#endif
     void WriteEncryptedValue<TValue>(
       Utf8JsonWriter writer,
       TValue value
     );
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+    [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInMethod)]
+    [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInMethod)]
+#endif
     TValue ReadDecryptedValue<TValue>(
       ref Utf8JsonReader reader,
       Type typeToConvert
@@ -113,15 +130,23 @@ public sealed class SecurePassThroughJsonConverterFactory :
       //   throw new NotSupportedException($"unexpected type to convert: {typeToConvert.FullName}");
       : null;
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInMethod)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInMethod)]
+#endif
   void IPassThroughObjectJsonConverter.WriteEncryptedValue<TValue>(
     Utf8JsonWriter writer,
     TValue value
   )
-    => PassThroughMessageTransform.WriteEncryptedValue(
+    => PassThroughMessageTransform.WriteEncryptedValueRequiresDynamicCode(
       writer: writer,
       value: value
     );
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInMethod)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInMethod)]
+#endif
   TValue IPassThroughObjectJsonConverter.ReadDecryptedValue<TValue>(
     ref Utf8JsonReader reader,
     Type typeToConvert
@@ -132,12 +157,16 @@ public sealed class SecurePassThroughJsonConverterFactory :
 
     using var encryptedValueStream = new MemoryStream(base64, writable: false);
 
-    return PassThroughMessageTransform.ReadDecryptedValue<TValue>(
+    return PassThroughMessageTransform.ReadDecryptedValueRequiresDynamicCode<TValue>(
       encryptedValueStream: encryptedValueStream,
       typeToConvert: typeToConvert
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonConverterFactoryInType)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonConverterFactoryInType)]
+#endif
 #pragma warning disable IDE0055, CA1812
   private sealed class PassThroughObjectJsonConverter<TPassThroughObject>
     : JsonConverter<TPassThroughObject>

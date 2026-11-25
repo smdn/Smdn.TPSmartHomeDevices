@@ -1,5 +1,9 @@
 // SPDX-FileCopyrightText: 2023 smdn <smdn@smdn.jp>
 // SPDX-License-Identifier: MIT
+#if NET10_0_OR_GREATER
+#define SYSTEM_CONVERT_TRYTOHEXSTRINGLOWER_UTF8DESTINATION
+#endif
+
 using System;
 using System.Buffers;
 using System.Buffers.Text;
@@ -7,7 +11,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
+#if !SYSTEM_CONVERT_TRYTOHEXSTRINGLOWER_UTF8DESTINATION
 using Smdn.Formats;
+#endif
 
 namespace Smdn.TPSmartHomeDevices.Tapo.Credentials;
 
@@ -98,8 +104,13 @@ public static partial class TapoCredentials {
       /*
         * SHA-1 hash byte array -> hex byte array
         */
+#if SYSTEM_CONVERT_TRYTOHEXSTRINGLOWER_UTF8DESTINATION
+      if (!Convert.TryToHexStringLower(sha1hash, destination, out bytesWritten))
+        return false; // destination too short
+#else
       if (!Hexadecimal.TryEncodeLowerCase(sha1hash, destination, out bytesWritten))
         return false; // destination too short
+#endif
 
       return true;
     }

@@ -25,12 +25,18 @@ SPDX-License-Identifier: MIT
   <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/Logging/">
     <Project Path="Smdn.TPSmartHomeDevices.Kasa/Logging/Program.csproj" />
   </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Kasa/NativeAOT/">
+    <Project Path="Smdn.TPSmartHomeDevices.Kasa/NativeAOT/Program.csproj" />
+  </Folder>
   <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/" />
   <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/GettingStarted/">
     <Project Path="Smdn.TPSmartHomeDevices.MacAddressEndPoint/GettingStarted/Program.csproj" />
   </Folder>
   <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/">
     <Project Path="Smdn.TPSmartHomeDevices.MacAddressEndPoint/MacAddressResolution/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.MacAddressEndPoint/NativeAOT/">
+    <Project Path="Smdn.TPSmartHomeDevices.MacAddressEndPoint/NativeAOT/Program.csproj" />
   </Folder>
   <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/" />
   <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/ConfigureTimeout/">
@@ -62,6 +68,9 @@ SPDX-License-Identifier: MIT
   </Folder>
   <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/Logging/">
     <Project Path="Smdn.TPSmartHomeDevices.Tapo/Logging/Program.csproj" />
+  </Folder>
+  <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/NativeAOT/">
+    <Project Path="Smdn.TPSmartHomeDevices.Tapo/NativeAOT/Program.csproj" />
   </Folder>
   <Folder Name="/Smdn.TPSmartHomeDevices.Tapo/P105Plug/">
     <Project Path="Smdn.TPSmartHomeDevices.Tapo/P105Plug/Program.csproj" />

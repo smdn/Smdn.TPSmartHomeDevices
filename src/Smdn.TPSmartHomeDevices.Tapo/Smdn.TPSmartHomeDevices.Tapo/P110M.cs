@@ -160,7 +160,7 @@ public class P110M : TapoDevice {
       serviceProvider: serviceProvider
     );
 
-  private readonly struct GetCurrentPowerResult {
+  internal readonly struct GetCurrentPowerResult {
     [JsonPropertyName("current_power")]
     [JsonConverter(typeof(TapoElectricPowerInWattJsonConverter))]
     public decimal? CurrentPower { get; init; }
@@ -177,12 +177,10 @@ public class P110M : TapoDevice {
   public virtual ValueTask<decimal?> GetCurrentPowerConsumptionAsync(
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<
-      GetCurrentPowerRequest,
-      PassThroughResponse<GetCurrentPowerResult>,
-      decimal?
-    >(
+    => SendRequestAsync(
       request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetCurrentPowerRequest,
+      responseTypeInfo: P110MJsonSerializerContext.Default.PassThroughResponseGetCurrentPowerResult,
       composeResult: static result => result.Result.CurrentPower,
       cancellationToken: cancellationToken
     );
@@ -196,12 +194,10 @@ public class P110M : TapoDevice {
   public virtual ValueTask<TapoPlugMonitoringData> GetMonitoringDataAsync(
     CancellationToken cancellationToken = default
   )
-    => SendRequestAsync<
-      GetEnergyUsageRequest,
-      PassThroughResponse<TapoPlugMonitoringData>,
-      TapoPlugMonitoringData
-    >(
+    => SendRequestAsync(
       request: default,
+      requestTypeInfo: TapoPassThroughJsonSerializerContext.Default.GetEnergyUsageRequest,
+      responseTypeInfo: TapoDeviceJsonSerializerContext.Default.PassThroughResponseTapoPlugMonitoringData,
       composeResult: static result => result.Result,
       cancellationToken: cancellationToken
     );

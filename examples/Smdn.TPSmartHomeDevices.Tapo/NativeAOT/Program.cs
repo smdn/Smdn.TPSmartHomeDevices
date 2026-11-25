@@ -1,0 +1,24 @@
+﻿// SPDX-FileCopyrightText: 2026 smdn <smdn@smdn.jp>
+// SPDX-License-Identifier: MIT
+using System.Net;
+
+using Smdn.TPSmartHomeDevices.Tapo;
+
+using var bulb = new L530(IPAddress.Parse("192.0.2.1"), "user@mail.test", "password");
+
+// Methods called in typical use cases support native AOT compilation.
+// However, if you attempt to call a method that is not AOT-compatible,
+// a warning will be reported. In such cases, modify your code to call
+// the version that takes a `JsonTypeInfo<T>` as an argument.
+
+for (var temp = 2500; temp <= 6500; temp += 500) {
+  await bulb.SetColorTemperatureAsync(colorTemperature: temp, brightness: 15);
+  await Task.Delay(1000);
+}
+
+for (var hue = 0; hue <= 360; hue += 40) {
+  await bulb.SetColorAsync(hue: hue, saturation: 100, brightness: 5);
+  await Task.Delay(1000);
+}
+
+await bulb.TurnOffAsync();

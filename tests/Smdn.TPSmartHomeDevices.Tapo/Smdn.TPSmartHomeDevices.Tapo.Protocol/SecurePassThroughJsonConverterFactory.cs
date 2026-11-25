@@ -99,13 +99,13 @@ public class SecurePassThroughJsonConverterFactoryTests {
       => throw new ThrowExceptionJsonConverterException();
   }
 
+#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
   private static SecurePassThroughJsonConverterFactory CreateFactory(
     ICryptoTransform? encryptorForPassThroughRequest = null,
     ICryptoTransform? decryptorForPassThroughResponse = null,
     JsonSerializerOptions? baseJsonSerializerOptions = null,
     ILogger? logger = null
   )
-#pragma warning disable CS0618 // CS0618: 'SecurePassThroughJsonConverterFactory' is obsolete.
     => new(
       identity: null,
       encryptorForPassThroughRequest: encryptorForPassThroughRequest ?? new NullTransform(),
@@ -513,13 +513,7 @@ public class SecurePassThroughJsonConverterFactoryTests {
   }
 
   private class NullLogger : ILogger {
-#if NET11_0_OR_GREATER
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-#else
-    public IDisposable BeginScope<TState>(TState state)
-#endif
-       => NullLoggerScope.Instance; // do nothing
-
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullLoggerScope.Instance; // do nothing
     public bool IsEnabled(LogLevel logLevel) => true; // enable all log level
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { } // do nothing
   }

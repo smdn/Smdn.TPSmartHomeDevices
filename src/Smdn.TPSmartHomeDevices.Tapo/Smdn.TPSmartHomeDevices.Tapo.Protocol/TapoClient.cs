@@ -3,13 +3,14 @@
 #pragma warning disable CA1873
 
 using System;
-#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_MEMBERNOTNULLWHENATTRIBUTE || SYSTEM_DIAGNOSTICS_CODEANALYSIS_UNCONDITIONALSUPPRESSMESSAGEATTRIBUTE
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +28,9 @@ namespace Smdn.TPSmartHomeDevices.Tapo.Protocol;
 /// Python implementation by <see href="https://github.com/fishbigger">Toby Johnson</see>:
 /// <see href="https://github.com/fishbigger/TapoP100">fishbigger/TapoP100</see>, published under the MIT License.
 /// </remarks>
+#pragma warning disable CA1506 // TODO: reduce complexity
 public sealed partial class TapoClient : IDisposable {
+#pragma warning restore CA1506
   public const int DefaultPort = 80; // HTTP
 
   internal static Uri GetEndPointUri(EndPoint endPoint)
@@ -194,6 +197,11 @@ public sealed partial class TapoClient : IDisposable {
     );
   }
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     CancellationToken cancellationToken = default
   )
@@ -204,6 +212,11 @@ public sealed partial class TapoClient : IDisposable {
       cancellationToken: cancellationToken
     );
 
+#if SYSTEM_DIAGNOSTICS_CODEANALYSIS_REQUIRESUNREFERENCEDCODEATTRIBUTE
+  [RequiresDynamicCode(FeatureRequirementMessages.RequiresDynamicCodeJsonSerializeInMethodOverload)]
+  [RequiresUnreferencedCode(FeatureRequirementMessages.RequiresUnreferencedCodeJsonSerializeInMethodOverload)]
+#endif
+  [Obsolete(ObsoleteMessages.RequiresReflectionBasedJsonSerializeInMethodOverload)]
   public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
     TRequest request,
     CancellationToken cancellationToken = default
@@ -230,6 +243,72 @@ public sealed partial class TapoClient : IDisposable {
         klapSession: klapSession,
         request: request,
         jsonSerializerOptions: CommonJsonSerializerOptions,
+        cancellationToken: cancellationToken
+      ),
+      _ => throw new InvalidOperationException($"Invalid type of session: {session.GetType().FullName}"),
+    };
+  }
+
+  public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : notnull, ITapoPassThroughRequest, new()
+    where TResponse : ITapoPassThroughResponse
+    => SendRequestAsync(
+      request: new(),
+      requestTypeInfo: requestTypeInfo,
+      responseTypeInfo: responseTypeInfo,
+      cancellationToken: cancellationToken
+    );
+
+  public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : notnull, ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+    => SendRequestAsync(
+      request: request,
+      requestTypeInfo: requestTypeInfo,
+      requestTypeInfoForLogging: requestTypeInfo,
+      responseTypeInfo: responseTypeInfo,
+      cancellationToken: cancellationToken
+    );
+
+  public ValueTask<TResponse> SendRequestAsync<TRequest, TResponse>(
+    TRequest request,
+    JsonTypeInfo<TRequest> requestTypeInfo,
+    JsonTypeInfo<TRequest> requestTypeInfoForLogging,
+    JsonTypeInfo<TResponse> responseTypeInfo,
+    CancellationToken cancellationToken = default
+  )
+    where TRequest : notnull, ITapoPassThroughRequest
+    where TResponse : ITapoPassThroughResponse
+  {
+    if (request is null)
+      throw new ArgumentNullException(nameof(request));
+
+    ThrowIfDisposed();
+
+    return session switch {
+      null => throw new InvalidOperationException("The session for this instance has not been established."),
+      TapoSecurePassThroughSession securePassThroughSession => PostSecurePassThroughRequestAsync(
+        securePassThroughSession: securePassThroughSession,
+        request: request,
+        requestTypeInfo: requestTypeInfo,
+        requestTypeInfoForLogging: requestTypeInfoForLogging,
+        responseTypeInfo: responseTypeInfo,
+        cancellationToken: cancellationToken
+      ),
+      TapoKlapSession klapSession => PostKlapRequestAsync(
+        klapSession: klapSession,
+        request: request,
+        requestTypeInfo: requestTypeInfo,
+        responseTypeInfo: responseTypeInfo,
         cancellationToken: cancellationToken
       ),
       _ => throw new InvalidOperationException($"Invalid type of session: {session.GetType().FullName}"),

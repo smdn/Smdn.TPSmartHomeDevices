@@ -8,13 +8,13 @@ SPDX-License-Identifier: MIT
     <VersionPrefix>2.1.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageValidationBaselineVersion>2.0.0</PackageValidationBaselineVersion>
-    <IsTrimmable>false</IsTrimmable>
-    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>CA1848;$(NoWarn)</NoWarn> <!-- CA1848: For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogXxxxx(...)' -->
     <NoWarn>CS1591;$(NoWarn)</NoWarn> <!-- CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member' -->
+    <!-- Suppress assembly AOT compatibility warning in the CI/CD environment (packaging and testing) -->
+    <NoWarn Condition="'$(ContinuousIntegrationBuild)' == 'true'">$(NoWarn);IL3058</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="assembly attributes">
@@ -29,12 +29,24 @@ SPDX-License-Identifier: MIT
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="10.0.0" />
     <ProjectOrPackageReference ReferencePackageVersion="[1.1.1,2.0.0)" Include="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
   </ItemGroup>
 
+  <ItemGroup
+    Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))"
+    Label="Update to AOT-ready package version"
+  >
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    <ProjectOrPackageReference ReferencePackageVersion="[1.4.0,2.0.0)" Update="..\Smdn.TPSmartHomeDevices.Primitives\Smdn.TPSmartHomeDevices.Primitives.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\FeatureRequirementMessages.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\None.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ObsoleteMessages.cs" />
     <Compile Include="..\Common\Smdn.TPSmartHomeDevices\ServiceProviderExtensions.cs" />
+    <Compile Include="..\Common\Smdn.TPSmartHomeDevices\UnconditionalSuppressMessages.cs" />
     <Compile Include="..\Common\System.Runtime.CompilerServices\IsExternalInit.cs" />
     <Compile Include="..\Common\System.Threading.Tasks\ValueTaskShim.cs" />
   </ItemGroup>

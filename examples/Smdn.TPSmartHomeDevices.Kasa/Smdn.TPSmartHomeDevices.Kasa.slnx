@@ -24,4 +24,7 @@ SPDX-License-Identifier: MIT
   <Folder Name="/Logging/">
     <Project Path="Logging/Program.csproj" />
   </Folder>
+  <Folder Name="/NativeAOT/">
+    <Project Path="NativeAOT/Program.csproj" />
+  </Folder>
 </Solution>

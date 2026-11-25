@@ -1,0 +1,8 @@
+# Native AOT
+This sample demonstrates Native AOT compilation. Executing `dotnet publish` enables the deployment of a precompiled application via [Native AOT compilation](https://learn.microsoft.com/dotnet/core/deploying/native-aot/).
+
+## Notes on AOT Compatibility
+
+`Smdn.TPSmartHomeDevices.MacAddressEndPoint` itself and the majority of its dependencies are AOT compatible. However, certain dependencies (including transitive ones) do not yet explicitly declare AOT compatibility (meaning they lack `IsAotCompatible=true` in their assembly metadata), despite their execution paths being implicitly AOT compatible. Consequently, AOT compilation may trigger warnings such as [IL3058](https://learn.microsoft.com/dotnet/core/deploying/native-aot/warnings/il3058), and potential runtime issues (such as unexpected missing metadata or execution failures) cannot be completely ruled out.
+
+`Smdn.TPSmartHomeDevices.MacAddressEndPoint` depends on [Smdn.Net.AddressResolution](https://www.nuget.org/packages/Smdn.Net.AddressResolution) for address resolution. This library relies on [Vanara.PInvoke.IpHlpApi](https://www.nuget.org/packages/Vanara.PInvoke.IpHlpApi), which is not marked as `IsAotCompatible=true`, to call the Windows native API. `Smdn.Net.AddressResolution` uses a Windows-specific implementation that is incompatible with AOT compilation via `Vanara.PInvoke.IpHlpApi` only when Windows (such as `net10.0-windows7.0`) is specified as the `<TargetFramework>`; as a result, warning `IL3058 ` is reported. On the other hand, if the `<TargetFramework>` is set to an OS-independent one such as `net10.0`, a multi-platform and AOT-compatible fallback implementation is used instead of the Windows-specific implementation, and in this case, warning `IL3058` is not reported.
