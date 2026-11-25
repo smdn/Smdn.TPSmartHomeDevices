@@ -1,18 +1,18 @@
-// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.1.0)
+// Smdn.TPSmartHomeDevices.Kasa.dll (Smdn.TPSmartHomeDevices.Kasa-2.2.0)
 //   Name: Smdn.TPSmartHomeDevices.Kasa
-//   AssemblyVersion: 2.1.0.0
-//   InformationalVersion: 2.1.0+66f3966f8c2864562a16625b12052994056bc7d3
+//   AssemblyVersion: 2.2.0.0
+//   InformationalVersion: 2.2.0+8e81ccc9d643813367ec125fa1e8cf7085c77da9
 //   TargetFramework: .NETStandard,Version=v2.1
 //   Configuration: Release
 //   Metadata: RepositoryUrl=https://github.com/smdn/Smdn.TPSmartHomeDevices
 //   Metadata: RepositoryBranch=main
-//   Metadata: RepositoryCommit=66f3966f8c2864562a16625b12052994056bc7d3
+//   Metadata: RepositoryCommit=8e81ccc9d643813367ec125fa1e8cf7085c77da9
 //   Referenced assemblies:
 //     Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Microsoft.Extensions.Logging.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60
 //     Smdn.TPSmartHomeDevices.Primitives, Version=1.1.1.0, Culture=neutral
-//     System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-//     System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Text.Encodings.Web, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+//     System.Text.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 //     netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
 #nullable enable annotations
 
@@ -22,6 +22,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,7 +74,7 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
   }
 
   public class KasaDevice : IDisposable {
-    protected readonly struct NullParameter {
+    internal protected readonly struct NullParameter {
     }
 
     protected static readonly JsonEncodedText MethodTextGetSysInfo; // = "get_sysinfo"
@@ -99,7 +100,10 @@ namespace Smdn.TPSmartHomeDevices.Kasa {
     public ValueTask<KasaDeviceInfo?> GetDeviceInfoAsync(CancellationToken cancellationToken = default) {}
     protected ValueTask<TSysInfo> GetSysInfoAsync<TSysInfo>(Func<JsonElement, TSysInfo> composeResult, CancellationToken cancellationToken = default) {}
     public ValueTask<EndPoint> ResolveEndPointAsync(CancellationToken cancellationToken = default) {}
+    [Obsolete("This method overload is deprecated, and its removal in a future major version release is under consideration. Migrate to the version that takes a `JsonTypeInfo<T>` as an argument.")]
     protected ValueTask SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, CancellationToken cancellationToken) {}
+    protected ValueTask SendRequestAsync<TMethodParameter>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, JsonTypeInfo<TMethodParameter> parametersJsonTypeInfo, CancellationToken cancellationToken) {}
+    [Obsolete("This method overload is deprecated, and its removal in a future major version release is under consideration. Migrate to the version that takes a `JsonTypeInfo<T>` as an argument.")]
     protected ValueTask<TMethodResult> SendRequestAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameters, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
     protected ValueTask<TMethodResult> SendRequestAsync<TMethodResult>(JsonEncodedText module, JsonEncodedText method, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken) {}
     public override string? ToString() {}
@@ -248,7 +252,9 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
     public bool IsConnected { get; }
 
     public void Dispose() {}
+    [Obsolete("This method overload is deprecated, and its removal in a future major version release is under consideration. Migrate to the version that takes a `JsonTypeInfo<T>` as an argument.")]
     public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken = default) {}
+    public ValueTask<TMethodResult> SendAsync<TMethodParameter, TMethodResult>(JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, JsonTypeInfo<TMethodParameter> parameterJsonTypeInfo, Func<JsonElement, TMethodResult> composeResult, CancellationToken cancellationToken = default) {}
   }
 
   public static class KasaJsonSerializer {
@@ -257,7 +263,9 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
     public static void DecryptInPlace(Span<byte> body) {}
     public static JsonElement Deserialize(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method, ILogger? logger = null) {}
     public static void EncryptInPlace(Span<byte> body) {}
+    [Obsolete("This method overload is deprecated, and its removal in a future major version release is under consideration. Migrate to the version that takes a `JsonTypeInfo<T>` as an argument.")]
     public static void Serialize<TMethodParameter>(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, ILogger? logger = null) {}
+    public static void Serialize<TMethodParameter>(ArrayBufferWriter<byte> buffer, JsonEncodedText module, JsonEncodedText method, TMethodParameter parameter, JsonTypeInfo<TMethodParameter> parameterJsonTypeInfo, ILogger? logger = null) {}
   }
 
   public class KasaMessageBodyTooShortException : KasaMessageException {
@@ -275,5 +283,5 @@ namespace Smdn.TPSmartHomeDevices.Kasa.Protocol {
     public KasaMessageHeaderTooShortException(string message) {}
   }
 }
-// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.7.1.0.
-// Smdn.Reflection.ReverseGenerating.ListApi.Core v1.5.0.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
+// API list generated by Smdn.Reflection.ReverseGenerating.ListApi.MSBuild.Tasks v1.9.0.0.
+// Smdn.Reflection.ReverseGenerating.ListApi.Core v1.6.2.0 (https://github.com/smdn/Smdn.Reflection.ReverseGenerating)
