@@ -9,4 +9,7 @@ SPDX-License-Identifier: MIT
   <Folder Name="/MacAddressResolution/">
     <Project Path="MacAddressResolution/Program.csproj" />
   </Folder>
+  <Folder Name="/NativeAOT/">
+    <Project Path="NativeAOT/Program.csproj" />
+  </Folder>
 </Solution>
